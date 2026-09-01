@@ -3,8 +3,6 @@ import json
 import struct
 from pathlib import Path
 
-import ooz
-
 from data_manager import PalStorageDataManager
 
 
@@ -98,14 +96,58 @@ CSV_FIELDS = [
 
 
 def decompress_save(path):
-    raw = path.read_bytes()
+    raw = Path(path).read_bytes()
     uncompressed_len, compressed_len = struct.unpack_from("<II", raw, 0)
     if raw[8:12] != b"PlM1":
         raise ValueError(f"Expected PlM1 Oodle save, got {raw[8:12]!r}")
+
+    import ooz
+
     data = ooz.decompress(raw[12 : 12 + compressed_len], uncompressed_len)
     if data[:4] != b"GVAS":
         raise ValueError("Decoded payload does not start with GVAS")
     return data
+
+
+def build_manager(resources_path=RESOURCES_PATH):
+    resources_path = Path(resources_path)
+    return PalStorageDataManager(
+        active_skill_lookup=PalStorageDataManager.load_active_skill_lookup(
+            resources_path / "active_skills_lookup.json"
+        ),
+        passive_skill_lookup=PalStorageDataManager.load_passive_skill_lookup(
+            resources_path / "passive_skills_lookup.json"
+        ),
+        passive_rank_lookup=PalStorageDataManager.load_passive_rank_lookup(
+            resources_path / "passive_ranks_lookup.lua"
+        ),
+        pal_lookup=PalStorageDataManager.load_pal_name_lookup(
+            resources_path / "pal_names_lookup.lua"
+        ),
+    )
+
+
+def extract_decoded_save(decoded_save, resources_path=RESOURCES_PATH):
+    manager = build_manager(resources_path)
+    return manager.extract_records(decoded_save)
+
+
+def extract_decoded_save_to_json(decoded_save_path, resources_path=RESOURCES_PATH, flattened=False):
+    decoded_save = Path(decoded_save_path).read_bytes()
+    result = extract_decoded_save(decoded_save, resources_path)
+    records = result["records"]
+    if flattened:
+        records = [flatten_record(item) for item in records]
+    return json.dumps(records)
+
+
+def extract_save_to_json(save_path=SAVE_PATH, resources_path=RESOURCES_PATH, flattened=False):
+    decoded_save = decompress_save(Path(save_path))
+    result = extract_decoded_save(decoded_save, resources_path)
+    records = result["records"]
+    if flattened:
+        records = [flatten_record(item) for item in records]
+    return json.dumps(records)
 
 
 def join_values(values):
@@ -212,27 +254,15 @@ def write_csv(records):
 
 
 def main():
-    manager = PalStorageDataManager(
-        active_skill_lookup=PalStorageDataManager.load_active_skill_lookup(
-            ACTIVE_SKILL_LOOKUP_PATH
-        ),
-        passive_skill_lookup=PalStorageDataManager.load_passive_skill_lookup(
-            PASSIVE_SKILL_LOOKUP_PATH
-        ),
-        passive_rank_lookup=PalStorageDataManager.load_passive_rank_lookup(
-            PASSIVE_RANK_LOOKUP_PATH
-        ),
-        pal_lookup=PalStorageDataManager.load_pal_name_lookup(PAL_NAME_LOOKUP_PATH),
-    )
-
     OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
     decoded_save = decompress_save(SAVE_PATH)
     GVAS_PATH.write_bytes(decoded_save)
-    result = manager.extract_records(decoded_save)
+    result = extract_decoded_save(decoded_save)
     records = result["records"]
 
     JSON_PATH.write_text(json.dumps(records, indent=2), encoding="utf-8")
     csv_path = write_csv(records)
+    manager = build_manager()
 
     print(
         json.dumps(
