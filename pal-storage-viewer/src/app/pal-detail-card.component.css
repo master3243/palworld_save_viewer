@@ -1,0 +1,89 @@
+.card {
+  background:
+    linear-gradient(180deg, rgba(18, 52, 78, 0.98), rgba(10, 29, 46, 0.98));
+  border: 1px solid rgba(135, 226, 255, 0.36);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 32px rgba(0, 0, 0, 0.32);
+  color: #e8f8ff;
+  margin: 14px;
+  max-width: calc(100% - 28px);
+  min-width: 0;
+  overflow: hidden;
+  padding: 18px;
+}
+
+header {
+  border-bottom: 1px solid rgba(151, 224, 255, 0.18);
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+}
+
+h2 {
+  color: #ffffff;
+  font-size: 1.45rem;
+  line-height: 1.15;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+p {
+  color: #8fdcff;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+dl {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  margin: 0;
+  min-width: 0;
+}
+
+div {
+  cursor: default;
+}
+
+.field {
+  background: rgba(4, 16, 27, 0.48);
+  border: 1px solid rgba(151, 224, 255, 0.12);
+  border-radius: 8px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.field.expandable {
+  cursor: pointer;
+}
+
+.field.expandable:hover {
+  border-color: rgba(151, 224, 255, 0.32);
+}
+
+dt {
+  color: #91dfff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+dd {
+  display: -webkit-box;
+  color: #f4fbff;
+  margin: 0;
+  max-height: 4.8em;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  white-space: normal;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.field.expanded dd {
+  display: block;
+  max-height: none;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}

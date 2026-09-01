@@ -1,9 +1,17 @@
 <main class="page">
   <section class="toolbar">
-    <h1>Palworld Storage Viewer</h1>
+    <span class="logo-crop">
+      <img
+        class="title-logo"
+        src="https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/logo.png?t=1622889070"
+        alt="Palworld"
+      >
+    </span>
+    <span class="viewer-title">Storage Viewer</span>
   </section>
 
   <label
+    *ngIf="!rows.length"
     class="dropzone"
     [class.dragging]="isDragging"
     [class.busy]="isParsing"
@@ -19,17 +27,108 @@
   <p class="error" *ngIf="error">{{ error }}</p>
 
   <section class="table-shell" *ngIf="rows.length">
-    <div class="table-scroll">
+    <div class="table-tools">
+      <button
+        class="gear-button"
+        type="button"
+        aria-label="Column settings"
+        [attr.aria-expanded]="isColumnMenuOpen"
+        (click)="toggleColumnMenu()"
+      >
+        &#9881;
+      </button>
+
+      <div class="column-menu" *ngIf="isColumnMenuOpen">
+        <label *ngFor="let column of columns; trackBy: trackColumn">
+          <input type="checkbox" [checked]="column.visible" (change)="toggleColumn(column)">
+          <span>{{ column.title }}</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="table-scroll" #tableScroll (scroll)="onTableScroll($event)">
       <table>
         <thead>
           <tr>
-            <th *ngFor="let column of columns">{{ column.label }}</th>
+            <th class="arrow-cell"></th>
+            <th
+              *ngFor="let column of displayedColumns; trackBy: trackColumn"
+              [class.pal-name-cell]="column.key === 'pal_name'"
+              [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky'"
+              [class.sorted]="sortColumn === column.key"
+              [title]="column.title"
+              (click)="toggleSort(column)"
+            >
+              <span class="header-label">{{ column.label }}</span>
+              <span class="sort-marker">{{ sortMarker(column) }}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of rows">
-            <td *ngFor="let column of columns" [title]="cellValue(row, column.key)">
-              {{ cellValue(row, column.key) }}
+          <tr class="spacer-row" *ngIf="topSpacerHeight > 0">
+            <td [attr.colspan]="detailColspan" [style.height.px]="topSpacerHeight"></td>
+          </tr>
+          <ng-container *ngFor="let item of virtualRows; trackBy: trackVirtualRow">
+            <tr
+              class="data-row"
+              [class.open]="isRowOpen(item.index)"
+              (click)="toggleRow(item.index)"
+            >
+              <td class="arrow-cell">
+                <span class="row-arrow" [class.open]="isRowOpen(item.index)">&gt;</span>
+              </td>
+              <td
+                *ngFor="let column of displayedColumns; trackBy: trackColumn"
+                [class.pal-name-cell]="column.key === 'pal_name'"
+                [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky'"
+                [title]="cellTitle(item.row, column)"
+              >
+                <span
+                  *ngIf="column.key === 'pal_variant' && isAlpha(item.row)"
+                  aria-label="Alpha"
+                >
+                  <img class="alpha-icon" src="alpha.png" alt="Alpha">
+                </span>
+                <span
+                  *ngIf="column.key === 'gender' && isFemale(item.row)"
+                  class="gender-icon female"
+                  aria-label="Female"
+                >
+                  ♀
+                </span>
+                <span
+                  *ngIf="column.key === 'gender' && isMale(item.row)"
+                  class="gender-icon male"
+                  aria-label="Male"
+                >
+                  ♂
+                </span>
+                <span
+                  *ngIf="column.key === 'is_lucky' && isLucky(item.row)"
+                  class="lucky-icon"
+                  aria-label="Lucky"
+                >
+                  ★
+                </span>
+                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky'">
+                  {{ cellDisplay(item.row, column) }}
+                </ng-container>
+              </td>
+            </tr>
+            <tr class="detail-row" *ngIf="isRowOpen(item.index)">
+              <td [attr.colspan]="detailColspan">
+                <app-pal-detail-card [row]="item.row"></app-pal-detail-card>
+              </td>
+            </tr>
+          </ng-container>
+          <tr class="spacer-row" *ngIf="bottomSpacerHeight > 0">
+            <td [attr.colspan]="detailColspan" [style.height.px]="bottomSpacerHeight"></td>
+          </tr>
+          <tr *ngIf="!displayedColumns.length">
+            <td [attr.colspan]="detailColspan">
+              <button class="empty-columns" type="button" (click)="toggleColumnMenu()">
+                &#9881;
+              </button>
             </td>
           </tr>
         </tbody>

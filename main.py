@@ -151,7 +151,7 @@ def extract_save_to_json(save_path=SAVE_PATH, resources_path=RESOURCES_PATH, fla
 
 
 def join_values(values):
-    return ";".join(str(value) for value in values if value is not None)
+    return ", ".join(str(value) for value in values if value is not None)
 
 
 def flatten_record(item):

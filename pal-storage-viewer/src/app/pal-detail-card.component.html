@@ -1,0 +1,20 @@
+<article class="card">
+  <header>
+    <h2>{{ name }}</h2>
+    <p *ngIf="subtitle">{{ subtitle }}</p>
+  </header>
+
+  <dl>
+    <div
+      *ngFor="let field of fields"
+      class="field"
+      [class.expandable]="isExpandable(field)"
+      [class.expanded]="isExpanded(field)"
+      (click)="toggleField(field)"
+      [title]="isExpandable(field) ? 'Click to expand' : null"
+    >
+      <dt>{{ field.label }}</dt>
+      <dd>{{ field.value }}</dd>
+    </div>
+  </dl>
+</article>
