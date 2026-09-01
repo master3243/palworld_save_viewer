@@ -348,7 +348,7 @@ class PalStorageDataManager:
                 continue
             try:
                 name, prop_type, _, _ = cls.read_tag_header(data, pos - 4)
-            except (IndexError, struct.error, UnicodeDecodeError):
+            except (IndexError, OverflowError, struct.error, UnicodeDecodeError):
                 continue
             if not prop_type or not prop_type.endswith("Property"):
                 continue

@@ -1,0 +1,153 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100vh;
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.toolbar {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 6px;
+  max-width: 1440px;
+  width: 100%;
+}
+
+h1 {
+  color: #172033;
+  font-size: 2rem;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.dropzone {
+  align-items: center;
+  background: #fbfcfe;
+  border: 1px dashed #93a1b8;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 1440px;
+  min-height: 112px;
+  padding: 24px;
+  text-align: center;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.dropzone.dragging {
+  background: #eef9f7;
+  border-color: #0f766e;
+  transform: translateY(-1px);
+}
+
+.dropzone.busy {
+  cursor: progress;
+}
+
+.dropzone input {
+  inline-size: 1px;
+  opacity: 0;
+  position: absolute;
+}
+
+.drop-title {
+  color: #172033;
+  font-size: 1.15rem;
+  font-weight: 750;
+}
+
+.spinner {
+  animation: spin 850ms linear infinite;
+  block-size: 24px;
+  border: 3px solid #d7dce5;
+  border-top-color: #0f766e;
+  border-radius: 50%;
+  inline-size: 24px;
+}
+
+.error {
+  color: #b42318;
+  margin: 0 auto 18px;
+  max-width: 1440px;
+}
+
+.table-shell {
+  background: #ffffff;
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 auto;
+  max-width: 1440px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.table-scroll {
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  min-width: 1500px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid #edf0f5;
+  max-width: 360px;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f6f8fb;
+  color: #344054;
+  font-weight: 750;
+  overflow: hidden;
+  position: sticky;
+  text-overflow: ellipsis;
+  top: 0;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 18px;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,39 @@
+<main class="page">
+  <section class="toolbar">
+    <h1>Palworld Storage Viewer</h1>
+  </section>
+
+  <label
+    class="dropzone"
+    [class.dragging]="isDragging"
+    [class.busy]="isParsing"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+  >
+    <input type="file" accept=".sav,.gvas" (change)="onFileInput($event)">
+    <span class="spinner" *ngIf="isParsing" aria-hidden="true"></span>
+    <span class="drop-title">{{ isParsing ? 'Loading' : 'Drop save file here' }}</span>
+  </label>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <section class="table-shell" *ngIf="rows.length">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let column of columns">{{ column.label }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows">
+            <td *ngFor="let column of columns" [title]="cellValue(row, column.key)">
+              {{ cellValue(row, column.key) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
