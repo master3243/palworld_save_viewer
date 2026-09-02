@@ -92,6 +92,16 @@
   <section class="table-shell" *ngIf="rows.length">
     <div class="table-tools">
       <button
+        class="export-button"
+        type="button"
+        aria-label="Download full raw data as CSV"
+        (click)="exportRawCsv()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v12m0 0 5-5m-5 5-5-5M5 19h14"/>
+        </svg>
+      </button>
+      <button
         class="gear-button"
         type="button"
         aria-label="Column settings"

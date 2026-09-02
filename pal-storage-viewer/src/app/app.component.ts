@@ -246,6 +246,29 @@ export class AppComponent {
     this.isDropHelpOpen = false;
   }
 
+  exportRawCsv(): void {
+    if (!this.originalRows.length) return;
+
+    const keys = Array.from(new Set(this.originalRows.flatMap((row) => Object.keys(row))));
+    const lines = [
+      keys.map((key) => this.csvValue(key)).join(','),
+      ...this.originalRows.map((row) => keys.map((key) => this.csvValue(row[key])).join(','))
+    ];
+    const blob = new Blob([`\uFEFF${lines.join('\r\n')}`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'pal-storage-full.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private csvValue(value: unknown): string {
+    if (value === null || value === undefined) return '';
+    const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
   closeDemoPrompt(): void {
     this.isDemoPromptOpen = false;
   }
