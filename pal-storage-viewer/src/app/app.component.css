@@ -9,6 +9,39 @@
   position: relative;
 }
 
+.github-link {
+  align-items: center;
+  bottom: 8px;
+  color: #68c9ee;
+  display: flex;
+  height: 28px;
+  justify-content: center;
+  left: 26px;
+  opacity: 0.72;
+  position: fixed;
+  transition: color 150ms ease, filter 150ms ease, opacity 150ms ease;
+  width: 28px;
+  z-index: 10;
+}
+
+.github-link svg {
+  fill: currentColor;
+  height: 22px;
+  width: 22px;
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  color: #8ee5ff;
+  filter: drop-shadow(0 0 4px rgba(92, 211, 248, 0.42));
+  opacity: 1;
+}
+
+.github-link:focus-visible {
+  outline: 1px solid rgba(142, 229, 255, 0.7);
+  outline-offset: 2px;
+}
+
 .toolbar {
   align-items: center;
   display: flex;
