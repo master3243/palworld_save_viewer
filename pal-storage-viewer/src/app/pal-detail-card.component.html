@@ -1,20 +1,118 @@
 <article class="card">
-  <header>
-    <h2>{{ name }}</h2>
-    <p *ngIf="subtitle">{{ subtitle }}</p>
-  </header>
+  <section class="pal-profile">
+    <header class="identity">
+      <div class="level-block">
+        <span>Level</span>
+        <strong>{{ valueFor('level') || '—' }}</strong>
+      </div>
 
-  <dl>
-    <div
-      *ngFor="let field of fields"
-      class="field"
-      [class.expandable]="isExpandable(field)"
-      [class.expanded]="isExpanded(field)"
-      (click)="toggleField(field)"
-      [title]="isExpandable(field) ? 'Click to expand' : null"
-    >
-      <dt>{{ field.label }}</dt>
-      <dd>{{ field.value }}</dd>
+      <div class="name-block">
+        <div class="name-line">
+          <h2>{{ name }}</h2>
+          <img *ngIf="isAlpha && alphaImageSrc" class="alpha-badge" [src]="alphaImageSrc" alt="Alpha" title="Alpha Pal">
+          <span *ngIf="isLucky" class="lucky-badge" title="Lucky Pal">★ Lucky</span>
+          <span *ngIf="gender" class="gender" [class.female]="gender === 'Female'">
+            {{ gender === 'Female' ? '♀' : gender === 'Male' ? '♂' : gender }}
+          </span>
+        </div>
+        <p>{{ subtitle || 'Pal profile' }}</p>
+      </div>
+
+      <div class="rank-block" *ngIf="valueFor('rank')">
+        <span>Rank</span>
+        <div class="stars" [attr.aria-label]="'Rank ' + valueFor('rank')">
+          <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
+        </div>
+      </div>
+    </header>
+
+    <div class="profile-body">
+      <div class="portrait" aria-hidden="true">
+        <div class="portrait-ring">
+          <img
+            *ngIf="palImageSrc && !palImageFailed; else portraitFallback"
+            [src]="palImageSrc"
+            [alt]="name"
+            (error)="palImageFailed = true"
+          >
+          <ng-template #portraitFallback><span>{{ initials }}</span></ng-template>
+        </div>
+        <small>{{ valueFor('species_id') }}</small>
+      </div>
+
+      <div class="vitals">
+        <div class="vital-row hp" *ngIf="valueFor('hp')">
+          <span class="vital-icon">♥</span>
+          <span class="vital-label">HP</span>
+          <strong>{{ valueFor('hp') }}</strong>
+        </div>
+        <div class="vital-row shield" *ngIf="valueFor('shield_hp')">
+          <span class="vital-icon">◆</span>
+          <span class="vital-label">Shield</span>
+          <strong>{{ valueFor('shield_hp') }}</strong>
+        </div>
+
+        <div class="stat-panels">
+          <section class="stat-panel" *ngIf="ivStats.length">
+            <h3>IV</h3>
+            <div *ngFor="let stat of ivStats" class="stat">
+              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small><strong>{{ stat.value }}</strong>
+            </div>
+          </section>
+          <section class="stat-panel soul-panel" *ngIf="soulStats.length">
+            <h3>SR</h3>
+            <div *ngFor="let stat of soulStats" class="stat">
+              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small><strong>{{ stat.value }}</strong>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
-  </dl>
+
+    <div class="skill-layout" *ngIf="passiveSkills.length || activeMoves.length">
+      <section class="skill-group" *ngIf="passiveSkills.length">
+        <h3>Passive Skills</h3>
+        <div class="skill-chips">
+          <span
+            *ngFor="let skill of passiveSkills"
+            class="skill-chip"
+            [attr.data-tone]="skill.color"
+          >
+            {{ skill.name }}
+            <img
+              *ngIf="imageSource(skill.rankIcon) as rankIconSource"
+              class="passive-rank-icon"
+              [src]="rankIconSource"
+              [alt]="skill.rankMarker"
+              [title]="'Passive rank ' + skill.rankMarker"
+            >
+          </span>
+        </div>
+      </section>
+
+      <section class="skill-group" *ngIf="activeMoves.length">
+        <h3>Active Skills</h3>
+        <div class="move-list">
+          <span *ngFor="let move of activeMoves"><i>◆</i>{{ move }}</span>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="additional" *ngIf="fields.length">
+    <h3><span>Additional details</span></h3>
+    <dl>
+      <div
+        *ngFor="let field of fields"
+        class="field"
+        [class.expandable]="isExpandable(field)"
+        [class.expanded]="isExpanded(field)"
+        (click)="toggleField(field)"
+        [title]="field.rawValue ? 'Raw: ' + field.rawValue : (isExpandable(field) ? 'Click to expand' : null)"
+      >
+        <dt>{{ field.label }}</dt>
+        <dd>{{ field.value }}</dd>
+      </div>
+    </dl>
+  </section>
 </article>

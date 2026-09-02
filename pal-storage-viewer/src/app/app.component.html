@@ -122,7 +122,7 @@
                   *ngIf="column.key === 'pal_variant' && isAlpha(item.row)"
                   aria-label="Alpha"
                 >
-                  <img class="alpha-icon" src="alpha.png" alt="Alpha">
+                  <img *ngIf="alphaImageSrc" class="alpha-icon" [src]="alphaImageSrc" alt="Alpha">
                 </span>
                 <span
                   *ngIf="column.key === 'gender' && isFemale(item.row)"

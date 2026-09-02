@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
+import { OfflineImageService } from './offline-image.service';
 import { PalStorageRow, SaveParserService } from './save-parser.service';
 
 interface TableColumn {
@@ -43,6 +44,7 @@ export class AppComponent {
   viewportHeight = 560;
   palNameWidth = 140;
   detailHeight = 0;
+  alphaImageSrc = '';
 
   private readonly demoSaveName = '00000000000000000000000000000001_dps.sav';
   private readonly demoSaveUrl = `resources/example_save/${this.demoSaveName}`;
@@ -179,7 +181,16 @@ export class AppComponent {
     'last_jumped_z'
   ];
 
-  constructor(private readonly parser: SaveParserService) {}
+  constructor(
+    private readonly parser: SaveParserService,
+    private readonly offlineImages: OfflineImageService,
+    private readonly changeDetector: ChangeDetectorRef
+  ) {
+    void this.offlineImages.load('assets/ui/alpha.pog').then((source) => {
+      this.alphaImageSrc = source;
+      this.changeDetector.markForCheck();
+    });
+  }
 
   async onFileInput(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
