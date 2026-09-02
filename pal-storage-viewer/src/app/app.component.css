@@ -251,8 +251,14 @@ th.sorted {
 }
 
 th.icon-cell {
-  padding-left: 4px;
-  padding-right: 4px;
+  padding-left: 2px;
+  padding-right: 2px;
+  transition: width 160ms ease;
+}
+
+/* Room for the sort arrow next to a one-letter label. */
+th.icon-cell.sorted {
+  width: 46px;
 }
 
 th.icon-cell .header-label {
@@ -262,14 +268,15 @@ th.icon-cell .header-label {
 }
 
 th.icon-cell .sort-marker {
-  display: none;
+  font-size: 0.62rem;
+  margin-right: 2px;
 }
 
 .sort-marker {
   color: #8ee8ff;
   display: inline-block;
   font-size: 0.72rem;
-  margin-left: 4px;
+  margin-right: 4px;
   min-width: 0;
 }
 
@@ -285,8 +292,14 @@ td.arrow-cell {
   width: 34px;
 }
 
+/*
+ * Fixed so every row is identical regardless of content: icon cells use a
+ * larger font-size, so a row with a gender glyph would otherwise be taller
+ * than one without, and the virtual scroll model assumes uniform rows.
+ */
 .data-row {
   cursor: pointer;
+  height: 40px;
 }
 
 .data-row.open {
@@ -317,7 +330,17 @@ td.pal-name-cell {
   overflow: visible;
   text-overflow: clip;
   white-space: nowrap;
-  width: 180px;
+}
+
+/* Wide enough for four digits, or the header plus its sort arrow. */
+th.slot-cell,
+td.slot-cell {
+  width: 64px;
+}
+
+th.soul-rank-cell,
+td.soul-rank-cell {
+  width: 96px;
 }
 
 th.icon-cell,
@@ -325,19 +348,21 @@ td.icon-cell {
   color: #ffffff;
   font-weight: 900;
   text-align: center;
-  width: 42px;
+  width: 24px;
 }
 
 td.icon-cell {
   color: #7fd9ff;
   font-size: 1.08rem;
+  padding-left: 2px;
+  padding-right: 2px;
 }
 
 .gender-icon {
   display: inline-block;
-  font-size: 1.22rem;
+  font-size: 1.02rem;
   line-height: 1;
-  text-shadow: 0 0 10px currentColor;
+  text-shadow: 0 0 3px currentColor;
 }
 
 .gender-icon.female {

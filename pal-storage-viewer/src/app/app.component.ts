@@ -41,11 +41,17 @@ export class AppComponent {
   sortDirection: SortDirection = null;
   scrollTop = 0;
   viewportHeight = 560;
+  palNameWidth = 140;
+  detailHeight = 0;
 
   private readonly demoSaveName = '00000000000000000000000000000001_dps.sav';
   private readonly demoSaveUrl = `resources/example_save/${this.demoSaveName}`;
 
-  private readonly rowHeight = 37;
+  private measureContext?: CanvasRenderingContext2D;
+
+  // Measured from the DOM after render; 40 matches the CSS row height and is
+  // only the value used before the first measurement lands.
+  private rowHeight = 40;
   private readonly virtualBuffer = 12;
 
   get displayedColumns(): TableColumn[] {
@@ -57,14 +63,46 @@ export class AppComponent {
   }
 
   get virtualStartIndex(): number {
-    return Math.max(0, Math.floor(this.scrollTop / this.rowHeight) - this.virtualBuffer);
+    return Math.max(0, this.indexAtOffset(this.scrollTop) - this.virtualBuffer);
   }
 
   get virtualEndIndex(): number {
     return Math.min(
       this.rows.length,
-      Math.ceil((this.scrollTop + this.viewportHeight) / this.rowHeight) + this.virtualBuffer
+      this.indexAtOffset(this.scrollTop + this.viewportHeight) + 1 + this.virtualBuffer
     );
+  }
+
+  /**
+   * Rows are a uniform `rowHeight` apart, except that an open detail card
+   * inserts `detailHeight` after its row. Everything below is pushed down by
+   * that much, so scroll offsets cannot be divided by `rowHeight` alone.
+   */
+  private get extraHeight(): number {
+    return this.openRowIndex === null ? 0 : this.detailHeight;
+  }
+
+  private get totalContentHeight(): number {
+    return this.rows.length * this.rowHeight + this.extraHeight;
+  }
+
+  /** Distance from the top of the list to the top of row `index`. */
+  private rowOffset(index: number): number {
+    const pushedDown = this.openRowIndex !== null && index > this.openRowIndex;
+    return index * this.rowHeight + (pushedDown ? this.detailHeight : 0);
+  }
+
+  /** Inverse of rowOffset: which row is at this scroll offset. */
+  private indexAtOffset(offset: number): number {
+    const openIndex = this.openRowIndex;
+    if (openIndex === null || this.detailHeight <= 0) {
+      return Math.floor(offset / this.rowHeight);
+    }
+
+    const cardTop = (openIndex + 1) * this.rowHeight;
+    if (offset < cardTop) return Math.floor(offset / this.rowHeight);
+    if (offset < cardTop + this.detailHeight) return openIndex;
+    return Math.floor((offset - this.detailHeight) / this.rowHeight);
   }
 
   get virtualRows(): VirtualRow[] {
@@ -75,11 +113,11 @@ export class AppComponent {
   }
 
   get topSpacerHeight(): number {
-    return this.virtualStartIndex * this.rowHeight;
+    return this.rowOffset(this.virtualStartIndex);
   }
 
   get bottomSpacerHeight(): number {
-    return Math.max(0, (this.rows.length - this.virtualEndIndex) * this.rowHeight);
+    return Math.max(0, this.totalContentHeight - this.rowOffset(this.virtualEndIndex));
   }
 
   private readonly defaultVisibleColumns = new Set([
@@ -89,6 +127,7 @@ export class AppComponent {
     'pal_variant',
     'gender',
     'is_lucky',
+    'favorite_index',
     'nickname',
     'level',
     'rank',
@@ -127,7 +166,6 @@ export class AppComponent {
     'is_lucky',
     'is_awakening',
     'is_player',
-    'favorite_index',
     'voice_id',
     'skin_name',
     'friendship_points',
@@ -211,6 +249,7 @@ export class AppComponent {
     this.columns = [];
     this.error = '';
     this.openRowIndex = null;
+    this.detailHeight = 0;
     this.sortColumn = null;
     this.sortDirection = null;
     this.scrollTop = 0;
@@ -221,6 +260,8 @@ export class AppComponent {
       this.originalRows = rows;
       this.rows = [...rows];
       this.columns = this.buildColumns(rows);
+      this.palNameWidth = this.measurePalNameWidth(rows);
+      this.scheduleMeasure();
     } catch (error) {
       this.error = error instanceof Error ? error.message : 'Could not load this save file.';
     } finally {
@@ -247,6 +288,7 @@ export class AppComponent {
       this.sortDirection = null;
     }
     this.openRowIndex = null;
+    this.detailHeight = 0;
     this.resetTableScroll();
     this.applySort();
   }
@@ -258,6 +300,33 @@ export class AppComponent {
 
   toggleRow(index: number): void {
     this.openRowIndex = this.openRowIndex === index ? null : index;
+    this.detailHeight = 0;
+    this.scheduleMeasure();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    // The detail card is a responsive grid, so its height changes with width.
+    this.scheduleMeasure();
+  }
+
+  /**
+   * The virtual scroll model has to match real layout exactly: any per-row
+   * error compounds with scroll depth. Measure rather than assume.
+   */
+  private scheduleMeasure(): void {
+    requestAnimationFrame(() => {
+      const scroller = this.tableScroll?.nativeElement;
+      if (!scroller) return;
+
+      const row = scroller.querySelector<HTMLElement>('.data-row');
+      if (row?.offsetHeight) this.rowHeight = row.offsetHeight;
+
+      if (scroller.clientHeight) this.viewportHeight = scroller.clientHeight;
+
+      const card = scroller.querySelector<HTMLElement>('.detail-row');
+      this.detailHeight = this.openRowIndex === null ? 0 : card?.offsetHeight ?? 0;
+    });
   }
 
   isRowOpen(index: number): boolean {
@@ -299,6 +368,14 @@ export class AppComponent {
     return value ? `${column.title}: ${value}` : column.title;
   }
 
+  isSlotNumber(column: TableColumn): boolean {
+    return column.key === 'storage_slot' || column.key === 'slot_index';
+  }
+
+  isSoulRank(column: TableColumn): boolean {
+    return column.key.startsWith('soul_rank_');
+  }
+
   isAlpha(row: PalStorageRow): boolean {
     return this.cellValue(row, 'pal_variant').toLowerCase() === 'alpha';
   }
@@ -313,6 +390,35 @@ export class AppComponent {
 
   isLucky(row: PalStorageRow): boolean {
     return this.cellValue(row, 'is_lucky').toLowerCase() === 'true';
+  }
+
+  /**
+   * The table is `table-layout: fixed`, so column widths never follow content.
+   * Measure the longest name up front and set the width explicitly instead.
+   */
+  private measurePalNameWidth(rows: PalStorageRow[]): number {
+    const minWidth = 116;
+    const maxWidth = 320;
+    const cellPadding = 26;
+
+    // Header is bold and carries the sort arrow, so it can be the widest thing.
+    let widest = this.measureText('Pal Name', 750) + 18;
+    for (const row of rows) {
+      widest = Math.max(widest, this.measureText(this.cellValue(row, 'pal_name'), 400));
+    }
+
+    return Math.round(Math.min(maxWidth, Math.max(minWidth, widest + cellPadding)));
+  }
+
+  private measureText(text: string, weight: number): number {
+    this.measureContext ??= document.createElement('canvas').getContext('2d') ?? undefined;
+    if (!this.measureContext) return text.length * 7.4;
+
+    const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    this.measureContext.font =
+      `${weight} ${0.84 * rootSize}px Inter, ui-sans-serif, system-ui, -apple-system, ` +
+      `BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    return this.measureContext.measureText(text).width;
   }
 
   private buildColumns(rows: PalStorageRow[]): TableColumn[] {
@@ -373,6 +479,12 @@ export class AppComponent {
     if (key === 'pal_variant') return 'A';
     if (key === 'gender') return 'G';
     if (key === 'is_lucky') return 'L';
+    if (key === 'storage_slot') return 'Slot';
+    if (key === 'slot_index') return 'Ind';
+    if (key === 'favorite_index') return 'FAV';
+    if (key === 'soul_rank_hp') return 'SR HP';
+    if (key === 'soul_rank_attack') return 'SR ATK';
+    if (key === 'soul_rank_defense') return 'SR DEF';
     return this.toTitle(key);
   }
 
@@ -380,6 +492,7 @@ export class AppComponent {
     if (key === 'pal_variant') return 'Alpha';
     if (key === 'is_lucky') return 'Lucky';
     if (key === 'iv_hp') return 'IV HP';
+    if (key === 'soul_rank_hp') return 'Soul Rank HP';
     if (key === 'iv_attack') return 'IV ATK';
     if (key === 'iv_defense') return 'IV DEF';
     return key

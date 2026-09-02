@@ -84,13 +84,16 @@
             <th
               *ngFor="let column of displayedColumns; trackBy: trackColumn"
               [class.pal-name-cell]="column.key === 'pal_name'"
+              [style.width.px]="column.key === 'pal_name' ? palNameWidth : null"
               [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky'"
+              [class.slot-cell]="isSlotNumber(column)"
+              [class.soul-rank-cell]="isSoulRank(column)"
               [class.sorted]="sortColumn === column.key"
               [title]="column.title"
               (click)="toggleSort(column)"
             >
+              <span class="sort-marker" *ngIf="sortMarker(column)">{{ sortMarker(column) }}</span>
               <span class="header-label">{{ column.label }}</span>
-              <span class="sort-marker">{{ sortMarker(column) }}</span>
             </th>
           </tr>
         </thead>
@@ -111,6 +114,8 @@
                 *ngFor="let column of displayedColumns; trackBy: trackColumn"
                 [class.pal-name-cell]="column.key === 'pal_name'"
                 [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky'"
+                [class.slot-cell]="isSlotNumber(column)"
+                [class.soul-rank-cell]="isSoulRank(column)"
                 [title]="cellTitle(item.row, column)"
               >
                 <span
