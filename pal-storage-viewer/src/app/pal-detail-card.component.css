@@ -38,7 +38,6 @@
 .name-block { align-self: center; min-width: 0; padding: 10px 18px; }
 .name-line { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; }
 h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
-.name-block p { color: #7eddf6; font-size: .8rem; margin: 5px 0 0; }
 .gender { color: #58cfff; font-size: 1.25rem; font-weight: 900; }.gender.female { color: #ff6c9d; }
 .lucky-badge { background: rgba(255, 224, 111, .12); border: 1px solid rgba(255, 224, 111, .42); border-radius: 20px; color: #ffe06f; font-size: .68rem; font-weight: 800; padding: 3px 8px; text-transform: uppercase; }
 .alpha-badge { height: 21px; object-fit: contain; width: 21px; }

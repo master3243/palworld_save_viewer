@@ -39,6 +39,7 @@ export class AppComponent {
   isDragging = false;
   isColumnMenuOpen = false;
   isDemoPromptOpen = false;
+  isDropHelpOpen = false;
   openRowIndex: number | null = null;
   sortColumn: string | null = null;
   sortDirection: SortDirection = null;
@@ -146,8 +147,7 @@ export class AppComponent {
     'soul_rank_defense',
     'skills',
     'combat_moves',
-    'learned_moves',
-    'species_id'
+    'learned_moves'
   ]);
 
   private readonly preferredColumnOrder = [
@@ -234,6 +234,16 @@ export class AppComponent {
     event.preventDefault();
     event.stopPropagation();
     this.isDemoPromptOpen = true;
+  }
+
+  toggleDropHelp(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDropHelpOpen = true;
+  }
+
+  closeDropHelp(): void {
+    this.isDropHelpOpen = false;
   }
 
   closeDemoPrompt(): void {
@@ -448,6 +458,16 @@ export class AppComponent {
 
   isIv(column: TableColumn): boolean {
     return column.key.startsWith('iv_');
+  }
+
+  isHighIv(row: PalStorageRow, column: TableColumn): boolean {
+    if (!this.isIv(column)) return false;
+    const value = Number(this.cellValue(row, column.key));
+    return value >= 70 && value < 100;
+  }
+
+  isPerfectIv(row: PalStorageRow, column: TableColumn): boolean {
+    return this.isIv(column) && Number(this.cellValue(row, column.key)) === 100;
   }
 
   isAlpha(row: PalStorageRow): boolean {

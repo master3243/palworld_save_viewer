@@ -38,11 +38,6 @@ export class PalDetailCardComponent implements OnChanges {
     return this.valueFor('nickname') || this.valueFor('pal_name') || this.valueFor('species_id') || 'Pal';
   }
 
-  get subtitle(): string {
-    const species = this.valueFor('pal_name');
-    return [species !== this.name ? species : '', this.valueFor('pal_variant')].filter(Boolean).join(' · ');
-  }
-
   get palpediaUrl(): string {
     return `https://www.palpedia.net/pals/${encodeURIComponent(this.wikiName)}`;
   }

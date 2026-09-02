@@ -23,16 +23,49 @@
     <span class="spinner" *ngIf="isParsing" aria-hidden="true"></span>
     <span class="drop-title">{{ isParsing ? 'Loading' : 'Drop save file here' }}</span>
 
-    <button
-      class="demo-button"
-      type="button"
-      *ngIf="!isParsing"
-      (click)="openDemoPrompt($event)"
-    >
-      <span class="demo-glyph" aria-hidden="true">&#9654;</span>
-      <span>Demo</span>
-    </button>
+    <span class="drop-actions" *ngIf="!isParsing">
+      <button
+        class="demo-button"
+        type="button"
+        (click)="openDemoPrompt($event)"
+      >
+        <span class="demo-glyph" aria-hidden="true">&#9654;</span>
+        <span>Demo</span>
+      </button>
+      <button
+        class="drop-help-button"
+        type="button"
+        aria-label="Save file help"
+        [attr.aria-expanded]="isDropHelpOpen"
+        (click)="toggleDropHelp($event)"
+      >?</button>
+    </span>
   </label>
+
+  <div
+    class="modal-backdrop help-backdrop"
+    *ngIf="isDropHelpOpen"
+    (click)="closeDropHelp()"
+  >
+    <div
+      class="modal help-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dropHelpTitle"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="help-text" id="dropHelpTitle">
+        <p>Upload the "xxx_dps.sav" file to inspect the pals in the storage.</p>
+        <p>The save file (for Steam users) is in:</p>
+        <code class="save-path">%LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\Players\00000000000000000000000000000001_dps.sav</code>
+        <p>Where <code>IDprofile</code> and <code>IDworld</code> are long random numbers.</p>
+        <p>Or choose the demo save file (my personal save file).</p>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-primary" type="button" (click)="closeDropHelp()">Dismiss</button>
+      </div>
+    </div>
+  </div>
 
   <div
     class="modal-backdrop"
@@ -88,6 +121,7 @@
               [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
               [class.slot-cell]="isSlotNumber(column)"
               [class.paldeck-cell]="column.key === 'paldeck_no'"
+              [class.nickname-cell]="column.key === 'nickname'"
               [class.level-cell]="column.key === 'level'"
               [class.rank-cell]="column.key === 'rank'"
               [class.iv-cell]="isIv(column)"
@@ -129,9 +163,12 @@
                 [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
                 [class.slot-cell]="isSlotNumber(column)"
                 [class.paldeck-cell]="column.key === 'paldeck_no'"
+                [class.nickname-cell]="column.key === 'nickname'"
                 [class.level-cell]="column.key === 'level'"
                 [class.rank-cell]="column.key === 'rank'"
                 [class.iv-cell]="isIv(column)"
+                [class.iv-high]="isHighIv(item.row, column)"
+                [class.iv-perfect]="isPerfectIv(item.row, column)"
                 [class.sorted-column]="sortColumn === column.key"
                 [class.soul-rank-cell]="isSoulRank(column)"
                 [title]="cellTitle(item.row, column)"

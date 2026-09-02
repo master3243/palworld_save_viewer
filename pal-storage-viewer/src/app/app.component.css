@@ -431,6 +431,22 @@ td.paldeck-cell {
   width: 48px;
 }
 
+th.nickname-cell,
+td.nickname-cell {
+  box-sizing: border-box;
+  max-width: 90px;
+  min-width: 90px;
+  padding-left: 7px;
+  padding-right: 7px;
+  width: 90px;
+}
+
+th.nickname-cell.sorted {
+  max-width: 106px;
+  min-width: 106px;
+  width: 106px;
+}
+
 th.rank-cell,
 td.rank-cell {
   box-sizing: border-box;
@@ -503,6 +519,16 @@ th.soul-rank-cell.sorted {
   max-width: 72px;
   min-width: 72px;
   width: 72px;
+}
+
+td.iv-cell.iv-high {
+  color: #63e6a3;
+  font-weight: 750;
+}
+
+td.iv-cell.iv-perfect {
+  color: #ff9a45;
+  font-weight: 800;
 }
 
 th.icon-cell,
@@ -600,26 +626,98 @@ tbody tr:hover {
   }
 }
 
+.drop-actions {
+  align-items: center;
+  bottom: 14px;
+  display: flex;
+  gap: 5px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
 .demo-button {
   align-items: center;
   background: rgba(116, 230, 255, 0.07);
   border: 1px solid rgba(123, 214, 255, 0.32);
   border-radius: 999px;
-  bottom: 10px;
   color: #b8ecff;
   cursor: pointer;
   display: inline-flex;
   font-size: 0.7rem;
   font-weight: 600;
   gap: 5px;
-  left: 50%;
   letter-spacing: 0.02em;
   line-height: 1;
   padding: 4px 11px;
-  position: absolute;
-  transform: translateX(-50%);
   white-space: nowrap;
   transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.drop-help-button {
+  align-items: center;
+  background: rgba(116, 230, 255, 0.07);
+  border: 1px solid rgba(123, 214, 255, 0.32);
+  border-radius: 50%;
+  color: #b8ecff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 800;
+  height: 22px;
+  justify-content: center;
+  padding: 0;
+  width: 22px;
+}
+
+.drop-help-button:hover,
+.drop-help-button:focus-visible {
+  background: rgba(116, 230, 255, 0.15);
+  border-color: rgba(149, 243, 255, 0.7);
+  color: #eafaff;
+}
+
+.modal.help-modal {
+  max-width: 840px;
+}
+
+.help-backdrop {
+  backdrop-filter: blur(5px);
+  background: rgba(2, 7, 13, 0.82);
+}
+
+.help-text {
+  color: #d9edf7;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  margin: 0 0 18px;
+  text-align: left;
+}
+
+.help-text p {
+  margin: 0 0 8px;
+}
+
+.help-text code {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(123, 214, 255, 0.18);
+  border-radius: 3px;
+  color: #9fe7ff;
+  font-size: 0.72rem;
+  padding: 1px 4px;
+}
+
+.help-text .save-path {
+  border-radius: 5px;
+  display: block;
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+  padding: 7px 8px;
+  text-align: left;
+}
+
+.help-text p:last-child {
+  margin-bottom: 0;
 }
 
 .demo-button:hover {
