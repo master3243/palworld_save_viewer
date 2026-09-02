@@ -22,7 +22,37 @@
     <input type="file" accept=".sav,.gvas" (change)="onFileInput($event)">
     <span class="spinner" *ngIf="isParsing" aria-hidden="true"></span>
     <span class="drop-title">{{ isParsing ? 'Loading' : 'Drop save file here' }}</span>
+
+    <button
+      class="demo-button"
+      type="button"
+      *ngIf="!isParsing"
+      (click)="openDemoPrompt($event)"
+    >
+      <span class="demo-glyph" aria-hidden="true">&#9654;</span>
+      <span>Demo</span>
+    </button>
   </label>
+
+  <div
+    class="modal-backdrop"
+    *ngIf="isDemoPromptOpen"
+    (click)="closeDemoPrompt()"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="demoPromptTitle"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 class="modal-title" id="demoPromptTitle">Load demo save?</h2>
+      <div class="modal-actions">
+        <button class="modal-ghost" type="button" (click)="closeDemoPrompt()">Cancel</button>
+        <button class="modal-primary" type="button" (click)="loadDemoSave()">Load</button>
+      </div>
+    </div>
+  </div>
 
   <p class="error" *ngIf="error">{{ error }}</p>
 

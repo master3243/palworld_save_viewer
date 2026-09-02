@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
 import { PalStorageRow, SaveParserService } from './save-parser.service';
@@ -35,11 +35,15 @@ export class AppComponent {
   isParsing = false;
   isDragging = false;
   isColumnMenuOpen = false;
+  isDemoPromptOpen = false;
   openRowIndex: number | null = null;
   sortColumn: string | null = null;
   sortDirection: SortDirection = null;
   scrollTop = 0;
   viewportHeight = 560;
+
+  private readonly demoSaveName = '00000000000000000000000000000001_dps.sav';
+  private readonly demoSaveUrl = `resources/example_save/${this.demoSaveName}`;
 
   private readonly rowHeight = 37;
   private readonly virtualBuffer = 12;
@@ -161,6 +165,44 @@ export class AppComponent {
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
     this.isDragging = false;
+  }
+
+  openDemoPrompt(event: Event): void {
+    // The dropzone is a <label> wrapping the file input, so a bare click here
+    // would also pop the OS file picker.
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDemoPromptOpen = true;
+  }
+
+  closeDemoPrompt(): void {
+    this.isDemoPromptOpen = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeDemoPrompt();
+  }
+
+  async loadDemoSave(): Promise<void> {
+    this.isDemoPromptOpen = false;
+    this.error = '';
+    this.isParsing = true;
+
+    let file: File;
+    try {
+      const response = await fetch(this.demoSaveUrl);
+      if (!response.ok) {
+        throw new Error(`Could not load the demo save (${response.status}).`);
+      }
+      file = new File([await response.arrayBuffer()], this.demoSaveName);
+    } catch (error) {
+      this.isParsing = false;
+      this.error = error instanceof Error ? error.message : 'Could not load the demo save.';
+      return;
+    }
+
+    await this.parseFile(file);
   }
 
   private async parseFile(file: File): Promise<void> {
