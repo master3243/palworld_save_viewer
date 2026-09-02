@@ -24,7 +24,7 @@
       <div class="portrait" aria-hidden="true">
         <div class="portrait-rank" *ngIf="valueFor('rank')">
           <span>Rank</span>
-          <div class="stars" [attr.aria-label]="'Rank ' + valueFor('rank')">
+          <div class="stars" [attr.aria-label]="'Rank ' + displayRank + ' of 4'">
             <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
           </div>
         </div>
@@ -46,12 +46,6 @@
           <span class="vital-label">HP</span>
           <strong>{{ valueFor('hp') }}</strong>
         </div>
-        <div class="vital-row shield" *ngIf="valueFor('shield_hp')">
-          <span class="vital-icon">◆</span>
-          <span class="vital-label">Shield</span>
-          <strong>{{ valueFor('shield_hp') }}</strong>
-        </div>
-
         <div class="stat-panels">
           <section class="stat-panel" *ngIf="ivStats.length">
             <h3>IV</h3>

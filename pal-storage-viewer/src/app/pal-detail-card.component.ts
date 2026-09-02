@@ -25,7 +25,7 @@ export class PalDetailCardComponent implements OnChanges {
 
   private readonly featuredKeys = new Set([
     'pal_name', 'pal_variant', 'species_id', 'nickname', 'filtered_nickname',
-    'level', 'rank', 'gender', 'is_lucky', 'hp', 'shield_hp',
+    'level', 'rank', 'gender', 'is_lucky', 'hp',
     'iv_hp', 'iv_attack', 'iv_defense', 'soul_rank_hp', 'soul_rank_attack',
     'soul_rank_defense', 'skills', 'skill_ranks', 'skill_colors',
     'passive_skill_ids', 'combat_moves', 'active_skill_ids'
@@ -53,9 +53,13 @@ export class PalDetailCardComponent implements OnChanges {
   get isLucky(): boolean { return /^(true|1|yes)$/i.test(this.valueFor('is_lucky')); }
   get isAlpha(): boolean { return this.valueFor('pal_variant').toLowerCase().includes('alpha'); }
 
+  get displayRank(): number {
+    const storedRank = Number(this.valueFor('rank'));
+    return Number.isFinite(storedRank) ? Math.max(0, Math.min(4, storedRank - 1)) : 0;
+  }
+
   get rankStars(): boolean[] {
-    const rank = Math.max(0, Math.min(4, Number(this.valueFor('rank')) || 0));
-    return Array.from({ length: 4 }, (_, index) => index < rank);
+    return Array.from({ length: 4 }, (_, index) => index < this.displayRank);
   }
 
   get ivStats(): PalStat[] {

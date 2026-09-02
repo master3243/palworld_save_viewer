@@ -54,7 +54,7 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .vitals { align-self: center; min-width: 0; }
 .vital-row { align-items: center; background: rgba(2, 13, 21, .45); border-left: 3px solid currentColor; display: grid; gap: 8px; grid-template-columns: 18px 52px auto; margin-bottom: 7px; max-width: 260px; padding: 7px 10px; }
 .vital-icon { font-size: .9rem; }.vital-label { color: #c8e9f2; font-size: .68rem; font-weight: 800; text-transform: uppercase; }.vital-row strong { font-size: .8rem; min-width: 32px; text-align: right; }
-.hp { color: #48e2a5; }.shield { color: #57ddff; }
+.hp { color: #48e2a5; }
 .stat-panels { border-top: 1px solid rgba(145, 227, 255, .16); display: flex; gap: 9px; margin-top: 14px; padding-top: 14px; }
 .stat-panel { background: rgba(1, 11, 18, .62); border: 1px solid rgba(107, 218, 247, .26); min-width: 150px; padding: 8px 10px; }
 .stat-panel h3 { border-bottom: 1px solid rgba(126, 222, 248, .16); margin-bottom: 4px; padding-bottom: 6px; }

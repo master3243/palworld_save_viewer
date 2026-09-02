@@ -406,12 +406,19 @@ export class AppComponent {
     if (column.key === 'pal_variant') return this.isAlpha(row) ? 'A' : '';
     if (column.key === 'gender') return this.genderIcon(value);
     if (column.key === 'is_lucky') return this.isLucky(row) ? '★' : '';
+    if (column.key === 'rank') return this.displayRank(value);
     return this.formatSeparators(value);
   }
 
   cellTitle(row: PalStorageRow, column: TableColumn): string {
     const value = this.cellValue(row, column.key);
+    if (column.key === 'rank' && value) return `${column.title}: ${this.displayRank(value)} of 4`;
     return value ? `${column.title}: ${value}` : column.title;
+  }
+
+  private displayRank(value: string): string {
+    const storedRank = Number(value);
+    return Number.isFinite(storedRank) ? String(Math.max(0, Math.min(4, storedRank - 1))) : value;
   }
 
   isSlotNumber(column: TableColumn): boolean {
