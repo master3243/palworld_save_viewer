@@ -43,6 +43,12 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .lucky-badge { background: rgba(255, 224, 111, .12); border: 1px solid rgba(255, 224, 111, .42); border-radius: 20px; color: #ffe06f; font-size: .68rem; font-weight: 800; padding: 3px 8px; text-transform: uppercase; }
 .alpha-badge { height: 21px; object-fit: contain; width: 21px; }
 .favorite-badge { height: 24px; object-fit: contain; width: 24px; }
+.wiki-links { display: inline-flex; gap: 7px; margin-left: auto; }
+.wiki-link { align-items: center; background: rgba(3, 17, 27, .72); border: 1px solid rgba(126, 221, 248, .34); border-radius: 7px; color: #8de2f8; display: inline-flex; font-size: .74rem; font-weight: 900; gap: 5px; height: 32px; justify-content: center; min-width: 49px; padding: 0 8px; text-decoration: none; transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease; }
+.wiki-link svg { fill: none; height: 16px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; width: 16px; }
+.wiki-link:hover, .wiki-link:focus-visible { background: rgba(61, 174, 217, .2); border-color: #8de2f8; box-shadow: 0 0 6px rgba(99, 214, 246, .28); color: #fff; outline: none; }
+.wikigg-link { border-color: rgba(151, 184, 255, .38); color: #afc7ff; }
+.wikigg-link:hover, .wikigg-link:focus-visible { border-color: #afc7ff; box-shadow: 0 0 6px rgba(132, 165, 245, .28); }
 .portrait-rank { align-items: center; display: flex; flex-direction: column; margin-bottom: 12px; }
 .stars { display: flex; gap: 5px; margin-top: 5px; }.stars i { color: rgba(255,255,255,.16); font-size: 1.2rem; font-style: normal; line-height: 1; }.stars i.filled { color: #fff; text-shadow: 0 0 9px #63ddff; }
 

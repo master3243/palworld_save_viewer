@@ -5,7 +5,7 @@
   height: 100vh;
   min-height: 100vh;
   overflow: hidden;
-  padding: 28px 32px 32px;
+  padding: 18px 32px 32px;
   position: relative;
 }
 
@@ -56,10 +56,10 @@
 .logo-crop {
   display: block;
   flex: 0 0 auto;
-  height: clamp(72px, 10vw, 108px);
+  height: clamp(52px, 7vw, 76px);
   overflow: visible;
   position: relative;
-  width: clamp(128px, 18vw, 192px);
+  width: clamp(104px, 14vw, 146px);
 }
 
 .title-logo {
@@ -104,6 +104,7 @@
   position: relative;
   text-align: center;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  width: 100%;
 }
 
 .dropzone.dragging {

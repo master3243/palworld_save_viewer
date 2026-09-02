@@ -41,6 +41,14 @@ export class PalDetailCardComponent implements OnChanges {
     return [species !== this.name ? species : '', this.valueFor('pal_variant')].filter(Boolean).join(' · ');
   }
 
+  get palpediaUrl(): string {
+    return `https://www.palpedia.net/pals/${encodeURIComponent(this.wikiName)}`;
+  }
+
+  get wikiGgUrl(): string {
+    return `https://palworld.wiki.gg/wiki/${encodeURIComponent(this.wikiName.replace(/\s+/g, '_'))}`;
+  }
+
   get initials(): string {
     return this.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
   }
@@ -195,6 +203,10 @@ export class PalDetailCardComponent implements OnChanges {
       .replace(/_(?:BossRush|Oilrig|Tower|otomo|MAX)$/, '')
       .replace(/_Quest(?:_Enemy|_Friend)?$/, '')
       .replace(/_2$/, '');
+  }
+
+  private get wikiName(): string {
+    return this.valueFor('pal_name') || this.name;
   }
 
   private toLabel(key: string): string {
