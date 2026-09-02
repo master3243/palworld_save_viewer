@@ -61,7 +61,7 @@
   align-items: center;
   display: flex;
   flex-direction: row;
-  gap: 12px;
+  gap: 0;
   justify-content: center;
   margin: 0 auto 6px;
   max-width: 1440px;
@@ -71,15 +71,15 @@
 .logo-crop {
   display: block;
   flex: 0 0 auto;
-  height: clamp(52px, 7vw, 76px);
+  height: clamp(62px, 8.4vw, 91px);
   overflow: visible;
   position: relative;
-  width: clamp(104px, 14vw, 146px);
+  width: clamp(125px, 16.8vw, 175px);
 }
 
 .title-logo {
   display: block;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.48)) drop-shadow(0 0 16px rgba(72, 196, 255, 0.38));
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.48)) drop-shadow(0 0 18px rgba(116, 220, 255, 0.48));
   height: 100%;
   left: 0;
   object-fit: contain;
@@ -91,13 +91,16 @@
 }
 
 .viewer-title {
-  color: #c7f3ff;
+  color: #f1fbff;
   flex: 0 0 auto;
-  font-size: clamp(1.15rem, 2.4vw, 2rem);
+  font-size: clamp(0.95rem, 1.8vw, 1.5rem);
   font-weight: 850;
   letter-spacing: 0;
+  margin-left: -14px;
   position: relative;
+  top: 3px;
   text-transform: lowercase;
+  text-shadow: 0 0 9px rgba(129, 222, 255, 0.45);
   white-space: nowrap;
 }
 
