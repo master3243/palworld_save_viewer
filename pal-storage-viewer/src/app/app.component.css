@@ -431,9 +431,78 @@ td.paldeck-cell {
   width: 48px;
 }
 
+th.rank-cell,
+td.rank-cell {
+  box-sizing: border-box;
+  max-width: 58px;
+  min-width: 58px;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+  width: 58px;
+}
+
+th.level-cell,
+td.level-cell {
+  box-sizing: border-box;
+  max-width: 44px;
+  min-width: 44px;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+  width: 44px;
+}
+
+th.level-cell.sorted {
+  max-width: 60px;
+  min-width: 60px;
+  width: 60px;
+}
+
+th.rank-cell.sorted {
+  max-width: 74px;
+  min-width: 74px;
+  width: 74px;
+}
+
+.table-rank-stars {
+  display: inline-grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, auto);
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.table-rank-stars i {
+  color: rgba(255, 255, 255, 0.16);
+  font-size: 0.58rem;
+  font-style: normal;
+  line-height: 0.72;
+}
+
+.table-rank-stars i.filled {
+  color: #ffffff;
+  text-shadow: 0 0 5px rgba(99, 221, 255, 0.9);
+}
+
+th.iv-cell,
+td.iv-cell,
 th.soul-rank-cell,
 td.soul-rank-cell {
-  width: 96px;
+  box-sizing: border-box;
+  max-width: 58px;
+  min-width: 58px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+  width: 58px;
+}
+
+th.iv-cell.sorted,
+th.soul-rank-cell.sorted {
+  max-width: 72px;
+  min-width: 72px;
+  width: 72px;
 }
 
 th.icon-cell,

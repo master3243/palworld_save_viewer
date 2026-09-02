@@ -123,6 +123,10 @@ export class PalDetailCardComponent implements OnChanges {
     return `https://palworld.wiki.gg/wiki/${encodeURIComponent(move.replace(/\s+/g, '_'))}`;
   }
 
+  passiveSkillUrl(skill: string): string {
+    return `https://palworld.wiki.gg/wiki/${encodeURIComponent(skill.replace(/\s+/g, '_'))}`;
+  }
+
   constructor(
     private readonly offlineImages: OfflineImageService,
     private readonly game8Lookup: Game8LookupService,

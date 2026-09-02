@@ -135,10 +135,14 @@
       <section class="skill-group" *ngIf="passiveSkills.length">
         <h3>Passive Skills</h3>
         <div class="skill-chips">
-          <span
+          <a
             *ngFor="let skill of passiveSkills"
             class="skill-chip"
             [attr.data-tone]="skill.color"
+            [href]="passiveSkillUrl(skill.name)"
+            target="_blank"
+            rel="noopener noreferrer"
+            [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
           >
             {{ skill.name }}
             <img
@@ -148,7 +152,7 @@
               [alt]="skill.rankMarker"
               [title]="'Passive rank ' + skill.rankMarker"
             >
-          </span>
+          </a>
         </div>
       </section>
 

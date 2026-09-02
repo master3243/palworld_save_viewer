@@ -88,6 +88,9 @@
               [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
               [class.slot-cell]="isSlotNumber(column)"
               [class.paldeck-cell]="column.key === 'paldeck_no'"
+              [class.level-cell]="column.key === 'level'"
+              [class.rank-cell]="column.key === 'rank'"
+              [class.iv-cell]="isIv(column)"
               [class.soul-rank-cell]="isSoulRank(column)"
               [class.sorted]="sortColumn === column.key"
               [title]="column.title"
@@ -126,6 +129,9 @@
                 [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
                 [class.slot-cell]="isSlotNumber(column)"
                 [class.paldeck-cell]="column.key === 'paldeck_no'"
+                [class.level-cell]="column.key === 'level'"
+                [class.rank-cell]="column.key === 'rank'"
+                [class.iv-cell]="isIv(column)"
                 [class.sorted-column]="sortColumn === column.key"
                 [class.soul-rank-cell]="isSoulRank(column)"
                 [title]="cellTitle(item.row, column)"
@@ -166,7 +172,10 @@
                     [attr.aria-label]="'Favorite ' + favorite"
                   >
                 </ng-container>
-                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index'">
+                <span class="table-rank-stars" *ngIf="column.key === 'rank'" [attr.aria-label]="cellDisplay(item.row, column) + ' of 4 stars'">
+                  <i *ngFor="let filled of rankStarsFor(item.row)" [class.filled]="filled">★</i>
+                </span>
+                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank'">
                   {{ cellDisplay(item.row, column) }}
                 </ng-container>
               </td>

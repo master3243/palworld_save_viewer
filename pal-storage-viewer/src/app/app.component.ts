@@ -446,6 +446,10 @@ export class AppComponent {
     return column.key.startsWith('soul_rank_');
   }
 
+  isIv(column: TableColumn): boolean {
+    return column.key.startsWith('iv_');
+  }
+
   isAlpha(row: PalStorageRow): boolean {
     return this.cellValue(row, 'pal_variant').toLowerCase() === 'alpha';
   }
@@ -465,6 +469,11 @@ export class AppComponent {
   favoriteIndex(row: PalStorageRow): number {
     const favorite = Number(this.cellValue(row, 'favorite_index'));
     return favorite >= 1 && favorite <= 3 ? favorite : 0;
+  }
+
+  rankStarsFor(row: PalStorageRow): boolean[] {
+    const rank = Number(this.displayRank(this.cellValue(row, 'rank'))) || 0;
+    return Array.from({ length: 4 }, (_, index) => index < rank);
   }
 
   /**
@@ -558,6 +567,7 @@ export class AppComponent {
     if (key === 'slot_index') return 'Ind';
     if (key === 'paldeck_no') return 'No';
     if (key === 'favorite_index') return 'F';
+    if (key === 'level') return 'LVL';
     if (key === 'soul_rank_hp') return 'SR HP';
     if (key === 'soul_rank_attack') return 'SR ATK';
     if (key === 'soul_rank_defense') return 'SR DEF';
