@@ -309,10 +309,32 @@ export class AppComponent {
     return this.sortDirection === 'asc' ? '▲' : '▼';
   }
 
-  toggleRow(index: number): void {
-    this.openRowIndex = this.openRowIndex === index ? null : index;
+  toggleRow(index: number, event: MouseEvent): void {
+    const scroller = this.tableScroll?.nativeElement;
+    const clickedRow = event.currentTarget as HTMLElement | null;
+    const anchorTop = scroller && clickedRow
+      ? clickedRow.getBoundingClientRect().top - scroller.getBoundingClientRect().top
+      : null;
+    const nextOpenIndex = this.openRowIndex === index ? null : index;
+
+    // scrollTop is expressed in coordinates that include the old detail card.
+    // Remove the part of that card which is above the viewport before moving
+    // the detail height to a different row, otherwise every later row jumps.
+    if (scroller && this.openRowIndex !== null && this.openRowIndex !== nextOpenIndex && this.detailHeight > 0) {
+      const oldCardTop = (this.openRowIndex + 1) * this.rowHeight;
+      const oldHeightAboveViewport = Math.max(
+        0,
+        Math.min(this.detailHeight, scroller.scrollTop - oldCardTop)
+      );
+      if (oldHeightAboveViewport > 0) {
+        scroller.scrollTop -= oldHeightAboveViewport;
+        this.scrollTop = scroller.scrollTop;
+      }
+    }
+
+    this.openRowIndex = nextOpenIndex;
     this.detailHeight = 0;
-    this.scheduleMeasure();
+    this.scheduleMeasure(nextOpenIndex, anchorTop);
   }
 
   @HostListener('window:resize')
@@ -325,7 +347,7 @@ export class AppComponent {
    * The virtual scroll model has to match real layout exactly: any per-row
    * error compounds with scroll depth. Measure rather than assume.
    */
-  private scheduleMeasure(): void {
+  private scheduleMeasure(anchorIndex: number | null = null, anchorTop: number | null = null): void {
     requestAnimationFrame(() => {
       const scroller = this.tableScroll?.nativeElement;
       if (!scroller) return;
@@ -337,6 +359,19 @@ export class AppComponent {
 
       const card = scroller.querySelector<HTMLElement>('.detail-row');
       this.detailHeight = this.openRowIndex === null ? 0 : card?.offsetHeight ?? 0;
+
+      if (anchorIndex !== null && anchorTop !== null) {
+        requestAnimationFrame(() => {
+          const anchoredRow = scroller.querySelector<HTMLElement>(`[data-row-index="${anchorIndex}"]`);
+          if (!anchoredRow) return;
+          const currentTop = anchoredRow.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+          const correction = currentTop - anchorTop;
+          if (Math.abs(correction) > 0.5) {
+            scroller.scrollTop += correction;
+            this.scrollTop = scroller.scrollTop;
+          }
+        });
+      }
     });
   }
 

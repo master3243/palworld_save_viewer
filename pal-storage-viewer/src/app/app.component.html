@@ -104,8 +104,9 @@
           <ng-container *ngFor="let item of virtualRows; trackBy: trackVirtualRow">
             <tr
               class="data-row"
+              [attr.data-row-index]="item.index"
               [class.open]="isRowOpen(item.index)"
-              (click)="toggleRow(item.index)"
+              (click)="toggleRow(item.index, $event)"
             >
               <td class="arrow-cell">
                 <span class="row-arrow" [class.open]="isRowOpen(item.index)">&gt;</span>

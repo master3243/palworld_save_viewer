@@ -18,16 +18,16 @@
         <p>{{ subtitle || 'Pal profile' }}</p>
       </div>
 
-      <div class="rank-block" *ngIf="valueFor('rank')">
-        <span>Rank</span>
-        <div class="stars" [attr.aria-label]="'Rank ' + valueFor('rank')">
-          <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
-        </div>
-      </div>
     </header>
 
     <div class="profile-body">
       <div class="portrait" aria-hidden="true">
+        <div class="portrait-rank" *ngIf="valueFor('rank')">
+          <span>Rank</span>
+          <div class="stars" [attr.aria-label]="'Rank ' + valueFor('rank')">
+            <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
+          </div>
+        </div>
         <div class="portrait-ring">
           <img
             *ngIf="palImageSrc && !palImageFailed; else portraitFallback"

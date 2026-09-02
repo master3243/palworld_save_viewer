@@ -207,6 +207,7 @@
   height: 100%;
   min-height: 0;
   overflow: auto;
+  overflow-anchor: none;
   overscroll-behavior: contain;
 }
 
