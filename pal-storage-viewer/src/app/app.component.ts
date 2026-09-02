@@ -45,6 +45,7 @@ export class AppComponent {
   palNameWidth = 140;
   detailHeight = 0;
   alphaImageSrc = '';
+  favoriteImageSrcs: Record<number, string> = {};
 
   private readonly demoSaveName = '00000000000000000000000000000001_dps.sav';
   private readonly demoSaveUrl = `resources/example_save/${this.demoSaveName}`;
@@ -125,11 +126,11 @@ export class AppComponent {
   private readonly defaultVisibleColumns = new Set([
     'storage_slot',
     'slot_index',
-    'pal_name',
     'pal_variant',
     'gender',
     'is_lucky',
     'favorite_index',
+    'pal_name',
     'nickname',
     'level',
     'rank',
@@ -190,6 +191,12 @@ export class AppComponent {
       this.alphaImageSrc = source;
       this.changeDetector.markForCheck();
     });
+    for (const favorite of [1, 2, 3]) {
+      void this.offlineImages.load(`assets/ui/fav${favorite}.pog`).then((source) => {
+        this.favoriteImageSrcs[favorite] = source;
+        this.changeDetector.markForCheck();
+      });
+    }
   }
 
   async onFileInput(event: Event): Promise<void> {
@@ -445,6 +452,11 @@ export class AppComponent {
     return this.cellValue(row, 'is_lucky').toLowerCase() === 'true';
   }
 
+  favoriteIndex(row: PalStorageRow): number {
+    const favorite = Number(this.cellValue(row, 'favorite_index'));
+    return favorite >= 1 && favorite <= 3 ? favorite : 0;
+  }
+
   /**
    * The table is `table-layout: fixed`, so column widths never follow content.
    * Measure the longest name up front and set the width explicitly instead.
@@ -534,7 +546,7 @@ export class AppComponent {
     if (key === 'is_lucky') return 'L';
     if (key === 'storage_slot') return 'Slot';
     if (key === 'slot_index') return 'Ind';
-    if (key === 'favorite_index') return 'FAV';
+    if (key === 'favorite_index') return 'F';
     if (key === 'soul_rank_hp') return 'SR HP';
     if (key === 'soul_rank_attack') return 'SR ATK';
     if (key === 'soul_rank_defense') return 'SR DEF';

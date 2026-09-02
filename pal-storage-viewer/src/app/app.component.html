@@ -85,7 +85,7 @@
               *ngFor="let column of displayedColumns; trackBy: trackColumn"
               [class.pal-name-cell]="column.key === 'pal_name'"
               [style.width.px]="column.key === 'pal_name' ? palNameWidth : null"
-              [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky'"
+              [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
               [class.slot-cell]="isSlotNumber(column)"
               [class.soul-rank-cell]="isSoulRank(column)"
               [class.sorted]="sortColumn === column.key"
@@ -114,7 +114,7 @@
               <td
                 *ngFor="let column of displayedColumns; trackBy: trackColumn"
                 [class.pal-name-cell]="column.key === 'pal_name'"
-                [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky'"
+                [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
                 [class.slot-cell]="isSlotNumber(column)"
                 [class.soul-rank-cell]="isSoulRank(column)"
                 [title]="cellTitle(item.row, column)"
@@ -146,7 +146,16 @@
                 >
                   ★
                 </span>
-                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky'">
+                <ng-container *ngIf="column.key === 'favorite_index' && favoriteIndex(item.row) as favorite">
+                  <img
+                    *ngIf="favoriteImageSrcs[favorite] as favoriteSource"
+                    class="favorite-icon"
+                    [src]="favoriteSource"
+                    alt=""
+                    [attr.aria-label]="'Favorite ' + favorite"
+                  >
+                </ng-container>
+                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index'">
                   {{ cellDisplay(item.row, column) }}
                 </ng-container>
               </td>

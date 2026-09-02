@@ -5,7 +5,7 @@ import { OfflineImageService } from './offline-image.service';
 import { PalStorageRow } from './save-parser.service';
 
 interface DetailField { key: string; label: string; value: string; rawValue?: string; }
-interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense'; }
+interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense' | 'crafting'; }
 interface PassiveSkill { name: string; rank: string; color: string; rankMarker: string; rankIcon: string; }
 
 @Component({
@@ -21,13 +21,14 @@ export class PalDetailCardComponent implements OnChanges {
   palImageFailed = false;
   palImageSrc = '';
   alphaImageSrc = '';
+  favoriteImageSrc = '';
   private readonly imageSources = new Map<string, string>();
 
   private readonly featuredKeys = new Set([
     'pal_name', 'pal_variant', 'species_id', 'nickname', 'filtered_nickname',
-    'level', 'rank', 'gender', 'is_lucky', 'hp',
+    'level', 'rank', 'gender', 'is_lucky', 'favorite_index', 'hp',
     'iv_hp', 'iv_attack', 'iv_defense', 'soul_rank_hp', 'soul_rank_attack',
-    'soul_rank_defense', 'skills', 'skill_ranks', 'skill_colors',
+    'soul_rank_defense', 'soul_rank_craft_speed', 'skills', 'skill_ranks', 'skill_colors',
     'passive_skill_ids', 'combat_moves', 'active_skill_ids'
   ]);
 
@@ -75,7 +76,8 @@ export class PalDetailCardComponent implements OnChanges {
     const stats: PalStat[] = [
       { label: 'HP', value: this.valueFor('soul_rank_hp'), icon: 'hp' },
       { label: 'Attack', value: this.valueFor('soul_rank_attack'), icon: 'attack' },
-      { label: 'Defense', value: this.valueFor('soul_rank_defense'), icon: 'defense' }
+      { label: 'Defense', value: this.valueFor('soul_rank_defense'), icon: 'defense' },
+      { label: 'Crafting', value: this.valueFor('soul_rank_craft_speed'), icon: 'crafting' }
     ];
     return stats.filter((stat) => stat.value !== '');
   }
@@ -121,6 +123,14 @@ export class PalDetailCardComponent implements OnChanges {
       this.alphaImageSrc = source;
       this.changeDetector.markForCheck();
     });
+    const favorite = Number(this.valueFor('favorite_index'));
+    this.favoriteImageSrc = '';
+    if (favorite >= 1 && favorite <= 3) {
+      void this.offlineImages.load(`assets/ui/fav${favorite}.pog`).then((source) => {
+        this.favoriteImageSrc = source;
+        this.changeDetector.markForCheck();
+      });
+    }
     for (const skill of this.passiveSkills) {
       if (!skill.rankIcon || this.imageSources.has(skill.rankIcon)) continue;
       void this.offlineImages.load(skill.rankIcon).then((source) => {

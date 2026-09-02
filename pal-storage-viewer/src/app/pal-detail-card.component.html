@@ -11,6 +11,7 @@
           <h2>{{ name }}</h2>
           <img *ngIf="isAlpha && alphaImageSrc" class="alpha-badge" [src]="alphaImageSrc" alt="Alpha" title="Alpha Pal">
           <span *ngIf="isLucky" class="lucky-badge" title="Lucky Pal">★ Lucky</span>
+          <img *ngIf="favoriteImageSrc" class="favorite-badge" [src]="favoriteImageSrc" alt="" aria-label="Favorite" title="Favorite">
           <span *ngIf="gender" class="gender" [class.female]="gender === 'Female'">
             {{ gender === 'Female' ? '♀' : gender === 'Male' ? '♂' : gender }}
           </span>

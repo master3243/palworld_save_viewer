@@ -336,6 +336,7 @@ td.pal-name-cell {
 /* Wide enough for four digits, or the header plus its sort arrow. */
 th.slot-cell,
 td.slot-cell {
+  text-align: center;
   width: 64px;
 }
 
@@ -388,6 +389,14 @@ td.icon-cell {
   font-size: 1rem;
   line-height: 1;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+.favorite-icon {
+  display: inline-block;
+  height: 20px;
+  object-fit: contain;
+  vertical-align: middle;
+  width: 20px;
 }
 
 tbody tr:nth-child(even) {
