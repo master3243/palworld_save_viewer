@@ -318,7 +318,8 @@ export class AppComponent {
 
   toggleRow(index: number, event: MouseEvent): void {
     const scroller = this.tableScroll?.nativeElement;
-    const clickedRow = event.currentTarget as HTMLElement | null;
+    const clickedTarget = event.currentTarget as HTMLElement | null;
+    const clickedRow = clickedTarget?.closest<HTMLElement>('.data-row') ?? null;
     const anchorTop = scroller && clickedRow
       ? clickedRow.getBoundingClientRect().top - scroller.getBoundingClientRect().top
       : null;

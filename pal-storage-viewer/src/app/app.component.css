@@ -282,8 +282,8 @@ th.icon-cell .sort-marker {
 }
 
 .arrow-cell {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: 3px;
+  padding-right: 3px;
   text-align: center;
   width: 34px;
 }
@@ -315,6 +315,25 @@ td.arrow-cell {
   transition: transform 140ms ease;
 }
 
+.row-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  height: 24px;
+  justify-content: center;
+  margin: -4px 0;
+  padding: 0;
+  width: 24px;
+}
+
+.row-toggle:focus-visible {
+  outline: 1px solid #95f3ff;
+  outline-offset: 1px;
+}
+
 .row-arrow.open {
   transform: rotate(90deg);
 }
@@ -333,11 +352,23 @@ td.pal-name-cell {
   white-space: nowrap;
 }
 
-/* Wide enough for four digits, or the header plus its sort arrow. */
+/* Four digits plus the compact horizontal padding. */
 th.slot-cell,
 td.slot-cell {
+  box-sizing: border-box;
+  max-width: 42px;
+  min-width: 42px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
-  width: 64px;
+  width: 42px;
+}
+
+th.slot-cell.sorted,
+td.slot-cell.sorted-column {
+  max-width: 58px;
+  min-width: 58px;
+  width: 58px;
 }
 
 th.soul-rank-cell,

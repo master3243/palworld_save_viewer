@@ -109,13 +109,22 @@
               (click)="toggleRow(item.index, $event)"
             >
               <td class="arrow-cell">
-                <span class="row-arrow" [class.open]="isRowOpen(item.index)">&gt;</span>
+                <button
+                  class="row-toggle"
+                  type="button"
+                  [attr.aria-label]="isRowOpen(item.index) ? 'Collapse Pal details' : 'Expand Pal details'"
+                  [attr.aria-expanded]="isRowOpen(item.index)"
+                  (click)="$event.stopPropagation(); toggleRow(item.index, $event)"
+                >
+                  <span class="row-arrow" [class.open]="isRowOpen(item.index)">&gt;</span>
+                </button>
               </td>
               <td
                 *ngFor="let column of displayedColumns; trackBy: trackColumn"
                 [class.pal-name-cell]="column.key === 'pal_name'"
                 [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
                 [class.slot-cell]="isSlotNumber(column)"
+                [class.sorted-column]="sortColumn === column.key"
                 [class.soul-rank-cell]="isSoulRank(column)"
                 [title]="cellTitle(item.row, column)"
               >
