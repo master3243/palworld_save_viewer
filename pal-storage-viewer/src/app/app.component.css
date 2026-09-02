@@ -420,6 +420,17 @@ td.slot-cell.sorted-column {
   width: 58px;
 }
 
+th.paldeck-cell,
+td.paldeck-cell {
+  box-sizing: border-box;
+  max-width: 48px;
+  min-width: 48px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+  width: 48px;
+}
+
 th.soul-rank-cell,
 td.soul-rank-cell {
   width: 96px;

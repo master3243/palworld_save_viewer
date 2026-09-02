@@ -27,7 +27,7 @@ export class PalDetailCardComponent implements OnChanges {
   private readonly imageSources = new Map<string, string>();
 
   private readonly featuredKeys = new Set([
-    'pal_name', 'pal_variant', 'species_id', 'nickname', 'filtered_nickname',
+    'pal_name', 'paldeck_no', 'pal_variant', 'species_id', 'nickname', 'filtered_nickname',
     'level', 'rank', 'gender', 'is_lucky', 'favorite_index', 'hp',
     'iv_hp', 'iv_attack', 'iv_defense', 'soul_rank_hp', 'soul_rank_attack',
     'soul_rank_defense', 'soul_rank_craft_speed', 'skills', 'skill_ranks', 'skill_colors',

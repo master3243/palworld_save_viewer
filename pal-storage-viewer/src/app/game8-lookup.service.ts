@@ -11,6 +11,10 @@ export class Game8LookupService {
     return (await this.lookupPromise)[palName]?.url || '';
   }
 
+  async numberFor(palName: string): Promise<string> {
+    return (await this.lookupPromise)[palName]?.number || '';
+  }
+
   private async loadLookup(): Promise<Game8Lookup> {
     try {
       const response = await fetch(new URL('resources/game8_lookup.json', document.baseURI));

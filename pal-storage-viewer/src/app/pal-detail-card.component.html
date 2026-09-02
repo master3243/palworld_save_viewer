@@ -8,7 +8,7 @@
 
       <div class="name-block">
         <div class="name-line">
-          <h2>{{ name }}</h2>
+          <h2><span *ngIf="valueFor('paldeck_no')">{{ valueFor('paldeck_no') }}. </span>{{ name }}</h2>
           <img *ngIf="isAlpha && alphaImageSrc" class="alpha-badge" [src]="alphaImageSrc" alt="Alpha" title="Alpha Pal">
           <span *ngIf="isLucky" class="lucky-badge" title="Lucky Pal">★ Lucky</span>
           <img *ngIf="favoriteImageSrc" class="favorite-badge" [src]="favoriteImageSrc" alt="" aria-label="Favorite" title="Favorite">

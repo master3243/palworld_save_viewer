@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } fro
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
 import { APP_VERSION } from './app-version';
+import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
 import { PalStorageRow, SaveParserService } from './save-parser.service';
 
@@ -128,6 +129,7 @@ export class AppComponent {
   private readonly defaultVisibleColumns = new Set([
     'storage_slot',
     'slot_index',
+    'paldeck_no',
     'pal_variant',
     'gender',
     'is_lucky',
@@ -187,6 +189,7 @@ export class AppComponent {
   constructor(
     private readonly parser: SaveParserService,
     private readonly offlineImages: OfflineImageService,
+    private readonly game8Lookup: Game8LookupService,
     private readonly changeDetector: ChangeDetectorRef
   ) {
     void this.offlineImages.load('assets/ui/alpha.pog').then((source) => {
@@ -276,7 +279,11 @@ export class AppComponent {
     this.isColumnMenuOpen = false;
     this.isParsing = true;
     try {
-      const rows = await this.parser.parse(file);
+      const parsedRows = await this.parser.parse(file);
+      const rows = await Promise.all(parsedRows.map(async (row) => ({
+        ...row,
+        paldeck_no: await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name'))
+      })));
       this.originalRows = rows;
       this.rows = [...rows];
       this.columns = this.buildColumns(rows);
@@ -549,6 +556,7 @@ export class AppComponent {
     if (key === 'is_lucky') return 'L';
     if (key === 'storage_slot') return 'Slot';
     if (key === 'slot_index') return 'Ind';
+    if (key === 'paldeck_no') return 'No';
     if (key === 'favorite_index') return 'F';
     if (key === 'soul_rank_hp') return 'SR HP';
     if (key === 'soul_rank_attack') return 'SR ATK';
@@ -557,6 +565,7 @@ export class AppComponent {
   }
 
   private toTitle(key: string): string {
+    if (key === 'paldeck_no') return 'Paldeck No.';
     if (key === 'pal_variant') return 'Alpha';
     if (key === 'is_lucky') return 'Lucky';
     if (key === 'iv_hp') return 'IV HP';
