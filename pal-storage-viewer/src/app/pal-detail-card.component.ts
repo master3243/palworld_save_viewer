@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 
+import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
 import { PalStorageRow } from './save-parser.service';
 
@@ -22,6 +23,7 @@ export class PalDetailCardComponent implements OnChanges {
   palImageSrc = '';
   alphaImageSrc = '';
   favoriteImageSrc = '';
+  game8Url = 'https://game8.co/games/Palworld/archives/439556';
   private readonly imageSources = new Map<string, string>();
 
   private readonly featuredKeys = new Set([
@@ -47,6 +49,14 @@ export class PalDetailCardComponent implements OnChanges {
 
   get wikiGgUrl(): string {
     return `https://palworld.wiki.gg/wiki/${encodeURIComponent(this.wikiName.replace(/\s+/g, '_'))}`;
+  }
+
+  get fandomUrl(): string {
+    return `https://palworld.fandom.com/wiki/${encodeURIComponent(this.wikiName.replace(/\s+/g, '_'))}`;
+  }
+
+  get palDbUrl(): string {
+    return `https://paldb.cc/en/${encodeURIComponent(this.wikiName.replace(/\s+/g, '_'))}`;
   }
 
   get initials(): string {
@@ -109,8 +119,13 @@ export class PalDetailCardComponent implements OnChanges {
 
   get activeMoves(): string[] { return this.listFor('combat_moves'); }
 
+  activeSkillUrl(move: string): string {
+    return `https://palworld.wiki.gg/wiki/${encodeURIComponent(move.replace(/\s+/g, '_'))}`;
+  }
+
   constructor(
     private readonly offlineImages: OfflineImageService,
+    private readonly game8Lookup: Game8LookupService,
     private readonly changeDetector: ChangeDetectorRef
   ) {}
 
@@ -118,6 +133,14 @@ export class PalDetailCardComponent implements OnChanges {
     this.palImageFailed = false;
     this.palImageSrc = '';
     const palPath = this.palImageUrl;
+    const currentPalName = this.wikiName;
+    this.game8Url = 'https://game8.co/games/Palworld/archives/439556';
+    void this.game8Lookup.urlFor(currentPalName).then((url) => {
+      if (this.wikiName === currentPalName && url) {
+        this.game8Url = url;
+        this.changeDetector.markForCheck();
+      }
+    });
     if (palPath) {
       void this.offlineImages.load(palPath).then((source) => {
         if (this.palImageUrl === palPath) {

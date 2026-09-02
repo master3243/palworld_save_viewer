@@ -9,19 +9,26 @@
   position: relative;
 }
 
+.github-meta {
+  align-items: center;
+  bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  left: 26px;
+  position: fixed;
+  width: 28px;
+  z-index: 10;
+}
+
 .github-link {
   align-items: center;
-  bottom: 8px;
   color: #68c9ee;
   display: flex;
   height: 28px;
   justify-content: center;
-  left: 26px;
   opacity: 0.72;
-  position: fixed;
   transition: color 150ms ease, filter 150ms ease, opacity 150ms ease;
   width: 28px;
-  z-index: 10;
 }
 
 .github-link svg {
@@ -35,6 +42,14 @@
   color: #8ee5ff;
   filter: drop-shadow(0 0 4px rgba(92, 211, 248, 0.42));
   opacity: 1;
+}
+
+.app-version {
+  color: rgba(104, 201, 238, 0.58);
+  font-size: 0.48rem;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .github-link:focus-visible {

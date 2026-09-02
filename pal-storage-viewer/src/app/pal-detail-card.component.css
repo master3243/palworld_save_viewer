@@ -49,6 +49,12 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .wiki-link:hover, .wiki-link:focus-visible { background: rgba(61, 174, 217, .2); border-color: #8de2f8; box-shadow: 0 0 6px rgba(99, 214, 246, .28); color: #fff; outline: none; }
 .wikigg-link { border-color: rgba(151, 184, 255, .38); color: #afc7ff; }
 .wikigg-link:hover, .wikigg-link:focus-visible { border-color: #afc7ff; box-shadow: 0 0 6px rgba(132, 165, 245, .28); }
+.fandom-link { border-color: rgba(255, 166, 203, .38); color: #ffacd0; }
+.fandom-link:hover, .fandom-link:focus-visible { border-color: #ffacd0; box-shadow: 0 0 6px rgba(255, 139, 190, .25); }
+.paldb-link { border-color: rgba(153, 231, 170, .38); color: #9de7ad; }
+.paldb-link:hover, .paldb-link:focus-visible { border-color: #9de7ad; box-shadow: 0 0 6px rgba(126, 224, 149, .24); }
+.game8-link { border-color: rgba(255, 185, 104, .4); color: #ffc078; }
+.game8-link:hover, .game8-link:focus-visible { border-color: #ffc078; box-shadow: 0 0 6px rgba(255, 171, 75, .26); }
 .portrait-rank { align-items: center; display: flex; flex-direction: column; margin-bottom: 12px; }
 .stars { display: flex; gap: 5px; margin-top: 5px; }.stars i { color: rgba(255,255,255,.16); font-size: 1.2rem; font-style: normal; line-height: 1; }.stars i.filled { color: #fff; text-shadow: 0 0 9px #63ddff; }
 
@@ -99,7 +105,7 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 h3 { color: #71dcf8; font-size: .68rem; letter-spacing: .11em; margin: 0 0 9px; text-transform: uppercase; }
 .skill-chips { display: flex; flex-wrap: wrap; gap: 6px; }.skill-chip { align-items: center; background: #176f77; border-left: 3px solid #4cf2e1; color: white; display: inline-flex; font-size: .72rem; gap: 5px; padding: 5px 8px; }.skill-chip[data-tone="gold"] { background: #7c6410; border-color: #ffe04e; }.skill-chip[data-tone="platinum"] { background: #396390; border-color: #aee9ff; }.skill-chip[data-tone="negative"] { background: #6b2934; border-color: #ff7085; }.skill-chip b { color: #d7fbff; font-size: .58rem; margin-left: 3px; }
 .passive-rank-icon { height: 17px; object-fit: contain; width: 17px; }
-.move-list { display: flex; flex-wrap: wrap; gap: 6px 14px; }.move-list span { color: #dff7ff; font-size: .75rem; }.move-list i { color: #65dcff; font-style: normal; margin-right: 5px; }
+.move-list { display: flex; flex-wrap: wrap; gap: 6px 14px; }.move-list a { color: #dff7ff; font-size: .75rem; text-decoration: none; transition: color 130ms ease, text-shadow 130ms ease; }.move-list a:hover, .move-list a:focus-visible { color: #fff; outline: none; text-shadow: 0 0 6px rgba(101, 220, 255, .55); }.move-list i { color: #65dcff; font-style: normal; margin-right: 5px; }
 
 .additional { background: linear-gradient(180deg, #081824, #06111a); padding: 16px 22px 22px; }
 .additional h3 { align-items: center; display: flex; gap: 12px; }.additional h3::after { background: rgba(125, 216, 245, .16); content: ''; flex: 1; height: 1px; }

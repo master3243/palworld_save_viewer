@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
+import { APP_VERSION } from './app-version';
 import { OfflineImageService } from './offline-image.service';
 import { PalStorageRow, SaveParserService } from './save-parser.service';
 
@@ -45,6 +46,7 @@ export class AppComponent {
   palNameWidth = 140;
   detailHeight = 0;
   alphaImageSrc = '';
+  readonly appVersion = APP_VERSION;
   favoriteImageSrcs: Record<number, string> = {};
 
   private readonly demoSaveName = '00000000000000000000000000000001_dps.sav';
