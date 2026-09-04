@@ -273,6 +273,14 @@ input.value::placeholder {
   padding: 4px 7px;
 }
 
+/* A rule no pal satisfies is almost always a typo or a wrong value. */
+.rule-count.zero {
+  background: rgba(255, 112, 133, 0.18);
+  border-color: rgba(255, 112, 133, 0.7);
+  color: #ffb3c0;
+  font-weight: 750;
+}
+
 .rule-actions {
   display: inline-flex;
   gap: 3px;

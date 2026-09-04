@@ -290,7 +290,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'exp', label: 'Experience', group: G.condition, kind: 'number', aliases: ['xp'], get: (row) => number(row, 'exp') },
 
   { key: 'slot', label: 'Storage page', group: G.storage, kind: 'number', aliases: ['storage_slot', 'box', 'page'], get: (row) => number(row, 'storage_slot') },
-  { key: 'index', label: 'Slot index', group: G.storage, kind: 'number', aliases: ['slot_index', 'ind'], get: (row) => number(row, 'slot_index') }
+  { key: 'index', label: 'Pal Box slot index', group: G.storage, kind: 'number', aliases: ['pal_box_slot_index', 'slot_index', 'box_slot', 'ind'], get: (row) => number(row, 'pal_box_slot_index') }
 ];
 
 /** Raw keys already represented by a known field; not offered again as generic fields. */
@@ -299,7 +299,7 @@ const CONSUMED_KEYS = new Set([
   'level', 'rank', 'iv_hp', 'iv_attack', 'iv_defense', 'soul_rank_hp', 'soul_rank_attack', 'soul_rank_defense',
   'soul_rank_craft_speed', 'skills', 'skill_colors', 'combat_moves', 'learned_moves', 'hp', 'full_stomach',
   'sanity', 'physical_health', 'hunger_type', 'worker_sick', 'friendship_points', 'current_work_suitability',
-  'exp', 'storage_slot', 'slot_index', 'skill_ranks', 'raw_property_names'
+  'exp', 'storage_slot', 'pal_box_slot_index', 'skill_ranks', 'raw_property_names'
 ]);
 
 function toTitle(key: string): string {

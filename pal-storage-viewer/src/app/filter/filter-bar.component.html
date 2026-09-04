@@ -8,7 +8,7 @@
     class="search-input"
     type="text"
     [value]="queryText"
-    placeholder="Search or filter… e.g. level>=40 skills:Legend"
+    placeholder="Search... e.g. level>=40 skills:Legend"
     aria-label="Filter pals"
     autocomplete="off"
     spellcheck="false"
@@ -128,7 +128,7 @@
 </div>
 
 <span class="match-count" [class.active]="isActive" [title]="isActive ? 'Pals matching the filter' : 'Pals in storage'">
-  <ng-container *ngIf="isActive">{{ matchCount | number }}<em>&nbsp;of&nbsp;</em></ng-container>{{ total | number }}
+  <ng-container *ngIf="isActive">{{ matchCount | number }}<em>&nbsp;/&nbsp;</em></ng-container>{{ total | number }}
 </span>
 
 <div class="filter-panel" *ngIf="isPanelOpen">

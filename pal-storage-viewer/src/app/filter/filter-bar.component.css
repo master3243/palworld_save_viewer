@@ -12,9 +12,10 @@
   border: 1px solid rgba(144, 226, 255, 0.32);
   border-radius: 8px;
   display: flex;
-  flex: 1 1 320px;
+  /* Gives way before the chip row does, so chips stay on one line when they fit. */
+  flex: 1 2 300px;
   height: 32px;
-  max-width: 560px;
+  max-width: 415px;
   min-width: 200px;
   position: relative;
   transition: border-color 140ms ease, box-shadow 140ms ease;
@@ -282,6 +283,7 @@
   gap: 6px;
   height: 32px;
   padding: 0 10px;
+  position: relative;
 }
 
 .panel-toggle svg {
@@ -303,15 +305,20 @@
   fill: rgba(116, 230, 255, 0.35);
 }
 
+/* Overlaid on the corner so the button keeps its width when the badge appears. */
 .panel-toggle b {
   background: #42c8f5;
   border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(5, 15, 25, 0.9);
   color: #04121d;
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   line-height: 1;
-  min-width: 17px;
-  padding: 3px 5px;
+  min-width: 16px;
+  padding: 3px 4px;
+  position: absolute;
+  right: -7px;
   text-align: center;
+  top: -6px;
 }
 
 .quick-chips {
@@ -335,7 +342,7 @@
   font-size: 0.7rem;
   font-weight: 650;
   line-height: 1;
-  padding: 6px 10px;
+  padding: 6px 9px;
   transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
   white-space: nowrap;
 }
@@ -420,7 +427,11 @@
   flex: 0 0 auto;
   font-size: 0.74rem;
   font-variant-numeric: tabular-nums;
+  /* Reserve room for "N of N" up front so activating a filter never widens
+     the count and pushes the chip row onto a second line. */
+  min-width: 6.5em;
   padding: 0 4px;
+  text-align: right;
   white-space: nowrap;
 }
 

@@ -116,7 +116,8 @@
               <span
                 class="rule-count"
                 *ngIf="countFor(child) !== null"
-                title="Pals matching this rule on its own"
+                [class.zero]="countFor(child) === 0"
+                [title]="countFor(child) === 0 ? 'No pal matches this rule on its own, so nothing can pass the filter while it is here' : 'Pals matching this rule on its own'"
               >{{ countFor(child) }}</span>
 
               <span class="rule-actions">
