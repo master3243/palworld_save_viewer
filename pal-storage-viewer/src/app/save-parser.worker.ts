@@ -17,6 +17,11 @@ export interface ParseRequest {
   files: WorkerFile[];
 }
 
+/** Sent on page load so the runtime is ready before the first file arrives. */
+export interface InitRequest {
+  type: 'init';
+}
+
 export interface ProgressMessage {
   type: 'progress';
   id: number;
@@ -65,14 +70,26 @@ const scope = self as unknown as DedicatedWorkerGlobalScope;
 let pyodidePromise: Promise<PyodideRuntime> | undefined;
 let oozPromise: Promise<OozModule> | undefined;
 
-scope.addEventListener('message', (event: MessageEvent<ParseRequest>) => {
+/** Decoded byte size of every file already parsed and cached inside Python, by file key. */
+const parsedWeights = new Map<string, number>();
+
+scope.addEventListener('message', (event: MessageEvent<ParseRequest | InitRequest>) => {
   const request = event.data;
+  if (request?.type === 'init') {
+    void Promise.all([getPyodide(), getOoz()]).catch(() => { /* reported on first parse */ });
+    return;
+  }
   if (request?.type !== 'parse') return;
   void handleParse(request).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     post({ type: 'error', id: request.id, message });
   });
 });
+
+/** Stable identity for a picked file; the same file picked again hits the parse cache. */
+function fileKey(entry: WorkerFile): string {
+  return `${entry.set}|${entry.name}|${entry.file.size}|${entry.file.lastModified}`;
+}
 
 function post(message: WorkerResponse): void {
   scope.postMessage(message);
@@ -88,16 +105,26 @@ async function handleParse(request: ParseRequest): Promise<void> {
   const [pyodide, ooz] = await Promise.all([getPyodide(), getOoz()]);
   pyodide.FS.mkdirTree('/app/input');
 
-  // Stage 1: read + decompress every file.
-  const manifest: { path: string; name: string; set: string }[] = [];
+  // Stage 1: read + decompress every file that Python has not already parsed.
+  const manifest: { key: string; path: string; name: string; set: string }[] = [];
   const weights: number[] = [];
+  const written: string[] = [];
+  const keys = files.map(fileKey);
   for (const [index, entry] of files.entries()) {
+    const key = keys[index];
+    const cachedWeight = parsedWeights.get(key);
+    if (cachedWeight !== undefined) {
+      manifest.push({ key, path: '', name: entry.name, set: entry.set });
+      weights.push(cachedWeight);
+      continue;
+    }
     progress((index / files.length) * READ_SHARE, 'Decompressing', `${entry.name} (${index + 1} of ${files.length})`);
     const bytes = new Uint8Array(await entry.file.arrayBuffer());
     const decoded = decodeSave(bytes, ooz);
     const path = `/app/input/${index}_${entry.name.replace(/[^A-Za-z0-9._-]/g, '_')}`;
     pyodide.FS.writeFile(path, decoded);
-    manifest.push({ path, name: entry.name, set: entry.set });
+    written.push(path);
+    manifest.push({ key, path, name: entry.name, set: entry.set });
     weights.push(decoded.byteLength);
   }
   const totalWeight = weights.reduce((sum, weight) => sum + weight, 0) || 1;
@@ -143,10 +170,13 @@ main.combine_decoded_saves_to_json(${JSON.stringify(JSON.stringify(manifest))}, 
 `);
   } finally {
     pyodide.globals.delete('progress_cb');
-    for (const entry of manifest) {
-      try { pyodide.FS.unlink(entry.path); } catch { /* already gone */ }
+    for (const path of written) {
+      try { pyodide.FS.unlink(path); } catch { /* already gone */ }
     }
   }
+  // Python now caches these; mirror the set so the next request skips them.
+  parsedWeights.clear();
+  keys.forEach((key, index) => parsedWeights.set(key, weights[index]));
   progress(1, 'Building table', '');
   post({ type: 'result', id, json: jsonText });
 }

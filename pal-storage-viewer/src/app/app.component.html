@@ -140,11 +140,7 @@
     </div>
   </div>
 
-  <div
-    class="modal-backdrop"
-    *ngIf="pendingInputs"
-    (click)="cancelPending()"
-  >
+  <div class="modal-backdrop" *ngIf="pendingFiles">
     <div
       class="modal confirm-modal"
       role="dialog"
@@ -163,11 +159,19 @@
               <span class="source-kind">{{ file.kind }}</span>
               <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
               <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
+              <button
+                class="source-remove"
+                type="button"
+                [attr.aria-label]="'Leave out ' + file.name"
+                title="Leave this file out"
+                (click)="removePendingFile(file)"
+              >&times;</button>
             </li>
           </ul>
         </div>
       </div>
       <p class="confirm-note" *ngIf="pendingIgnored">{{ pendingIgnored }} other {{ pendingIgnored === 1 ? 'file' : 'files' }} ignored (not Pal saves).</p>
+      <p class="confirm-note">Drop more files to add them to this list.</p>
       <div class="modal-actions">
         <button class="modal-ghost" type="button" (click)="cancelPending()">Cancel</button>
         <button class="modal-primary" type="button" (click)="confirmPending()">{{ pendingAppend ? 'Add' : 'Load' }}</button>
@@ -204,11 +208,8 @@
         <div class="source-group" *ngFor="let group of sourceGroups">
           <div class="source-group-head">
             <span class="source-group-name">{{ group.set?.label || group.folder || 'Files' }}</span>
-            <span class="source-group-meta">
-              <span *ngIf="group.set?.host_player_name">{{ group.set?.host_player_name }}</span>
-              <span *ngIf="group.set?.in_game_day !== null && group.set?.in_game_day !== undefined">day {{ group.set?.in_game_day }}</span>
-              <span *ngIf="group.set?.saved_at">saved {{ savedAtLabel(group.set?.saved_at) }}</span>
-              <span *ngIf="group.folder" class="source-group-folder" [title]="group.folder">{{ group.folder }}</span>
+            <span class="source-group-meta" [title]="group.folder">
+              <span *ngFor="let part of groupMeta(group)">{{ part }}</span>
               <span class="source-group-count">{{ group.pals | number }} pals</span>
             </span>
           </div>

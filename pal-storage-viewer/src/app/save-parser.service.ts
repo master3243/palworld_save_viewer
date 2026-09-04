@@ -74,6 +74,15 @@ export class SaveParserService {
     return (await this.parseMany([{ file, path: file.name }])).rows;
   }
 
+  /** Start the worker and its Python runtime now, so the first load skips that wait. */
+  warmUp(): void {
+    try {
+      this.getWorker().postMessage({ type: 'init' });
+    } catch {
+      // No worker support; the error surfaces when a file is loaded.
+    }
+  }
+
   /**
    * Decode every given save file and merge them into one pal list. Files that
    * share a top-level folder are treated as one save (so Level.sav, the

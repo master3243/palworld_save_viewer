@@ -38,9 +38,17 @@ interface SourceGroup {
   pals: number;
 }
 
+interface PendingFile {
+  input: SaveInput;
+  folder: string;
+  name: string;
+  size: number;
+  kind: string;
+}
+
 interface PendingFolder {
   folder: string;
-  files: { name: string; size: number; kind: string }[];
+  files: PendingFile[];
 }
 
 /** Minimal typing for the non-standard directory entry API used by drag and drop. */
@@ -75,10 +83,43 @@ export class AppComponent {
   progress: ParseProgress | null = null;
   isSourcesOpen = false;
   /** Files waiting for the user to confirm a multi-file load. */
-  pendingInputs: SaveInput[] | null = null;
+  pendingFiles: PendingFile[] | null = null;
   pendingAppend = false;
-  pendingFolders: PendingFolder[] = [];
   pendingIgnored = 0;
+
+  get pendingFolders(): PendingFolder[] {
+    const folders = new Map<string, PendingFolder>();
+    for (const file of this.pendingFiles ?? []) {
+      let entry = folders.get(file.folder);
+      if (!entry) {
+        entry = { folder: file.folder, files: [] };
+        folders.set(file.folder, entry);
+      }
+      entry.files.push(file);
+    }
+    return Array.from(folders.values());
+  }
+
+  get pendingFileCount(): number {
+    return this.pendingFiles?.length ?? 0;
+  }
+
+  /** Header details for a save group, minus anything its label already says. */
+  groupMeta(group: SourceGroup): string[] {
+    const set = group.set;
+    const label = set?.label ?? '';
+    const parts: string[] = [];
+    if (set?.host_player_name) parts.push(set.host_player_name);
+    if (set?.in_game_day !== null && set?.in_game_day !== undefined && !label.includes(`day ${set.in_game_day}`)) {
+      parts.push(`day ${set.in_game_day}`);
+    }
+    if (set?.saved_at && !label.includes(set.saved_at.replace('T', ' ').slice(0, 16))) {
+      parts.push(`saved ${this.savedAtLabel(set.saved_at)}`);
+    }
+    const tail = group.folder.replace(/\/+$/, '').split('/').pop() ?? '';
+    if (tail && !label.includes(tail)) parts.push(tail);
+    return parts;
+  }
 
   get sourceGroups(): SourceGroup[] {
     const groups = new Map<string, SourceGroup>();
@@ -333,6 +374,7 @@ export class AppComponent {
         this.changeDetector.markForCheck();
       });
     }
+    this.parser.warmUp();
   }
 
   async onFileInput(event: Event): Promise<void> {
@@ -353,44 +395,50 @@ export class AppComponent {
     if (inputs.length) await this.offerInputs(inputs, this.hasData);
   }
 
-  /** Single files load straight away; anything more is confirmed with a file list first. */
+  /**
+   * Single files load straight away; anything more is confirmed with a file list
+   * first. Files dropped while that list is open are added to it.
+   */
   private async offerInputs(inputs: SaveInput[], append: boolean): Promise<void> {
     const candidates = inputs.filter((input) => this.parser.isCandidate(input));
-    if (candidates.length <= 1) {
+    if (candidates.length <= 1 && !this.pendingFiles) {
       await this.parseInputs(inputs, append);
       return;
     }
-    const folders = new Map<string, PendingFolder>();
+    const pending = this.pendingFiles ? [...this.pendingFiles] : [];
     for (const input of candidates) {
-      const folder = this.folderOf(input.path);
-      let entry = folders.get(folder);
-      if (!entry) {
-        entry = { folder, files: [] };
-        folders.set(folder, entry);
-      }
-      entry.files.push({ name: input.file.name, size: input.file.size, kind: this.guessKind(input.file.name) });
+      const duplicate = pending.some((file) => file.input.path === input.path && file.size === input.file.size);
+      if (duplicate) continue;
+      pending.push({
+        input,
+        folder: this.folderOf(input.path),
+        name: input.file.name,
+        size: input.file.size,
+        kind: this.guessKind(input.file.name)
+      });
     }
-    this.pendingInputs = candidates;
-    this.pendingAppend = append;
-    this.pendingFolders = Array.from(folders.values());
-    this.pendingIgnored = inputs.length - candidates.length;
+    this.pendingFiles = pending;
+    this.pendingAppend = this.pendingFiles && this.pendingAppend ? true : append;
+    this.pendingIgnored += inputs.length - candidates.length;
+  }
+
+  removePendingFile(file: PendingFile): void {
+    if (!this.pendingFiles) return;
+    this.pendingFiles = this.pendingFiles.filter((entry) => entry !== file);
+    if (!this.pendingFiles.length) this.cancelPending();
   }
 
   async confirmPending(): Promise<void> {
-    const inputs = this.pendingInputs;
+    const inputs = this.pendingFiles?.map((file) => file.input) ?? null;
     const append = this.pendingAppend;
     this.cancelPending();
-    if (inputs) await this.parseInputs(inputs, append);
+    if (inputs?.length) await this.parseInputs(inputs, append);
   }
 
   cancelPending(): void {
-    this.pendingInputs = null;
-    this.pendingFolders = [];
+    this.pendingFiles = null;
+    this.pendingAppend = false;
     this.pendingIgnored = 0;
-  }
-
-  get pendingFileCount(): number {
-    return this.pendingInputs?.length ?? 0;
   }
 
   private folderOf(path: string): string {

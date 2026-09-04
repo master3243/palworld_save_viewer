@@ -1226,7 +1226,7 @@ tbody tr:hover {
 .progress-block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   max-width: 420px;
   width: 80%;
 }
@@ -1239,54 +1239,48 @@ tbody tr:hover {
 
 .progress-label {
   color: #e8f8ff;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .progress-percent {
-  color: #9df0c0;
+  color: rgba(232, 248, 255, 0.8);
+  font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
 }
 
 .progress-track {
-  background: rgba(144, 226, 255, 0.14);
-  border-radius: 999px;
-  height: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  height: 4px;
   overflow: hidden;
   position: relative;
   width: 100%;
 }
 
 .progress-fill {
-  background: linear-gradient(90deg, #4fc3f7, #7ef0c4);
-  border-radius: 999px;
+  background: #9de3ff;
   display: block;
   height: 100%;
-  transition: width 160ms ease-out;
 }
 
 .progress-track.indeterminate .progress-fill {
-  animation: progress-slide 1.2s ease-in-out infinite;
-  background: linear-gradient(90deg, transparent, #4fc3f7, #7ef0c4, transparent);
-  width: 40% !important;
+  animation: progress-slide 1.4s linear infinite;
+  width: 30% !important;
 }
 
 @keyframes progress-slide {
   from { transform: translateX(-100%); }
-  to { transform: translateX(250%); }
+  to { transform: translateX(333%); }
 }
 
 .progress-detail {
-  color: rgba(200, 236, 255, 0.72);
-  font-size: 0.85rem;
+  color: rgba(200, 236, 255, 0.6);
+  font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
   min-height: 1.2em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 
 /* Multi-file confirmation ------------------------------------------- */
 .confirm-modal {

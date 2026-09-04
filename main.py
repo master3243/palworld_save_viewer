@@ -232,9 +232,9 @@ def locate_level_record(record, save_set):
 
 
 def save_display_names(sets):
-    """Short, distinct labels for each save set. Starts from the world name and, only for
-    saves that would otherwise read the same (typical for backups of one world), adds the
-    in-game day, then the save time, then the folder."""
+    """Short, distinct labels for each save set. Starts from the world name; only saves
+    that would read the same (typical for backups of one world) get the in-game day,
+    then the save time, then the folder name added, and only those saves."""
 
     def folder_tail(folder):
         return folder.rstrip("/").rsplit("/", 1)[-1] if folder else ""
@@ -251,31 +251,111 @@ def save_display_names(sets):
             parts.append(f"day {save_set['in_game_day']}")
         if depth >= 2 and save_set["saved_at"]:
             parts.append(save_set["saved_at"].replace("T", " ")[:16])
-        if depth >= 3 and label and label != base and folder_tail(label) != base:
+        tail = folder_tail(label)
+        if depth >= 3 and tail and tail != base:
+            parts.append(tail)
+        if depth >= 4 and label and label != tail:
             parts.append(label)
         return " · ".join(parts)
 
-    groups = {}
-    for label, save_set in sets.items():
-        groups.setdefault(base_name(label, save_set), []).append(label)
-
-    names = {}
-    for base, labels in groups.items():
-        chosen = None
-        for depth in range(4):
-            candidate = {label: level(label, sets[label], depth) for label in labels}
-            if len(set(candidate.values())) == len(candidate):
-                chosen = candidate
-                break
-        if chosen is None:
-            chosen = {label: level(label, sets[label], 3) for label in labels}
-            seen = {}
-            for label, name in list(chosen.items()):
-                seen[name] = seen.get(name, 0) + 1
-                if seen[name] > 1:
-                    chosen[label] = f"{name} ({seen[name]})"
-        names.update(chosen)
+    depths = {label: 0 for label in sets}
+    names = {label: level(label, sets[label], 0) for label in sets}
+    for _ in range(5):
+        counts = {}
+        for name in names.values():
+            counts[name] = counts.get(name, 0) + 1
+        clashing = [label for label, name in names.items() if counts[name] > 1 and depths[label] < 4]
+        if not clashing:
+            break
+        for label in clashing:
+            depths[label] += 1
+            names[label] = level(label, sets[label], depths[label])
+    seen = {}
+    for label, name in list(names.items()):
+        seen[name] = seen.get(name, 0) + 1
+        if seen[name] > 1:
+            names[label] = f"{name} ({seen[name]})"
     return names
+
+
+# Parsed files keyed by the caller's file key, so adding or removing one file in the
+# browser does not re-parse the others. The worker sends a key per file; without keys
+# nothing is cached.
+PARSE_CACHE = {}
+STALE_CACHE_LIMIT = 6
+
+
+def parse_save_file(entry, manager, progress=None):
+    """Decode one save file into a cacheable dict: kind, timestamp and its parsed payload."""
+    try:
+        data = decompress_save(Path(entry["path"]))
+    except Exception as error:  # noqa: BLE001 - report per file, keep going
+        return {"error": str(error)}
+    kind, class_name = manager.detect_save_kind(data)
+    parsed = {
+        "kind": kind,
+        "class_name": class_name,
+        "saved_at": manager.read_save_timestamp(data),
+        "payload": None,
+    }
+    if kind == "dimensional_storage":
+        parsed["payload"] = manager.extract_records(data, progress)
+    elif kind == "level":
+        parsed["payload"] = manager.extract_level_records(data, progress)
+    elif kind == "player":
+        parsed["payload"] = manager.extract_player_save(data)
+    elif kind == "level_meta":
+        parsed["payload"] = manager.extract_level_meta(data)
+    return parsed
+
+
+def apply_parsed_file(parsed, source, save_set):
+    """Fold one parsed file into its save set and describe it in `source`."""
+    kind = parsed["kind"]
+    payload = parsed["payload"]
+    source["kind"] = kind
+    source["class_name"] = parsed["class_name"]
+    source["saved_at"] = parsed["saved_at"]
+    # Level.sav is the authoritative world clock; other files only fill a gap.
+    if source["saved_at"] and (kind == "level" or not save_set["saved_at"]):
+        save_set["saved_at"] = source["saved_at"]
+    if kind == "dimensional_storage":
+        for record in payload["records"]:
+            record["_source"] = source
+        save_set["dps_records"].extend(payload["records"])
+        source["pals"] = payload["occupied_slots"]
+        source["total_slots"] = payload["total_storage_slots"]
+    elif kind == "level":
+        for record in payload["records"]:
+            record["_source"] = source
+        save_set["level_records"].extend(payload["records"])
+        save_set["bases"].extend(payload["bases"])
+        save_set["containers"].update(payload["containers"])
+        for base in payload["bases"]:
+            if base.get("worker_container_id"):
+                save_set["base_containers"][base["worker_container_id"]] = base
+        for player in payload["players"]:
+            if player.get("player_uid"):
+                save_set["player_names"][player["player_uid"]] = player.get("name") or ""
+        source["pals"] = len(payload["records"])
+        source["players"] = len(payload["players"])
+        source["bases"] = len(payload["bases"])
+        source["skipped"] = payload["skipped"]
+    elif kind == "player":
+        if payload.get("party_container_id"):
+            save_set["party_containers"].add(payload["party_container_id"])
+        if payload.get("pal_box_container_id"):
+            save_set["pal_box_containers"].add(payload["pal_box_container_id"])
+        if payload.get("player_uid"):
+            save_set["players"][payload["player_uid"]] = payload
+        source["player_uid"] = payload.get("player_uid")
+    elif kind == "level_meta":
+        save_set["world_name"] = payload.get("world_name") or ""
+        save_set["host_player_name"] = payload.get("host_player_name") or ""
+        save_set["in_game_day"] = payload.get("in_game_day")
+        source.update(payload)
+    else:
+        source["note"] = "Contains no pals; ignored."
 
 
 def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
@@ -313,68 +393,30 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
         })
 
     for file_index, entry in enumerate(files):
-        path = Path(entry["path"])
-        name = entry.get("name") or path.name
+        name = entry.get("name") or Path(entry.get("path") or "").name
         save_set = get_set(entry.get("set") or "")
         source = {"file": name, "set": save_set["label"], "kind": "unknown", "pals": 0, "note": ""}
         sources.append(source)
-        try:
-            data = decompress_save(path)
-        except Exception as error:  # noqa: BLE001 - report per file, keep going
-            source["note"] = f"Could not decode: {error}"
+        key = entry.get("key")
+        parsed = PARSE_CACHE.get(key) if key else None
+        if parsed is None:
+            if progress:
+                progress("start", file_index, 0, 1, 0, "")
+            parsed = parse_save_file(entry, manager, file_progress(file_index))
+            if key:
+                PARSE_CACHE[key] = parsed
+        if parsed.get("error"):
+            source["note"] = f"Could not decode: {parsed['error']}"
             continue
-        kind, class_name = manager.detect_save_kind(data)
-        source["kind"] = kind
-        source["class_name"] = class_name
-        source["saved_at"] = manager.read_save_timestamp(data)
-        # Level.sav is the authoritative world clock; other files only fill a gap.
-        if source["saved_at"] and (kind == "level" or not save_set["saved_at"]):
-            save_set["saved_at"] = source["saved_at"]
-        if progress:
-            progress("start", file_index, 0, 1, 0, "")
-        if kind == "dimensional_storage":
-            result = manager.extract_records(data, file_progress(file_index))
-            for record in result["records"]:
-                record["_source"] = source
-            save_set["dps_records"].extend(result["records"])
-            source["pals"] = result["occupied_slots"]
-            source["total_slots"] = result["total_storage_slots"]
-        elif kind == "level":
-            result = manager.extract_level_records(data, file_progress(file_index))
-            for record in result["records"]:
-                record["_source"] = source
-            save_set["level_records"].extend(result["records"])
-            save_set["bases"].extend(result["bases"])
-            save_set["containers"].update(result["containers"])
-            for base in result["bases"]:
-                if base.get("worker_container_id"):
-                    save_set["base_containers"][base["worker_container_id"]] = base
-            for player in result["players"]:
-                if player.get("player_uid"):
-                    save_set["player_names"][player["player_uid"]] = player.get("name") or ""
-            source["pals"] = len(result["records"])
-            source["players"] = len(result["players"])
-            source["bases"] = len(result["bases"])
-            source["skipped"] = result["skipped"]
-        elif kind == "player":
-            info = manager.extract_player_save(data)
-            if info.get("party_container_id"):
-                save_set["party_containers"].add(info["party_container_id"])
-            if info.get("pal_box_container_id"):
-                save_set["pal_box_containers"].add(info["pal_box_container_id"])
-            if info.get("player_uid"):
-                save_set["players"][info["player_uid"]] = info
-            source["player_uid"] = info.get("player_uid")
-        elif kind == "level_meta":
-            meta = manager.extract_level_meta(data)
-            save_set["world_name"] = meta.get("world_name") or ""
-            save_set["host_player_name"] = meta.get("host_player_name") or ""
-            save_set["in_game_day"] = meta.get("in_game_day")
-            source.update(meta)
-        else:
-            source["note"] = "Contains no pals; ignored."
+        apply_parsed_file(parsed, source, save_set)
         if progress:
             progress("done", file_index, 1, 1, source["pals"], "")
+
+    # Keep a few recently removed files so re-adding them is instant, but bound memory.
+    live_keys = {entry.get("key") for entry in files if entry.get("key")}
+    stale = [key for key in PARSE_CACHE if key not in live_keys]
+    for key in stale[: max(0, len(stale) - STALE_CACHE_LIMIT)]:
+        del PARSE_CACHE[key]
 
     if progress:
         progress("combine", len(files), 0, 1, 0, "")
