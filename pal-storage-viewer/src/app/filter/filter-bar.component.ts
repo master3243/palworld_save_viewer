@@ -205,14 +205,9 @@ export class FilterBarComponent implements OnChanges {
     this.engine = this.rows.length ? new FilterEngine(this.lookup, this.rows) : null;
     this.suggestions = [];
 
-    const fromHash = this.readHashQuery();
-    if (fromHash) {
-      this.queryText = fromHash;
-      this.root = parseQuery(fromHash, this.lookup).root;
-    } else {
-      this.queryText = '';
-      this.root = createGroup();
-    }
+    // A new save (or a return to the drop screen) always starts unfiltered.
+    this.queryText = '';
+    this.root = createGroup();
     this.unknownFields = [];
     // The parent is mid change-detection when inputs arrive; emit afterwards.
     void Promise.resolve().then(() => this.recompute());
@@ -529,7 +524,6 @@ export class FilterBarComponent implements OnChanges {
     const rows = this.isActive ? this.engine.filter(this.root) : this.rows;
     this.matchCount = rows.length;
     this.ruleCounts = this.computeRuleCounts(this.root);
-    this.writeHashQuery();
     this.filtered.emit(rows);
   }
 
@@ -541,22 +535,5 @@ export class FilterBarComponent implements OnChanges {
       for (const child of node.children) this.computeRuleCounts(child, into);
     }
     return into;
-  }
-
-  private readHashQuery(): string {
-    const match = /^#q=(.*)$/.exec(window.location.hash);
-    if (!match) return '';
-    try {
-      return decodeURIComponent(match[1]);
-    } catch {
-      return '';
-    }
-  }
-
-  private writeHashQuery(): void {
-    const query = this.queryText.trim();
-    const next = query ? `#q=${encodeURIComponent(query)}` : '';
-    if (window.location.hash === next || (!next && !window.location.hash)) return;
-    history.replaceState(null, '', `${window.location.pathname}${window.location.search}${next}`);
   }
 }
