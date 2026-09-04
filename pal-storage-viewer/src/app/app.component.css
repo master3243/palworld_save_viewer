@@ -20,6 +20,33 @@
   z-index: 10;
 }
 
+.github-row {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.corner-help {
+  background: transparent;
+  border: 1px solid rgba(104, 201, 238, 0.45);
+  border-radius: 50%;
+  color: rgba(104, 201, 238, 0.8);
+  cursor: pointer;
+  font-size: 0.6rem;
+  font-weight: 700;
+  height: 14px;
+  line-height: 1;
+  padding: 0;
+  width: 14px;
+}
+
+.corner-help:hover,
+.corner-help:focus-visible {
+  border-color: #8ee5ff;
+  color: #8ee5ff;
+  outline: none;
+}
+
 .github-link {
   align-items: center;
   color: #68c9ee;
@@ -1471,4 +1498,111 @@ td.where-cell {
 
 .confirm-file-pals.pending {
   color: rgba(200, 236, 255, 0.5);
+}
+
+
+/* FAQ ------------------------------------------------------------------ */
+.faq-title {
+  margin-bottom: 10px;
+}
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 16px;
+  max-height: 60vh;
+  overflow: auto;
+  padding-right: 6px;
+  scrollbar-gutter: stable;
+  text-align: left;
+}
+
+.faq-item {
+  border: 1px solid rgba(123, 214, 255, 0.18);
+  border-radius: 8px;
+  color: #d9edf7;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.faq-item summary {
+  color: #e8f8ff;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  padding: 8px 12px 8px 30px;
+  position: relative;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::before {
+  color: #9de3ff;
+  content: '▸';
+  left: 12px;
+  position: absolute;
+}
+
+.faq-item[open] summary::before {
+  content: '▾';
+}
+
+.faq-item[open] summary {
+  border-bottom: 1px solid rgba(123, 214, 255, 0.12);
+}
+
+.faq-body {
+  padding: 8px 12px 10px 30px;
+}
+
+.faq-body p {
+  margin: 0 0 6px;
+}
+
+.faq-body ul {
+  margin: 0 0 6px;
+  padding-left: 18px;
+}
+
+.faq-body code {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(123, 214, 255, 0.18);
+  border-radius: 3px;
+  color: #9fe7ff;
+  font-size: 0.72rem;
+  padding: 1px 4px;
+}
+
+.faq-body code.save-path {
+  display: block;
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+}
+
+.faq-github {
+  align-items: center;
+  background: rgba(24, 68, 96, 0.6);
+  border: 1px solid rgba(144, 226, 255, 0.35);
+  border-radius: 6px;
+  color: #9de3ff;
+  display: inline-flex;
+  height: 22px;
+  justify-content: center;
+  margin: 0 2px;
+  vertical-align: middle;
+  width: 26px;
+}
+
+.faq-github svg {
+  fill: currentColor;
+  height: 15px;
+  width: 15px;
+}
+
+.faq-github:hover {
+  background: rgba(34, 92, 128, 0.9);
+  color: #e8f8ff;
 }
