@@ -140,36 +140,100 @@
     </div>
   </div>
 
+  <div
+    class="modal-backdrop"
+    *ngIf="pendingInputs"
+    (click)="cancelPending()"
+  >
+    <div
+      class="modal confirm-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirmLoadTitle"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 class="modal-title" id="confirmLoadTitle">
+        {{ pendingAppend ? 'Add' : 'Load' }} {{ pendingFileCount }} files from {{ pendingFolders.length }} {{ pendingFolders.length === 1 ? 'folder' : 'folders' }}?
+      </h2>
+      <div class="confirm-list">
+        <div class="confirm-folder" *ngFor="let folder of pendingFolders">
+          <div class="confirm-folder-name" [title]="folder.folder">{{ folder.folder || 'Loose files' }}</div>
+          <ul>
+            <li *ngFor="let file of folder.files">
+              <span class="source-kind">{{ file.kind }}</span>
+              <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
+              <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p class="confirm-note" *ngIf="pendingIgnored">{{ pendingIgnored }} other {{ pendingIgnored === 1 ? 'file' : 'files' }} ignored (not Pal saves).</p>
+      <div class="modal-actions">
+        <button class="modal-ghost" type="button" (click)="cancelPending()">Cancel</button>
+        <button class="modal-primary" type="button" (click)="confirmPending()">{{ pendingAppend ? 'Add' : 'Load' }}</button>
+      </div>
+    </div>
+  </div>
+
   <p class="error" *ngIf="error">{{ error }}</p>
 
   <section class="table-shell" *ngIf="hasData">
-    <div class="sources-bar" aria-label="Loaded save files">
-      <span class="sources-label">Sources</span>
-      <span
-        *ngFor="let source of sources; let i = index; trackBy: trackSource"
-        class="source-chip"
-        [attr.data-kind]="source.kind"
-        [class.muted]="!source.pals && source.kind !== 'player' && source.kind !== 'level_meta'"
-        [title]="sourceTitle(source)"
-      >
-        <span class="source-kind">{{ source.kind === 'dimensional_storage' ? 'DPS' : source.kind === 'level' ? 'World' : source.kind === 'player' ? 'Player' : source.kind === 'level_meta' ? 'Info' : 'Skip' }}</span>
-        <span class="source-name">{{ source.file }}</span>
-        <span class="source-count" *ngIf="source.pals">{{ source.pals | number }}</span>
+    <div class="sources-bar" [class.open]="isSourcesOpen" aria-label="Loaded save files">
+      <div class="sources-row">
         <button
-          class="source-remove"
+          class="sources-toggle"
           type="button"
-          [attr.aria-label]="'Remove ' + source.file"
-          title="Remove this file"
-          (click)="removeSource(i)"
-        >&times;</button>
-      </span>
-      <button class="add-source-button" type="button" title="Add more save files to this table" (click)="openAddFilesPicker()">+ Files</button>
-      <button class="add-source-button" type="button" title="Add a whole save folder to this table" (click)="openFolderPicker($event)">+ Folder</button>
-      <span class="location-summary">
-        <span *ngFor="let item of locationCounts" class="location-pill" [attr.data-location]="item.location">
-          {{ item.location }} <b>{{ item.count | number }}</b>
+          [attr.aria-expanded]="isSourcesOpen"
+          (click)="toggleSources()"
+          title="Show or hide the loaded save files"
+        >
+          <span class="sources-caret" aria-hidden="true">{{ isSourcesOpen ? '▾' : '▸' }}</span>
+          <span class="sources-label">Sources</span>
+          <span class="sources-summary">{{ sourcesSummary }}</span>
+        </button>
+        <button class="add-source-button" type="button" title="Add more save files to this table" (click)="openAddFilesPicker()">+ Files</button>
+        <button class="add-source-button" type="button" title="Add a whole save folder to this table" (click)="openFolderPicker($event)">+ Folder</button>
+        <span class="location-summary">
+          <span *ngFor="let item of locationCounts" class="location-pill" [attr.data-location]="item.location">
+            {{ item.location }} <b>{{ item.count | number }}</b>
+          </span>
         </span>
-      </span>
+      </div>
+
+      <div class="sources-groups" *ngIf="isSourcesOpen">
+        <div class="source-group" *ngFor="let group of sourceGroups">
+          <div class="source-group-head">
+            <span class="source-group-name">{{ group.set?.label || group.folder || 'Files' }}</span>
+            <span class="source-group-meta">
+              <span *ngIf="group.set?.host_player_name">{{ group.set?.host_player_name }}</span>
+              <span *ngIf="group.set?.in_game_day !== null && group.set?.in_game_day !== undefined">day {{ group.set?.in_game_day }}</span>
+              <span *ngIf="group.set?.saved_at">saved {{ savedAtLabel(group.set?.saved_at) }}</span>
+              <span *ngIf="group.folder" class="source-group-folder" [title]="group.folder">{{ group.folder }}</span>
+              <span class="source-group-count">{{ group.pals | number }} pals</span>
+            </span>
+          </div>
+          <div class="source-group-files">
+            <span
+              *ngFor="let item of group.sources"
+              class="source-chip"
+              [attr.data-kind]="item.source.kind"
+              [class.muted]="!item.source.pals && item.source.kind !== 'player' && item.source.kind !== 'level_meta'"
+              [title]="item.source.file + ' · ' + sourceTitle(item.source)"
+            >
+              <span class="source-kind">{{ sourceKindTag(item.source) }}</span>
+              <span class="source-name">{{ shortFileName(item.source.file) }}</span>
+              <span class="source-count" *ngIf="item.source.pals">{{ item.source.pals | number }}</span>
+              <button
+                class="source-remove"
+                type="button"
+                [attr.aria-label]="'Remove ' + item.source.file"
+                title="Remove this file"
+                (click)="removeSource(item.index)"
+              >&times;</button>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="table-tools">
       <app-filter-bar [rows]="originalRows" (filtered)="onFilterChanged($event)"></app-filter-bar>

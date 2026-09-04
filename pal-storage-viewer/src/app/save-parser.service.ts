@@ -21,6 +21,7 @@ export interface SaveSource {
   total_slots?: number;
   world_name?: string;
   host_player_name?: string;
+  saved_at?: string;
   skipped?: { players: number; wild_or_npc: number; unreadable: number };
 }
 
@@ -29,6 +30,8 @@ export interface SaveSetSummary {
   folder: string;
   world_name: string;
   host_player_name: string;
+  in_game_day: number | null;
+  saved_at: string;
   pals: number;
   bases: { index: number; location: { x: number; y: number; z: number } | null; workers: number }[];
   players: { uid: string; name: string }[];

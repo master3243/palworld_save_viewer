@@ -231,6 +231,53 @@ def locate_level_record(record, save_set):
     return "Other container", slot_label
 
 
+def save_display_names(sets):
+    """Short, distinct labels for each save set. Starts from the world name and, only for
+    saves that would otherwise read the same (typical for backups of one world), adds the
+    in-game day, then the save time, then the folder."""
+
+    def folder_tail(folder):
+        return folder.rstrip("/").rsplit("/", 1)[-1] if folder else ""
+
+    ordinals = {label: index for index, label in enumerate(sets, start=1)}
+
+    def base_name(label, save_set):
+        return save_set["world_name"] or folder_tail(label) or f"Save {ordinals[label]}"
+
+    def level(label, save_set, depth):
+        base = base_name(label, save_set)
+        parts = [base]
+        if depth >= 1 and save_set["in_game_day"] is not None:
+            parts.append(f"day {save_set['in_game_day']}")
+        if depth >= 2 and save_set["saved_at"]:
+            parts.append(save_set["saved_at"].replace("T", " ")[:16])
+        if depth >= 3 and label and label != base and folder_tail(label) != base:
+            parts.append(label)
+        return " · ".join(parts)
+
+    groups = {}
+    for label, save_set in sets.items():
+        groups.setdefault(base_name(label, save_set), []).append(label)
+
+    names = {}
+    for base, labels in groups.items():
+        chosen = None
+        for depth in range(4):
+            candidate = {label: level(label, sets[label], depth) for label in labels}
+            if len(set(candidate.values())) == len(candidate):
+                chosen = candidate
+                break
+        if chosen is None:
+            chosen = {label: level(label, sets[label], 3) for label in labels}
+            seen = {}
+            for label, name in list(chosen.items()):
+                seen[name] = seen.get(name, 0) + 1
+                if seen[name] > 1:
+                    chosen[label] = f"{name} ({seen[name]})"
+        names.update(chosen)
+    return names
+
+
 def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
     """Merge any number of decoded save files into one pal list with a location per pal.
 
@@ -252,6 +299,8 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
             "label": label,
             "world_name": "",
             "host_player_name": "",
+            "in_game_day": None,
+            "saved_at": "",
             "players": {},
             "player_names": {},
             "party_containers": set(),
@@ -277,6 +326,10 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
         kind, class_name = manager.detect_save_kind(data)
         source["kind"] = kind
         source["class_name"] = class_name
+        source["saved_at"] = manager.read_save_timestamp(data)
+        # Level.sav is the authoritative world clock; other files only fill a gap.
+        if source["saved_at"] and (kind == "level" or not save_set["saved_at"]):
+            save_set["saved_at"] = source["saved_at"]
         if progress:
             progress("start", file_index, 0, 1, 0, "")
         if kind == "dimensional_storage":
@@ -316,6 +369,7 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
             meta = manager.extract_level_meta(data)
             save_set["world_name"] = meta.get("world_name") or ""
             save_set["host_player_name"] = meta.get("host_player_name") or ""
+            save_set["in_game_day"] = meta.get("in_game_day")
             source.update(meta)
         else:
             source["note"] = "Contains no pals; ignored."
@@ -326,10 +380,9 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
         progress("combine", len(files), 0, 1, 0, "")
     records = []
     set_summaries = []
+    displays = save_display_names(sets)
     for ordinal, (label, save_set) in enumerate(sets.items(), start=1):
-        display = save_set["world_name"] or label or f"Save {ordinal}"
-        if save_set["world_name"] and label and len(sets) > 1:
-            display = f"{save_set['world_name']} ({label})"
+        display = displays[label]
         for record in save_set["level_records"]:
             location, detail = locate_level_record(record, save_set)
             record["placement"] = {"location": location, "detail": detail}
@@ -351,6 +404,8 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
             "folder": label,
             "world_name": save_set["world_name"],
             "host_player_name": save_set["host_player_name"],
+            "in_game_day": save_set["in_game_day"],
+            "saved_at": save_set["saved_at"],
             "pals": len(save_set["level_records"]) + len(save_set["dps_records"]),
             "bases": [
                 {"index": b.get("index"), "location": b.get("location"), "workers": sum(

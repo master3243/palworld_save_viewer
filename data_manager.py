@@ -639,6 +639,18 @@ class PalStorageDataManager:
             return None
 
     @classmethod
+    def read_save_timestamp(cls, data):
+        """Every Palworld save starts with a `Timestamp` DateTime; return it as ISO text."""
+        ticks = cls.read_datetime_struct(data, cls.find_property_start(data, "Timestamp", 0, 65536))
+        if not ticks:
+            return ""
+        from datetime import datetime, timedelta
+        try:
+            return (datetime(1, 1, 1) + timedelta(microseconds=ticks / 10)).isoformat(timespec="seconds")
+        except (OverflowError, ValueError):
+            return ""
+
+    @classmethod
     def extract_level_meta(cls, data):
         info = cls.read_struct_property(data, cls.find_property_start(data, "SaveData")) or {}
         return {
@@ -646,6 +658,7 @@ class PalStorageDataManager:
             "host_player_name": info.get("HostPlayerName") or "",
             "host_player_level": info.get("HostPlayerLevel"),
             "in_game_day": info.get("InGameDay"),
+            "saved_at": cls.read_save_timestamp(data),
         }
 
     @classmethod

@@ -84,7 +84,7 @@ async function handleParse(request: ParseRequest): Promise<void> {
     post({ type: 'progress', id, fraction, label, detail });
 
   const runtimeReady = Boolean(pyodidePromise && oozPromise);
-  if (!runtimeReady) progress(null, 'Loading Python runtime', 'first time only, about 10 MB');
+  if (!runtimeReady) progress(null, 'Initializing\u2026', '');
   const [pyodide, ooz] = await Promise.all([getPyodide(), getOoz()]);
   pyodide.FS.mkdirTree('/app/input');
 

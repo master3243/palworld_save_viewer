@@ -996,14 +996,104 @@ tbody tr:hover {
 }
 
 .sources-bar {
-  align-items: center;
   background: rgba(5, 15, 25, 0.7);
   border-bottom: 1px solid rgba(134, 220, 255, 0.12);
   display: flex;
   flex: 0 0 auto;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 8px;
+}
+
+.sources-row {
+  align-items: center;
+  display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 6px 8px;
+  min-height: 30px;
+}
+
+.sources-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #e8f8ff;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px 6px;
+}
+
+.sources-toggle:hover {
+  background: rgba(144, 226, 255, 0.1);
+}
+
+.sources-caret {
+  color: #9de3ff;
+  font-size: 0.8rem;
+  width: 10px;
+}
+
+.sources-summary {
+  color: rgba(200, 236, 255, 0.85);
+  font-size: 0.85rem;
+}
+
+.sources-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 40vh;
+  overflow: auto;
+  padding: 2px 0 6px;
+}
+
+.source-group {
+  border-left: 2px solid rgba(144, 226, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 8px;
+}
+
+.source-group-head {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.source-group-name {
+  color: #e8f8ff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.source-group-meta {
+  color: rgba(200, 236, 255, 0.7);
+  display: inline-flex;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  gap: 10px;
+}
+
+.source-group-folder {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-group-count {
+  color: #9df0c0;
+  font-variant-numeric: tabular-nums;
+}
+
+.source-group-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .sources-label {
@@ -1195,4 +1285,64 @@ tbody tr:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+
+/* Multi-file confirmation ------------------------------------------- */
+.confirm-modal {
+  max-width: 560px;
+  width: min(92vw, 560px);
+}
+
+.confirm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 4px;
+  max-height: 50vh;
+  overflow: auto;
+  text-align: left;
+}
+
+.confirm-folder-name {
+  color: #9de3ff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.confirm-folder ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.confirm-folder li {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.confirm-file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.confirm-file-size {
+  color: rgba(200, 236, 255, 0.7);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.confirm-note {
+  color: rgba(200, 236, 255, 0.7);
+  font-size: 0.85rem;
+  margin: 6px 0 12px;
+  text-align: left;
 }

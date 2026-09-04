@@ -31,6 +31,18 @@ interface LocationCount {
   count: number;
 }
 
+interface SourceGroup {
+  set: SaveSetSummary | null;
+  folder: string;
+  sources: { source: SaveSource; index: number }[];
+  pals: number;
+}
+
+interface PendingFolder {
+  folder: string;
+  files: { name: string; size: number; kind: string }[];
+}
+
 /** Minimal typing for the non-standard directory entry API used by drag and drop. */
 interface DirectoryEntryLike {
   isFile: boolean;
@@ -61,6 +73,64 @@ export class AppComponent {
   locationCounts: LocationCount[] = [];
   /** Live progress while parsing; the worker reports real per-record counts. */
   progress: ParseProgress | null = null;
+  isSourcesOpen = false;
+  /** Files waiting for the user to confirm a multi-file load. */
+  pendingInputs: SaveInput[] | null = null;
+  pendingAppend = false;
+  pendingFolders: PendingFolder[] = [];
+  pendingIgnored = 0;
+
+  get sourceGroups(): SourceGroup[] {
+    const groups = new Map<string, SourceGroup>();
+    for (const [index, source] of this.sources.entries()) {
+      let group = groups.get(source.set);
+      if (!group) {
+        group = {
+          set: this.saveSets.find((set) => set.folder === source.set) ?? null,
+          folder: source.set,
+          sources: [],
+          pals: 0
+        };
+        groups.set(source.set, group);
+      }
+      group.sources.push({ source, index });
+      group.pals += source.pals;
+    }
+    return Array.from(groups.values());
+  }
+
+  get sourcesSummary(): string {
+    const saves = this.saveSets.length;
+    const files = this.sources.length;
+    return `${saves} save${saves === 1 ? '' : 's'} · ${files} file${files === 1 ? '' : 's'}`;
+  }
+
+  toggleSources(): void {
+    this.isSourcesOpen = !this.isSourcesOpen;
+  }
+
+  /** Long player-id file names read as "…0001_dps.sav"; the full name stays in the tooltip. */
+  shortFileName(name: string): string {
+    const match = /^([0-9a-f]{32})(_dps)?\.sav$/i.exec(name);
+    return match ? `…${match[1].slice(-4)}${match[2] ?? ''}.sav` : name;
+  }
+
+  savedAtLabel(value: string | undefined): string {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  }
+
+  sourceKindTag(source: SaveSource): string {
+    switch (source.kind) {
+      case 'dimensional_storage': return 'DPS';
+      case 'level': return 'World';
+      case 'player': return 'Player';
+      case 'level_meta': return 'Info';
+      default: return 'Skip';
+    }
+  }
 
   get progressPercent(): number {
     return this.progress?.fraction === null || this.progress?.fraction === undefined
@@ -272,7 +342,7 @@ export class AppComponent {
       path: (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name
     }));
     input.value = '';
-    if (inputs.length) await this.parseInputs(inputs, this.hasData);
+    if (inputs.length) await this.offerInputs(inputs, this.hasData);
   }
 
   async onDrop(event: DragEvent): Promise<void> {
@@ -280,7 +350,69 @@ export class AppComponent {
     event.stopPropagation();
     this.isDragging = false;
     const inputs = await this.collectDroppedFiles(event.dataTransfer);
-    if (inputs.length) await this.parseInputs(inputs, this.hasData);
+    if (inputs.length) await this.offerInputs(inputs, this.hasData);
+  }
+
+  /** Single files load straight away; anything more is confirmed with a file list first. */
+  private async offerInputs(inputs: SaveInput[], append: boolean): Promise<void> {
+    const candidates = inputs.filter((input) => this.parser.isCandidate(input));
+    if (candidates.length <= 1) {
+      await this.parseInputs(inputs, append);
+      return;
+    }
+    const folders = new Map<string, PendingFolder>();
+    for (const input of candidates) {
+      const folder = this.folderOf(input.path);
+      let entry = folders.get(folder);
+      if (!entry) {
+        entry = { folder, files: [] };
+        folders.set(folder, entry);
+      }
+      entry.files.push({ name: input.file.name, size: input.file.size, kind: this.guessKind(input.file.name) });
+    }
+    this.pendingInputs = candidates;
+    this.pendingAppend = append;
+    this.pendingFolders = Array.from(folders.values());
+    this.pendingIgnored = inputs.length - candidates.length;
+  }
+
+  async confirmPending(): Promise<void> {
+    const inputs = this.pendingInputs;
+    const append = this.pendingAppend;
+    this.cancelPending();
+    if (inputs) await this.parseInputs(inputs, append);
+  }
+
+  cancelPending(): void {
+    this.pendingInputs = null;
+    this.pendingFolders = [];
+    this.pendingIgnored = 0;
+  }
+
+  get pendingFileCount(): number {
+    return this.pendingInputs?.length ?? 0;
+  }
+
+  private folderOf(path: string): string {
+    const parts = path.split('/').filter(Boolean);
+    parts.pop();
+    if (parts.length && parts[parts.length - 1].toLowerCase() === 'players') parts.pop();
+    return parts.join('/');
+  }
+
+  private guessKind(name: string): string {
+    const lower = name.toLowerCase();
+    if (lower === 'level.sav') return 'World';
+    if (lower === 'levelmeta.sav') return 'Info';
+    if (lower.endsWith('_dps.sav')) return 'DPS';
+    if (/^[0-9a-f]{32}\.sav$/.test(lower)) return 'Player';
+    return 'Save';
+  }
+
+  formatSize(bytes: number): string {
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
+    return `${bytes} B`;
   }
 
   openFolderPicker(event: Event): void {
@@ -408,6 +540,7 @@ export class AppComponent {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.closeDemoPrompt();
+    this.cancelPending();
     this.isExportMenuOpen = false;
   }
 
@@ -469,7 +602,7 @@ export class AppComponent {
 
     this.resetData();
     this.isParsing = true;
-    this.progress = { fraction: null, label: 'Starting', detail: '' };
+    this.progress = { fraction: null, label: 'Initializing\u2026', detail: '' };
     try {
       // The worker owns 0..95% of the bar; the table build takes the rest.
       const result = await this.parser.parseMany(merged, (update) => {
