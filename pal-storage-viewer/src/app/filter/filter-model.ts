@@ -292,7 +292,8 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'slot', label: 'Storage page', group: G.storage, kind: 'number', aliases: ['storage_slot', 'box', 'page'], get: (row) => number(row, 'storage_slot') },
   { key: 'index', label: 'Pal Box slot index', group: G.storage, kind: 'number', aliases: ['pal_box_slot_index', 'slot_index', 'box_slot', 'ind'], get: (row) => number(row, 'pal_box_slot_index') },
   { key: 'where', label: 'Location', group: G.storage, kind: 'text', aliases: ['location', 'loc', 'place', 'at'], suggest: true, hint: 'Party, Pal Box, Base 1, Dimensional Storage', get: (row) => text(row, 'location') },
-  { key: 'save', label: 'Save (letter or name)', group: G.storage, kind: 'text', aliases: ['world', 'save_id'], suggest: true, hint: 'A, B, … or the save name', get: (row) => [text(row, 'save_id'), text(row, 'save')].filter(Boolean).join(' ') },
+  { key: 'save', label: 'Save (letter)', group: G.storage, kind: 'text', aliases: ['save_id'], suggest: true, hint: 'A, B, …', get: (row) => text(row, 'save_id') },
+  { key: 'save_name', label: 'Save name', group: G.storage, kind: 'text', aliases: ['world'], suggest: true, get: (row) => text(row, 'save') },
   { key: 'owner', label: 'Owner', group: G.storage, kind: 'text', aliases: ['owner_name', 'player'], suggest: true, get: (row) => text(row, 'owner_name') },
   { key: 'file', label: 'Source file', group: G.storage, kind: 'text', aliases: ['source_file', 'source'], suggest: true, get: (row) => text(row, 'source_file') }
 ];

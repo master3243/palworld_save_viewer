@@ -166,10 +166,10 @@ export class AppComponent {
   /** Two or three words on what a file contributes; shown on chips and in the confirmation. */
   kindBlurb(kind: string): string {
     switch (kind) {
-      case 'level': case 'World': return 'party · box · bases';
-      case 'dimensional_storage': case 'DPS': return 'dimensional storage';
-      case 'player': case 'Player': return 'party / box ids';
-      case 'level_meta': case 'Info': return 'world name · day';
+      case 'level': return 'party · box · bases';
+      case 'dimensional_storage': return 'dimensional storage';
+      case 'player': return 'party / box ids';
+      case 'level_meta': return 'world name · day';
       default: return 'no pals';
     }
   }
@@ -179,13 +179,18 @@ export class AppComponent {
   }
 
   sourceKindTag(source: SaveSource): string {
-    switch (source.kind) {
-      case 'dimensional_storage': return 'DPS';
-      case 'level': return 'World';
-      case 'player': return 'Player';
-      case 'level_meta': return 'Info';
-      default: return 'Skip';
+    return this.kindTag(source.kind);
+  }
+
+  /** Drop every file of one save at once. */
+  async removeSaveGroup(group: SourceGroup): Promise<void> {
+    const drop = new Set(group.sources.map((entry) => entry.index));
+    const remaining = this.loadedInputs.filter((_, index) => !drop.has(index));
+    if (!remaining.length) {
+      await this.removeSource(-1);
+      return;
     }
+    await this.parseInputs(remaining, false);
   }
 
   get progressPercent(): number {
@@ -471,11 +476,33 @@ export class AppComponent {
 
   private guessKind(name: string): string {
     const lower = name.toLowerCase();
-    if (lower === 'level.sav') return 'World';
-    if (lower === 'levelmeta.sav') return 'Info';
-    if (lower.endsWith('_dps.sav')) return 'DPS';
-    if (/^[0-9a-f]{32}\.sav$/.test(lower)) return 'Player';
-    return 'Save';
+    if (lower === 'level.sav') return 'level';
+    if (lower === 'levelmeta.sav') return 'level_meta';
+    if (lower.endsWith('_dps.sav')) return 'dimensional_storage';
+    if (/^[0-9a-f]{32}\.sav$/.test(lower)) return 'player';
+    return 'unknown';
+  }
+
+  /** Short tag for a file kind, used on every chip. */
+  kindTag(kind: string): string {
+    switch (kind) {
+      case 'dimensional_storage': return 'DPS';
+      case 'level': return 'World';
+      case 'player': return 'Player';
+      case 'level_meta': return 'Info';
+      default: return 'Skip';
+    }
+  }
+
+  /** Tooltip explaining what a file kind is for. */
+  kindTitle(kind: string): string {
+    switch (kind) {
+      case 'level': return 'Level.sav: the world save. Every pal in the party, Pal Box and bases, plus base camps and player names.';
+      case 'dimensional_storage': return 'Dimensional Pal Storage: the extra storage with up to 9,600 slots.';
+      case 'player': return 'Player save: says which container is this player\'s party and which is their Pal Box.';
+      case 'level_meta': return 'World info: world name, host and in-game day, used to label the save.';
+      default: return 'Not a pal save; ignored.';
+    }
   }
 
   formatSize(bytes: number): string {
@@ -495,7 +522,7 @@ export class AppComponent {
   }
 
   async removeSource(index: number): Promise<void> {
-    const remaining = this.loadedInputs.filter((_, position) => position !== index);
+    const remaining = index < 0 ? [] : this.loadedInputs.filter((_, position) => position !== index);
     if (!remaining.length) {
       this.resetData();
       this.loadedInputs = [];

@@ -19,6 +19,8 @@ interface PassiveSkill { name: string; rank: string; color: string; rankMarker: 
 })
 export class PalDetailCardComponent implements OnChanges {
   @Input({ required: true }) row!: PalStorageRow;
+  /** Show the save letter in the header (only useful with several saves loaded). */
+  @Input() showSave = false;
   expandedFields = new Set<string>();
   palImageFailed = false;
   palImageSrc = '';
@@ -32,7 +34,7 @@ export class PalDetailCardComponent implements OnChanges {
     'level', 'rank', 'gender', 'is_lucky', 'favorite_index', 'hp',
     'iv_hp', 'iv_attack', 'iv_defense', 'soul_rank_hp', 'soul_rank_attack',
     'soul_rank_defense', 'soul_rank_craft_speed', 'skills', 'skill_ranks', 'skill_colors',
-    'passive_skill_ids', 'combat_moves', 'active_skill_ids', 'location', 'location_detail'
+    'passive_skill_ids', 'combat_moves', 'active_skill_ids', 'location', 'location_detail', 'save_id'
   ]);
 
   get name(): string {

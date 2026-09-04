@@ -103,7 +103,7 @@
 
 <div class="quick-chips" role="group" aria-label="Quick filters">
   <button
-    *ngFor="let chip of quickChips"
+    *ngFor="let chip of allChips"
     type="button"
     class="chip"
     [class.active]="chipState(chip) !== null"

@@ -173,14 +173,12 @@
   padding: 24px 24px 40px;
   position: relative;
   text-align: center;
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
   width: 100%;
 }
 
 .dropzone.dragging {
   background: rgba(17, 63, 80, 0.82);
   border-color: #95f3ff;
-  transform: translateY(-1px);
 }
 
 .dropzone.busy {
@@ -784,7 +782,6 @@ tbody tr:hover {
   line-height: 1;
   padding: 4px 11px;
   white-space: nowrap;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
 .drop-help-button {
@@ -913,7 +910,6 @@ tbody tr:hover {
   font-size: 0.85rem;
   font-weight: 650;
   padding: 8px 0;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
 .modal-ghost {
@@ -1134,19 +1130,27 @@ tbody tr:hover {
   text-transform: uppercase;
 }
 
-.source-chip[data-kind='level'] .source-kind {
+.source-kind[data-kind='level'] {
   background: rgba(120, 220, 160, 0.2);
   color: #9df0c0;
 }
 
-.source-chip[data-kind='dimensional_storage'] .source-kind {
+.source-kind[data-kind='dimensional_storage'] {
   background: rgba(196, 150, 255, 0.22);
   color: #d8bcff;
 }
 
-.source-chip[data-kind='player'] .source-kind {
+.source-kind[data-kind='player'] {
   background: rgba(255, 210, 120, 0.2);
   color: #ffd98a;
+}
+
+.source-kind[data-kind='unknown'] {
+  opacity: 0.6;
+}
+
+.group-remove {
+  margin-left: 4px;
 }
 
 .source-name {
@@ -1351,11 +1355,12 @@ tbody tr:hover {
 
 .button-icon {
   fill: none;
-  height: 16px;
+  height: 9px;
+  opacity: 0.85;
   stroke: currentColor;
   stroke-linejoin: round;
-  stroke-width: 1.8;
-  width: 16px;
+  stroke-width: 2.2;
+  width: 9px;
 }
 
 .source-blurb {

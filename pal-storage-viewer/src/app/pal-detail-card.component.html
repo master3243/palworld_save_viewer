@@ -16,6 +16,7 @@
             <app-gender-icon *ngIf="gender === 'Female' || gender === 'Male'; else genderText" [gender]="gender === 'Female' ? 'female' : 'male'"></app-gender-icon>
             <ng-template #genderText>{{ gender }}</ng-template>
           </span>
+          <span class="save-badge" *ngIf="showSave && valueFor('save_id')" [title]="'Save ' + valueFor('save_id') + ': ' + valueFor('save')">Save {{ valueFor('save_id') }}</span>
           <span class="location-badge" *ngIf="valueFor('location')" [attr.data-location]="valueFor('location')" title="Where this Pal is">
             {{ valueFor('location') }}<small *ngIf="valueFor('location_detail')"> · {{ valueFor('location_detail') }}</small>
           </span>

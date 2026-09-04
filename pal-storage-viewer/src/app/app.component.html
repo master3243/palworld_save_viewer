@@ -157,7 +157,7 @@
           <div class="confirm-folder-name" [title]="folder.folder">{{ folder.folder || 'Loose files' }}</div>
           <ul>
             <li *ngFor="let file of folder.files">
-              <span class="source-kind">{{ file.kind }}</span>
+              <span class="source-kind" [attr.data-kind]="file.kind" [title]="kindTitle(file.kind)">{{ kindTag(file.kind) }}</span>
               <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
               <span class="source-blurb">{{ kindBlurb(file.kind) }}</span>
               <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
@@ -172,7 +172,7 @@
           </ul>
         </div>
       </div>
-      <p class="confirm-note" *ngIf="pendingIgnored">{{ pendingIgnored }} other {{ pendingIgnored === 1 ? 'file' : 'files' }} ignored (not Pal saves).</p>
+      <p class="confirm-note" *ngIf="pendingIgnored">{{ pendingIgnored }} {{ pendingIgnored === 1 ? 'file' : 'files' }} ignored (not Pal saves)</p>
       <p class="confirm-note">Drop more files to add them to this list</p>
       <div class="modal-actions">
         <button class="modal-ghost" type="button" (click)="cancelPending()">Cancel</button>
@@ -215,6 +215,13 @@
               <span *ngFor="let part of groupMeta(group)">{{ part }}</span>
               <span class="source-group-count">{{ group.pals | number }} pals</span>
             </span>
+            <button
+              class="source-remove group-remove"
+              type="button"
+              [attr.aria-label]="'Remove save ' + (group.set?.letter || group.set?.label || '')"
+              title="Remove this whole save"
+              (click)="removeSaveGroup(group)"
+            >&times;</button>
           </div>
           <div class="source-group-files">
             <span
@@ -224,7 +231,7 @@
               [class.muted]="!item.source.pals && item.source.kind !== 'player' && item.source.kind !== 'level_meta'"
               [title]="item.source.file + ' · ' + sourceTitle(item.source)"
             >
-              <span class="source-kind">{{ sourceKindTag(item.source) }}</span>
+              <span class="source-kind" [attr.data-kind]="item.source.kind" [title]="kindTitle(item.source.kind)">{{ sourceKindTag(item.source) }}</span>
               <span class="source-name">{{ shortFileName(item.source.file) }}</span>
               <span class="source-blurb">{{ kindBlurb(item.source.kind) }}</span>
               <span class="source-count" *ngIf="item.source.pals">{{ item.source.pals | number }}</span>
@@ -402,7 +409,7 @@
             </tr>
             <tr class="detail-row" *ngIf="isRowOpen(item.index)">
               <td [attr.colspan]="detailColspan">
-                <app-pal-detail-card [row]="item.row"></app-pal-detail-card>
+                <app-pal-detail-card [row]="item.row" [showSave]="saveSets.length > 1"></app-pal-detail-card>
               </td>
             </tr>
           </ng-container>

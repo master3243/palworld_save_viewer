@@ -133,6 +133,13 @@ export class FilterBarComponent implements OnChanges {
   suggestionIndex = -1;
   private suggestionsVisible = false;
 
+  /** One state per loaded save (A, B, …); only offered when more than one save is loaded. */
+  saveChip: QuickChip | null = null;
+
+  get allChips(): QuickChip[] {
+    return this.saveChip ? [this.saveChip, ...this.quickChips] : this.quickChips;
+  }
+
   readonly quickChips: QuickChip[] = [
     {
       label: 'Where',
@@ -141,7 +148,7 @@ export class FilterBarComponent implements OnChanges {
         { label: 'Party', title: 'In the party', tone: 'include', make: () => createRule('where', 'is', ['Party']) },
         { label: 'Box', title: 'In the Pal Box', tone: 'include', make: () => createRule('where', 'is', ['Pal Box']) },
         { label: 'Base', title: 'Working at a base', tone: 'include', make: () => createRule('where', 'starts', ['Base']) },
-        { label: 'DPS', title: 'In dimensional storage', tone: 'include', make: () => createRule('where', 'is', ['Dimensional Storage']) }
+        { label: 'DimS', title: 'In dimensional storage', tone: 'include', make: () => createRule('where', 'is', ['Dimensional Storage']) }
       ]
     },
     flagChip('Alpha', 'Alpha pals', 'alpha'),
@@ -233,6 +240,18 @@ export class FilterBarComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes['rows']) return;
+    const letters = Array.from(new Set(this.rows.map((row) => String(row['save_id'] ?? '')).filter(Boolean)))
+      .sort((left, right) => left.length - right.length || left.localeCompare(right));
+    this.saveChip = letters.length > 1 ? {
+      label: 'Save',
+      title: 'Save: click to cycle through the loaded saves',
+      states: letters.map((letter) => ({
+        label: `Save ${letter}`,
+        title: `Only save ${letter}`,
+        tone: 'include' as const,
+        make: () => createRule('save', 'is', [letter])
+      }))
+    } : null;
     this.fields = buildFieldRegistry(this.rows);
     this.lookup = new FieldLookup(this.fields);
     const groups = new Map<string, FilterField[]>();
