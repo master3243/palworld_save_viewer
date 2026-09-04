@@ -92,16 +92,38 @@
   <section class="table-shell" *ngIf="hasData">
     <div class="table-tools">
       <app-filter-bar [rows]="originalRows" (filtered)="onFilterChanged($event)"></app-filter-bar>
-      <button
-        class="export-button"
-        type="button"
-        aria-label="Download full raw data as CSV"
-        (click)="exportRawCsv()"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 3v12m0 0 5-5m-5 5-5-5M5 19h14"/>
-        </svg>
-      </button>
+      <div class="export-wrap">
+        <button
+          class="export-button"
+          type="button"
+          aria-label="Download as CSV"
+          title="Download as CSV"
+          aria-haspopup="menu"
+          [attr.aria-expanded]="isExportMenuOpen"
+          [class.open]="isExportMenuOpen"
+          (click)="toggleExportMenu()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v12m0 0 5-5m-5 5-5-5M5 19h14"/>
+          </svg>
+        </button>
+        <div class="export-menu" *ngIf="isExportMenuOpen" role="menu">
+          <button
+            type="button"
+            role="menuitem"
+            [disabled]="!isFiltered"
+            [title]="isFiltered ? 'Only the rows currently shown, in their current order' : 'No filter is active, so visible rows are all rows'"
+            (click)="exportCsv('visible')"
+          >
+            <span>Visible</span>
+            <small>{{ rows.length | number }} rows</small>
+          </button>
+          <button type="button" role="menuitem" title="Every pal in the save" (click)="exportCsv('all')">
+            <span>All</span>
+            <small>{{ originalRows.length | number }} rows</small>
+          </button>
+        </div>
+      </div>
       <button
         class="gear-button"
         type="button"
@@ -194,16 +216,12 @@
                   *ngIf="column.key === 'gender' && isFemale(item.row)"
                   class="gender-icon female"
                   aria-label="Female"
-                >
-                  ♀
-                </span>
+                ><app-gender-icon gender="female"></app-gender-icon></span>
                 <span
                   *ngIf="column.key === 'gender' && isMale(item.row)"
                   class="gender-icon male"
                   aria-label="Male"
-                >
-                  ♂
-                </span>
+                ><app-gender-icon gender="male"></app-gender-icon></span>
                 <span
                   *ngIf="column.key === 'is_lucky' && isLucky(item.row)"
                   class="lucky-icon"

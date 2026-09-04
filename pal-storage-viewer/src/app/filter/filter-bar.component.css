@@ -350,6 +350,21 @@
   color: #ffffff;
 }
 
+.chip {
+  align-items: center;
+  display: inline-flex;
+}
+
+.chip-genders {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.9rem;
+  gap: 1px;
+}
+
+.chip-genders[data-state="any"] app-gender-icon:first-child { color: #6fd6ff; }
+.chip-genders[data-state="any"] app-gender-icon:last-child { color: #ff8db5; }
+
 .chip .chip-sign {
   font-weight: 800;
   margin-right: 3px;

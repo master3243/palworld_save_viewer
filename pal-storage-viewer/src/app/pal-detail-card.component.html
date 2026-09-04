@@ -13,7 +13,8 @@
           <span *ngIf="isLucky" class="lucky-badge" title="Lucky Pal">★ Lucky</span>
           <img *ngIf="favoriteImageSrc" class="favorite-badge" [src]="favoriteImageSrc" alt="" aria-label="Favorite" title="Favorite">
           <span *ngIf="gender" class="gender" [class.female]="gender === 'Female'">
-            {{ gender === 'Female' ? '♀' : gender === 'Male' ? '♂' : gender }}
+            <app-gender-icon *ngIf="gender === 'Female' || gender === 'Male'; else genderText" [gender]="gender === 'Female' ? 'female' : 'male'"></app-gender-icon>
+            <ng-template #genderText>{{ gender }}</ng-template>
           </span>
           <span class="wiki-links">
             <a

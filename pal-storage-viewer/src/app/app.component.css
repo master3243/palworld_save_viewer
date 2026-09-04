@@ -217,10 +217,66 @@
   width: 32px;
 }
 
-.export-button {
+.export-wrap {
   margin-left: auto;
+  position: relative;
+}
+
+.export-button {
   padding: 0;
   width: 32px;
+}
+
+.export-button.open {
+  background: rgba(42, 125, 161, 0.88);
+  border-color: rgba(164, 239, 255, 0.78);
+}
+
+.export-menu {
+  background: rgba(9, 25, 39, 0.98);
+  border: 1px solid rgba(137, 221, 255, 0.34);
+  border-radius: 8px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.44);
+  display: grid;
+  gap: 2px;
+  min-width: 150px;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 5;
+}
+
+.export-menu button {
+  align-items: baseline;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #dff6ff;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.82rem;
+  font-weight: 650;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.export-menu button small {
+  color: rgba(199, 243, 255, 0.5);
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+.export-menu button:hover:not(:disabled) {
+  background: rgba(88, 197, 238, 0.14);
+  color: #f4fdff;
+}
+
+.export-menu button:disabled {
+  cursor: default;
+  opacity: 0.38;
 }
 
 .export-button svg {
@@ -572,10 +628,10 @@ td.icon-cell {
 }
 
 .gender-icon {
-  display: inline-block;
-  font-size: 1.02rem;
+  display: inline-flex;
+  font-size: 1rem;
   line-height: 1;
-  text-shadow: 0 0 3px currentColor;
+  vertical-align: top;
 }
 
 .gender-icon.female {

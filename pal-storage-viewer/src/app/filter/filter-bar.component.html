@@ -114,7 +114,13 @@
   >
     <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'include'" aria-hidden="true">+</span>
     <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'exclude'" aria-hidden="true">−</span>
-    <span>{{ chipLabel(chip) }}</span>
+    <ng-container *ngIf="isGenderChip(chip); else textLabel">
+      <span class="chip-genders" [attr.data-state]="chipState(chip)?.tone || 'any'">
+        <app-gender-icon *ngIf="chipState(chip)?.tone !== 'female'" gender="male"></app-gender-icon>
+        <app-gender-icon *ngIf="chipState(chip)?.tone !== 'male'" gender="female"></app-gender-icon>
+      </span>
+    </ng-container>
+    <ng-template #textLabel><span>{{ chipLabel(chip) }}</span></ng-template>
   </button>
 </div>
 

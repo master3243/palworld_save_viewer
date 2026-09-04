@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } fro
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
 import { FilterBarComponent } from './filter/filter-bar.component';
+import { GenderIconComponent } from './gender-icon.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
@@ -25,7 +26,7 @@ type SortDirection = 'asc' | 'desc' | null;
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent],
+  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -41,6 +42,7 @@ export class AppComponent {
   isParsing = false;
   isDragging = false;
   isColumnMenuOpen = false;
+  isExportMenuOpen = false;
   isDemoPromptOpen = false;
   isDropHelpOpen = false;
   openRowIndex: number | null = null;
@@ -266,9 +268,16 @@ export class AppComponent {
     this.isDropHelpOpen = false;
   }
 
-  exportRawCsv(): void {
-    // With a filter active, export what is on screen (in its current order).
-    const source = this.isFiltered ? this.rows : this.originalRows;
+  toggleExportMenu(): void {
+    this.isExportMenuOpen = !this.isExportMenuOpen;
+    if (this.isExportMenuOpen) this.isColumnMenuOpen = false;
+  }
+
+  exportCsv(scope: 'visible' | 'all'): void {
+    this.isExportMenuOpen = false;
+    if (scope === 'visible' && !this.isFiltered) return;
+    // "Visible" is the filtered set in its current sort order.
+    const source = scope === 'visible' ? this.rows : this.originalRows;
     if (!source.length) return;
 
     const keys = Array.from(new Set(source.flatMap((row) => Object.keys(row))));
@@ -280,7 +289,7 @@ export class AppComponent {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = this.isFiltered ? 'pal-storage-filtered.csv' : 'pal-storage-full.csv';
+    link.download = scope === 'visible' ? 'pal-storage-visible.csv' : 'pal-storage-full.csv';
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -298,6 +307,7 @@ export class AppComponent {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.closeDemoPrompt();
+    this.isExportMenuOpen = false;
   }
 
   async loadDemoSave(): Promise<void> {
@@ -333,6 +343,7 @@ export class AppComponent {
     this.sortDirection = null;
     this.scrollTop = 0;
     this.isColumnMenuOpen = false;
+    this.isExportMenuOpen = false;
     this.isParsing = true;
     try {
       const parsedRows = await this.parser.parse(file);
@@ -355,6 +366,7 @@ export class AppComponent {
 
   toggleColumnMenu(): void {
     this.isColumnMenuOpen = !this.isColumnMenuOpen;
+    if (this.isColumnMenuOpen) this.isExportMenuOpen = false;
   }
 
   toggleColumn(column: TableColumn): void {

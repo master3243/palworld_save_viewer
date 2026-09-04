@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 
 import { Game8LookupService } from './game8-lookup.service';
+import { GenderIconComponent } from './gender-icon.component';
 import { OfflineImageService } from './offline-image.service';
 import { PalStorageRow } from './save-parser.service';
 
@@ -12,7 +13,7 @@ interface PassiveSkill { name: string; rank: string; color: string; rankMarker: 
 @Component({
   selector: 'app-pal-detail-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, GenderIconComponent],
   templateUrl: './pal-detail-card.component.html',
   styleUrl: './pal-detail-card.component.css'
 })

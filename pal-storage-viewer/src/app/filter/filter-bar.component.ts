@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 
 import type { PalStorageRow } from '../save-parser.service';
+import { GenderIconComponent } from '../gender-icon.component';
 import { FilterBuilderComponent } from './filter-builder.component';
 import { FilterEngine } from './filter-engine';
 import {
@@ -100,7 +101,7 @@ function numberChip(label: string, title: string, field: string, op: FilterRule[
 @Component({
   selector: 'app-filter-bar',
   standalone: true,
-  imports: [CommonModule, FilterBuilderComponent],
+  imports: [CommonModule, FilterBuilderComponent, GenderIconComponent],
   templateUrl: './filter-bar.component.html',
   styleUrl: './filter-bar.component.css'
 })
@@ -133,11 +134,11 @@ export class FilterBarComponent implements OnChanges {
     flagChip('Alpha', 'Alpha pals', 'alpha'),
     flagChip('★ Lucky', 'Lucky pals', 'lucky'),
     {
-      label: '♀♂',
-      title: 'Gender: click to cycle female, male, any',
+      label: '♂♀',
+      title: 'Gender: click to cycle male, female, any',
       states: [
-        { label: '♀', title: 'Female only', tone: 'female', make: () => createRule('gender', 'is', ['Female']) },
-        { label: '♂', title: 'Male only', tone: 'male', make: () => createRule('gender', 'is', ['Male']) }
+        { label: '♂', title: 'Male only', tone: 'male', make: () => createRule('gender', 'is', ['Male']) },
+        { label: '♀', title: 'Female only', tone: 'female', make: () => createRule('gender', 'is', ['Female']) }
       ]
     },
     flagChip('Fav', 'Marked as favorite', 'favorite'),
@@ -372,6 +373,10 @@ export class FilterBarComponent implements OnChanges {
   chipState(chip: QuickChip): ChipState | null {
     const index = this.chipStateIndex(chip);
     return index >= 0 ? chip.states[index] : null;
+  }
+
+  isGenderChip(chip: QuickChip): boolean {
+    return chip.states[0]?.tone === 'male';
   }
 
   chipLabel(chip: QuickChip): string {
