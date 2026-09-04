@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
+import { FilterBarComponent } from './filter/filter-bar.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
@@ -24,14 +25,16 @@ type SortDirection = 'asc' | 'desc' | null;
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent],
+  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
   @ViewChild('tableScroll') tableScroll?: ElementRef<HTMLElement>;
 
-  private originalRows: PalStorageRow[] = [];
+  originalRows: PalStorageRow[] = [];
+  /** Rows that pass the current filter, before sorting. */
+  private filteredRows: PalStorageRow[] = [];
   rows: PalStorageRow[] = [];
   columns: TableColumn[] = [];
   error = '';
@@ -63,6 +66,23 @@ export class AppComponent {
 
   get displayedColumns(): TableColumn[] {
     return this.columns.filter((column) => column.visible);
+  }
+
+  get hasData(): boolean {
+    return this.originalRows.length > 0;
+  }
+
+  get isFiltered(): boolean {
+    return this.filteredRows.length !== this.originalRows.length;
+  }
+
+  onFilterChanged(rows: PalStorageRow[]): void {
+    this.filteredRows = rows;
+    this.openRowIndex = null;
+    this.detailHeight = 0;
+    this.resetTableScroll();
+    this.applySort();
+    this.scheduleMeasure();
   }
 
   get detailColspan(): number {
@@ -247,18 +267,20 @@ export class AppComponent {
   }
 
   exportRawCsv(): void {
-    if (!this.originalRows.length) return;
+    // With a filter active, export what is on screen (in its current order).
+    const source = this.isFiltered ? this.rows : this.originalRows;
+    if (!source.length) return;
 
-    const keys = Array.from(new Set(this.originalRows.flatMap((row) => Object.keys(row))));
+    const keys = Array.from(new Set(source.flatMap((row) => Object.keys(row))));
     const lines = [
       keys.map((key) => this.csvValue(key)).join(','),
-      ...this.originalRows.map((row) => keys.map((key) => this.csvValue(row[key])).join(','))
+      ...source.map((row) => keys.map((key) => this.csvValue(row[key])).join(','))
     ];
     const blob = new Blob([`\uFEFF${lines.join('\r\n')}`], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'pal-storage-full.csv';
+    link.download = this.isFiltered ? 'pal-storage-filtered.csv' : 'pal-storage-full.csv';
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -302,6 +324,7 @@ export class AppComponent {
   private async parseFile(file: File): Promise<void> {
     this.rows = [];
     this.originalRows = [];
+    this.filteredRows = [];
     this.columns = [];
     this.error = '';
     this.openRowIndex = null;
@@ -318,6 +341,7 @@ export class AppComponent {
         paldeck_no: await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name'))
       })));
       this.originalRows = rows;
+      this.filteredRows = rows;
       this.rows = [...rows];
       this.columns = this.buildColumns(rows);
       this.palNameWidth = this.measurePalNameWidth(rows);
@@ -569,13 +593,13 @@ export class AppComponent {
 
   private applySort(): void {
     if (!this.sortColumn || !this.sortDirection) {
-      this.rows = [...this.originalRows];
+      this.rows = [...this.filteredRows];
       return;
     }
 
     const direction = this.sortDirection === 'asc' ? 1 : -1;
     const key = this.sortColumn;
-    this.rows = [...this.originalRows].sort((left, right) => {
+    this.rows = [...this.filteredRows].sort((left, right) => {
       const leftValue = this.sortValue(left[key]);
       const rightValue = this.sortValue(right[key]);
       if (typeof leftValue === 'number' && typeof rightValue === 'number') {

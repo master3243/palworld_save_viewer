@@ -1,0 +1,170 @@
+<div class="search" [class.active]="isActive" [class.has-warning]="unknownFields.length">
+  <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="11" cy="11" r="6.5"/>
+    <path d="m20 20-4.2-4.2"/>
+  </svg>
+  <input
+    #searchInput
+    class="search-input"
+    type="text"
+    [value]="queryText"
+    placeholder="Search or filter… e.g. level>=40 skills:Legend"
+    aria-label="Filter pals"
+    autocomplete="off"
+    spellcheck="false"
+    (input)="onQueryInput($event)"
+    (focus)="onQueryFocus($event)"
+    (click)="onQueryClick($event)"
+    (keydown)="onQueryKeydown($event)"
+    (blur)="onQueryBlur()"
+  >
+  <button
+    class="search-clear"
+    type="button"
+    aria-label="Clear filter"
+    title="Clear filter (Esc)"
+    *ngIf="queryText"
+    (click)="clear()"
+  >×</button>
+  <button
+    class="help-button"
+    type="button"
+    aria-label="Filter syntax help"
+    title="Filter syntax help"
+    [attr.aria-expanded]="isHelpOpen"
+    (click)="toggleHelp()"
+  >?</button>
+
+  <ul class="search-suggestions" *ngIf="suggestions.length" role="listbox">
+    <li
+      *ngFor="let item of suggestions; let i = index"
+      role="option"
+      [class.active]="i === suggestionIndex"
+      [class.field]="item.kind === 'field'"
+      [attr.aria-selected]="i === suggestionIndex"
+      (mousedown)="$event.preventDefault(); acceptSuggestion(item, searchInput)"
+    >
+      <span class="suggest-label">{{ item.label }}</span>
+      <span class="suggest-detail">{{ item.detail }}</span>
+    </li>
+  </ul>
+
+  <p class="search-warning" *ngIf="unknownFields.length">
+    Unknown field{{ unknownFields.length > 1 ? 's' : '' }}: {{ unknownFields.join(', ') }} (ignored)
+  </p>
+
+  <div class="help-popover" *ngIf="isHelpOpen" role="dialog" aria-label="Filter syntax help">
+    <div class="help-columns">
+      <section>
+        <h4>Query syntax</h4>
+        <ul class="help-examples">
+          <li *ngFor="let example of helpExamples">
+            <button type="button" (click)="applyQuery(example.query)">{{ example.query }}</button>
+            <span>{{ example.meaning }}</span>
+          </li>
+        </ul>
+        <p class="help-note">
+          Values with spaces go in quotes: <code>moves:"Dragon Burst"</code>.
+          Prefix anything with <code>-</code> to negate it. Click a field on the right to insert it.
+        </p>
+      </section>
+      <section class="help-fields">
+        <h4>Fields</h4>
+        <div class="help-field-group" *ngFor="let group of fieldGroups">
+          <span class="help-group-name">{{ group.name }}</span>
+          <button
+            *ngFor="let field of group.fields"
+            type="button"
+            class="help-field"
+            [title]="field.label + (field.hint ? ' — ' + field.hint : '')"
+            (click)="insertField(field)"
+          >{{ field.key }}</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<button
+  class="panel-toggle"
+  type="button"
+  [class.open]="isPanelOpen"
+  [class.active]="isActive"
+  [attr.aria-expanded]="isPanelOpen"
+  title="Open the filter builder"
+  (click)="togglePanel()"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 5h16l-6.5 7.5V19l-3-1.5v-5z"/>
+  </svg>
+  <span>Filters</span>
+  <b *ngIf="activeRuleCount">{{ activeRuleCount }}</b>
+</button>
+
+<div class="quick-chips" role="group" aria-label="Quick filters">
+  <button
+    *ngFor="let chip of quickChips"
+    type="button"
+    class="chip"
+    [class.active]="isChipActive(chip)"
+    [attr.data-tone]="chip.tone || null"
+    [attr.aria-pressed]="isChipActive(chip)"
+    [title]="chip.title"
+    (click)="toggleChip(chip)"
+  >{{ chip.label }}</button>
+</div>
+
+<span class="match-count" [class.active]="isActive" [title]="isActive ? 'Pals matching the filter' : 'Pals in storage'">
+  <ng-container *ngIf="isActive">{{ matchCount | number }}<em>&nbsp;of&nbsp;</em></ng-container>{{ total | number }}
+</span>
+
+<div class="filter-panel" *ngIf="isPanelOpen">
+  <app-filter-builder
+    [root]="root"
+    [fields]="fields"
+    [engine]="engine"
+    [ruleCounts]="ruleCounts"
+    (changed)="onTreeChanged()"
+  ></app-filter-builder>
+
+  <div class="panel-footer">
+    <div class="presets">
+      <span class="presets-label">Saved</span>
+      <button
+        *ngFor="let preset of presets"
+        type="button"
+        class="preset"
+        [class.active]="isPresetActive(preset)"
+        [title]="preset.query"
+        (click)="applyQuery(preset.query)"
+      >
+        {{ preset.name }}
+        <span class="preset-delete" role="button" aria-label="Delete saved filter" (click)="deletePreset(preset, $event)">×</span>
+      </button>
+      <span class="presets-empty" *ngIf="!presets.length && !isSavingPreset">none yet</span>
+
+      <ng-container *ngIf="isSavingPreset; else saveButton">
+        <input
+          class="preset-name"
+          type="text"
+          placeholder="Name this filter"
+          autofocus
+          [value]="presetName"
+          (input)="onPresetNameInput($event)"
+          (keydown.enter)="savePreset()"
+          (keydown.escape)="cancelSavePreset(); $event.stopPropagation()"
+        >
+        <button type="button" class="ghost" [disabled]="!presetName.trim() || !isActive" (click)="savePreset()">Save</button>
+        <button type="button" class="ghost" (click)="cancelSavePreset()">Cancel</button>
+      </ng-container>
+      <ng-template #saveButton>
+        <button type="button" class="ghost" [disabled]="!isActive" title="Save the current filter" (click)="startSavePreset()">+ save current</button>
+      </ng-template>
+    </div>
+
+    <div class="footer-actions">
+      <button type="button" class="ghost" [disabled]="!isActive" (click)="clear()">Clear all</button>
+      <button type="button" class="ghost" (click)="togglePanel()">Close</button>
+    </div>
+  </div>
+</div>

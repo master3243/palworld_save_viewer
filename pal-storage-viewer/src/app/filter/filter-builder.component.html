@@ -1,0 +1,141 @@
+<ng-container *ngTemplateOutlet="groupTpl; context: { $implicit: root, parent: null, depth: 0 }"></ng-container>
+
+<ng-template #groupTpl let-group let-parent="parent" let-depth="depth">
+  <div class="group" [class.root]="depth === 0" [class.negated]="group.negate" [class.any]="group.combinator === 'or'">
+    <div class="group-head">
+      <span class="match-word">{{ group.negate ? 'Exclude pals matching' : 'Match' }}</span>
+      <span class="combinator" role="group" aria-label="Combine rules with">
+        <button
+          type="button"
+          [class.active]="group.combinator === 'and'"
+          (click)="setCombinator(group, 'and')"
+        >all</button>
+        <button
+          type="button"
+          [class.active]="group.combinator === 'or'"
+          (click)="setCombinator(group, 'or')"
+        >any</button>
+      </span>
+      <span class="match-word">of these</span>
+
+      <span class="group-actions">
+        <button class="ghost" type="button" (click)="addRule(group)">+ rule</button>
+        <button class="ghost" type="button" (click)="addGroup(group)">+ group</button>
+        <button
+          *ngIf="depth > 0"
+          class="ghost"
+          type="button"
+          [class.active]="group.negate"
+          title="Invert this group"
+          (click)="toggleNegate(group)"
+        >NOT</button>
+        <button
+          *ngIf="depth > 0 && parent"
+          class="icon"
+          type="button"
+          aria-label="Remove group"
+          title="Remove group"
+          (click)="remove(parent, group)"
+        >×</button>
+      </span>
+    </div>
+
+    <p class="empty-group" *ngIf="!group.children.length">
+      No rules yet. Add a rule, click a quick filter, or type a query above.
+    </p>
+
+    <div class="children">
+      <ng-container *ngFor="let child of group.children; let index = index; trackBy: trackNode">
+        <div class="child" [class.first]="index === 0">
+          <span class="joiner" aria-hidden="true">{{ index === 0 ? '' : (group.combinator === 'and' ? 'and' : 'or') }}</span>
+
+          <ng-container *ngIf="child.type === 'rule'; else nestedGroup">
+            <div class="rule" [class.unknown]="isUnknownField(child)">
+              <select class="field" [value]="child.field" (change)="onFieldChange(child, $event)" [title]="hint(child)">
+                <option *ngIf="isUnknownField(child)" [value]="child.field" disabled>{{ child.field }} (unknown)</option>
+                <optgroup *ngFor="let fieldGroup of fieldGroups" [label]="fieldGroup.name">
+                  <option *ngFor="let field of fieldGroup.fields" [value]="field.key" [selected]="field.key === child.field">{{ field.label }}</option>
+                </optgroup>
+              </select>
+
+              <select class="op" [value]="child.op" (change)="onOperatorChange(child, $event)">
+                <option *ngFor="let def of operatorsFor(child)" [value]="def.op" [selected]="def.op === child.op">{{ def.label }}</option>
+              </select>
+
+              <ng-container [ngSwitch]="arity(child)">
+                <ng-container *ngSwitchCase="'none'"></ng-container>
+
+                <ng-container *ngSwitchCase="'two'">
+                  <input
+                    class="value narrow"
+                    type="number"
+                    [value]="singleValue(child, 0)"
+                    [placeholder]="placeholder(child, 0)"
+                    (input)="onSlotInput(child, 0, $event)"
+                  >
+                  <span class="dash">–</span>
+                  <input
+                    class="value narrow"
+                    type="number"
+                    [value]="singleValue(child, 1)"
+                    [placeholder]="placeholder(child, 1)"
+                    (input)="onSlotInput(child, 1, $event)"
+                  >
+                </ng-container>
+
+                <span class="value-wrap" *ngSwitchDefault>
+                  <input
+                    #valueInput
+                    class="value"
+                    [class.narrow]="inputType(child) === 'number'"
+                    [type]="inputType(child)"
+                    [value]="valueText(child)"
+                    [placeholder]="placeholder(child)"
+                    autocomplete="off"
+                    spellcheck="false"
+                    (input)="onValueInput(child, $event)"
+                    (focus)="onValueFocus(child, $event)"
+                    (blur)="onValueBlur(child)"
+                    (keydown)="onValueKeydown(child, $event)"
+                  >
+                  <ul class="suggestions" *ngIf="suggestionsFor(child).length" role="listbox">
+                    <li
+                      *ngFor="let item of suggestionsFor(child); let i = index"
+                      role="option"
+                      [class.active]="i === suggestionIndex(child)"
+                      [attr.aria-selected]="i === suggestionIndex(child)"
+                      (mousedown)="$event.preventDefault(); pickSuggestion(child, item, valueInput)"
+                    >
+                      <span class="suggest-value">{{ item.value }}</span>
+                      <span class="suggest-count">{{ item.count }}</span>
+                    </li>
+                  </ul>
+                </span>
+              </ng-container>
+
+              <span
+                class="rule-count"
+                *ngIf="countFor(child) !== null"
+                title="Pals matching this rule on its own"
+              >{{ countFor(child) }}</span>
+
+              <span class="rule-actions">
+                <button class="icon" type="button" aria-label="Duplicate rule" title="Duplicate" (click)="duplicate(group, child)">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="9" y="9" width="11" height="11" rx="2"/>
+                    <path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/>
+                  </svg>
+                </button>
+                <button class="icon" type="button" aria-label="Remove rule" title="Remove" (click)="remove(group, child)">×</button>
+              </span>
+            </div>
+          </ng-container>
+
+          <ng-template #nestedGroup>
+            <ng-container *ngTemplateOutlet="groupTpl; context: { $implicit: child, parent: group, depth: depth + 1 }"></ng-container>
+          </ng-template>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
