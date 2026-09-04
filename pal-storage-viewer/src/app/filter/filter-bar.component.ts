@@ -142,17 +142,16 @@ export class FilterBarComponent implements OnChanges {
     },
     flagChip('Fav', 'Marked as favorite', 'favorite'),
     numberChip('4★', 'Max rank (4 stars)', 'rank', 'eq', ['4']),
-    numberChip('100 IV', 'At least one perfect IV', 'iv_max', 'eq', ['100']),
-    numberChip('IV 70+', 'All three IVs at 70 or more', 'iv_min', 'gte', ['70']),
-    numberChip('Platinum', 'Has a platinum tier passive', 'platinum', 'gte', ['1']),
-    numberChip('Gold', 'Has a gold tier passive', 'gold', 'gte', ['1']),
-    numberChip('Negative', 'Has a negative passive', 'negative', 'gte', ['1']),
+    numberChip('=300 IV', 'Perfect IVs (100 / 100 / 100)', 'iv', 'eq', ['300']),
+    numberChip('≥60 SR', 'Perfect soul ranks (HP + Attack + Defense at 60 or more)', 'sr', 'gte', ['60']),
+    numberChip('4 platinum', 'Four platinum tier passives', 'platinum', 'eq', ['4']),
+    numberChip('0 negatives', 'No negative passives', 'negative', 'eq', ['0']),
     {
-      label: 'Named',
+      label: 'Nicknamed',
       title: 'Has a nickname',
       states: [
-        { label: 'Named', title: 'Has a nickname', tone: 'include', make: () => createRule('nick', 'not_empty') },
-        { label: 'Named', title: 'Has no nickname', tone: 'exclude', make: () => createRule('nick', 'empty') }
+        { label: 'Nicknamed', title: 'Has a nickname', tone: 'include', make: () => createRule('nick', 'not_empty') },
+        { label: 'Nicknamed', title: 'Has no nickname', tone: 'exclude', make: () => createRule('nick', 'empty') }
       ]
     }
   ];
