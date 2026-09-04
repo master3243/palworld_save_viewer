@@ -27,6 +27,7 @@ export interface SaveSource {
 
 export interface SaveSetSummary {
   label: string;
+  letter: string;
   folder: string;
   world_name: string;
   host_player_name: string;
@@ -57,7 +58,7 @@ export interface ParseProgress {
 
 type WorkerResponse =
   | { type: 'progress'; id: number; fraction: number | null; label: string; detail: string }
-  | { type: 'result'; id: number; json: string }
+  | { type: 'result'; id: number; bytes: Uint8Array; timing: { pyStart: number; pyDone: number; posted: number } }
   | { type: 'error'; id: number; message: string };
 
 @Injectable({ providedIn: 'root' })
@@ -69,6 +70,8 @@ export class SaveParserService {
     reject: (error: Error) => void;
     onProgress?: (progress: ParseProgress) => void;
   }>();
+  /** Durations of the last parse, in ms, for debugging slow loads. */
+  lastTiming: Record<string, number> = {};
 
   async parse(file: File): Promise<PalStorageRow[]> {
     return (await this.parseMany([{ file, path: file.name }])).rows;
@@ -105,7 +108,10 @@ export class SaveParserService {
       throw new Error(this.formatParseError(error));
     }
 
-    const result = JSON.parse(jsonText) as CombinedSaves;
+    const parseStart = Date.now();
+    const result = JSON.parse(jsonText) as CombinedSaves & { timing?: Record<string, number> };
+    this.lastTiming['jsonParse'] = Date.now() - parseStart;
+    Object.assign(this.lastTiming, result.timing ?? {});
     if (!result.rows.length) {
       const notes = result.sources.map((source) => source.note).filter(Boolean);
       throw new Error(notes[0] || this.wrongSaveMessage());
@@ -146,7 +152,15 @@ export class SaveParserService {
         request.onProgress?.({ fraction: message.fraction, label: message.label, detail: message.detail });
       } else if (message.type === 'result') {
         this.pending.delete(message.id);
-        request.resolve(message.json);
+        const received = Date.now();
+        const jsonText = new TextDecoder().decode(message.bytes);
+        this.lastTiming = {
+          python: message.timing.pyDone - message.timing.pyStart,
+          transfer: received - message.timing.posted,
+          decode: Date.now() - received,
+          jsonBytes: message.bytes.byteLength
+        };
+        request.resolve(jsonText);
       } else {
         this.pending.delete(message.id);
         request.reject(new Error(message.message));

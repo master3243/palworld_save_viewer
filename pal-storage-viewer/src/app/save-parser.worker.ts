@@ -34,7 +34,10 @@ export interface ProgressMessage {
 export interface ResultMessage {
   type: 'result';
   id: number;
-  json: string;
+  /** UTF-8 JSON, transferred rather than copied. */
+  bytes: Uint8Array;
+  /** Wall-clock stamps (ms since epoch) so the main thread can attribute the wait. */
+  timing: { pyStart: number; pyDone: number; posted: number };
 }
 
 export interface ErrorMessage {
@@ -46,6 +49,8 @@ export interface ErrorMessage {
 export type WorkerResponse = ProgressMessage | ResultMessage | ErrorMessage;
 
 type OozModule = { decompress(data: Uint8Array, rawSize: number): Uint8Array };
+
+type PyBytesProxy = { toJs(): Uint8Array; destroy(): void };
 
 type PyodideRuntime = {
   FS: {
@@ -159,15 +164,18 @@ async function handleParse(request: ParseRequest): Promise<void> {
   };
   pyodide.globals.set('progress_cb', onProgress);
 
-  let jsonText: string;
+  let bytes: Uint8Array;
+  const pyStart = Date.now();
   try {
-    jsonText = await pyodide.runPythonAsync<string>(`
+    const proxy = await pyodide.runPythonAsync<PyBytesProxy>(`
 import importlib
 import sys
 sys.path.insert(0, '/app')
 main = importlib.import_module('main')
-main.combine_decoded_saves_to_json(${JSON.stringify(JSON.stringify(manifest))}, '/app/resources', flattened=True, progress=progress_cb)
+main.combine_decoded_saves_to_json_bytes(${JSON.stringify(JSON.stringify(manifest))}, '/app/resources', progress=progress_cb)
 `);
+    bytes = proxy.toJs();
+    proxy.destroy();
   } finally {
     pyodide.globals.delete('progress_cb');
     for (const path of written) {
@@ -177,8 +185,10 @@ main.combine_decoded_saves_to_json(${JSON.stringify(JSON.stringify(manifest))}, 
   // Python now caches these; mirror the set so the next request skips them.
   parsedWeights.clear();
   keys.forEach((key, index) => parsedWeights.set(key, weights[index]));
+  const pyDone = Date.now();
   progress(1, 'Building table', '');
-  post({ type: 'result', id, json: jsonText });
+  const message: ResultMessage = { type: 'result', id, bytes, timing: { pyStart, pyDone, posted: Date.now() } };
+  scope.postMessage(message, [bytes.buffer]);
 }
 
 function decodeSave(bytes: Uint8Array, ooz: OozModule): Uint8Array {

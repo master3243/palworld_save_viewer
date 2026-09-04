@@ -40,13 +40,14 @@
     class="dropzone"
     [class.dragging]="isDragging"
     [class.busy]="isParsing"
+    (click)="onDropzoneClick($event)"
     (drop)="onDrop($event)"
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
   >
-    <input type="file" accept=".sav,.gvas" multiple (change)="onFileInput($event)">
-    <span class="drop-title" *ngIf="!isParsing">Drop save files or a save folder here</span>
-    <span class="drop-subtitle" *ngIf="!isParsing">Level.sav + Players folder for everything, or just a _dps.sav</span>
+    <input type="file" accept=".sav,.gvas" multiple [disabled]="isParsing" (change)="onFileInput($event)">
+    <span class="drop-title" *ngIf="!isParsing">Drop save file/folder here</span>
+    <span class="drop-subtitle" *ngIf="!isParsing">Supported files: Level.sav / LevelMeta.sav / Player .sav / Player _dps.sav</span>
 
     <span
       class="progress-block"
@@ -74,7 +75,7 @@
         title="Pick a whole save folder"
         (click)="openFolderPicker($event)"
       >
-        <span class="demo-glyph" aria-hidden="true">&#128193;</span>
+        <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2a1.5 1.5 0 0 1 1.06.44L11 6.7h8.5A1.5 1.5 0 0 1 21 8.2v9.3a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/></svg>
         <span>Folder</span>
       </button>
       <button
@@ -158,6 +159,7 @@
             <li *ngFor="let file of folder.files">
               <span class="source-kind">{{ file.kind }}</span>
               <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
+              <span class="source-blurb">{{ kindBlurb(file.kind) }}</span>
               <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
               <button
                 class="source-remove"
@@ -171,7 +173,7 @@
         </div>
       </div>
       <p class="confirm-note" *ngIf="pendingIgnored">{{ pendingIgnored }} other {{ pendingIgnored === 1 ? 'file' : 'files' }} ignored (not Pal saves).</p>
-      <p class="confirm-note">Drop more files to add them to this list.</p>
+      <p class="confirm-note">Drop more files to add them to this list</p>
       <div class="modal-actions">
         <button class="modal-ghost" type="button" (click)="cancelPending()">Cancel</button>
         <button class="modal-primary" type="button" (click)="confirmPending()">{{ pendingAppend ? 'Add' : 'Load' }}</button>
@@ -207,6 +209,7 @@
       <div class="sources-groups" *ngIf="isSourcesOpen">
         <div class="source-group" *ngFor="let group of sourceGroups">
           <div class="source-group-head">
+            <span class="save-letter" *ngIf="saveSets.length > 1 && group.set?.letter">{{ group.set?.letter }}</span>
             <span class="source-group-name">{{ group.set?.label || group.folder || 'Files' }}</span>
             <span class="source-group-meta" [title]="group.folder">
               <span *ngFor="let part of groupMeta(group)">{{ part }}</span>
@@ -223,6 +226,7 @@
             >
               <span class="source-kind">{{ sourceKindTag(item.source) }}</span>
               <span class="source-name">{{ shortFileName(item.source.file) }}</span>
+              <span class="source-blurb">{{ kindBlurb(item.source.kind) }}</span>
               <span class="source-count" *ngIf="item.source.pals">{{ item.source.pals | number }}</span>
               <button
                 class="source-remove"
@@ -299,6 +303,8 @@
               [style.width.px]="column.key === 'pal_name' ? palNameWidth : null"
               [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
               [class.slot-cell]="isSlotNumber(column)"
+              [class.where-cell]="isWhere(column)"
+              [class.save-cell]="isSaveLetter(column)"
               [class.paldeck-cell]="column.key === 'paldeck_no'"
               [class.nickname-cell]="column.key === 'nickname'"
               [class.level-cell]="column.key === 'level'"
@@ -341,6 +347,8 @@
                 [class.pal-name-cell]="column.key === 'pal_name'"
                 [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
                 [class.slot-cell]="isSlotNumber(column)"
+                [class.where-cell]="isWhere(column)"
+                [class.save-cell]="isSaveLetter(column)"
                 [class.paldeck-cell]="column.key === 'paldeck_no'"
                 [class.nickname-cell]="column.key === 'nickname'"
                 [class.level-cell]="column.key === 'level'"

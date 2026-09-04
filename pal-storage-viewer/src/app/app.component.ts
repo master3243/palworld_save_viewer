@@ -163,6 +163,21 @@ export class AppComponent {
     return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
   }
 
+  /** Two or three words on what a file contributes; shown on chips and in the confirmation. */
+  kindBlurb(kind: string): string {
+    switch (kind) {
+      case 'level': case 'World': return 'party · box · bases';
+      case 'dimensional_storage': case 'DPS': return 'dimensional storage';
+      case 'player': case 'Player': return 'party / box ids';
+      case 'level_meta': case 'Info': return 'world name · day';
+      default: return 'no pals';
+    }
+  }
+
+  onDropzoneClick(event: Event): void {
+    if (this.isParsing) event.preventDefault();
+  }
+
   sourceKindTag(source: SaveSource): string {
     switch (source.kind) {
       case 'dimensional_storage': return 'DPS';
@@ -295,6 +310,7 @@ export class AppComponent {
 
   private readonly defaultVisibleColumns = new Set([
     'storage_slot',
+    'save_id',
     'location',
     'pal_box_slot_index',
     'paldeck_no',
@@ -379,6 +395,10 @@ export class AppComponent {
 
   async onFileInput(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
+    if (this.isParsing) {
+      input.value = '';
+      return;
+    }
     const inputs = Array.from(input.files ?? []).map((file) => ({
       file,
       path: (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name
@@ -391,6 +411,7 @@ export class AppComponent {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
+    if (this.isParsing) return;
     const inputs = await this.collectDroppedFiles(event.dataTransfer);
     if (inputs.length) await this.offerInputs(inputs, this.hasData);
   }
@@ -651,6 +672,7 @@ export class AppComponent {
     this.resetData();
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Initializing\u2026', detail: '' };
+    performance.mark('pal:load-start');
     try {
       // The worker owns 0..95% of the bar; the table build takes the rest.
       const result = await this.parser.parseMany(merged, (update) => {
@@ -660,6 +682,8 @@ export class AppComponent {
         };
         this.changeDetector.markForCheck();
       });
+      performance.mark('pal:worker-done');
+      console.debug('[pal] parse timing', JSON.stringify(this.parser.lastTiming));
       const rows: PalStorageRow[] = [];
       for (const [index, row] of result.rows.entries()) {
         rows.push({ ...row, paldeck_no: await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name')) });
@@ -673,6 +697,7 @@ export class AppComponent {
         }
       }
       this.progress = { fraction: 1, label: 'Done', detail: '' };
+      performance.mark('pal:enrich-done');
       this.loadedInputs = merged;
       this.sources = result.sources;
       this.saveSets = result.sets;
@@ -682,7 +707,9 @@ export class AppComponent {
       this.rows = [...rows];
       this.columns = this.buildColumns(rows);
       this.palNameWidth = this.measurePalNameWidth(rows);
+      performance.mark('pal:table-ready');
       this.scheduleMeasure();
+      requestAnimationFrame(() => performance.mark('pal:rendered'));
     } catch (error) {
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';
       if (append && previous.length) {
@@ -874,6 +901,14 @@ export class AppComponent {
     return column.key === 'storage_slot' || column.key === 'pal_box_slot_index';
   }
 
+  isWhere(column: TableColumn): boolean {
+    return column.key === 'location';
+  }
+
+  isSaveLetter(column: TableColumn): boolean {
+    return column.key === 'save_id';
+  }
+
   isSoulRank(column: TableColumn): boolean {
     return column.key.startsWith('soul_rank_');
   }
@@ -964,8 +999,7 @@ export class AppComponent {
       key,
       label: this.toLabel(key),
       title: this.toTitle(key),
-      visible: this.defaultVisibleColumns.has(key)
-        || (key === 'save' && multipleSaves)
+      visible: (this.defaultVisibleColumns.has(key) && (key !== 'save_id' || multipleSaves))
         || (key === 'owner_name' && multiplePlayers)
     }));
   }
@@ -1012,7 +1046,8 @@ export class AppComponent {
     if (key === 'storage_slot') return 'Slot';
     if (key === 'pal_box_slot_index') return 'Box';
     if (key === 'location') return 'Where';
-    if (key === 'save') return 'Save';
+    if (key === 'save_id') return 'Save';
+    if (key === 'save') return 'Save name';
     if (key === 'location_detail') return 'Detail';
     if (key === 'source_file') return 'File';
     if (key === 'owner_name') return 'Owner';
@@ -1030,7 +1065,8 @@ export class AppComponent {
     if (key === 'pal_box_slot_index') return 'Pal Box slot';
     if (key === 'location') return 'Location';
     if (key === 'location_detail') return 'Location detail';
-    if (key === 'save') return 'Save (world)';
+    if (key === 'save_id') return 'Save (letter)';
+    if (key === 'save') return 'Save name';
     if (key === 'source_file') return 'Source file';
     if (key === 'owner_name') return 'Owner';
     if (key === 'pal_variant') return 'Alpha';

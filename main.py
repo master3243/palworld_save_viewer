@@ -23,6 +23,7 @@ PAL_NAME_LOOKUP_PATH = RESOURCES_PATH / "pal_names_lookup.lua"
 
 CSV_FIELDS = [
     "storage_slot",
+    "save_id",
     "location",
     "location_detail",
     "save",
@@ -231,6 +232,15 @@ def locate_level_record(record, save_set):
     return "Other container", slot_label
 
 
+def save_letter(ordinal):
+    """1 -> A, 26 -> Z, 27 -> AA: a short tag to tell saves apart in the table."""
+    letters = ""
+    while ordinal > 0:
+        ordinal, remainder = divmod(ordinal - 1, 26)
+        letters = chr(ord("A") + remainder) + letters
+    return letters
+
+
 def save_display_names(sets):
     """Short, distinct labels for each save set. Starts from the world name; only saves
     that would read the same (typical for backups of one world) get the in-game day,
@@ -425,6 +435,7 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
     displays = save_display_names(sets)
     for ordinal, (label, save_set) in enumerate(sets.items(), start=1):
         display = displays[label]
+        letter = save_letter(ordinal)
         for record in save_set["level_records"]:
             location, detail = locate_level_record(record, save_set)
             record["placement"] = {"location": location, "detail": detail}
@@ -437,12 +448,14 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
             owner = record["ownership"]["owner_player_uid"]
             record["owner_name"] = save_set["player_names"].get(owner, "") if owner else ""
             record["save"] = display
+            record["save_id"] = letter
             record["source_file"] = record["_source"]["file"]
             record["source_kind"] = SOURCE_KIND_LABELS.get(record["_source"]["kind"], record["_source"]["kind"])
             del record["_source"]
             records.append(record)
         set_summaries.append({
             "label": display,
+            "letter": letter,
             "folder": label,
             "world_name": save_set["world_name"],
             "host_player_name": save_set["host_player_name"],
@@ -472,20 +485,77 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
     return {"records": records, "sources": sources, "sets": set_summaries}
 
 
+# Flattened keys that depend on which files are loaded together; everything else is
+# a property of the pal itself and is encoded once per record, then reused.
+DYNAMIC_ROW_KEYS = (
+    "save_id",
+    "location",
+    "location_detail",
+    "save",
+    "source_file",
+    "source_kind",
+    "owner_name",
+)
+
+
+def encode_row(item):
+    """JSON text for one flattened row. The static part is cached on the record so a
+    re-combine (add/remove a file) costs a small dict dump per pal instead of a full one."""
+    static = item.get("_flat_json")
+    if static is None:
+        flat = flatten_record(item)
+        for key in DYNAMIC_ROW_KEYS:
+            flat.pop(key, None)
+        static = json.dumps(flat)[1:-1]
+        item["_flat_json"] = static
+    dynamic = json.dumps({
+        "save_id": item.get("save_id"),
+        "location": (item.get("placement") or {}).get("location"),
+        "location_detail": (item.get("placement") or {}).get("detail"),
+        "save": item.get("save"),
+        "source_file": item.get("source_file"),
+        "source_kind": item.get("source_kind"),
+        "owner_name": item.get("owner_name"),
+    })[1:-1]
+    return "{" + dynamic + "," + static + "}"
+
+
 def combine_decoded_saves_to_json(manifest_json, resources_path=RESOURCES_PATH, flattened=True, progress=None):
+    import time
+
+    stamps = {"start": time.perf_counter()}
     files = json.loads(manifest_json) if isinstance(manifest_json, str) else list(manifest_json)
     result = combine_saves(files, resources_path, progress)
+    stamps["combine"] = time.perf_counter()
     records = result["records"]
-    if flattened:
-        flat = []
-        for index, item in enumerate(records):
-            if progress and index % 250 == 0:
-                progress("flatten", len(files), index, len(records), index, "pals")
-            flat.append(flatten_record(item))
-        records = flat
+    if not flattened:
+        return json.dumps({"rows": records, "sources": result["sources"], "sets": result["sets"]})
+    encoded = []
+    for index, item in enumerate(records):
+        if progress and index % 250 == 0:
+            progress("flatten", len(files), index, len(records), index, "pals")
+        encoded.append(encode_row(item))
     if progress:
         progress("flatten", len(files), len(records), len(records), len(records), "pals")
-    return json.dumps({"rows": records, "sources": result["sources"], "sets": result["sets"]})
+    stamps["encode"] = time.perf_counter()
+    rows_json = ",".join(encoded)
+    stamps["join"] = time.perf_counter()
+    timing = {
+        "combine_ms": round((stamps["combine"] - stamps["start"]) * 1000),
+        "encode_ms": round((stamps["encode"] - stamps["combine"]) * 1000),
+        "join_ms": round((stamps["join"] - stamps["encode"]) * 1000),
+    }
+    return (
+        '{"rows":[' + rows_json + '],"sources":' + json.dumps(result["sources"])
+        + ',"sets":' + json.dumps(result["sets"]) + ',"timing":' + json.dumps(timing) + "}"
+    )
+
+
+def combine_decoded_saves_to_json_bytes(manifest_json, resources_path=RESOURCES_PATH, progress=None):
+    """Same as combine_decoded_saves_to_json but as UTF-8 bytes. Pyodide hands a bytes
+    object to JavaScript as a zero-copy view, while converting a multi-megabyte str
+    takes seconds."""
+    return combine_decoded_saves_to_json(manifest_json, resources_path, True, progress).encode("utf-8")
 
 
 def join_values(values):
@@ -506,6 +576,7 @@ def join_items(items):
 def flatten_record(item):
     return {
         "storage_slot": item["storage_index"],
+        "save_id": item.get("save_id"),
         "location": (item.get("placement") or {}).get("location"),
         "location_detail": (item.get("placement") or {}).get("detail"),
         "save": item.get("save"),

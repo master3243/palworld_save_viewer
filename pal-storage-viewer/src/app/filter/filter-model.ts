@@ -292,7 +292,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'slot', label: 'Storage page', group: G.storage, kind: 'number', aliases: ['storage_slot', 'box', 'page'], get: (row) => number(row, 'storage_slot') },
   { key: 'index', label: 'Pal Box slot index', group: G.storage, kind: 'number', aliases: ['pal_box_slot_index', 'slot_index', 'box_slot', 'ind'], get: (row) => number(row, 'pal_box_slot_index') },
   { key: 'where', label: 'Location', group: G.storage, kind: 'text', aliases: ['location', 'loc', 'place', 'at'], suggest: true, hint: 'Party, Pal Box, Base 1, Dimensional Storage', get: (row) => text(row, 'location') },
-  { key: 'save', label: 'Save (world)', group: G.storage, kind: 'text', aliases: ['world'], suggest: true, get: (row) => text(row, 'save') },
+  { key: 'save', label: 'Save (letter or name)', group: G.storage, kind: 'text', aliases: ['world', 'save_id'], suggest: true, hint: 'A, B, … or the save name', get: (row) => [text(row, 'save_id'), text(row, 'save')].filter(Boolean).join(' ') },
   { key: 'owner', label: 'Owner', group: G.storage, kind: 'text', aliases: ['owner_name', 'player'], suggest: true, get: (row) => text(row, 'owner_name') },
   { key: 'file', label: 'Source file', group: G.storage, kind: 'text', aliases: ['source_file', 'source'], suggest: true, get: (row) => text(row, 'source_file') }
 ];
@@ -304,7 +304,7 @@ const CONSUMED_KEYS = new Set([
   'soul_rank_craft_speed', 'skills', 'skill_colors', 'combat_moves', 'learned_moves', 'hp', 'full_stomach',
   'sanity', 'physical_health', 'hunger_type', 'worker_sick', 'friendship_points', 'current_work_suitability',
   'exp', 'storage_slot', 'pal_box_slot_index', 'skill_ranks', 'raw_property_names',
-  'location', 'save', 'owner_name', 'source_file'
+  'location', 'save', 'save_id', 'owner_name', 'source_file'
 ]);
 
 function toTitle(key: string): string {

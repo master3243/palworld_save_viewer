@@ -1295,6 +1295,8 @@ tbody tr:hover {
   margin: 8px 0 4px;
   max-height: 50vh;
   overflow: auto;
+  padding-right: 10px;
+  scrollbar-gutter: stable;
   text-align: left;
 }
 
@@ -1339,4 +1341,66 @@ tbody tr:hover {
   font-size: 0.85rem;
   margin: 6px 0 12px;
   text-align: left;
+}
+
+
+.dropzone.busy {
+  cursor: default;
+  pointer-events: none;
+}
+
+.button-icon {
+  fill: none;
+  height: 16px;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 16px;
+}
+
+.source-blurb {
+  color: rgba(200, 236, 255, 0.55);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.save-letter {
+  background: rgba(144, 226, 255, 0.18);
+  border: 1px solid rgba(144, 226, 255, 0.45);
+  border-radius: 4px;
+  color: #e8f8ff;
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-right: 6px;
+  min-width: 14px;
+  padding: 3px 5px;
+  text-align: center;
+}
+
+th.save-cell,
+td.save-cell {
+  box-sizing: border-box;
+  max-width: 48px;
+  min-width: 48px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+  width: 48px;
+}
+
+td.save-cell {
+  font-weight: 600;
+}
+
+th.where-cell,
+td.where-cell {
+  box-sizing: border-box;
+  max-width: 108px;
+  min-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 108px;
 }

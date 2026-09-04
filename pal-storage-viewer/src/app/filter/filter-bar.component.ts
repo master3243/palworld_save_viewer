@@ -134,6 +134,16 @@ export class FilterBarComponent implements OnChanges {
   private suggestionsVisible = false;
 
   readonly quickChips: QuickChip[] = [
+    {
+      label: 'Where',
+      title: 'Location: click to cycle party, Pal Box, bases, dimensional storage, any',
+      states: [
+        { label: 'Party', title: 'In the party', tone: 'include', make: () => createRule('where', 'is', ['Party']) },
+        { label: 'Box', title: 'In the Pal Box', tone: 'include', make: () => createRule('where', 'is', ['Pal Box']) },
+        { label: 'Base', title: 'Working at a base', tone: 'include', make: () => createRule('where', 'starts', ['Base']) },
+        { label: 'DPS', title: 'In dimensional storage', tone: 'include', make: () => createRule('where', 'is', ['Dimensional Storage']) }
+      ]
+    },
     flagChip('Alpha', 'Alpha pals', 'alpha'),
     flagChip('★ Lucky', 'Lucky pals', 'lucky'),
     {
