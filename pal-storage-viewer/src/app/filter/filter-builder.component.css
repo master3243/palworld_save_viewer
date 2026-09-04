@@ -301,3 +301,13 @@ input.value::placeholder {
   stroke-width: 2;
   width: 13px;
 }
+
+.empty-group {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.inline-add {
+  margin: 0;
+}

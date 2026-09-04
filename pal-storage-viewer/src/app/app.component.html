@@ -23,7 +23,7 @@
     (change)="onFileInput($event)"
   >
   <section class="toolbar">
-    <a class="title-link" href="./" aria-label="Palworld Storage Viewer home" title="Back to start">
+    <a class="title-link" href="./" aria-label="Palworld Save Viewer home" title="Back to start">
       <span class="logo-crop">
         <img
           class="title-logo"
@@ -31,7 +31,7 @@
           alt="Palworld"
         >
       </span>
-      <span class="viewer-title">Storage Viewer</span>
+      <span class="viewer-title">Save Viewer</span>
     </a>
   </section>
 
@@ -46,7 +46,7 @@
     (dragleave)="onDragLeave($event)"
   >
     <input type="file" accept=".sav,.gvas" multiple [disabled]="isParsing" (change)="onFileInput($event)">
-    <span class="drop-title" *ngIf="!isParsing">Drop save file/folder here</span>
+    <span class="drop-title" *ngIf="!isParsing">Drop save file/folder</span>
     <span class="drop-subtitle" *ngIf="!isParsing">Supported files: Level.sav / LevelMeta.sav / Player .sav / Player _dps.sav</span>
 
     <span
@@ -151,6 +151,7 @@
     >
       <h2 class="modal-title" id="confirmLoadTitle">
         {{ pendingAppend ? 'Add' : 'Load' }} {{ pendingFileCount }} files from {{ pendingFolders.length }} {{ pendingFolders.length === 1 ? 'folder' : 'folders' }}?
+        <small class="modal-subtitle" *ngIf="pendingPalTotal !== null">{{ pendingPalTotal | number }} pals</small>
       </h2>
       <div class="confirm-list">
         <div class="confirm-folder" *ngFor="let folder of pendingFolders">
@@ -160,6 +161,7 @@
               <span class="source-kind" [attr.data-kind]="file.kind" [title]="kindTitle(file.kind)">{{ kindTag(file.kind) }}</span>
               <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
               <span class="source-blurb">{{ kindBlurb(file.kind) }}</span>
+              <span class="confirm-file-pals" [class.pending]="file.pals === undefined">{{ pendingPalLabel(file) }}</span>
               <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
               <button
                 class="source-remove"
@@ -221,7 +223,7 @@
               [attr.aria-label]="'Remove save ' + (group.set?.letter || group.set?.label || '')"
               title="Remove this whole save"
               (click)="removeSaveGroup(group)"
-            >&times;</button>
+            ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
           </div>
           <div class="source-group-files">
             <span

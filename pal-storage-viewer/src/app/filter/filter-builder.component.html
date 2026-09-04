@@ -41,7 +41,7 @@
     </div>
 
     <p class="empty-group" *ngIf="!group.children.length">
-      No rules. Add rule, click quick filter, or type query above.
+      No rules. <button class="ghost inline-add" type="button" (click)="addRule(group)">+ rule</button>
     </p>
 
     <div class="children">

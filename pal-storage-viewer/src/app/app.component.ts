@@ -44,6 +44,8 @@ interface PendingFile {
   name: string;
   size: number;
   kind: string;
+  /** undefined = still counting, null = holds no pals. */
+  pals?: number | null;
 }
 
 interface PendingFolder {
@@ -455,20 +457,43 @@ export class AppComponent {
       return;
     }
     const pending = this.pendingFiles ? [...this.pendingFiles] : [];
+    const added: PendingFile[] = [];
     for (const input of candidates) {
       const duplicate = pending.some((file) => file.input.path === input.path && file.size === input.file.size);
       if (duplicate) continue;
-      pending.push({
+      const file: PendingFile = {
         input,
         folder: this.folderOf(input.path),
         name: input.file.name,
         size: input.file.size,
         kind: this.guessKind(input.file.name)
-      });
+      };
+      pending.push(file);
+      added.push(file);
     }
     this.pendingFiles = pending;
     this.pendingAppend = this.pendingFiles && this.pendingAppend ? true : append;
     this.pendingIgnored += inputs.length - candidates.length;
+    // Preview counts arrive one file at a time while the user reads the list.
+    void this.parser.countPals(added.map((file) => file.input), (index, kind, pals) => {
+      const file = added[index];
+      if (!file) return;
+      file.pals = pals;
+      if (kind !== 'unknown') file.kind = kind;
+      this.changeDetector.markForCheck();
+    });
+  }
+
+  get pendingPalTotal(): number | null {
+    const files = this.pendingFiles ?? [];
+    if (files.some((file) => file.pals === undefined)) return null;
+    return files.reduce((sum, file) => sum + (file.pals ?? 0), 0);
+  }
+
+  pendingPalLabel(file: PendingFile): string {
+    if (file.pals === undefined) return '…';
+    if (file.pals === null) return '';
+    return `${file.pals.toLocaleString()} pal${file.pals === 1 ? '' : 's'}`;
   }
 
   removePendingFile(file: PendingFile): void {
@@ -654,6 +679,14 @@ export class AppComponent {
 
   closeDemoPrompt(): void {
     this.isDemoPromptOpen = false;
+  }
+
+  /** Menus close when the click lands anywhere outside their own control. */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (this.isExportMenuOpen && !target?.closest('.export-wrap')) this.isExportMenuOpen = false;
+    if (this.isColumnMenuOpen && !target?.closest('.gear-button, .column-menu')) this.isColumnMenuOpen = false;
   }
 
   @HostListener('document:keydown.escape')

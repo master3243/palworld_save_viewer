@@ -24,6 +24,26 @@ export interface InitRequest {
   type: 'init';
 }
 
+/** Cheap pal counts for a confirmation preview; decompresses and scans, no parse. */
+export interface CountRequest {
+  type: 'count';
+  id: number;
+  files: { file: File; name: string }[];
+}
+
+export interface CountMessage {
+  type: 'count';
+  id: number;
+  index: number;
+  kind: string;
+  pals: number | null;
+}
+
+export interface CountDoneMessage {
+  type: 'count-done';
+  id: number;
+}
+
 export interface ProgressMessage {
   type: 'progress';
   id: number;
@@ -48,7 +68,7 @@ export interface ErrorMessage {
   message: string;
 }
 
-export type WorkerResponse = ProgressMessage | ResultMessage | ErrorMessage;
+export type WorkerResponse = ProgressMessage | ResultMessage | ErrorMessage | CountMessage | CountDoneMessage;
 
 type OozModule = { decompress(data: Uint8Array, rawSize: number): Uint8Array };
 
@@ -80,10 +100,14 @@ let oozPromise: Promise<OozModule> | undefined;
 /** Decoded byte size of every file already parsed and cached inside Python, by file key. */
 const parsedWeights = new Map<string, number>();
 
-scope.addEventListener('message', (event: MessageEvent<ParseRequest | InitRequest>) => {
+scope.addEventListener('message', (event: MessageEvent<ParseRequest | InitRequest | CountRequest>) => {
   const request = event.data;
   if (request?.type === 'init') {
     void Promise.all([getPyodide(), getOoz()]).catch(() => { /* reported on first parse */ });
+    return;
+  }
+  if (request?.type === 'count') {
+    void handleCount(request).catch(() => post({ type: 'count-done', id: request.id }));
     return;
   }
   if (request?.type !== 'parse') return;
@@ -191,6 +215,37 @@ main.combine_decoded_saves_to_json_bytes(${JSON.stringify(JSON.stringify(manifes
   progress(1, 'Building table', '');
   const message: ResultMessage = { type: 'result', id, bytes, timing: { pyStart, pyDone, posted: Date.now() } };
   scope.postMessage(message, [bytes.buffer]);
+}
+
+async function handleCount(request: CountRequest): Promise<void> {
+  const [pyodide, ooz] = await Promise.all([getPyodide(), getOoz()]);
+  pyodide.FS.mkdirTree('/app/input');
+  for (const [index, entry] of request.files.entries()) {
+    let kind = 'unknown';
+    let pals: number | null = null;
+    const path = `/app/input/count_${index}`;
+    try {
+      const decoded = decodeSave(new Uint8Array(await entry.file.arrayBuffer()), ooz);
+      pyodide.FS.writeFile(path, decoded);
+      const result = await pyodide.runPythonAsync<{ toJs(opts: { dict_converter: typeof Object.fromEntries }): { kind: string; pals: number | null }; destroy(): void }>(`
+import importlib
+import sys
+sys.path.insert(0, '/app')
+main = importlib.import_module('main')
+main.quick_count(${JSON.stringify(path)})
+`);
+      const plain = result.toJs({ dict_converter: Object.fromEntries });
+      result.destroy();
+      kind = plain.kind;
+      pals = plain.pals ?? null;
+    } catch {
+      // Unreadable file: leave the count unknown; the real load reports the error.
+    } finally {
+      try { pyodide.FS.unlink(path); } catch { /* never written */ }
+    }
+    post({ type: 'count', id: request.id, index, kind, pals });
+  }
+  post({ type: 'count-done', id: request.id });
 }
 
 function decodeSave(bytes: Uint8Array, ooz: OozModule): Uint8Array {

@@ -1,4 +1,4 @@
--- PalScouter passive_ranks.lua — precomputed raw passive id -> display/scoring rank.
+-- PalScouter passive_ranks.lua - precomputed raw passive id -> display/scoring rank.
 -- Snapshot source: the installed APSE DT_PassiveSkill_Main (2026-07-18).
 -- Kept as plain Lua so F8 never traverses UDataTable through UE4SS.
 return {

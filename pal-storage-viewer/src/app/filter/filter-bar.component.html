@@ -76,7 +76,7 @@
             *ngFor="let field of group.fields"
             type="button"
             class="help-field"
-            [title]="field.label + (field.hint ? ' — ' + field.hint : '')"
+            [title]="field.label + (field.hint ? ' - ' + field.hint : '')"
             (click)="insertField(field)"
           >{{ field.key }}</button>
         </div>

@@ -130,7 +130,6 @@ export class FilterBuilderComponent {
 
   addGroup(group: FilterGroup): void {
     const child = createGroup(group.combinator === 'and' ? 'or' : 'and');
-    child.children.push(createRule('skills', 'has_any'));
     group.children.push(child);
     this.emit();
   }

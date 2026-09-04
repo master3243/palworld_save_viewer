@@ -242,7 +242,7 @@ export class FilterBarComponent implements OnChanges {
     if (!changes['rows']) return;
     const letters = Array.from(new Set(this.rows.map((row) => String(row['save_id'] ?? '')).filter(Boolean)))
       .sort((left, right) => left.length - right.length || left.localeCompare(right));
-    this.saveChip = letters.length > 1 ? {
+    this.saveChip = letters.length ? {
       label: 'Save',
       title: 'Save: click to cycle through the loaded saves',
       states: letters.map((letter) => ({

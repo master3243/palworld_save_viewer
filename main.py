@@ -557,6 +557,40 @@ def combine_decoded_saves_to_json(manifest_json, resources_path=RESOURCES_PATH, 
     )
 
 
+PLAYER_TRUE_PATTERN = b"IsPlayer\x00\x0d\x00\x00\x00BoolProperty\x00" + b"\x00" * 8 + b"\x01"
+
+
+def quick_count(path, manager=None):
+    """Cheap pal count for a save file, for previews: byte-pattern scans, no per-pal parse.
+    Returns {"kind", "pals"}; `pals` is None for files that hold no pals."""
+    manager = manager or build_manager()
+    try:
+        data = decompress_save(Path(path))
+    except Exception as error:  # noqa: BLE001
+        return {"kind": "unknown", "pals": None, "error": str(error)}
+    kind, _ = manager.detect_save_kind(data)
+    if kind == "dimensional_storage":
+        total = data.count(b"PalIndividualCharacterSaveParameter\x00")
+        return {"kind": kind, "pals": total - data.count(manager.EMPTY_SLOT_PATTERN)}
+    if kind == "level":
+        entries = manager.map_entry_count(data, "CharacterSaveParameterMap")
+        players = data.count(PLAYER_TRUE_PATTERN)
+        # Wild pals and NPCs sit in no container: a zero SlotId.ContainerId.
+        unplaced = 0
+        search = 0
+        while True:
+            offset = manager.find_property_start(data, "SlotId", search)
+            if offset == -1:
+                break
+            slot = manager.read_struct_property(data, offset) or {}
+            container = (slot.get("ContainerId") or {}).get("ID")
+            if container in (None, manager.ZERO_GUID):
+                unplaced += 1
+            search = offset + 4 + len("SlotId") + 1
+        return {"kind": kind, "pals": max(0, entries - players - unplaced)}
+    return {"kind": kind, "pals": None}
+
+
 def combine_decoded_saves_to_json_bytes(manifest_json, resources_path=RESOURCES_PATH, progress=None):
     """Same as combine_decoded_saves_to_json but as UTF-8 bytes. Pyodide hands a bytes
     object to JavaScript as a zero-copy view, while converting a multi-megabyte str

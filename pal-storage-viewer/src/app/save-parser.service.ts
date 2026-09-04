@@ -59,7 +59,9 @@ export interface ParseProgress {
 type WorkerResponse =
   | { type: 'progress'; id: number; fraction: number | null; label: string; detail: string }
   | { type: 'result'; id: number; bytes: Uint8Array; timing: { pyStart: number; pyDone: number; posted: number } }
-  | { type: 'error'; id: number; message: string };
+  | { type: 'error'; id: number; message: string }
+  | { type: 'count'; id: number; index: number; kind: string; pals: number | null }
+  | { type: 'count-done'; id: number };
 
 @Injectable({ providedIn: 'root' })
 export class SaveParserService {
@@ -72,6 +74,24 @@ export class SaveParserService {
   }>();
   /** Durations of the last parse, in ms, for debugging slow loads. */
   lastTiming: Record<string, number> = {};
+  private readonly pendingCounts = new Map<number, {
+    onEach: (index: number, kind: string, pals: number | null) => void;
+    resolve: () => void;
+  }>();
+
+  /**
+   * Preview how many pals each file holds. Runs in the worker (decompress + byte
+   * scan, about a tenth of the full parse) and reports per file as it goes.
+   */
+  countPals(inputs: SaveInput[], onEach: (index: number, kind: string, pals: number | null) => void): Promise<void> {
+    if (!inputs.length) return Promise.resolve();
+    const worker = this.getWorker();
+    const id = this.nextRequestId++;
+    return new Promise<void>((resolve) => {
+      this.pendingCounts.set(id, { onEach, resolve });
+      worker.postMessage({ type: 'count', id, files: inputs.map((input) => ({ file: input.file, name: input.file.name })) });
+    });
+  }
 
   async parse(file: File): Promise<PalStorageRow[]> {
     return (await this.parseMany([{ file, path: file.name }])).rows;
@@ -153,6 +173,17 @@ export class SaveParserService {
     const worker = new Worker(new URL('./save-parser.worker', import.meta.url), { type: 'module' });
     worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       const message = event.data;
+      if (message.type === 'count' || message.type === 'count-done') {
+        const counting = this.pendingCounts.get(message.id);
+        if (!counting) return;
+        if (message.type === 'count') {
+          counting.onEach(message.index, message.kind, message.pals);
+        } else {
+          this.pendingCounts.delete(message.id);
+          counting.resolve();
+        }
+        return;
+      }
       const request = this.pending.get(message.id);
       if (!request) return;
       if (message.type === 'progress') {
