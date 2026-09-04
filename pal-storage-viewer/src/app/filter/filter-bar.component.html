@@ -106,12 +106,16 @@
     *ngFor="let chip of quickChips"
     type="button"
     class="chip"
-    [class.active]="isChipActive(chip)"
-    [attr.data-tone]="chip.tone || null"
-    [attr.aria-pressed]="isChipActive(chip)"
-    [title]="chip.title"
-    (click)="toggleChip(chip)"
-  >{{ chip.label }}</button>
+    [class.active]="chipState(chip) !== null"
+    [attr.data-tone]="chipState(chip)?.tone || null"
+    [attr.aria-pressed]="chipState(chip) !== null"
+    [title]="chipTitle(chip)"
+    (click)="cycleChip(chip)"
+  >
+    <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'include'" aria-hidden="true">+</span>
+    <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'exclude'" aria-hidden="true">−</span>
+    <span>{{ chipLabel(chip) }}</span>
+  </button>
 </div>
 
 <span class="match-count" [class.active]="isActive" [title]="isActive ? 'Pals matching the filter' : 'Pals in storage'">

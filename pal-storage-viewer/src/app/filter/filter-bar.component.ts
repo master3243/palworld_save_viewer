@@ -25,15 +25,28 @@ import {
   createGroup,
   createRule,
   isEmptyTree,
+  operatorDef,
   rulesEqual
 } from './filter-model';
 import { completionContext, parseQuery, quoteValue, serializeQuery } from './filter-query';
 
-interface QuickChip {
+interface ChipState {
+  /** Label shown while this state is active. */
   label: string;
   title: string;
-  tone?: 'male' | 'female' | 'gold' | 'platinum' | 'negative' | 'lucky';
+  tone: 'include' | 'exclude' | 'female' | 'male';
   make: () => FilterRule;
+}
+
+/**
+ * A quick chip cycles through its states on each click and back to off:
+ * off -> include (+) -> exclude (-) -> off, or off -> female -> male -> off.
+ */
+interface QuickChip {
+  /** Label shown while the chip is off. */
+  label: string;
+  title: string;
+  states: ChipState[];
 }
 
 interface SearchSuggestion {
@@ -54,6 +67,28 @@ interface HelpExample {
 }
 
 const PRESET_STORAGE_KEY = 'pal-storage-viewer.filter-presets';
+
+function flagChip(label: string, title: string, field: string): QuickChip {
+  return {
+    label,
+    title,
+    states: [
+      { label, title, tone: 'include', make: () => createRule(field, 'is_true') },
+      { label, title: `Not ${title.toLowerCase()}`, tone: 'exclude', make: () => createRule(field, 'is_false') }
+    ]
+  };
+}
+
+function numberChip(label: string, title: string, field: string, op: FilterRule['op'], values: string[]): QuickChip {
+  return {
+    label,
+    title,
+    states: [
+      { label, title, tone: 'include', make: () => createRule(field, op, values) },
+      { label, title: `Not: ${title.toLowerCase()}`, tone: 'exclude', make: () => createRule(field, operatorDef(op).negated, values) }
+    ]
+  };
+}
 
 /**
  * Owns the filter state for the table. Three ways in, one model:
@@ -95,18 +130,31 @@ export class FilterBarComponent implements OnChanges {
   private suggestionsVisible = false;
 
   readonly quickChips: QuickChip[] = [
-    { label: 'Alpha', title: 'Alpha pals', make: () => createRule('alpha', 'is_true') },
-    { label: '★ Lucky', title: 'Lucky pals', tone: 'lucky', make: () => createRule('lucky', 'is_true') },
-    { label: '♂', title: 'Male', tone: 'male', make: () => createRule('gender', 'is', ['Male']) },
-    { label: '♀', title: 'Female', tone: 'female', make: () => createRule('gender', 'is', ['Female']) },
-    { label: 'Fav', title: 'Marked as favorite', make: () => createRule('favorite', 'is_true') },
-    { label: '4★', title: 'Max rank (4 stars)', make: () => createRule('rank', 'eq', ['4']) },
-    { label: '100 IV', title: 'At least one perfect IV', make: () => createRule('iv_max', 'eq', ['100']) },
-    { label: 'IV 70+', title: 'All three IVs at 70 or more', make: () => createRule('iv_min', 'gte', ['70']) },
-    { label: 'Platinum', title: 'Has a platinum tier passive', tone: 'platinum', make: () => createRule('platinum', 'gte', ['1']) },
-    { label: 'Gold', title: 'Has a gold tier passive', tone: 'gold', make: () => createRule('gold', 'gte', ['1']) },
-    { label: 'Negative', title: 'Has a negative passive', tone: 'negative', make: () => createRule('negative', 'gte', ['1']) },
-    { label: 'Named', title: 'Has a nickname', make: () => createRule('nick', 'not_empty') }
+    flagChip('Alpha', 'Alpha pals', 'alpha'),
+    flagChip('★ Lucky', 'Lucky pals', 'lucky'),
+    {
+      label: '♀♂',
+      title: 'Gender: click to cycle female, male, any',
+      states: [
+        { label: '♀', title: 'Female only', tone: 'female', make: () => createRule('gender', 'is', ['Female']) },
+        { label: '♂', title: 'Male only', tone: 'male', make: () => createRule('gender', 'is', ['Male']) }
+      ]
+    },
+    flagChip('Fav', 'Marked as favorite', 'favorite'),
+    numberChip('4★', 'Max rank (4 stars)', 'rank', 'eq', ['4']),
+    numberChip('100 IV', 'At least one perfect IV', 'iv_max', 'eq', ['100']),
+    numberChip('IV 70+', 'All three IVs at 70 or more', 'iv_min', 'gte', ['70']),
+    numberChip('Platinum', 'Has a platinum tier passive', 'platinum', 'gte', ['1']),
+    numberChip('Gold', 'Has a gold tier passive', 'gold', 'gte', ['1']),
+    numberChip('Negative', 'Has a negative passive', 'negative', 'gte', ['1']),
+    {
+      label: 'Named',
+      title: 'Has a nickname',
+      states: [
+        { label: 'Named', title: 'Has a nickname', tone: 'include', make: () => createRule('nick', 'not_empty') },
+        { label: 'Named', title: 'Has no nickname', tone: 'exclude', make: () => createRule('nick', 'empty') }
+      ]
+    }
   ];
 
   readonly helpExamples: HelpExample[] = [
@@ -314,22 +362,42 @@ export class FilterBarComponent implements OnChanges {
 
   /* ------------------------------------------------------------- quick chips */
 
-  isChipActive(chip: QuickChip): boolean {
-    const rule = chip.make();
-    return this.root.children.some((child) => child.type === 'rule' && rulesEqual(child, rule));
+  /** Index of the chip state currently present in the root group, or -1 when off. */
+  chipStateIndex(chip: QuickChip): number {
+    return chip.states.findIndex((state) => {
+      const rule = state.make();
+      return this.root.children.some((child) => child.type === 'rule' && rulesEqual(child, rule));
+    });
   }
 
-  toggleChip(chip: QuickChip): void {
-    const rule = chip.make();
-    const existing = this.root.children.find((child) => child.type === 'rule' && rulesEqual(child, rule));
-    if (existing) {
-      this.root.children = this.root.children.filter((child) => child !== existing);
-    } else {
+  chipState(chip: QuickChip): ChipState | null {
+    const index = this.chipStateIndex(chip);
+    return index >= 0 ? chip.states[index] : null;
+  }
+
+  chipLabel(chip: QuickChip): string {
+    return this.chipState(chip)?.label ?? chip.label;
+  }
+
+  chipTitle(chip: QuickChip): string {
+    const state = this.chipState(chip);
+    return state ? `${state.title} (click to change)` : chip.title;
+  }
+
+  cycleChip(chip: QuickChip): void {
+    const current = this.chipStateIndex(chip);
+    const rules = chip.states.map((state) => state.make());
+    this.root.children = this.root.children.filter(
+      (child) => child.type !== 'rule' || !rules.some((rule) => rulesEqual(child, rule))
+    );
+
+    const nextIndex = current + 1;
+    if (nextIndex < chip.states.length) {
       if (this.root.combinator === 'or' && this.root.children.length > 1) {
         // Keep the user's OR block intact and AND the chip with it.
         this.root = createGroup('and', [this.root]);
       }
-      this.root.children.push(rule);
+      this.root.children.push(rules[nextIndex]);
     }
     this.onTreeChanged();
   }

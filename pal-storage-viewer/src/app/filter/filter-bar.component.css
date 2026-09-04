@@ -316,17 +316,13 @@
 
 .quick-chips {
   display: flex;
-  /* Shrinks and scrolls rather than wrapping the count and buttons onto a new line. */
+  /* Shrinks and wraps within its own box so nothing is clipped and the count
+     and buttons stay on the first line. */
   flex: 1 1 160px;
+  flex-wrap: wrap;
   gap: 4px;
   min-width: 120px;
-  overflow-x: auto;
   padding: 2px 0;
-  scrollbar-width: none;
-}
-
-.quick-chips::-webkit-scrollbar {
-  display: none;
 }
 
 .chip {
@@ -351,17 +347,45 @@
 }
 
 .chip.active {
-  background: rgba(116, 230, 255, 0.24);
-  border-color: #95f3ff;
   color: #ffffff;
 }
 
-.chip[data-tone="male"].active { background: rgba(66, 200, 255, 0.3); border-color: #42c8ff; }
-.chip[data-tone="female"].active { background: rgba(255, 109, 159, 0.28); border-color: #ff6d9f; }
-.chip[data-tone="gold"].active { background: rgba(255, 224, 78, 0.24); border-color: #ffe04e; }
-.chip[data-tone="platinum"].active { background: rgba(174, 233, 255, 0.28); border-color: #aee9ff; }
-.chip[data-tone="negative"].active { background: rgba(255, 112, 133, 0.26); border-color: #ff7085; }
-.chip[data-tone="lucky"].active { background: rgba(255, 255, 255, 0.2); border-color: #ffffff; }
+.chip .chip-sign {
+  font-weight: 800;
+  margin-right: 3px;
+}
+
+.chip[data-tone="include"] {
+  background: rgba(99, 230, 163, 0.18);
+  border-color: rgba(99, 230, 163, 0.85);
+  color: #c9ffe3;
+}
+
+.chip[data-tone="include"] .chip-sign {
+  color: #63e6a3;
+}
+
+.chip[data-tone="exclude"] {
+  background: rgba(255, 112, 133, 0.18);
+  border-color: rgba(255, 112, 133, 0.85);
+  color: #ffd3da;
+}
+
+.chip[data-tone="exclude"] .chip-sign {
+  color: #ff7085;
+}
+
+.chip[data-tone="female"] {
+  background: rgba(255, 109, 159, 0.26);
+  border-color: #ff6d9f;
+  color: #ffe1ec;
+}
+
+.chip[data-tone="male"] {
+  background: rgba(66, 200, 255, 0.28);
+  border-color: #42c8ff;
+  color: #e3f7ff;
+}
 
 .match-count {
   color: rgba(199, 243, 255, 0.6);
