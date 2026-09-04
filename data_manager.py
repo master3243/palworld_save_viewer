@@ -849,7 +849,9 @@ class PalStorageDataManager:
 
     def build_record(self, block, storage_index, identity=None):
         """Read one pal from a byte block containing its PalIndividualCharacterSaveParameter
-        properties. `identity` overrides the InstanceId wrapper (Level.sav keeps it in the map key)."""
+        properties. `identity` overrides the InstanceId wrapper (Level.sav keeps it in the map key).
+        Properties the file omits stay None/empty: Level.sav skips values still at their
+        default (a fresh pal has no Level or Exp), and we report only what is in the file."""
         slot_number = storage_index
 
         def prop(label):
