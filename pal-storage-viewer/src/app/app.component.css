@@ -133,6 +133,7 @@
 
 .dropzone.busy {
   cursor: progress;
+  padding-bottom: 24px;
 }
 
 .dropzone input {
