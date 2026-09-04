@@ -151,7 +151,7 @@ export class AppComponent {
 
   private readonly defaultVisibleColumns = new Set([
     'storage_slot',
-    'slot_index',
+    'pal_box_slot_index',
     'paldeck_no',
     'pal_variant',
     'gender',
@@ -508,7 +508,7 @@ export class AppComponent {
   }
 
   isSlotNumber(column: TableColumn): boolean {
-    return column.key === 'storage_slot' || column.key === 'slot_index';
+    return column.key === 'storage_slot' || column.key === 'pal_box_slot_index';
   }
 
   isSoulRank(column: TableColumn): boolean {
@@ -643,7 +643,7 @@ export class AppComponent {
     if (key === 'gender') return 'G';
     if (key === 'is_lucky') return 'L';
     if (key === 'storage_slot') return 'Slot';
-    if (key === 'slot_index') return 'Ind';
+    if (key === 'pal_box_slot_index') return 'Box';
     if (key === 'paldeck_no') return 'No';
     if (key === 'favorite_index') return 'F';
     if (key === 'level') return 'LVL';
@@ -655,6 +655,7 @@ export class AppComponent {
 
   private toTitle(key: string): string {
     if (key === 'paldeck_no') return 'Paldeck No.';
+    if (key === 'pal_box_slot_index') return 'Pal Box slot the Pal last occupied before dimensional storage';
     if (key === 'pal_variant') return 'Alpha';
     if (key === 'is_lucky') return 'Lucky';
     if (key === 'iv_hp') return 'IV HP';

@@ -23,7 +23,8 @@ PAL_NAME_LOOKUP_PATH = RESOURCES_PATH / "pal_names_lookup.lua"
 
 CSV_FIELDS = [
     "storage_slot",
-    "slot_index",
+    "pal_box_slot_index",
+    "instance_id",
     "pal_name",
     "pal_variant",
     "species_id",
@@ -91,6 +92,37 @@ CSV_FIELDS = [
     "last_jumped_y",
     "last_jumped_z",
     "exp_table_migration_version",
+    "instance_player_uid",
+    "instance_debug_name",
+    "old_owner_player_uids",
+    "pal_box_container_id",
+    "item_container_id",
+    "base_camp_worker_event_type",
+    "base_camp_worker_event_progress_time",
+    "got_status_points",
+    "got_ex_status_points",
+    "food_regene_item_id",
+    "food_regene_effect_time",
+    "food_regene_remaining_time",
+    "food_regene_effect_parameters",
+    "off_work_suitability_list",
+    "work_suitability_add_ranks",
+    "work_suitability_overflow_ranks",
+    "skin_applied_character_id",
+    "expedition_map_object_instance_id",
+    "partner_skill_last_used_time",
+    "arena_restore_valid",
+    "arena_restore_hp",
+    "arena_restore_full_stomach",
+    "arena_restore_sanity",
+    "arena_restore_worker_sick",
+    "arena_restore_food_status_effect_item",
+    "arena_restore_food_status_effect_timer",
+    "arena_restore_food_regene_item_id",
+    "arena_restore_food_regene_effect_time",
+    "arena_restore_food_regene_remaining_time",
+    "arena_restore_food_full_stomach_keep_item",
+    "arena_restore_food_full_stomach_keep_timer",
     "raw_property_names",
 ]
 
@@ -154,10 +186,22 @@ def join_values(values):
     return ", ".join(str(value) for value in values if value is not None)
 
 
+def join_pairs(mapping):
+    return ", ".join(f"{key}={value}" for key, value in (mapping or {}).items())
+
+
+def join_items(items):
+    return ", ".join(
+        "/".join(f"{key}={value}" for key, value in item.items()) if isinstance(item, dict) else str(item)
+        for item in items or []
+    )
+
+
 def flatten_record(item):
     return {
         "storage_slot": item["storage_index"],
-        "slot_index": item["slot_index"],
+        "pal_box_slot_index": item["pal_box"]["slot_index"],
+        "instance_id": item["identity"]["instance_id"],
         "pal_name": item["pal_name"],
         "pal_variant": item["pal_variant"],
         "species_id": item["species_id"],
@@ -233,6 +277,37 @@ def flatten_record(item):
         "last_jumped_y": (item["location"]["last_jumped"] or {}).get("y"),
         "last_jumped_z": (item["location"]["last_jumped"] or {}).get("z"),
         "exp_table_migration_version": item["migration"]["exp_table_version"],
+        "instance_player_uid": item["identity"]["instance_player_uid"],
+        "instance_debug_name": item["identity"]["debug_name"],
+        "old_owner_player_uids": join_values(item["ownership"]["old_owner_player_uids"]),
+        "pal_box_container_id": item["pal_box"]["container_id"],
+        "item_container_id": item["item_container_id"],
+        "base_camp_worker_event_type": item["base_camp_event"]["type"],
+        "base_camp_worker_event_progress_time": item["base_camp_event"]["progress_time"],
+        "got_status_points": join_pairs(item["status_points"]["got"]),
+        "got_ex_status_points": join_pairs(item["status_points"]["got_ex"]),
+        "food_regene_item_id": item["food_regene"]["item_id"],
+        "food_regene_effect_time": item["food_regene"]["effect_time"],
+        "food_regene_remaining_time": item["food_regene"]["remaining_time"],
+        "food_regene_effect_parameters": join_items(item["food_regene"]["effect_parameters"]),
+        "off_work_suitability_list": join_values(item["work"]["off_suitability_list"]),
+        "work_suitability_add_ranks": join_items(item["work"]["add_ranks"]),
+        "work_suitability_overflow_ranks": join_items(item["work"]["overflow_granted_ranks"]),
+        "skin_applied_character_id": item["skin_applied_character_id"],
+        "expedition_map_object_instance_id": item["expedition_map_object_instance_id"],
+        "partner_skill_last_used_time": item["timers"]["partner_skill_last_used_time"],
+        "arena_restore_valid": item["arena"]["restore"]["valid"],
+        "arena_restore_hp": item["arena"]["restore"]["hp"],
+        "arena_restore_full_stomach": item["arena"]["restore"]["full_stomach"],
+        "arena_restore_sanity": item["arena"]["restore"]["sanity"],
+        "arena_restore_worker_sick": item["arena"]["restore"]["worker_sick"],
+        "arena_restore_food_status_effect_item": item["arena"]["restore"]["food_status_effect_item"],
+        "arena_restore_food_status_effect_timer": item["arena"]["restore"]["food_status_effect_timer"],
+        "arena_restore_food_regene_item_id": item["arena"]["restore"]["food_regene"]["item_id"],
+        "arena_restore_food_regene_effect_time": item["arena"]["restore"]["food_regene"]["effect_time"],
+        "arena_restore_food_regene_remaining_time": item["arena"]["restore"]["food_regene"]["remaining_time"],
+        "arena_restore_food_full_stomach_keep_item": item["arena"]["restore"]["food_full_stomach_keep_item"],
+        "arena_restore_food_full_stomach_keep_timer": item["arena"]["restore"]["food_full_stomach_keep_timer"],
         "raw_property_names": join_values(item["raw_property_names"]),
     }
 

@@ -305,18 +305,7 @@ class PalStorageDataManager:
         payload, _ = cls.read_struct_payload(data, offset, "Guid")
         if not payload or len(payload) < 16:
             return None
-        raw = payload[:16]
-        return (
-            raw[0:4][::-1].hex()
-            + "-"
-            + raw[4:6][::-1].hex()
-            + "-"
-            + raw[6:8][::-1].hex()
-            + "-"
-            + raw[8:10].hex()
-            + "-"
-            + raw[10:16].hex()
-        )
+        return cls.format_guid(payload[:16])
 
     @classmethod
     def read_datetime_struct(cls, data, offset):
@@ -337,6 +326,217 @@ class PalStorageDataManager:
         else:
             return None
         return {"x": x, "y": y, "z": z}
+
+    SCALAR_FORMATS = {
+        "IntProperty": "<i",
+        "Int64Property": "<q",
+        "Int16Property": "<h",
+        "Int8Property": "<b",
+        "UInt16Property": "<H",
+        "UInt32Property": "<I",
+        "UInt64Property": "<Q",
+        "FloatProperty": "<f",
+        "DoubleProperty": "<d",
+    }
+
+    ZERO_GUID = "00000000-0000-0000-0000-000000000000"
+
+    @staticmethod
+    def format_guid(raw):
+        # Unreal FGuid is four little-endian 32-bit words. Palworld tools (and the
+        # player save file names) print each word big-endian, hyphenated 8-4-4-4-12.
+        words = b"".join(raw[i : i + 4][::-1] for i in range(0, 16, 4)).hex()
+        return f"{words[:8]}-{words[8:12]}-{words[12:16]}-{words[16:20]}-{words[20:]}"
+
+    @classmethod
+    def guid_or_none(cls, value):
+        return None if value in (None, cls.ZERO_GUID) else value
+
+    @staticmethod
+    def enum_short(value):
+        if isinstance(value, str) and "::" in value:
+            return value.split("::", 1)[1]
+        return value
+
+    @classmethod
+    def read_property_value(cls, data, offset):
+        """Read one tagged property. Returns (name, value, next_offset); name is None at the
+        'None' terminator. Struct and array payloads are decoded recursively."""
+        name, prop_type, size, offset = cls.read_tag_header(data, offset)
+        if name == "None":
+            return None, None, offset
+        if prop_type == "BoolProperty":
+            return name, bool(data[offset]), offset + 2
+        if prop_type == "ByteProperty":
+            enum_name, offset = cls.read_fstring(data, offset)
+            offset += 1
+            if enum_name == "None" or size == 1:
+                value = data[offset]
+            else:
+                value, _ = cls.read_fstring(data, offset)
+            return name, value, offset + size
+        if prop_type == "EnumProperty":
+            _, offset = cls.read_fstring(data, offset)
+            offset += 1
+            value, _ = cls.read_fstring(data, offset)
+            return name, value, offset + size
+        if prop_type == "StructProperty":
+            struct_type, offset = cls.read_fstring(data, offset)
+            offset += 17
+            return name, cls.decode_struct(struct_type, data[offset : offset + size]), offset + size
+        if prop_type in ("ArrayProperty", "SetProperty"):
+            inner_type, offset = cls.read_fstring(data, offset)
+            offset += 1
+            return name, cls.decode_array(inner_type, data[offset : offset + size]), offset + size
+        if prop_type == "MapProperty":
+            _, offset = cls.read_fstring(data, offset)
+            _, offset = cls.read_fstring(data, offset)
+            offset += 1
+            return name, None, offset + size
+        offset += 1
+        fmt = cls.SCALAR_FORMATS.get(prop_type)
+        if fmt:
+            value = struct.unpack_from(fmt, data, offset)[0]
+        elif prop_type in ("NameProperty", "StrProperty"):
+            value, _ = cls.read_fstring(data, offset)
+        else:
+            value = None
+        return name, value, offset + size
+
+    @classmethod
+    def read_property_list(cls, data, offset=0):
+        """Read a 'None'-terminated list of tagged properties into a dict."""
+        fields = {}
+        while offset < len(data):
+            name, value, offset = cls.read_property_value(data, offset)
+            if name is None:
+                break
+            fields[name] = value
+        return fields, offset
+
+    @classmethod
+    def decode_struct(cls, struct_type, payload):
+        if struct_type == "Guid":
+            return cls.format_guid(payload[:16]) if len(payload) >= 16 else None
+        if struct_type == "DateTime":
+            return struct.unpack_from("<q", payload, 0)[0] if len(payload) >= 8 else None
+        if struct_type == "Vector":
+            if len(payload) >= 24:
+                x, y, z = struct.unpack_from("<ddd", payload, 0)
+            elif len(payload) >= 12:
+                x, y, z = struct.unpack_from("<fff", payload, 0)
+            else:
+                return None
+            return {"x": x, "y": y, "z": z}
+        fields, _ = cls.read_property_list(payload)
+        if struct_type == "FixedPoint64":
+            value = fields.get("Value")
+            return None if value is None else value / 1000
+        return fields
+
+    @classmethod
+    def decode_array(cls, inner_type, payload):
+        (count,) = struct.unpack_from("<i", payload, 0)
+        offset = 4
+        if count < 0:
+            return []
+        values = []
+        if inner_type == "StructProperty":
+            _, offset = cls.read_fstring(payload, offset)  # item name
+            _, offset = cls.read_fstring(payload, offset)  # "StructProperty"
+            offset += 8  # size + array index
+            struct_type, offset = cls.read_fstring(payload, offset)
+            offset += 17  # struct guid + has-guid flag
+            for _ in range(count):
+                if struct_type == "Guid":
+                    values.append(cls.format_guid(payload[offset : offset + 16]))
+                    offset += 16
+                elif struct_type == "DateTime":
+                    values.append(struct.unpack_from("<q", payload, offset)[0])
+                    offset += 8
+                else:
+                    fields, offset = cls.read_property_list(payload, offset)
+                    values.append(fields)
+            return values
+        if inner_type in ("EnumProperty", "NameProperty", "StrProperty"):
+            for _ in range(count):
+                value, offset = cls.read_fstring(payload, offset)
+                values.append(value)
+            return values
+        if inner_type == "BoolProperty":
+            return [bool(b) for b in payload[offset : offset + count]]
+        if inner_type == "ByteProperty":
+            return list(payload[offset : offset + count])
+        fmt = cls.SCALAR_FORMATS.get(inner_type)
+        if fmt:
+            step = struct.calcsize(fmt)
+            for i in range(count):
+                values.append(struct.unpack_from(fmt, payload, offset + i * step)[0])
+        return values
+
+    @classmethod
+    def read_struct_property(cls, data, offset):
+        """Decode a StructProperty at offset into a dict (or scalar for Guid/DateTime/Vector)."""
+        if offset == -1:
+            return None
+        try:
+            payload, struct_type = cls.read_struct_payload(data, offset)
+            if payload is None:
+                return None
+            return cls.decode_struct(struct_type, payload)
+        except (IndexError, struct.error, UnicodeDecodeError):
+            return None
+
+    @classmethod
+    def read_struct_array_property(cls, data, offset):
+        """Decode an ArrayProperty at offset into a list of decoded items."""
+        if offset == -1:
+            return []
+        try:
+            _, prop_type, size, offset = cls.read_tag_header(data, offset)
+            if prop_type != "ArrayProperty":
+                return []
+            inner_type, offset = cls.read_fstring(data, offset)
+            offset += 1
+            return cls.decode_array(inner_type, data[offset : offset + size])
+        except (IndexError, struct.error, UnicodeDecodeError):
+            return []
+
+    STATUS_POINT_NAMES = {
+        "\u6700\u5927HP": "max_hp",
+        "\u6700\u5927SP": "max_sp",
+        "\u653b\u6483\u529b": "attack",
+        "\u9632\u5fa1\u529b": "defense",
+        "\u6240\u6301\u91cd\u91cf": "carry_weight",
+        "\u6355\u7372\u7387": "capture_rate",
+        "\u4f5c\u696d\u901f\u5ea6": "work_speed",
+    }
+
+    @classmethod
+    def status_points_dict(cls, items):
+        return {
+            cls.STATUS_POINT_NAMES.get(item.get("StatusName"), item.get("StatusName")): item.get("StatusPoint")
+            for item in items
+            if isinstance(item, dict)
+        }
+
+    @classmethod
+    def suitability_rank_items(cls, items):
+        return [
+            {key: cls.enum_short(value) for key, value in item.items()}
+            for item in items
+            if isinstance(item, dict)
+        ]
+
+    @classmethod
+    def food_regene_info(cls, info):
+        info = info or {}
+        return {
+            "item_id": info.get("ItemId"),
+            "effect_time": info.get("EffectTime"),
+            "remaining_time": info.get("RemainingTime"),
+            "effect_parameters": info.get("RegeneEfectParameters") or [],
+        }
 
     @classmethod
     def validated_property_names(cls, data):
@@ -415,10 +615,27 @@ class PalStorageDataManager:
                 for skill_id in passive_skill_ids
             ]
 
+            instance = self.read_struct_property(block, prop("InstanceId")) or {}
+            slot_id = self.read_struct_property(block, prop("SlotId")) or {}
+            item_container = self.read_struct_property(block, prop("ItemContainerId")) or {}
+            work_option = self.read_struct_property(block, prop("WorkSuitabilityOptionInfo")) or {}
+            arena_restore = self.read_struct_property(block, prop("ArenaRestoreParameter")) or {}
+
             records.append(
                 {
                     "storage_index": slot_number,
-                    "slot_index": self.read_int_property(block, prop("SlotIndex")),
+                    "identity": {
+                        "instance_id": self.guid_or_none(instance.get("InstanceId")),
+                        "instance_player_uid": self.guid_or_none(instance.get("PlayerUId")),
+                        "debug_name": instance.get("DebugName") or "",
+                    },
+                    "pal_box": {
+                        "container_id": self.guid_or_none(
+                            (slot_id.get("ContainerId") or {}).get("ID")
+                        ),
+                        "slot_index": slot_id.get("SlotIndex"),
+                    },
+                    "item_container_id": self.guid_or_none(item_container.get("ID")),
                     "pal_name": pal_name,
                     "pal_variant": pal_variant,
                     "species_id": character_id,
@@ -528,17 +745,70 @@ class PalStorageDataManager:
                         "owner_player_uid": self.read_guid_struct(
                             block, prop("OwnerPlayerUId")
                         ),
+                        "old_owner_player_uids": self.read_struct_array_property(
+                            block, prop("OldOwnerPlayerUIds")
+                        ),
                         "last_nickname_modifier_player_uid": self.read_guid_struct(
                             block, prop("LastNickNameModifierPlayerUid")
                         ),
                     },
                     "arena": {
                         "rank_points": self.read_int_property(block, prop("ArenaRankPoint")),
+                        "restore": {
+                            "valid": arena_restore.get("bValid"),
+                            "hp": arena_restore.get("Hp"),
+                            "full_stomach": arena_restore.get("FullStomach"),
+                            "sanity": arena_restore.get("SanityValue"),
+                            "worker_sick": self.enum_short(arena_restore.get("WorkerSick")),
+                            "food_status_effect_item": arena_restore.get("FoodWithStatusEffect"),
+                            "food_status_effect_timer": arena_restore.get(
+                                "Tiemr_FoodWithStatusEffect"
+                            ),
+                            "food_regene": self.food_regene_info(
+                                arena_restore.get("FoodRegeneEffectInfo")
+                            ),
+                            "food_full_stomach_keep_item": arena_restore.get(
+                                "FoodWithFullStomachKeep"
+                            ),
+                            "food_full_stomach_keep_timer": arena_restore.get(
+                                "Tiemr_FoodWithFullStomachKeep"
+                            ),
+                        },
                     },
+                    "base_camp_event": {
+                        "type": self.read_enum_property(
+                            block, prop("BaseCampWorkerEventType"), "EPalBaseCampWorkerEventType::"
+                        ),
+                        "progress_time": self.read_float_property(
+                            block, prop("BaseCampWorkerEventProgressTime")
+                        ),
+                    },
+                    "status_points": {
+                        "got": self.status_points_dict(
+                            self.read_struct_array_property(block, prop("GotStatusPointList"))
+                        ),
+                        "got_ex": self.status_points_dict(
+                            self.read_struct_array_property(block, prop("GotExStatusPointList"))
+                        ),
+                    },
+                    "food_regene": self.food_regene_info(
+                        self.read_struct_property(block, prop("FoodRegeneEffectInfo"))
+                    ),
+                    "skin_applied_character_id": self.guid_or_none(
+                        self.read_guid_struct(block, prop("SkinAppliedCharacterId"))
+                    ),
+                    "expedition_map_object_instance_id": self.guid_or_none(
+                        self.read_guid_struct(
+                            block, prop("MapObjectConcreteInstanceIdAssignedToExpedition")
+                        )
+                    ),
                     "timers": {
                         "pal_revive": self.read_float_property(block, prop("PalReviveTimer")),
                         "partner_skill_cooldown_max": self.read_float_property(
                             block, prop("PartnerSkillCoolDownTimeMax")
+                        ),
+                        "partner_skill_last_used_time": self.read_datetime_struct(
+                            block, prop("PartnerSkillLastUsedTime")
                         ),
                         "food_with_status_effect": self.read_int_property(
                             block, prop("Tiemr_FoodWithStatusEffect")
@@ -558,6 +828,20 @@ class PalStorageDataManager:
                     "work": {
                         "current_suitability": self.read_enum_property(
                             block, prop("CurrentWorkSuitability"), "EPalWorkSuitability::"
+                        ),
+                        "off_suitability_list": [
+                            self.enum_short(value)
+                            for value in work_option.get("OffWorkSuitabilityList") or []
+                        ],
+                        "add_ranks": self.suitability_rank_items(
+                            self.read_struct_array_property(
+                                block, prop("GotWorkSuitabilityAddRankList")
+                            )
+                        ),
+                        "overflow_granted_ranks": self.suitability_rank_items(
+                            self.read_struct_array_property(
+                                block, prop("WorkSuitabilityOverflowGrantedRankList")
+                            )
                         ),
                     },
                     "location": {
