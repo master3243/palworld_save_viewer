@@ -245,8 +245,16 @@ export class AppComponent {
   readonly appVersion = APP_VERSION;
   favoriteImageSrcs: Record<number, string> = {};
 
-  private readonly demoSaveName = '00000000000000000000000000000001_dps.sav';
-  private readonly demoSaveUrl = `resources/example_save/${this.demoSaveName}`;
+  /** The demo is two snapshots of the same world, loaded as saves A and B. */
+  private readonly demoFiles = [
+    '2026-08-16-00-09/Level.sav',
+    '2026-08-16-00-09/LevelMeta.sav',
+    '2026-08-16-00-09/Players/00000000000000000000000000000001.sav',
+    '2026-09-01-21-50/Level.sav',
+    '2026-09-01-21-50/LevelMeta.sav',
+    '2026-09-01-21-50/Players/00000000000000000000000000000001.sav',
+    '2026-09-01-21-50/Players/00000000000000000000000000000001_dps.sav'
+  ];
 
   private measureContext?: CanvasRenderingContext2D;
 
@@ -632,7 +640,8 @@ export class AppComponent {
     // would also pop the OS file picker.
     event.preventDefault();
     event.stopPropagation();
-    this.isDemoPromptOpen = true;
+    // The file confirmation that follows already offers Cancel, so no separate prompt.
+    void this.loadDemoSave();
   }
 
   toggleDropHelp(event: Event): void {
@@ -702,24 +711,26 @@ export class AppComponent {
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Downloading demo save', detail: '' };
 
-    let file: File;
+    let inputs: SaveInput[];
     try {
-      const response = await fetch(this.demoSaveUrl);
-      if (!response.ok) {
-        throw new Error(`Could not load the demo save (${response.status}).`);
-      }
-      file = new File([await response.arrayBuffer()], this.demoSaveName);
+      inputs = await Promise.all(this.demoFiles.map(async (path) => {
+        const response = await fetch(`resources/example_save/${path}`);
+        if (!response.ok) {
+          throw new Error(`Could not load the demo save (${path}: ${response.status}).`);
+        }
+        const name = path.split('/').pop() ?? path;
+        return { file: new File([await response.arrayBuffer()], name), path };
+      }));
     } catch (error) {
-      this.isParsing = false;
       this.error = error instanceof Error ? error.message : 'Could not load the demo save.';
       return;
+    } finally {
+      this.isParsing = false;
+      this.progress = null;
     }
 
-    await this.parseFile(file);
-  }
-
-  private async parseFile(file: File): Promise<void> {
-    await this.parseInputs([{ file, path: file.name }], false);
+    // Same confirmation as a dropped folder, so the demo shows what it is about to load.
+    await this.offerInputs(inputs, this.hasData);
   }
 
   private resetData(): void {
