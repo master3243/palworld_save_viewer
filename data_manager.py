@@ -16,6 +16,12 @@ class PalStorageDataManager:
         self.passive_skill_lookup = passive_skill_lookup or {}
         self.passive_rank_lookup = passive_rank_lookup or {}
         self.pal_lookup = pal_lookup or {}
+        # Species ids in saves sometimes differ in case from the game data
+        # (BOSS_GhostAnglerFish vs GhostAnglerfish); map lower-case -> canonical spelling.
+        self.pal_canonical = {}
+        for key in self.pal_lookup:
+            if key.lower() != key or key.lower() not in self.pal_canonical:
+                self.pal_canonical.setdefault(key.lower(), key)
 
     @staticmethod
     def load_active_skill_lookup(path):
@@ -796,6 +802,15 @@ class PalStorageDataManager:
                 display = display[: -len(suffix)]
         return display, variant
 
+    def canonical_species_id(self, species_id):
+        """Base species id spelled as the game data spells it (drives image file names)."""
+        base_id = species_id
+        for prefix in ("BOSS_", "Boss_", "PREDATOR_"):
+            if base_id.startswith(prefix):
+                base_id = base_id[len(prefix):]
+                break
+        return self.pal_canonical.get(base_id.lower(), base_id)
+
     def extract_records(self, save_data, progress=None):
         """Dimensional storage (_dps.sav): one PalIndividualCharacterSaveParameter block per slot.
         `progress(done, total, found, unit)` is called every few slots. Empty slots are
@@ -883,6 +898,7 @@ class PalStorageDataManager:
                 "pal_name": pal_name,
                 "pal_variant": pal_variant,
                 "species_id": character_id,
+                "species_base_id": self.canonical_species_id(character_id),
                 "unique_npc_id": self.read_name_property(block, prop("UniqueNPCID")),
                 "gender": self.read_enum_property(block, prop("Gender"), "EPalGenderType::"),
                 "nickname": self.read_str_property(block, prop("NickName")),

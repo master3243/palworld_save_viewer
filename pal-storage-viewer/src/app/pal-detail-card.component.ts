@@ -62,7 +62,8 @@ export class PalDetailCardComponent implements OnChanges {
   }
 
   get palImageUrl(): string {
-    const speciesId = this.imageSpeciesId(this.valueFor('species_id'));
+    // The backend supplies the id as the game data spells it; saves vary in case.
+    const speciesId = this.valueFor('species_base_id') || this.imageSpeciesId(this.valueFor('species_id'));
     return speciesId ? `assets/pals/${encodeURIComponent(speciesId)}.pog` : '';
   }
 
@@ -190,7 +191,7 @@ export class PalDetailCardComponent implements OnChanges {
   }
 
   valueFor(key: string): string { return this.formatValue(this.row[key]); }
-  isExpandable(field: DetailField): boolean { return field.value.length > 120 || field.value.split(',').length > 4; }
+  isExpandable(field: DetailField): boolean { return field.value.length > 48 || field.value.split(',').length > 4; }
   isExpanded(field: DetailField): boolean { return this.expandedFields.has(field.key); }
 
   toggleField(field: DetailField): void {

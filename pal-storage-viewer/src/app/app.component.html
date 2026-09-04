@@ -109,7 +109,7 @@
       (click)="$event.stopPropagation()"
     >
       <div class="help-text" id="dropHelpTitle">
-        <p>Drop your whole world save folder (or pick it with <strong>Folder</strong>) to see every Pal: party, Pal Box, each base, and dimensional storage. The <strong>Where</strong> column tells you which.</p>
+        <p>Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, and dimensional storage.
         <p>The save folder (for Steam users) is:</p>
         <code class="save-path">%LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\</code>
         <p>Where <code>IDprofile</code> and <code>IDworld</code> are long random numbers. Inside it, <code>Level.sav</code> holds party, Pal Box and base Pals, <code>Players\xxx.sav</code> tells which container is whose, and <code>Players\xxx_dps.sav</code> is the dimensional storage.</p>
@@ -209,14 +209,14 @@
       <div class="sources-groups" *ngIf="isSourcesOpen">
         <div class="source-group" *ngFor="let group of sourceGroups">
           <div class="source-group-head">
-            <span class="save-letter" *ngIf="saveSets.length > 1 && group.set?.letter">{{ group.set?.letter }}</span>
+            <span class="save-letter" *ngIf="group.set?.letter">{{ group.set?.letter }}</span>
             <span class="source-group-name">{{ group.set?.label || group.folder || 'Files' }}</span>
             <span class="source-group-meta" [title]="group.folder">
               <span *ngFor="let part of groupMeta(group)">{{ part }}</span>
               <span class="source-group-count">{{ group.pals | number }} pals</span>
             </span>
             <button
-              class="source-remove group-remove"
+              class="group-remove"
               type="button"
               [attr.aria-label]="'Remove save ' + (group.set?.letter || group.set?.label || '')"
               title="Remove this whole save"

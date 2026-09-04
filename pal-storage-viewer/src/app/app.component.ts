@@ -81,6 +81,29 @@ export class AppComponent {
   locationCounts: LocationCount[] = [];
   /** Live progress while parsing; the worker reports real per-record counts. */
   progress: ParseProgress | null = null;
+  /** Save letters by set label. Assigned once and never reused, so B stays B after A is removed. */
+  private readonly saveLetters = new Map<string, string>();
+  private nextLetterIndex = 0;
+
+  private letterFor(index: number): string {
+    let ordinal = index + 1;
+    let letters = '';
+    while (ordinal > 0) {
+      const remainder = (ordinal - 1) % 26;
+      letters = String.fromCharCode(65 + remainder) + letters;
+      ordinal = Math.floor((ordinal - 1) / 26);
+    }
+    return letters;
+  }
+
+  private assignSaveLetters(inputs: SaveInput[]): void {
+    for (const input of inputs) {
+      const set = this.parser.setLabel(input);
+      if (!this.saveLetters.has(set)) {
+        this.saveLetters.set(set, this.letterFor(this.nextLetterIndex++));
+      }
+    }
+  }
   isSourcesOpen = false;
   /** Files waiting for the user to confirm a multi-file load. */
   pendingFiles: PendingFile[] | null = null;
@@ -700,6 +723,7 @@ export class AppComponent {
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Initializing\u2026', detail: '' };
     performance.mark('pal:load-start');
+    this.assignSaveLetters(merged);
     try {
       // The worker owns 0..95% of the bar; the table build takes the rest.
       const result = await this.parser.parseMany(merged, (update) => {
@@ -708,7 +732,7 @@ export class AppComponent {
           fraction: update.fraction === null ? null : update.fraction * PARSE_SHARE
         };
         this.changeDetector.markForCheck();
-      });
+      }, this.saveLetters);
       performance.mark('pal:worker-done');
       console.debug('[pal] parse timing', JSON.stringify(this.parser.lastTiming));
       const rows: PalStorageRow[] = [];
@@ -1020,13 +1044,12 @@ export class AppComponent {
       ...Array.from(keys).sort((left, right) => left.localeCompare(right))
     ];
 
-    const multipleSaves = this.saveSets.length > 1;
     const multiplePlayers = this.saveSets.some((set) => set.players.length > 1);
     return orderedKeys.map((key) => ({
       key,
       label: this.toLabel(key),
       title: this.toTitle(key),
-      visible: (this.defaultVisibleColumns.has(key) && (key !== 'save_id' || multipleSaves))
+      visible: this.defaultVisibleColumns.has(key)
         || (key === 'owner_name' && multiplePlayers)
     }));
   }

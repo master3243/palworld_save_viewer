@@ -184,7 +184,7 @@
         [class.expandable]="isExpandable(field)"
         [class.expanded]="isExpanded(field)"
         (click)="toggleField(field)"
-        [title]="field.rawValue ? 'Raw: ' + field.rawValue : (isExpandable(field) ? 'Click to expand' : null)"
+        [attr.title]="field.rawValue ? 'Raw: ' + field.rawValue : (isExpandable(field) ? 'Click to expand' : null)"
       >
         <dt>{{ field.label }}</dt>
         <dd>{{ field.value }}</dd>

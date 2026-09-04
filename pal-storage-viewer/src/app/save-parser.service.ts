@@ -95,12 +95,19 @@ export class SaveParserService {
    * All heavy work (Oodle, Pyodide) runs in a Web Worker so the page never
    * freezes; `onProgress` receives real per-file, per-record progress.
    */
-  async parseMany(inputs: SaveInput[], onProgress?: (progress: ParseProgress) => void): Promise<CombinedSaves> {
+  async parseMany(
+    inputs: SaveInput[],
+    onProgress?: (progress: ParseProgress) => void,
+    letters: ReadonlyMap<string, string> = new Map()
+  ): Promise<CombinedSaves> {
     const usable = inputs.filter((input) => this.isCandidate(input));
     if (!usable.length) {
       throw new Error('No Palworld save files found. Drop Level.sav, a Players folder, or a _dps.sav file.');
     }
-    const files = usable.map((input) => ({ file: input.file, name: input.file.name, set: this.setLabel(input) }));
+    const files = usable.map((input) => {
+      const set = this.setLabel(input);
+      return { file: input.file, name: input.file.name, set, letter: letters.get(set) ?? '' };
+    });
     let jsonText: string;
     try {
       jsonText = await this.runInWorker(files, onProgress);
@@ -127,7 +134,7 @@ export class SaveParserService {
   }
 
   private runInWorker(
-    files: { file: File; name: string; set: string }[],
+    files: { file: File; name: string; set: string; letter: string }[],
     onProgress?: (progress: ParseProgress) => void
   ): Promise<string> {
     const worker = this.getWorker();
@@ -181,7 +188,7 @@ export class SaveParserService {
    * Save set = the folder that holds Level.sav / Players. For "World/Players/x.sav"
    * that is "World"; for "World/Level.sav" also "World"; for a bare file "".
    */
-  private setLabel(input: SaveInput): string {
+  setLabel(input: SaveInput): string {
     const parts = input.path.split('/').filter(Boolean);
     parts.pop(); // file name
     if (parts.length && parts[parts.length - 1].toLowerCase() === 'players') parts.pop();

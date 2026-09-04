@@ -27,7 +27,6 @@
   height: 28px;
   justify-content: center;
   opacity: 0.72;
-  transition: color 150ms ease, filter 150ms ease, opacity 150ms ease;
   width: 28px;
 }
 
@@ -74,7 +73,6 @@
   color: inherit;
   display: flex;
   text-decoration: none;
-  transition: filter 160ms ease;
 }
 
 .title-link:hover {
@@ -492,7 +490,6 @@ td.arrow-cell {
   display: inline-block;
   font-size: 0.86rem;
   font-weight: 900;
-  transition: transform 140ms ease;
 }
 
 .row-toggle {
@@ -1149,8 +1146,28 @@ tbody tr:hover {
   opacity: 0.6;
 }
 
+.source-group-head {
+  align-items: center;
+}
+
 .group-remove {
-  margin-left: 4px;
+  background: rgba(255, 120, 120, 0.08);
+  border: 1px solid rgba(255, 120, 120, 0.35);
+  border-radius: 6px;
+  color: rgba(255, 190, 190, 0.9);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-size: 1.15rem;
+  height: 26px;
+  line-height: 1;
+  margin-left: auto;
+  padding: 0;
+  width: 30px;
+}
+
+.group-remove:hover {
+  background: rgba(255, 120, 120, 0.3);
+  color: #fff;
 }
 
 .source-name {
@@ -1393,6 +1410,20 @@ td.save-cell {
   padding-right: 4px;
   text-align: center;
   width: 48px;
+}
+
+th.save-cell.sorted,
+td.save-cell.sorted-column {
+  max-width: 64px;
+  min-width: 64px;
+  width: 64px;
+}
+
+th.where-cell.sorted,
+td.where-cell.sorted-column {
+  max-width: 124px;
+  min-width: 112px;
+  width: 124px;
 }
 
 td.save-cell {

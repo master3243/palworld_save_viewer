@@ -9,6 +9,8 @@ export interface WorkerFile {
   file: File;
   name: string;
   set: string;
+  /** Letter the page assigned to this save; stays stable across reloads. */
+  letter: string;
 }
 
 export interface ParseRequest {
@@ -111,7 +113,7 @@ async function handleParse(request: ParseRequest): Promise<void> {
   pyodide.FS.mkdirTree('/app/input');
 
   // Stage 1: read + decompress every file that Python has not already parsed.
-  const manifest: { key: string; path: string; name: string; set: string }[] = [];
+  const manifest: { key: string; path: string; name: string; set: string; letter: string }[] = [];
   const weights: number[] = [];
   const written: string[] = [];
   const keys = files.map(fileKey);
@@ -119,7 +121,7 @@ async function handleParse(request: ParseRequest): Promise<void> {
     const key = keys[index];
     const cachedWeight = parsedWeights.get(key);
     if (cachedWeight !== undefined) {
-      manifest.push({ key, path: '', name: entry.name, set: entry.set });
+      manifest.push({ key, path: '', name: entry.name, set: entry.set, letter: entry.letter });
       weights.push(cachedWeight);
       continue;
     }
@@ -129,7 +131,7 @@ async function handleParse(request: ParseRequest): Promise<void> {
     const path = `/app/input/${index}_${entry.name.replace(/[^A-Za-z0-9._-]/g, '_')}`;
     pyodide.FS.writeFile(path, decoded);
     written.push(path);
-    manifest.push({ key, path, name: entry.name, set: entry.set });
+    manifest.push({ key, path, name: entry.name, set: entry.set, letter: entry.letter });
     weights.push(decoded.byteLength);
   }
   const totalWeight = weights.reduce((sum, weight) => sum + weight, 0) || 1;

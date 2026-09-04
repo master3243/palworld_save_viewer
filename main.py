@@ -35,6 +35,7 @@ CSV_FIELDS = [
     "pal_name",
     "pal_variant",
     "species_id",
+    "species_base_id",
     "unique_npc_id",
     "gender",
     "nickname",
@@ -384,9 +385,10 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
     sets = {}
     sources = []
 
-    def get_set(label):
-        return sets.setdefault(label, {
+    def get_set(label, letter=""):
+        save_set = sets.setdefault(label, {
             "label": label,
+            "letter": "",
             "world_name": "",
             "host_player_name": "",
             "in_game_day": None,
@@ -401,10 +403,13 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
             "dps_records": [],
             "level_records": [],
         })
+        if letter and not save_set["letter"]:
+            save_set["letter"] = letter
+        return save_set
 
     for file_index, entry in enumerate(files):
         name = entry.get("name") or Path(entry.get("path") or "").name
-        save_set = get_set(entry.get("set") or "")
+        save_set = get_set(entry.get("set") or "", entry.get("letter") or "")
         source = {"file": name, "set": save_set["label"], "kind": "unknown", "pals": 0, "note": ""}
         sources.append(source)
         key = entry.get("key")
@@ -435,7 +440,8 @@ def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
     displays = save_display_names(sets)
     for ordinal, (label, save_set) in enumerate(sets.items(), start=1):
         display = displays[label]
-        letter = save_letter(ordinal)
+        # The browser assigns letters so they stay put when saves are added or removed.
+        letter = save_set["letter"] or save_letter(ordinal)
         for record in save_set["level_records"]:
             location, detail = locate_level_record(record, save_set)
             record["placement"] = {"location": location, "detail": detail}
@@ -588,6 +594,7 @@ def flatten_record(item):
         "pal_name": item["pal_name"],
         "pal_variant": item["pal_variant"],
         "species_id": item["species_id"],
+        "species_base_id": item.get("species_base_id"),
         "unique_npc_id": item["unique_npc_id"],
         "gender": item["gender"],
         "nickname": item["nickname"],
