@@ -1,4 +1,27 @@
-<main class="page" [class.compact]="hasData">
+<main
+  class="page"
+  [class.compact]="hasData"
+  [class.dragging-over]="hasData && isDragging"
+  (drop)="onDrop($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+>
+  <input
+    #folderInput
+    class="hidden-input"
+    type="file"
+    webkitdirectory
+    multiple
+    (change)="onFileInput($event)"
+  >
+  <input
+    #addFilesInput
+    class="hidden-input"
+    type="file"
+    accept=".sav,.gvas"
+    multiple
+    (change)="onFileInput($event)"
+  >
   <section class="toolbar">
     <a class="title-link" href="./" aria-label="Palworld Storage Viewer home" title="Back to start">
       <span class="logo-crop">
@@ -21,11 +44,39 @@
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
   >
-    <input type="file" accept=".sav,.gvas" (change)="onFileInput($event)">
-    <span class="spinner" *ngIf="isParsing" aria-hidden="true"></span>
-    <span class="drop-title">{{ isParsing ? 'Loading' : 'Drop save file here' }}</span>
+    <input type="file" accept=".sav,.gvas" multiple (change)="onFileInput($event)">
+    <span class="drop-title" *ngIf="!isParsing">Drop save files or a save folder here</span>
+    <span class="drop-subtitle" *ngIf="!isParsing">Level.sav + Players folder for everything, or just a _dps.sav</span>
+
+    <span
+      class="progress-block"
+      *ngIf="isParsing"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-valuenow]="progress?.fraction === null ? null : progressPercent"
+      [attr.aria-label]="progress?.label || 'Loading'"
+    >
+      <span class="progress-head">
+        <span class="progress-label">{{ progress?.label || 'Loading' }}</span>
+        <span class="progress-percent" *ngIf="progress?.fraction !== null">{{ progressPercent }}%</span>
+      </span>
+      <span class="progress-track" [class.indeterminate]="progress?.fraction === null">
+        <span class="progress-fill" [style.width.%]="progress?.fraction === null ? 100 : progressPercent"></span>
+      </span>
+      <span class="progress-detail">{{ progress?.detail || '\u00a0' }}</span>
+    </span>
 
     <span class="drop-actions" *ngIf="!isParsing">
+      <button
+        class="demo-button folder-button"
+        type="button"
+        title="Pick a whole save folder"
+        (click)="openFolderPicker($event)"
+      >
+        <span class="demo-glyph" aria-hidden="true">&#128193;</span>
+        <span>Folder</span>
+      </button>
       <button
         class="demo-button"
         type="button"
@@ -57,11 +108,11 @@
       (click)="$event.stopPropagation()"
     >
       <div class="help-text" id="dropHelpTitle">
-        <p>Upload the "xxx_dps.sav" file to inspect the pals in the storage.</p>
-        <p>The save file (for Steam users) is in:</p>
-        <code class="save-path">%LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\Players\00000000000000000000000000000001_dps.sav</code>
-        <p>Where <code>IDprofile</code> and <code>IDworld</code> are long random numbers.</p>
-        <p>Or choose the demo save file (my personal save file).</p>
+        <p>Drop your whole world save folder (or pick it with <strong>Folder</strong>) to see every Pal: party, Pal Box, each base, and dimensional storage. The <strong>Where</strong> column tells you which.</p>
+        <p>The save folder (for Steam users) is:</p>
+        <code class="save-path">%LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\</code>
+        <p>Where <code>IDprofile</code> and <code>IDworld</code> are long random numbers. Inside it, <code>Level.sav</code> holds party, Pal Box and base Pals, <code>Players\xxx.sav</code> tells which container is whose, and <code>Players\xxx_dps.sav</code> is the dimensional storage.</p>
+        <p>You can also drop single files, and add files from other worlds later to compare them in one table. Or choose the demo save file (my personal dimensional storage).</p>
       </div>
       <div class="modal-actions">
         <button class="modal-primary" type="button" (click)="closeDropHelp()">Dismiss</button>
@@ -92,6 +143,34 @@
   <p class="error" *ngIf="error">{{ error }}</p>
 
   <section class="table-shell" *ngIf="hasData">
+    <div class="sources-bar" aria-label="Loaded save files">
+      <span class="sources-label">Sources</span>
+      <span
+        *ngFor="let source of sources; let i = index; trackBy: trackSource"
+        class="source-chip"
+        [attr.data-kind]="source.kind"
+        [class.muted]="!source.pals && source.kind !== 'player' && source.kind !== 'level_meta'"
+        [title]="sourceTitle(source)"
+      >
+        <span class="source-kind">{{ source.kind === 'dimensional_storage' ? 'DPS' : source.kind === 'level' ? 'World' : source.kind === 'player' ? 'Player' : source.kind === 'level_meta' ? 'Info' : 'Skip' }}</span>
+        <span class="source-name">{{ source.file }}</span>
+        <span class="source-count" *ngIf="source.pals">{{ source.pals | number }}</span>
+        <button
+          class="source-remove"
+          type="button"
+          [attr.aria-label]="'Remove ' + source.file"
+          title="Remove this file"
+          (click)="removeSource(i)"
+        >&times;</button>
+      </span>
+      <button class="add-source-button" type="button" title="Add more save files to this table" (click)="openAddFilesPicker()">+ Files</button>
+      <button class="add-source-button" type="button" title="Add a whole save folder to this table" (click)="openFolderPicker($event)">+ Folder</button>
+      <span class="location-summary">
+        <span *ngFor="let item of locationCounts" class="location-pill" [attr.data-location]="item.location">
+          {{ item.location }} <b>{{ item.count | number }}</b>
+        </span>
+      </span>
+    </div>
     <div class="table-tools">
       <app-filter-bar [rows]="originalRows" (filtered)="onFilterChanged($event)"></app-filter-bar>
       <div class="export-wrap">

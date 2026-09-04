@@ -1,152 +1,165 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 
 export type PalStorageRow = Record<string, unknown>;
 
-type OozModule = {
-  decompress(data: Uint8Array, rawSize: number): Uint8Array;
-};
-
-type PyodideRuntime = {
-  FS: {
-    mkdirTree(path: string): void;
-    writeFile(path: string, data: string | Uint8Array): void;
-  };
-  runPythonAsync<T = unknown>(code: string): Promise<T>;
-};
-
-declare global {
-  interface Window {
-    loadPyodide?: (config: { indexURL: string }) => Promise<PyodideRuntime>;
-  }
+/** One save file chosen by the user, with the folder path it was picked from (if any). */
+export interface SaveInput {
+  file: File;
+  /** Relative path inside a dropped/picked folder, e.g. "MyWorld/Players/x_dps.sav". */
+  path: string;
 }
+
+export interface SaveSource {
+  file: string;
+  set: string;
+  kind: string;
+  kind_label: string;
+  pals: number;
+  note: string;
+  players?: number;
+  bases?: number;
+  total_slots?: number;
+  world_name?: string;
+  host_player_name?: string;
+  skipped?: { players: number; wild_or_npc: number; unreadable: number };
+}
+
+export interface SaveSetSummary {
+  label: string;
+  folder: string;
+  world_name: string;
+  host_player_name: string;
+  pals: number;
+  bases: { index: number; location: { x: number; y: number; z: number } | null; workers: number }[];
+  players: { uid: string; name: string }[];
+  has_level: boolean;
+  has_dimensional_storage: boolean;
+}
+
+export interface CombinedSaves {
+  rows: PalStorageRow[];
+  sources: SaveSource[];
+  sets: SaveSetSummary[];
+}
+
+/** Files in a save folder that never contain pals; skipped before decoding. */
+const IGNORED_FILE_NAMES = new Set(['localdata.sav', 'worldoption.sav']);
+
+export interface ParseProgress {
+  /** 0..1, or null while something with no progress events runs (runtime download). */
+  fraction: number | null;
+  label: string;
+  detail: string;
+}
+
+type WorkerResponse =
+  | { type: 'progress'; id: number; fraction: number | null; label: string; detail: string }
+  | { type: 'result'; id: number; json: string }
+  | { type: 'error'; id: number; message: string };
 
 @Injectable({ providedIn: 'root' })
 export class SaveParserService {
-  private readonly pyodideVersion = '0.26.4';
-  private pyodidePromise?: Promise<PyodideRuntime>;
-  private oozPromise?: Promise<OozModule>;
-
-  constructor(private readonly http: HttpClient) {}
+  private worker?: Worker;
+  private nextRequestId = 1;
+  private readonly pending = new Map<number, {
+    resolve: (json: string) => void;
+    reject: (error: Error) => void;
+    onProgress?: (progress: ParseProgress) => void;
+  }>();
 
   async parse(file: File): Promise<PalStorageRow[]> {
-    this.validateFileName(file.name);
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const decoded = await this.decodeSave(bytes);
-    const pyodide = await this.getPyodide();
+    return (await this.parseMany([{ file, path: file.name }])).rows;
+  }
 
-    pyodide.FS.writeFile('/app/input.gvas', decoded);
+  /**
+   * Decode every given save file and merge them into one pal list. Files that
+   * share a top-level folder are treated as one save (so Level.sav, the
+   * player save and the dimensional storage file resolve each other's
+   * container ids); loose files all go into one default set.
+   *
+   * All heavy work (Oodle, Pyodide) runs in a Web Worker so the page never
+   * freezes; `onProgress` receives real per-file, per-record progress.
+   */
+  async parseMany(inputs: SaveInput[], onProgress?: (progress: ParseProgress) => void): Promise<CombinedSaves> {
+    const usable = inputs.filter((input) => this.isCandidate(input));
+    if (!usable.length) {
+      throw new Error('No Palworld save files found. Drop Level.sav, a Players folder, or a _dps.sav file.');
+    }
+    const files = usable.map((input) => ({ file: input.file, name: input.file.name, set: this.setLabel(input) }));
     let jsonText: string;
     try {
-      jsonText = await pyodide.runPythonAsync<string>(`
-import importlib
-import sys
-sys.path.insert(0, '/app')
-main = importlib.import_module('main')
-main.extract_decoded_save_to_json('/app/input.gvas', '/app/resources', flattened=True)
-`);
+      jsonText = await this.runInWorker(files, onProgress);
     } catch (error) {
       throw new Error(this.formatParseError(error));
     }
 
-    const rows = JSON.parse(jsonText) as PalStorageRow[];
-    if (!rows.length) {
-      throw new Error(this.wrongSaveMessage());
+    const result = JSON.parse(jsonText) as CombinedSaves;
+    if (!result.rows.length) {
+      const notes = result.sources.map((source) => source.note).filter(Boolean);
+      throw new Error(notes[0] || this.wrongSaveMessage());
     }
-    return rows;
+    return result;
   }
 
-  private async getPyodide(): Promise<PyodideRuntime> {
-    this.pyodidePromise ??= this.loadPyodideRuntime().then(async (pyodide) => {
-      pyodide.FS.mkdirTree('/app/resources');
-      await Promise.all([
-        this.writeTextFile(pyodide, '/app/main.py', 'python/main.py'),
-        this.writeTextFile(pyodide, '/app/data_manager.py', 'python/data_manager.py'),
-        this.writeTextFile(pyodide, '/app/resources/active_skills_lookup.json', 'resources/active_skills_lookup.json'),
-        this.writeTextFile(pyodide, '/app/resources/passive_skills_lookup.json', 'resources/passive_skills_lookup.json'),
-        this.writeTextFile(pyodide, '/app/resources/passive_ranks_lookup.lua', 'resources/passive_ranks_lookup.lua'),
-        this.writeTextFile(pyodide, '/app/resources/pal_names_lookup.lua', 'resources/pal_names_lookup.lua')
-      ]);
-      return pyodide;
-    });
-    return this.pyodidePromise;
+  /** True for files worth decoding: any .sav/.gvas except the known pal-free ones. */
+  isCandidate(input: SaveInput): boolean {
+    const name = input.file.name.toLowerCase();
+    if (IGNORED_FILE_NAMES.has(name)) return false;
+    return name.endsWith('.sav') || name.endsWith('.gvas');
   }
 
-  private async loadPyodideRuntime(): Promise<PyodideRuntime> {
-    if (!window.loadPyodide) {
-      await this.loadScript(`https://cdn.jsdelivr.net/pyodide/v${this.pyodideVersion}/full/pyodide.js`);
-    }
-    if (!window.loadPyodide) {
-      throw new Error('Pyodide did not load. Check your browser network access and try again.');
-    }
-    return window.loadPyodide({
-      indexURL: `https://cdn.jsdelivr.net/pyodide/v${this.pyodideVersion}/full/`
+  private runInWorker(
+    files: { file: File; name: string; set: string }[],
+    onProgress?: (progress: ParseProgress) => void
+  ): Promise<string> {
+    const worker = this.getWorker();
+    const id = this.nextRequestId++;
+    return new Promise<string>((resolve, reject) => {
+      this.pending.set(id, { resolve, reject, onProgress });
+      worker.postMessage({ type: 'parse', id, files });
     });
   }
 
-  private loadScript(src: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
-      if (existing) {
-        existing.addEventListener('load', () => resolve(), { once: true });
-        existing.addEventListener('error', () => reject(new Error(`Could not load ${src}`)), { once: true });
-        if (window.loadPyodide) resolve();
-        return;
+  private getWorker(): Worker {
+    if (this.worker) return this.worker;
+    if (typeof Worker === 'undefined') {
+      throw new Error('This browser does not support Web Workers.');
+    }
+    const worker = new Worker(new URL('./save-parser.worker', import.meta.url), { type: 'module' });
+    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+      const message = event.data;
+      const request = this.pending.get(message.id);
+      if (!request) return;
+      if (message.type === 'progress') {
+        request.onProgress?.({ fraction: message.fraction, label: message.label, detail: message.detail });
+      } else if (message.type === 'result') {
+        this.pending.delete(message.id);
+        request.resolve(message.json);
+      } else {
+        this.pending.delete(message.id);
+        request.reject(new Error(message.message));
       }
-
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error(`Could not load ${src}`));
-      document.head.appendChild(script);
-    });
+    };
+    worker.onerror = (event) => {
+      const error = new Error(event.message || 'The save parser worker crashed.');
+      for (const request of this.pending.values()) request.reject(error);
+      this.pending.clear();
+      worker.terminate();
+      this.worker = undefined;
+    };
+    this.worker = worker;
+    return worker;
   }
 
-  private async writeTextFile(pyodide: PyodideRuntime, path: string, url: string): Promise<void> {
-    pyodide.FS.writeFile(path, await this.loadText(url));
-  }
-
-  private async decodeSave(bytes: Uint8Array): Promise<Uint8Array> {
-    if (this.startsWith(bytes, [0x47, 0x56, 0x41, 0x53])) {
-      return bytes;
-    }
-    if (!this.startsWith(bytes.subarray(8, 12), [0x50, 0x6c, 0x4d, 0x31])) {
-      throw new Error('This does not look like a Palworld PlM1/GVAS save file.');
-    }
-
-    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    const uncompressedLength = view.getUint32(0, true);
-    const compressedLength = view.getUint32(4, true);
-    const compressed = bytes.subarray(12, 12 + compressedLength);
-    const ooz = await this.getOoz();
-    const decoded = new Uint8Array(ooz.decompress(compressed, uncompressedLength));
-    if (!this.startsWith(decoded, [0x47, 0x56, 0x41, 0x53])) {
-      throw new Error('The save decoded, but the result was not a GVAS payload.');
-    }
-    return decoded;
-  }
-
-  private getOoz(): Promise<OozModule> {
-    const decoderUrl = new URL('resources/browser/ooz-index.js', document.baseURI).toString();
-    this.oozPromise ??= import(/* @vite-ignore */ decoderUrl) as Promise<OozModule>;
-    return this.oozPromise;
-  }
-
-  private loadText(url: string): Promise<string> {
-    return firstValueFrom(this.http.get(url, { responseType: 'text' }));
-  }
-
-  private startsWith(bytes: Uint8Array, signature: number[]): boolean {
-    return signature.every((byte, index) => bytes[index] === byte);
-  }
-
-  private validateFileName(fileName: string): void {
-    const normalized = fileName.trim().toLowerCase();
-    if (normalized === 'level.sav' || normalized.endsWith('/level.sav') || normalized.endsWith('\\level.sav')) {
-      throw new Error(this.wrongSaveMessage());
-    }
+  /**
+   * Save set = the folder that holds Level.sav / Players. For "World/Players/x.sav"
+   * that is "World"; for "World/Level.sav" also "World"; for a bare file "".
+   */
+  private setLabel(input: SaveInput): string {
+    const parts = input.path.split('/').filter(Boolean);
+    parts.pop(); // file name
+    if (parts.length && parts[parts.length - 1].toLowerCase() === 'players') parts.pop();
+    return parts.join('/');
   }
 
   private formatParseError(error: unknown): string {
@@ -162,6 +175,6 @@ main.extract_decoded_save_to_json('/app/input.gvas', '/app/resources', flattened
   }
 
   private wrongSaveMessage(): string {
-    return 'This looks like the wrong save file. Use the player dimensional storage save from the Players folder, usually a file ending in _dps.sav, not Level.sav.';
+    return 'No pals found in these files. Use Level.sav and the Players folder from your save, or the _dps.sav dimensional storage file.';
   }
 }

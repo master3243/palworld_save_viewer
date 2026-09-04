@@ -21,3 +21,19 @@ Rresources used while building the save decoder
 
 - [PalScouter passive ranks](https://github.com/tanguyannequin-dev/mod-palworld/blob/main/PalScouter/Scripts/passive_ranks.lua)
   - Map passive skill IDs to fixed rank/color tiers.
+
+## Save files
+
+Drop a whole world save folder (or single files) onto the viewer. Files are decoded in the browser; nothing is uploaded.
+
+| File | Where it lives | What it contributes |
+| --- | --- | --- |
+| `Level.sav` | world folder | Every Pal in the world: party, Pal Box and base workers, plus base camps and player names |
+| `Players/<uid>.sav` | world folder | Which container is that player's party and which is their Pal Box |
+| `Players/<uid>_dps.sav` | world folder | Dimensional Pal Storage (up to 9,600 Pals) |
+| `LevelMeta.sav` | world folder | World name (used to label the save) |
+| `LocalData.sav`, `WorldOption.sav` | world folder | Skipped, they contain no Pals |
+
+Files that share a folder are resolved together, so the `Where` column can say Party, Pal Box (page/slot), Base N, or Dimensional Storage. Files from different worlds can be loaded side by side; the `Save` column then shows which world each Pal belongs to.
+
+The Steam save path is `%LOCALAPPDATA%\Pal\Saved\SaveGames\<profile>\<world>\`.

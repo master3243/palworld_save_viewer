@@ -123,3 +123,29 @@ dd { color: #eefaff; display: -webkit-box; font-size: .76rem; margin: 0; max-hei
   .skill-layout { grid-template-columns: 1fr; padding: 0; }
   .additional { padding: 14px; }
 }
+
+
+.location-badge {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(144, 226, 255, 0.45);
+  border-radius: 999px;
+  color: #e8f8ff;
+  display: inline-flex;
+  font-size: 0.8rem;
+  font-weight: 600;
+  gap: 2px;
+  line-height: 1;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+.location-badge small {
+  color: rgba(232, 248, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.location-badge[data-location='Party'] { border-color: rgba(255, 210, 120, 0.6); }
+.location-badge[data-location='Pal Box'] { border-color: rgba(120, 220, 160, 0.6); }
+.location-badge[data-location='Dimensional Storage'] { border-color: rgba(196, 150, 255, 0.6); }

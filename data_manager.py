@@ -466,7 +466,7 @@ class PalStorageDataManager:
         if inner_type == "BoolProperty":
             return [bool(b) for b in payload[offset : offset + count]]
         if inner_type == "ByteProperty":
-            return list(payload[offset : offset + count])
+            return bytes(payload[offset : offset + count])
         fmt = cls.SCALAR_FORMATS.get(inner_type)
         if fmt:
             step = struct.calcsize(fmt)
@@ -539,6 +539,210 @@ class PalStorageDataManager:
         }
 
     @classmethod
+    def _map_header(cls, data, label):
+        """Return (first_entry_offset, count, end) for a MapProperty, or None."""
+        offset = cls.find_property_start(data, label)
+        if offset == -1:
+            return None
+        _, prop_type, size, offset = cls.read_tag_header(data, offset)
+        if prop_type != "MapProperty":
+            return None
+        _, offset = cls.read_fstring(data, offset)
+        _, offset = cls.read_fstring(data, offset)
+        offset += 1
+        end = offset + size
+        _, count = struct.unpack_from("<ii", data, offset)
+        return offset + 8, count, end
+
+    @classmethod
+    def map_entry_count(cls, data, label):
+        header = cls._map_header(data, label)
+        return header[1] if header else 0
+
+    @classmethod
+    def read_map_entries(cls, data, label, key_kind="properties"):
+        """Iterate (key, value) of a MapProperty whose values are property lists.
+        key_kind: "properties" (struct key serialized as a property list) or "guid"."""
+        header = cls._map_header(data, label)
+        if header is None:
+            return
+        offset, count, end = header
+        for _ in range(count):
+            if offset >= end:
+                return
+            if key_kind == "guid":
+                key = cls.format_guid(data[offset : offset + 16])
+                offset += 16
+            else:
+                key, offset = cls.read_property_list(data, offset)
+            value, offset = cls.read_property_list(data, offset)
+            yield key, value
+
+    SAVE_KINDS = {
+        "PalDimensionPalStorageSaveGame": "dimensional_storage",
+        "PalWorldSaveGame": "level",
+        "PalWorldPlayerSaveGame": "player",
+        "PalWorldBaseInfoSaveGame": "level_meta",
+        "PalWorldOptionSaveGame": "world_option",
+        "PalLocalWorldSaveGame": "local_data",
+    }
+
+    @classmethod
+    def detect_save_kind(cls, data):
+        """Return (kind, class_name) from the GVAS header's SaveGameClassName."""
+        pos = data.find(b"/Script/Pal.", 0, 65536)
+        if pos == -1:
+            return "unknown", ""
+        end = data.find(b"\x00", pos)
+        class_name = data[pos:end].decode("utf-8", "replace")
+        short = class_name.rsplit(".", 1)[-1]
+        return cls.SAVE_KINDS.get(short, "unknown"), class_name
+
+    @staticmethod
+    def _transform(raw, offset):
+        values = struct.unpack_from("<10d", raw, offset)
+        return {"rotation": values[0:4], "location": values[4:7], "scale": values[7:10]}, offset + 80
+
+    @classmethod
+    def decode_base_camp(cls, raw):
+        """PalBaseCampSaveData RawData: id, name, state, transform, area, group, fast travel, owner."""
+        try:
+            offset = 0
+            base_id = cls.format_guid(raw[offset : offset + 16])
+            offset += 16
+            name, offset = cls.read_fstring(raw, offset)
+            state = raw[offset]
+            offset += 1
+            transform, offset = cls._transform(raw, offset)
+            (area_range,) = struct.unpack_from("<f", raw, offset)
+            offset += 4
+            group_id = cls.format_guid(raw[offset : offset + 16])
+            x, y, z = transform["location"]
+            return {
+                "id": base_id,
+                "raw_name": name,
+                "state": state,
+                "location": {"x": x, "y": y, "z": z},
+                "area_range": area_range,
+                "group_id": group_id,
+            }
+        except (IndexError, struct.error, UnicodeDecodeError):
+            return None
+
+    @classmethod
+    def decode_worker_director(cls, raw):
+        """PalBaseCampSaveData_WorkerDirector RawData: id, spawn transform, 2 bytes, container id."""
+        try:
+            offset = 16 + 80 + 2
+            return cls.format_guid(raw[offset : offset + 16])
+        except (IndexError, struct.error):
+            return None
+
+    @classmethod
+    def extract_level_meta(cls, data):
+        info = cls.read_struct_property(data, cls.find_property_start(data, "SaveData")) or {}
+        return {
+            "world_name": info.get("WorldName") or "",
+            "host_player_name": info.get("HostPlayerName") or "",
+            "host_player_level": info.get("HostPlayerLevel"),
+            "in_game_day": info.get("InGameDay"),
+        }
+
+    @classmethod
+    def extract_player_save(cls, data):
+        """Players/<uid>.sav: which containers are this player's party and Pal Box."""
+        def guid_at(label):
+            offset = cls.find_property_start(data, label)
+            value = cls.read_struct_property(data, offset)
+            if isinstance(value, dict):
+                value = value.get("ID")
+            return cls.guid_or_none(value)
+
+        individual = cls.read_struct_property(data, cls.find_property_start(data, "IndividualId")) or {}
+        return {
+            "player_uid": guid_at("PlayerUId"),
+            "instance_id": cls.guid_or_none(individual.get("InstanceId")),
+            "party_container_id": guid_at("OtomoCharacterContainerId"),
+            "pal_box_container_id": guid_at("PalStorageContainerId"),
+        }
+
+    PROGRESS_EVERY = 50
+
+    # An unoccupied dimensional storage slot starts with CharacterID = "None":
+    # name tag, NameProperty type, size 9, array index 0, no-guid flag, FString "None".
+    EMPTY_SLOT_PATTERN = (
+        b"CharacterID\x00\x0d\x00\x00\x00NameProperty\x00"
+        b"\x09\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00None\x00"
+    )
+
+    def extract_level_records(self, data, progress=None):
+        """Level.sav: every pal in the world (party, Pal Box, bases, wild), plus players and bases.
+        `progress(done, total, found, unit)` is called every few records when given."""
+        records = []
+        players = []
+        skipped = {"players": 0, "wild_or_npc": 0, "unreadable": 0}
+        total = self.map_entry_count(data, "CharacterSaveParameterMap")
+        if progress:
+            progress(0, total, 0, "entries")
+        for index, (key, value) in enumerate(self.read_map_entries(data, "CharacterSaveParameterMap")):
+            if progress and index % self.PROGRESS_EVERY == 0 and index:
+                progress(index, total, len(records), "entries")
+            raw = value.get("RawData")
+            if not isinstance(raw, (bytes, bytearray)):
+                skipped["unreadable"] += 1
+                continue
+            identity = {
+                "instance_id": self.guid_or_none(key.get("InstanceId")),
+                "instance_player_uid": self.guid_or_none(key.get("PlayerUId")),
+                "debug_name": key.get("DebugName") or "",
+            }
+            block = bytes(raw)
+            if self.read_bool_property(block, self.find_property_start(block, "IsPlayer")):
+                players.append({
+                    "player_uid": identity["instance_player_uid"],
+                    "instance_id": identity["instance_id"],
+                    "name": self.read_str_property(block, self.find_property_start(block, "NickName")),
+                    "level": self.read_byte_property(block, self.find_property_start(block, "Level")),
+                })
+                skipped["players"] += 1
+                continue
+            record = self.build_record(block, index, identity)
+            if record is None:
+                skipped["unreadable"] += 1
+                continue
+            has_container = record["pal_box"]["container_id"] is not None
+            has_owner = record["ownership"]["owner_player_uid"] not in (None, self.ZERO_GUID)
+            if not has_container and not has_owner:
+                skipped["wild_or_npc"] += 1
+                continue
+            records.append(record)
+
+        if progress:
+            progress(total, total, len(records), "entries")
+
+        bases = []
+        for base_id, value in self.read_map_entries(data, "BaseCampSaveData", key_kind="guid"):
+            info = self.decode_base_camp(bytes(value.get("RawData") or b"")) or {"id": base_id}
+            director = value.get("WorkerDirector") or {}
+            info["worker_container_id"] = self.decode_worker_director(bytes(director.get("RawData") or b""))
+            info["index"] = len(bases) + 1
+            bases.append(info)
+
+        containers = {}
+        for key, value in self.read_map_entries(data, "CharacterContainerSaveData"):
+            slots = value.get("Slots") or []
+            occupied = sum(1 for slot in slots if isinstance(slot, dict) and slot.get("RawData"))
+            containers[key.get("ID")] = {"slots": len(slots), "occupied": occupied}
+
+        return {
+            "records": records,
+            "players": players,
+            "bases": bases,
+            "containers": containers,
+            "skipped": skipped,
+        }
+
+    @classmethod
     def validated_property_names(cls, data):
         names = []
         seen = set()
@@ -579,7 +783,11 @@ class PalStorageDataManager:
                 display = display[: -len(suffix)]
         return display, variant
 
-    def extract_records(self, save_data):
+    def extract_records(self, save_data, progress=None):
+        """Dimensional storage (_dps.sav): one PalIndividualCharacterSaveParameter block per slot.
+        `progress(done, total, found, unit)` is called every few slots. Empty slots are
+        large on disk but parse instantly, so progress counts occupied slots against an
+        up-front estimate from a byte-pattern scan."""
         marker = b"PalIndividualCharacterSaveParameter\x00"
         offsets = []
         search = 0
@@ -591,272 +799,18 @@ class PalStorageDataManager:
             search = pos + 1
 
         records = []
+        expected = max(1, len(offsets) - save_data.count(self.EMPTY_SLOT_PATTERN))
+        if progress:
+            progress(0, expected, 0, "pals")
         for slot_number, pos in enumerate(offsets):
+            if progress and slot_number % self.PROGRESS_EVERY == 0 and slot_number:
+                progress(min(len(records), expected), expected, len(records), "pals")
             end = offsets[slot_number + 1] if slot_number + 1 < len(offsets) else len(save_data)
-            block = save_data[pos:end]
-
-            def prop(label):
-                return self.find_property_start(block, label)
-
-            character_id = self.read_name_property(block, prop("CharacterID")) or ""
-            if not character_id or character_id == "None":
-                continue
-
-            pal_name, pal_variant = self.pal_display_name(character_id)
-            active_skill_ids = self.read_enum_array_property(
-                block, prop("EquipWaza"), "EPalWazaID::"
-            )
-            mastered_skill_ids = self.read_enum_array_property(
-                block, prop("MasteredWaza"), "EPalWazaID::"
-            )
-            passive_skill_ids = self.read_name_array_property(block, prop("PassiveSkillList"))
-            passive_skill_ranks = [
-                self.passive_rank_lookup.get(skill_id.lower())
-                for skill_id in passive_skill_ids
-            ]
-
-            instance = self.read_struct_property(block, prop("InstanceId")) or {}
-            slot_id = self.read_struct_property(block, prop("SlotId")) or {}
-            item_container = self.read_struct_property(block, prop("ItemContainerId")) or {}
-            work_option = self.read_struct_property(block, prop("WorkSuitabilityOptionInfo")) or {}
-            arena_restore = self.read_struct_property(block, prop("ArenaRestoreParameter")) or {}
-
-            records.append(
-                {
-                    "storage_index": slot_number,
-                    "identity": {
-                        "instance_id": self.guid_or_none(instance.get("InstanceId")),
-                        "instance_player_uid": self.guid_or_none(instance.get("PlayerUId")),
-                        "debug_name": instance.get("DebugName") or "",
-                    },
-                    "pal_box": {
-                        "container_id": self.guid_or_none(
-                            (slot_id.get("ContainerId") or {}).get("ID")
-                        ),
-                        "slot_index": slot_id.get("SlotIndex"),
-                    },
-                    "item_container_id": self.guid_or_none(item_container.get("ID")),
-                    "pal_name": pal_name,
-                    "pal_variant": pal_variant,
-                    "species_id": character_id,
-                    "unique_npc_id": self.read_name_property(block, prop("UniqueNPCID")),
-                    "gender": self.read_enum_property(block, prop("Gender"), "EPalGenderType::"),
-                    "nickname": self.read_str_property(block, prop("NickName")),
-                    "filtered_nickname": self.read_str_property(block, prop("FilteredNickName")),
-                    "level": self.read_byte_property(block, prop("Level")),
-                    "exp": self.read_int64_property(block, prop("Exp")),
-                    "rank": self.read_byte_property(block, prop("Rank")),
-                    "rank_up_exp": self.read_uint16_property(block, prop("RankUpExp")),
-                    "unused_status_points": self.read_uint16_property(
-                        block, prop("UnusedStatusPoint")
-                    ),
-                    "soul_ranks": {
-                        "hp": self.read_byte_property(block, prop("Rank_HP")),
-                        "attack": self.read_byte_property(block, prop("Rank_Attack")),
-                        "defense": self.read_byte_property(block, prop("Rank_Defence")),
-                        "craft_speed": self.read_byte_property(block, prop("Rank_CraftSpeed")),
-                    },
-                    "ivs": {
-                        "hp": self.read_byte_property(block, prop("Talent_HP")),
-                        "attack": self.read_byte_property(block, prop("Talent_Shot")),
-                        "defense": self.read_byte_property(block, prop("Talent_Defense")),
-                    },
-                    "needs": {
-                        "hp": self.read_fixed_point64_struct(block, prop("Hp")),
-                        "shield_hp": self.read_fixed_point64_struct(block, prop("ShieldHP")),
-                        "full_stomach": self.read_float_property(block, prop("FullStomach")),
-                        "sanity": self.read_float_property(block, prop("SanityValue")),
-                        "hunger_type": self.read_enum_property(
-                            block, prop("HungerType"), "EPalStatusHungerType::"
-                        ),
-                        "physical_health": self.read_enum_property(
-                            block,
-                            prop("PhysicalHealth"),
-                            "EPalStatusPhysicalHealthType::",
-                        ),
-                        "worker_sick": self.read_enum_property(
-                            block, prop("WorkerSick"), "EPalBaseCampWorkerSickType::"
-                        ),
-                    },
-                    "flags": {
-                        "is_lucky": self.read_bool_property(block, prop("IsRarePal")),
-                        "is_awakening": self.read_bool_property(block, prop("bIsAwakening")),
-                        "is_player": self.read_bool_property(block, prop("IsPlayer")),
-                        "allow_base_camp_battle": self.read_bool_property(
-                            block, prop("bAllowBaseCampBattle")
-                        ),
-                        "applied_death_penalty": self.read_bool_property(
-                            block, prop("bAppliedDeathPenarty")
-                        ),
-                        "apply_shield_damage": self.read_bool_property(
-                            block, prop("bApplyShieldDamage")
-                        ),
-                        "enable_player_respawn_in_hardcore": self.read_bool_property(
-                            block, prop("bEnablePlayerRespawnInHardcore")
-                        ),
-                        "favorite_changed_by_friendship": self.read_bool_property(
-                            block, prop("bFavoriteChangedByFriendship")
-                        ),
-                        "disable_sale_in_pal_lost": self.read_bool_property(
-                            block, prop("bDisableSaleInPalLost")
-                        ),
-                        "excluded_from_team_mission": self.read_bool_property(
-                            block, prop("bIsExcludedFromTeamMission")
-                        ),
-                        "imported_character": self.read_bool_property(
-                            block, prop("bImportedCharacter")
-                        ),
-                    },
-                    "favorite_index": self.read_byte_property(block, prop("FavoriteIndex")),
-                    "voice_id": self.read_byte_property(block, prop("VoiceID")),
-                    "skin_name": self.read_name_property(block, prop("SkinName")),
-                    "passive_skill_ids": passive_skill_ids,
-                    "skills": [
-                        self.passive_skill_lookup.get(skill_id, skill_id)
-                        for skill_id in passive_skill_ids
-                    ],
-                    "skill_ranks": passive_skill_ranks,
-                    "skill_colors": [
-                        self.passive_color_from_rank(rank)
-                        for rank in passive_skill_ranks
-                    ],
-                    "active_skill_ids": active_skill_ids,
-                    "combat_moves": [
-                        self.active_skill_lookup.get(skill_id, skill_id)
-                        for skill_id in active_skill_ids
-                    ],
-                    "mastered_skill_ids": mastered_skill_ids,
-                    "learned_moves": [
-                        self.active_skill_lookup.get(skill_id, skill_id)
-                        for skill_id in mastered_skill_ids
-                    ],
-                    "friendship": {
-                        "points": self.read_int_property(block, prop("FriendshipPoint")),
-                        "otomo_seconds": self.read_int_property(block, prop("FriendshipOtomoSec")),
-                        "active_otomo_seconds": self.read_int_property(
-                            block, prop("FriendshipActiveOtomoSec")
-                        ),
-                        "basecamp_seconds": self.read_int_property(
-                            block, prop("FriendshipBasecampSec")
-                        ),
-                    },
-                    "ownership": {
-                        "owned_time": self.read_datetime_struct(block, prop("OwnedTime")),
-                        "owner_player_uid": self.read_guid_struct(
-                            block, prop("OwnerPlayerUId")
-                        ),
-                        "old_owner_player_uids": self.read_struct_array_property(
-                            block, prop("OldOwnerPlayerUIds")
-                        ),
-                        "last_nickname_modifier_player_uid": self.read_guid_struct(
-                            block, prop("LastNickNameModifierPlayerUid")
-                        ),
-                    },
-                    "arena": {
-                        "rank_points": self.read_int_property(block, prop("ArenaRankPoint")),
-                        "restore": {
-                            "valid": arena_restore.get("bValid"),
-                            "hp": arena_restore.get("Hp"),
-                            "full_stomach": arena_restore.get("FullStomach"),
-                            "sanity": arena_restore.get("SanityValue"),
-                            "worker_sick": self.enum_short(arena_restore.get("WorkerSick")),
-                            "food_status_effect_item": arena_restore.get("FoodWithStatusEffect"),
-                            "food_status_effect_timer": arena_restore.get(
-                                "Tiemr_FoodWithStatusEffect"
-                            ),
-                            "food_regene": self.food_regene_info(
-                                arena_restore.get("FoodRegeneEffectInfo")
-                            ),
-                            "food_full_stomach_keep_item": arena_restore.get(
-                                "FoodWithFullStomachKeep"
-                            ),
-                            "food_full_stomach_keep_timer": arena_restore.get(
-                                "Tiemr_FoodWithFullStomachKeep"
-                            ),
-                        },
-                    },
-                    "base_camp_event": {
-                        "type": self.read_enum_property(
-                            block, prop("BaseCampWorkerEventType"), "EPalBaseCampWorkerEventType::"
-                        ),
-                        "progress_time": self.read_float_property(
-                            block, prop("BaseCampWorkerEventProgressTime")
-                        ),
-                    },
-                    "status_points": {
-                        "got": self.status_points_dict(
-                            self.read_struct_array_property(block, prop("GotStatusPointList"))
-                        ),
-                        "got_ex": self.status_points_dict(
-                            self.read_struct_array_property(block, prop("GotExStatusPointList"))
-                        ),
-                    },
-                    "food_regene": self.food_regene_info(
-                        self.read_struct_property(block, prop("FoodRegeneEffectInfo"))
-                    ),
-                    "skin_applied_character_id": self.guid_or_none(
-                        self.read_guid_struct(block, prop("SkinAppliedCharacterId"))
-                    ),
-                    "expedition_map_object_instance_id": self.guid_or_none(
-                        self.read_guid_struct(
-                            block, prop("MapObjectConcreteInstanceIdAssignedToExpedition")
-                        )
-                    ),
-                    "timers": {
-                        "pal_revive": self.read_float_property(block, prop("PalReviveTimer")),
-                        "partner_skill_cooldown_max": self.read_float_property(
-                            block, prop("PartnerSkillCoolDownTimeMax")
-                        ),
-                        "partner_skill_last_used_time": self.read_datetime_struct(
-                            block, prop("PartnerSkillLastUsedTime")
-                        ),
-                        "food_with_status_effect": self.read_int_property(
-                            block, prop("Tiemr_FoodWithStatusEffect")
-                        ),
-                        "food_with_full_stomach_keep": self.read_int_property(
-                            block, prop("Tiemr_FoodWithFullStomachKeep")
-                        ),
-                    },
-                    "food": {
-                        "status_effect_item": self.read_name_property(
-                            block, prop("FoodWithStatusEffect")
-                        ),
-                        "full_stomach_keep_item": self.read_name_property(
-                            block, prop("FoodWithFullStomachKeep")
-                        ),
-                    },
-                    "work": {
-                        "current_suitability": self.read_enum_property(
-                            block, prop("CurrentWorkSuitability"), "EPalWorkSuitability::"
-                        ),
-                        "off_suitability_list": [
-                            self.enum_short(value)
-                            for value in work_option.get("OffWorkSuitabilityList") or []
-                        ],
-                        "add_ranks": self.suitability_rank_items(
-                            self.read_struct_array_property(
-                                block, prop("GotWorkSuitabilityAddRankList")
-                            )
-                        ),
-                        "overflow_granted_ranks": self.suitability_rank_items(
-                            self.read_struct_array_property(
-                                block, prop("WorkSuitabilityOverflowGrantedRankList")
-                            )
-                        ),
-                    },
-                    "location": {
-                        "last_jumped": self.read_vector_struct(
-                            block, prop("LastJumpedLocation")
-                        ),
-                    },
-                    "migration": {
-                        "exp_table_version": self.read_byte_property(
-                            block, prop("ExpTableMigrationVersion")
-                        ),
-                    },
-                    "raw_property_names": self.validated_property_names(block),
-                }
-            )
+            record = self.build_record(save_data[pos:end], slot_number)
+            if record is not None:
+                records.append(record)
+        if progress:
+            progress(expected, expected, len(records), "pals")
 
         records.sort(key=lambda item: item["storage_index"])
         return {
@@ -864,3 +818,273 @@ class PalStorageDataManager:
             "occupied_slots": len(records),
             "records": records,
         }
+
+    def build_record(self, block, storage_index, identity=None):
+        """Read one pal from a byte block containing its PalIndividualCharacterSaveParameter
+        properties. `identity` overrides the InstanceId wrapper (Level.sav keeps it in the map key)."""
+        slot_number = storage_index
+
+        def prop(label):
+            return self.find_property_start(block, label)
+
+        character_id = self.read_name_property(block, prop("CharacterID")) or ""
+        if not character_id or character_id == "None":
+            return None
+
+        pal_name, pal_variant = self.pal_display_name(character_id)
+        active_skill_ids = self.read_enum_array_property(
+            block, prop("EquipWaza"), "EPalWazaID::"
+        )
+        mastered_skill_ids = self.read_enum_array_property(
+            block, prop("MasteredWaza"), "EPalWazaID::"
+        )
+        passive_skill_ids = self.read_name_array_property(block, prop("PassiveSkillList"))
+        passive_skill_ranks = [
+            self.passive_rank_lookup.get(skill_id.lower())
+            for skill_id in passive_skill_ids
+        ]
+
+        if identity is None:
+            instance = self.read_struct_property(block, prop("InstanceId")) or {}
+            identity = {
+                "instance_id": self.guid_or_none(instance.get("InstanceId")),
+                "instance_player_uid": self.guid_or_none(instance.get("PlayerUId")),
+                "debug_name": instance.get("DebugName") or "",
+            }
+        slot_id = self.read_struct_property(block, prop("SlotId")) or {}
+        item_container = self.read_struct_property(block, prop("ItemContainerId")) or {}
+        work_option = self.read_struct_property(block, prop("WorkSuitabilityOptionInfo")) or {}
+        arena_restore = self.read_struct_property(block, prop("ArenaRestoreParameter")) or {}
+
+        return (
+            {
+                "storage_index": slot_number,
+                "identity": identity,
+                "pal_box": {
+                    "container_id": self.guid_or_none(
+                        (slot_id.get("ContainerId") or {}).get("ID")
+                    ),
+                    "slot_index": slot_id.get("SlotIndex"),
+                },
+                "item_container_id": self.guid_or_none(item_container.get("ID")),
+                "pal_name": pal_name,
+                "pal_variant": pal_variant,
+                "species_id": character_id,
+                "unique_npc_id": self.read_name_property(block, prop("UniqueNPCID")),
+                "gender": self.read_enum_property(block, prop("Gender"), "EPalGenderType::"),
+                "nickname": self.read_str_property(block, prop("NickName")),
+                "filtered_nickname": self.read_str_property(block, prop("FilteredNickName")),
+                "level": self.read_byte_property(block, prop("Level")),
+                "exp": self.read_int64_property(block, prop("Exp")),
+                "rank": self.read_byte_property(block, prop("Rank")),
+                "rank_up_exp": self.read_uint16_property(block, prop("RankUpExp")),
+                "unused_status_points": self.read_uint16_property(
+                    block, prop("UnusedStatusPoint")
+                ),
+                "soul_ranks": {
+                    "hp": self.read_byte_property(block, prop("Rank_HP")),
+                    "attack": self.read_byte_property(block, prop("Rank_Attack")),
+                    "defense": self.read_byte_property(block, prop("Rank_Defence")),
+                    "craft_speed": self.read_byte_property(block, prop("Rank_CraftSpeed")),
+                },
+                "ivs": {
+                    "hp": self.read_byte_property(block, prop("Talent_HP")),
+                    "attack": self.read_byte_property(block, prop("Talent_Shot")),
+                    "defense": self.read_byte_property(block, prop("Talent_Defense")),
+                },
+                "needs": {
+                    "hp": self.read_fixed_point64_struct(block, prop("Hp")),
+                    "shield_hp": self.read_fixed_point64_struct(block, prop("ShieldHP")),
+                    "full_stomach": self.read_float_property(block, prop("FullStomach")),
+                    "sanity": self.read_float_property(block, prop("SanityValue")),
+                    "hunger_type": self.read_enum_property(
+                        block, prop("HungerType"), "EPalStatusHungerType::"
+                    ),
+                    "physical_health": self.read_enum_property(
+                        block,
+                        prop("PhysicalHealth"),
+                        "EPalStatusPhysicalHealthType::",
+                    ),
+                    "worker_sick": self.read_enum_property(
+                        block, prop("WorkerSick"), "EPalBaseCampWorkerSickType::"
+                    ),
+                },
+                "flags": {
+                    "is_lucky": self.read_bool_property(block, prop("IsRarePal")),
+                    "is_awakening": self.read_bool_property(block, prop("bIsAwakening")),
+                    "is_player": self.read_bool_property(block, prop("IsPlayer")),
+                    "allow_base_camp_battle": self.read_bool_property(
+                        block, prop("bAllowBaseCampBattle")
+                    ),
+                    "applied_death_penalty": self.read_bool_property(
+                        block, prop("bAppliedDeathPenarty")
+                    ),
+                    "apply_shield_damage": self.read_bool_property(
+                        block, prop("bApplyShieldDamage")
+                    ),
+                    "enable_player_respawn_in_hardcore": self.read_bool_property(
+                        block, prop("bEnablePlayerRespawnInHardcore")
+                    ),
+                    "favorite_changed_by_friendship": self.read_bool_property(
+                        block, prop("bFavoriteChangedByFriendship")
+                    ),
+                    "disable_sale_in_pal_lost": self.read_bool_property(
+                        block, prop("bDisableSaleInPalLost")
+                    ),
+                    "excluded_from_team_mission": self.read_bool_property(
+                        block, prop("bIsExcludedFromTeamMission")
+                    ),
+                    "imported_character": self.read_bool_property(
+                        block, prop("bImportedCharacter")
+                    ),
+                },
+                "favorite_index": self.read_byte_property(block, prop("FavoriteIndex")),
+                "voice_id": self.read_byte_property(block, prop("VoiceID")),
+                "skin_name": self.read_name_property(block, prop("SkinName")),
+                "passive_skill_ids": passive_skill_ids,
+                "skills": [
+                    self.passive_skill_lookup.get(skill_id, skill_id)
+                    for skill_id in passive_skill_ids
+                ],
+                "skill_ranks": passive_skill_ranks,
+                "skill_colors": [
+                    self.passive_color_from_rank(rank)
+                    for rank in passive_skill_ranks
+                ],
+                "active_skill_ids": active_skill_ids,
+                "combat_moves": [
+                    self.active_skill_lookup.get(skill_id, skill_id)
+                    for skill_id in active_skill_ids
+                ],
+                "mastered_skill_ids": mastered_skill_ids,
+                "learned_moves": [
+                    self.active_skill_lookup.get(skill_id, skill_id)
+                    for skill_id in mastered_skill_ids
+                ],
+                "friendship": {
+                    "points": self.read_int_property(block, prop("FriendshipPoint")),
+                    "otomo_seconds": self.read_int_property(block, prop("FriendshipOtomoSec")),
+                    "active_otomo_seconds": self.read_int_property(
+                        block, prop("FriendshipActiveOtomoSec")
+                    ),
+                    "basecamp_seconds": self.read_int_property(
+                        block, prop("FriendshipBasecampSec")
+                    ),
+                },
+                "ownership": {
+                    "owned_time": self.read_datetime_struct(block, prop("OwnedTime")),
+                    "owner_player_uid": self.read_guid_struct(
+                        block, prop("OwnerPlayerUId")
+                    ),
+                    "old_owner_player_uids": self.read_struct_array_property(
+                        block, prop("OldOwnerPlayerUIds")
+                    ),
+                    "last_nickname_modifier_player_uid": self.read_guid_struct(
+                        block, prop("LastNickNameModifierPlayerUid")
+                    ),
+                },
+                "arena": {
+                    "rank_points": self.read_int_property(block, prop("ArenaRankPoint")),
+                    "restore": {
+                        "valid": arena_restore.get("bValid"),
+                        "hp": arena_restore.get("Hp"),
+                        "full_stomach": arena_restore.get("FullStomach"),
+                        "sanity": arena_restore.get("SanityValue"),
+                        "worker_sick": self.enum_short(arena_restore.get("WorkerSick")),
+                        "food_status_effect_item": arena_restore.get("FoodWithStatusEffect"),
+                        "food_status_effect_timer": arena_restore.get(
+                            "Tiemr_FoodWithStatusEffect"
+                        ),
+                        "food_regene": self.food_regene_info(
+                            arena_restore.get("FoodRegeneEffectInfo")
+                        ),
+                        "food_full_stomach_keep_item": arena_restore.get(
+                            "FoodWithFullStomachKeep"
+                        ),
+                        "food_full_stomach_keep_timer": arena_restore.get(
+                            "Tiemr_FoodWithFullStomachKeep"
+                        ),
+                    },
+                },
+                "base_camp_event": {
+                    "type": self.read_enum_property(
+                        block, prop("BaseCampWorkerEventType"), "EPalBaseCampWorkerEventType::"
+                    ),
+                    "progress_time": self.read_float_property(
+                        block, prop("BaseCampWorkerEventProgressTime")
+                    ),
+                },
+                "status_points": {
+                    "got": self.status_points_dict(
+                        self.read_struct_array_property(block, prop("GotStatusPointList"))
+                    ),
+                    "got_ex": self.status_points_dict(
+                        self.read_struct_array_property(block, prop("GotExStatusPointList"))
+                    ),
+                },
+                "food_regene": self.food_regene_info(
+                    self.read_struct_property(block, prop("FoodRegeneEffectInfo"))
+                ),
+                "skin_applied_character_id": self.guid_or_none(
+                    self.read_guid_struct(block, prop("SkinAppliedCharacterId"))
+                ),
+                "expedition_map_object_instance_id": self.guid_or_none(
+                    self.read_guid_struct(
+                        block, prop("MapObjectConcreteInstanceIdAssignedToExpedition")
+                    )
+                ),
+                "timers": {
+                    "pal_revive": self.read_float_property(block, prop("PalReviveTimer")),
+                    "partner_skill_cooldown_max": self.read_float_property(
+                        block, prop("PartnerSkillCoolDownTimeMax")
+                    ),
+                    "partner_skill_last_used_time": self.read_datetime_struct(
+                        block, prop("PartnerSkillLastUsedTime")
+                    ),
+                    "food_with_status_effect": self.read_int_property(
+                        block, prop("Tiemr_FoodWithStatusEffect")
+                    ),
+                    "food_with_full_stomach_keep": self.read_int_property(
+                        block, prop("Tiemr_FoodWithFullStomachKeep")
+                    ),
+                },
+                "food": {
+                    "status_effect_item": self.read_name_property(
+                        block, prop("FoodWithStatusEffect")
+                    ),
+                    "full_stomach_keep_item": self.read_name_property(
+                        block, prop("FoodWithFullStomachKeep")
+                    ),
+                },
+                "work": {
+                    "current_suitability": self.read_enum_property(
+                        block, prop("CurrentWorkSuitability"), "EPalWorkSuitability::"
+                    ),
+                    "off_suitability_list": [
+                        self.enum_short(value)
+                        for value in work_option.get("OffWorkSuitabilityList") or []
+                    ],
+                    "add_ranks": self.suitability_rank_items(
+                        self.read_struct_array_property(
+                            block, prop("GotWorkSuitabilityAddRankList")
+                        )
+                    ),
+                    "overflow_granted_ranks": self.suitability_rank_items(
+                        self.read_struct_array_property(
+                            block, prop("WorkSuitabilityOverflowGrantedRankList")
+                        )
+                    ),
+                },
+                "location": {
+                    "last_jumped": self.read_vector_struct(
+                        block, prop("LastJumpedLocation")
+                    ),
+                },
+                "migration": {
+                    "exp_table_version": self.read_byte_property(
+                        block, prop("ExpTableMigrationVersion")
+                    ),
+                },
+                "raw_property_names": self.validated_property_names(block),
+            }
+        )

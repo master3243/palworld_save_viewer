@@ -23,6 +23,12 @@ PAL_NAME_LOOKUP_PATH = RESOURCES_PATH / "pal_names_lookup.lua"
 
 CSV_FIELDS = [
     "storage_slot",
+    "location",
+    "location_detail",
+    "save",
+    "source_file",
+    "source_kind",
+    "owner_name",
     "pal_box_slot_index",
     "instance_id",
     "pal_name",
@@ -129,6 +135,8 @@ CSV_FIELDS = [
 
 def decompress_save(path):
     raw = Path(path).read_bytes()
+    if raw[:4] == b"GVAS":
+        return raw
     uncompressed_len, compressed_len = struct.unpack_from("<II", raw, 0)
     if raw[8:12] != b"PlM1":
         raise ValueError(f"Expected PlM1 Oodle save, got {raw[8:12]!r}")
@@ -182,6 +190,207 @@ def extract_save_to_json(save_path=SAVE_PATH, resources_path=RESOURCES_PATH, fla
     return json.dumps(records)
 
 
+PAL_BOX_PAGE_SIZE = 30
+SOURCE_KIND_LABELS = {
+    "dimensional_storage": "Dimensional storage",
+    "level": "World (Level.sav)",
+    "player": "Player",
+    "level_meta": "World info",
+    "world_option": "World options",
+    "local_data": "Local data",
+    "unknown": "Unknown",
+}
+
+
+def locate_level_record(record, save_set):
+    """Decide where a Level.sav pal lives from its container id."""
+    container_id = record["pal_box"]["container_id"]
+    slot = record["pal_box"]["slot_index"]
+    slot_label = f"slot {slot + 1}" if isinstance(slot, int) and slot >= 0 else ""
+    if container_id is None:
+        return "Unknown", ""
+    if container_id in save_set["party_containers"]:
+        return "Party", slot_label
+    if container_id in save_set["pal_box_containers"]:
+        if isinstance(slot, int) and slot >= 0:
+            return "Pal Box", f"page {slot // PAL_BOX_PAGE_SIZE + 1}, slot {slot % PAL_BOX_PAGE_SIZE + 1}"
+        return "Pal Box", ""
+    base = save_set["base_containers"].get(container_id)
+    if base:
+        loc = base.get("location") or {}
+        where = f"x {loc.get('x', 0):.0f}, y {loc.get('y', 0):.0f}" if loc else ""
+        return f"Base {base['index']}", ", ".join(part for part in (slot_label, where) if part)
+    info = save_set["containers"].get(container_id)
+    if info:
+        # No player save for this owner: guess from the container size.
+        if info["slots"] <= 5:
+            return "Party", slot_label
+        if isinstance(slot, int) and slot >= 0:
+            return "Pal Box", f"page {slot // PAL_BOX_PAGE_SIZE + 1}, slot {slot % PAL_BOX_PAGE_SIZE + 1}"
+        return "Pal Box", ""
+    return "Other container", slot_label
+
+
+def combine_saves(files, resources_path=RESOURCES_PATH, progress=None):
+    """Merge any number of decoded save files into one pal list with a location per pal.
+
+    `files` is a list of {"path": ..., "name": ..., "set": ...}; files that share a `set`
+    label (usually the save folder) are resolved against each other.
+    `progress(stage, file_index, done, total, found, unit)` reports per-file parsing
+    progress; `found` is the number of pals read so far, `unit` is "entries" or "bytes"."""
+
+    def file_progress(index):
+        if progress is None:
+            return None
+        return lambda done, total, found, unit: progress("parse", index, done, total, found, unit)
+    manager = build_manager(resources_path)
+    sets = {}
+    sources = []
+
+    def get_set(label):
+        return sets.setdefault(label, {
+            "label": label,
+            "world_name": "",
+            "host_player_name": "",
+            "players": {},
+            "player_names": {},
+            "party_containers": set(),
+            "pal_box_containers": set(),
+            "base_containers": {},
+            "bases": [],
+            "containers": {},
+            "dps_records": [],
+            "level_records": [],
+        })
+
+    for file_index, entry in enumerate(files):
+        path = Path(entry["path"])
+        name = entry.get("name") or path.name
+        save_set = get_set(entry.get("set") or "")
+        source = {"file": name, "set": save_set["label"], "kind": "unknown", "pals": 0, "note": ""}
+        sources.append(source)
+        try:
+            data = decompress_save(path)
+        except Exception as error:  # noqa: BLE001 - report per file, keep going
+            source["note"] = f"Could not decode: {error}"
+            continue
+        kind, class_name = manager.detect_save_kind(data)
+        source["kind"] = kind
+        source["class_name"] = class_name
+        if progress:
+            progress("start", file_index, 0, 1, 0, "")
+        if kind == "dimensional_storage":
+            result = manager.extract_records(data, file_progress(file_index))
+            for record in result["records"]:
+                record["_source"] = source
+            save_set["dps_records"].extend(result["records"])
+            source["pals"] = result["occupied_slots"]
+            source["total_slots"] = result["total_storage_slots"]
+        elif kind == "level":
+            result = manager.extract_level_records(data, file_progress(file_index))
+            for record in result["records"]:
+                record["_source"] = source
+            save_set["level_records"].extend(result["records"])
+            save_set["bases"].extend(result["bases"])
+            save_set["containers"].update(result["containers"])
+            for base in result["bases"]:
+                if base.get("worker_container_id"):
+                    save_set["base_containers"][base["worker_container_id"]] = base
+            for player in result["players"]:
+                if player.get("player_uid"):
+                    save_set["player_names"][player["player_uid"]] = player.get("name") or ""
+            source["pals"] = len(result["records"])
+            source["players"] = len(result["players"])
+            source["bases"] = len(result["bases"])
+            source["skipped"] = result["skipped"]
+        elif kind == "player":
+            info = manager.extract_player_save(data)
+            if info.get("party_container_id"):
+                save_set["party_containers"].add(info["party_container_id"])
+            if info.get("pal_box_container_id"):
+                save_set["pal_box_containers"].add(info["pal_box_container_id"])
+            if info.get("player_uid"):
+                save_set["players"][info["player_uid"]] = info
+            source["player_uid"] = info.get("player_uid")
+        elif kind == "level_meta":
+            meta = manager.extract_level_meta(data)
+            save_set["world_name"] = meta.get("world_name") or ""
+            save_set["host_player_name"] = meta.get("host_player_name") or ""
+            source.update(meta)
+        else:
+            source["note"] = "Contains no pals; ignored."
+        if progress:
+            progress("done", file_index, 1, 1, source["pals"], "")
+
+    if progress:
+        progress("combine", len(files), 0, 1, 0, "")
+    records = []
+    set_summaries = []
+    for ordinal, (label, save_set) in enumerate(sets.items(), start=1):
+        display = save_set["world_name"] or label or f"Save {ordinal}"
+        if save_set["world_name"] and label and len(sets) > 1:
+            display = f"{save_set['world_name']} ({label})"
+        for record in save_set["level_records"]:
+            location, detail = locate_level_record(record, save_set)
+            record["placement"] = {"location": location, "detail": detail}
+        for record in save_set["dps_records"]:
+            record["placement"] = {
+                "location": "Dimensional Storage",
+                "detail": f"slot {record['storage_index']}",
+            }
+        for record in save_set["level_records"] + save_set["dps_records"]:
+            owner = record["ownership"]["owner_player_uid"]
+            record["owner_name"] = save_set["player_names"].get(owner, "") if owner else ""
+            record["save"] = display
+            record["source_file"] = record["_source"]["file"]
+            record["source_kind"] = SOURCE_KIND_LABELS.get(record["_source"]["kind"], record["_source"]["kind"])
+            del record["_source"]
+            records.append(record)
+        set_summaries.append({
+            "label": display,
+            "folder": label,
+            "world_name": save_set["world_name"],
+            "host_player_name": save_set["host_player_name"],
+            "pals": len(save_set["level_records"]) + len(save_set["dps_records"]),
+            "bases": [
+                {"index": b.get("index"), "location": b.get("location"), "workers": sum(
+                    1 for r in save_set["level_records"]
+                    if r["pal_box"]["container_id"] == b.get("worker_container_id")
+                )}
+                for b in save_set["bases"]
+            ],
+            "players": [
+                {"uid": uid, "name": save_set["player_names"].get(uid, "")}
+                for uid in sorted(set(save_set["players"]) | set(save_set["player_names"]))
+            ],
+            "has_level": bool(save_set["level_records"]) or any(
+                s["kind"] == "level" and s["set"] == label for s in sources
+            ),
+            "has_dimensional_storage": any(
+                s["kind"] == "dimensional_storage" and s["set"] == label for s in sources
+            ),
+        })
+    for source in sources:
+        source["kind_label"] = SOURCE_KIND_LABELS.get(source["kind"], source["kind"])
+    return {"records": records, "sources": sources, "sets": set_summaries}
+
+
+def combine_decoded_saves_to_json(manifest_json, resources_path=RESOURCES_PATH, flattened=True, progress=None):
+    files = json.loads(manifest_json) if isinstance(manifest_json, str) else list(manifest_json)
+    result = combine_saves(files, resources_path, progress)
+    records = result["records"]
+    if flattened:
+        flat = []
+        for index, item in enumerate(records):
+            if progress and index % 250 == 0:
+                progress("flatten", len(files), index, len(records), index, "pals")
+            flat.append(flatten_record(item))
+        records = flat
+    if progress:
+        progress("flatten", len(files), len(records), len(records), len(records), "pals")
+    return json.dumps({"rows": records, "sources": result["sources"], "sets": result["sets"]})
+
+
 def join_values(values):
     return ", ".join(str(value) for value in values if value is not None)
 
@@ -200,6 +409,12 @@ def join_items(items):
 def flatten_record(item):
     return {
         "storage_slot": item["storage_index"],
+        "location": (item.get("placement") or {}).get("location"),
+        "location_detail": (item.get("placement") or {}).get("detail"),
+        "save": item.get("save"),
+        "source_file": item.get("source_file"),
+        "source_kind": item.get("source_kind"),
+        "owner_name": item.get("owner_name"),
         "pal_box_slot_index": item["pal_box"]["slot_index"],
         "instance_id": item["identity"]["instance_id"],
         "pal_name": item["pal_name"],
@@ -312,8 +527,7 @@ def flatten_record(item):
     }
 
 
-def write_csv(records):
-    csv_path = CSV_PATH
+def write_csv(records, csv_path=CSV_PATH):
     try:
         csv_file = csv_path.open("w", newline="", encoding="utf-8")
     except PermissionError:
@@ -338,6 +552,7 @@ def main():
     JSON_PATH.write_text(json.dumps(records, indent=2), encoding="utf-8")
     csv_path = write_csv(records)
     manager = build_manager()
+    combined_summary = run_combined_sandbox()
 
     print(
         json.dumps(
@@ -353,10 +568,28 @@ def main():
                 "passive_rank_lookup_entries": len(manager.passive_rank_lookup),
                 "pal_lookup_entries": len(manager.pal_lookup),
                 "first_record": records[0] if records else None,
+                "combined": combined_summary,
             },
             indent=2,
         )
     )
+
+
+def run_combined_sandbox():
+    """Combine every .sav under sandbox/save, one set per top-level folder."""
+    files = []
+    for path in sorted((SANDBOX_PATH / "save").rglob("*.sav")):
+        top = path.relative_to(SANDBOX_PATH / "save").parts[0]
+        files.append({"path": str(path), "name": path.name, "set": top})
+    if not files:
+        return None
+    result = combine_saves(files)
+    combined_csv = OUTPUT_PATH / "combined_pals.csv"
+    write_csv(result["records"], combined_csv)
+    (OUTPUT_PATH / "combined_pals.json").write_text(
+        json.dumps(result["records"], indent=2), encoding="utf-8"
+    )
+    return {"csv": str(combined_csv), "sources": result["sources"], "sets": result["sets"]}
 
 
 if __name__ == "__main__":

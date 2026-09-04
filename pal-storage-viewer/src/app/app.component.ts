@@ -7,7 +7,7 @@ import { GenderIconComponent } from './gender-icon.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
-import { PalStorageRow, SaveParserService } from './save-parser.service';
+import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource } from './save-parser.service';
 
 interface TableColumn {
   key: string;
@@ -23,6 +23,24 @@ interface VirtualRow {
 
 type SortDirection = 'asc' | 'desc' | null;
 
+/** Share of the progress bar covered by decoding and parsing in the worker. */
+const PARSE_SHARE = 0.95;
+
+interface LocationCount {
+  location: string;
+  count: number;
+}
+
+/** Minimal typing for the non-standard directory entry API used by drag and drop. */
+interface DirectoryEntryLike {
+  isFile: boolean;
+  isDirectory: boolean;
+  name: string;
+  fullPath: string;
+  file(success: (file: File) => void, failure?: (error: unknown) => void): void;
+  createReader(): { readEntries(success: (entries: DirectoryEntryLike[]) => void, failure?: (error: unknown) => void): void };
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -32,8 +50,23 @@ type SortDirection = 'asc' | 'desc' | null;
 })
 export class AppComponent {
   @ViewChild('tableScroll') tableScroll?: ElementRef<HTMLElement>;
+  @ViewChild('folderInput') folderInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('addFilesInput') addFilesInput?: ElementRef<HTMLInputElement>;
 
   originalRows: PalStorageRow[] = [];
+  /** The save files currently merged into the table, aligned with `sources`. */
+  private loadedInputs: SaveInput[] = [];
+  sources: SaveSource[] = [];
+  saveSets: SaveSetSummary[] = [];
+  locationCounts: LocationCount[] = [];
+  /** Live progress while parsing; the worker reports real per-record counts. */
+  progress: ParseProgress | null = null;
+
+  get progressPercent(): number {
+    return this.progress?.fraction === null || this.progress?.fraction === undefined
+      ? 0
+      : Math.round(Math.min(1, Math.max(0, this.progress.fraction)) * 100);
+  }
   /** Rows that pass the current filter, before sorting. */
   private filteredRows: PalStorageRow[] = [];
   rows: PalStorageRow[] = [];
@@ -151,6 +184,7 @@ export class AppComponent {
 
   private readonly defaultVisibleColumns = new Set([
     'storage_slot',
+    'location',
     'pal_box_slot_index',
     'paldeck_no',
     'pal_variant',
@@ -174,6 +208,11 @@ export class AppComponent {
 
   private readonly preferredColumnOrder = [
     ...this.defaultVisibleColumns,
+    'location_detail',
+    'save',
+    'owner_name',
+    'source_file',
+    'source_kind',
     'unique_npc_id',
     'filtered_nickname',
     'exp',
@@ -228,16 +267,78 @@ export class AppComponent {
 
   async onFileInput(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) await this.parseFile(file);
+    const inputs = Array.from(input.files ?? []).map((file) => ({
+      file,
+      path: (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name
+    }));
     input.value = '';
+    if (inputs.length) await this.parseInputs(inputs, this.hasData);
   }
 
   async onDrop(event: DragEvent): Promise<void> {
     event.preventDefault();
+    event.stopPropagation();
     this.isDragging = false;
-    const file = event.dataTransfer?.files?.[0];
-    if (file) await this.parseFile(file);
+    const inputs = await this.collectDroppedFiles(event.dataTransfer);
+    if (inputs.length) await this.parseInputs(inputs, this.hasData);
+  }
+
+  openFolderPicker(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.folderInput?.nativeElement.click();
+  }
+
+  openAddFilesPicker(): void {
+    this.addFilesInput?.nativeElement.click();
+  }
+
+  async removeSource(index: number): Promise<void> {
+    const remaining = this.loadedInputs.filter((_, position) => position !== index);
+    if (!remaining.length) {
+      this.resetData();
+      this.loadedInputs = [];
+      this.sources = [];
+      this.saveSets = [];
+      this.locationCounts = [];
+      return;
+    }
+    await this.parseInputs(remaining, false);
+  }
+
+  /**
+   * Walk dropped items so a whole save folder can be dropped at once. Folder
+   * paths are kept so files from different worlds stay in separate sets.
+   */
+  private async collectDroppedFiles(transfer: DataTransfer | null): Promise<SaveInput[]> {
+    if (!transfer) return [];
+    const entries: DirectoryEntryLike[] = [];
+    for (const item of Array.from(transfer.items ?? [])) {
+      const getEntry = (item as DataTransferItem & { webkitGetAsEntry?: () => DirectoryEntryLike | null }).webkitGetAsEntry;
+      const entry = getEntry ? getEntry.call(item) : null;
+      if (entry) entries.push(entry);
+    }
+    if (!entries.length) {
+      return Array.from(transfer.files ?? []).map((file) => ({ file, path: file.name }));
+    }
+    const inputs: SaveInput[] = [];
+    for (const entry of entries) await this.walkEntry(entry, inputs);
+    return inputs;
+  }
+
+  private async walkEntry(entry: DirectoryEntryLike, inputs: SaveInput[]): Promise<void> {
+    if (entry.isFile) {
+      const file = await new Promise<File>((resolve, reject) => entry.file(resolve, reject));
+      inputs.push({ file, path: entry.fullPath.replace(/^\/+/, '') });
+      return;
+    }
+    if (!entry.isDirectory) return;
+    const reader = entry.createReader();
+    for (;;) {
+      const batch = await new Promise<DirectoryEntryLike[]>((resolve, reject) => reader.readEntries(resolve, reject));
+      if (!batch.length) break;
+      for (const child of batch) await this.walkEntry(child, inputs);
+    }
   }
 
   onDragOver(event: DragEvent): void {
@@ -314,6 +415,7 @@ export class AppComponent {
     this.isDemoPromptOpen = false;
     this.error = '';
     this.isParsing = true;
+    this.progress = { fraction: null, label: 'Downloading demo save', detail: '' };
 
     let file: File;
     try {
@@ -332,6 +434,10 @@ export class AppComponent {
   }
 
   private async parseFile(file: File): Promise<void> {
+    await this.parseInputs([{ file, path: file.name }], false);
+  }
+
+  private resetData(): void {
     this.rows = [];
     this.originalRows = [];
     this.filteredRows = [];
@@ -344,13 +450,52 @@ export class AppComponent {
     this.scrollTop = 0;
     this.isColumnMenuOpen = false;
     this.isExportMenuOpen = false;
+  }
+
+  /** Merge `inputs` (optionally on top of what is already loaded) and rebuild the table. */
+  private async parseInputs(inputs: SaveInput[], append: boolean): Promise<void> {
+    const candidates = inputs.filter((input) => this.parser.isCandidate(input));
+    if (!candidates.length) {
+      this.error = 'No Palworld save files found. Drop Level.sav, a Players folder, or a _dps.sav file.';
+      return;
+    }
+    const previous = this.loadedInputs;
+    const merged = append ? [...previous] : [];
+    for (const input of candidates) {
+      const duplicate = merged.some((existing) =>
+        existing.path === input.path && existing.file.size === input.file.size);
+      if (!duplicate) merged.push(input);
+    }
+
+    this.resetData();
     this.isParsing = true;
+    this.progress = { fraction: null, label: 'Starting', detail: '' };
     try {
-      const parsedRows = await this.parser.parse(file);
-      const rows = await Promise.all(parsedRows.map(async (row) => ({
-        ...row,
-        paldeck_no: await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name'))
-      })));
+      // The worker owns 0..95% of the bar; the table build takes the rest.
+      const result = await this.parser.parseMany(merged, (update) => {
+        this.progress = {
+          ...update,
+          fraction: update.fraction === null ? null : update.fraction * PARSE_SHARE
+        };
+        this.changeDetector.markForCheck();
+      });
+      const rows: PalStorageRow[] = [];
+      for (const [index, row] of result.rows.entries()) {
+        rows.push({ ...row, paldeck_no: await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name')) });
+        if (index % 500 === 0) {
+          this.progress = {
+            fraction: PARSE_SHARE + ((index + 1) / result.rows.length) * (1 - PARSE_SHARE),
+            label: 'Building table',
+            detail: `${(index + 1).toLocaleString()} of ${result.rows.length.toLocaleString()} pals`
+          };
+          await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        }
+      }
+      this.progress = { fraction: 1, label: 'Done', detail: '' };
+      this.loadedInputs = merged;
+      this.sources = result.sources;
+      this.saveSets = result.sets;
+      this.locationCounts = this.countLocations(rows);
       this.originalRows = rows;
       this.filteredRows = rows;
       this.rows = [...rows];
@@ -358,10 +503,47 @@ export class AppComponent {
       this.palNameWidth = this.measurePalNameWidth(rows);
       this.scheduleMeasure();
     } catch (error) {
-      this.error = error instanceof Error ? error.message : 'Could not load this save file.';
+      this.error = error instanceof Error ? error.message : 'Could not load these save files.';
+      if (append && previous.length) {
+        // Keep the table that was already there.
+        await this.parseInputs(previous, false);
+      }
     } finally {
       this.isParsing = false;
+      this.progress = null;
     }
+  }
+
+  private countLocations(rows: PalStorageRow[]): LocationCount[] {
+    const counts = new Map<string, number>();
+    for (const row of rows) {
+      const location = this.cellValue(row, 'location') || 'Unknown';
+      counts.set(location, (counts.get(location) ?? 0) + 1);
+    }
+    const order = ['Party', 'Pal Box', 'Dimensional Storage'];
+    return Array.from(counts, ([location, count]) => ({ location, count })).sort((left, right) => {
+      const leftRank = order.indexOf(left.location);
+      const rightRank = order.indexOf(right.location);
+      if (leftRank !== -1 || rightRank !== -1) {
+        return (leftRank === -1 ? order.length : leftRank) - (rightRank === -1 ? order.length : rightRank);
+      }
+      return left.location.localeCompare(right.location, undefined, { numeric: true });
+    });
+  }
+
+  sourceTitle(source: SaveSource): string {
+    const parts = [source.kind_label];
+    if (source.set) parts.push(`folder: ${source.set}`);
+    if (source.world_name) parts.push(`world: ${source.world_name}`);
+    if (source.players) parts.push(`${source.players} player${source.players === 1 ? '' : 's'}`);
+    if (source.bases) parts.push(`${source.bases} base${source.bases === 1 ? '' : 's'}`);
+    if (source.skipped?.wild_or_npc) parts.push(`${source.skipped.wild_or_npc} wild/NPC skipped`);
+    if (source.note) parts.push(source.note);
+    return parts.join(' · ');
+  }
+
+  trackSource(index: number): number {
+    return index;
   }
 
   toggleColumnMenu(): void {
@@ -595,11 +777,15 @@ export class AppComponent {
       ...Array.from(keys).sort((left, right) => left.localeCompare(right))
     ];
 
+    const multipleSaves = this.saveSets.length > 1;
+    const multiplePlayers = this.saveSets.some((set) => set.players.length > 1);
     return orderedKeys.map((key) => ({
       key,
       label: this.toLabel(key),
       title: this.toTitle(key),
       visible: this.defaultVisibleColumns.has(key)
+        || (key === 'save' && multipleSaves)
+        || (key === 'owner_name' && multiplePlayers)
     }));
   }
 
@@ -644,6 +830,11 @@ export class AppComponent {
     if (key === 'is_lucky') return 'L';
     if (key === 'storage_slot') return 'Slot';
     if (key === 'pal_box_slot_index') return 'Box';
+    if (key === 'location') return 'Where';
+    if (key === 'save') return 'Save';
+    if (key === 'location_detail') return 'Detail';
+    if (key === 'source_file') return 'File';
+    if (key === 'owner_name') return 'Owner';
     if (key === 'paldeck_no') return 'No';
     if (key === 'favorite_index') return 'F';
     if (key === 'level') return 'LVL';
@@ -655,7 +846,12 @@ export class AppComponent {
 
   private toTitle(key: string): string {
     if (key === 'paldeck_no') return 'Paldeck No.';
-    if (key === 'pal_box_slot_index') return 'Pal Box slot the Pal last occupied before dimensional storage';
+    if (key === 'pal_box_slot_index') return 'Pal Box slot';
+    if (key === 'location') return 'Location';
+    if (key === 'location_detail') return 'Location detail';
+    if (key === 'save') return 'Save (world)';
+    if (key === 'source_file') return 'Source file';
+    if (key === 'owner_name') return 'Owner';
     if (key === 'pal_variant') return 'Alpha';
     if (key === 'is_lucky') return 'Lucky';
     if (key === 'iv_hp') return 'IV HP';

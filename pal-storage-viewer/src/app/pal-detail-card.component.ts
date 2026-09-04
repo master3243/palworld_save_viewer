@@ -32,7 +32,7 @@ export class PalDetailCardComponent implements OnChanges {
     'level', 'rank', 'gender', 'is_lucky', 'favorite_index', 'hp',
     'iv_hp', 'iv_attack', 'iv_defense', 'soul_rank_hp', 'soul_rank_attack',
     'soul_rank_defense', 'soul_rank_craft_speed', 'skills', 'skill_ranks', 'skill_colors',
-    'passive_skill_ids', 'combat_moves', 'active_skill_ids'
+    'passive_skill_ids', 'combat_moves', 'active_skill_ids', 'location', 'location_detail'
   ]);
 
   get name(): string {
