@@ -68,6 +68,24 @@
   width: 100%;
 }
 
+.title-link {
+  align-items: center;
+  border-radius: 8px;
+  color: inherit;
+  display: flex;
+  text-decoration: none;
+  transition: filter 160ms ease;
+}
+
+.title-link:hover {
+  filter: brightness(1.12) drop-shadow(0 0 6px rgba(129, 222, 255, 0.35));
+}
+
+.title-link:focus-visible {
+  outline: 2px solid #95f3ff;
+  outline-offset: 4px;
+}
+
 .logo-crop {
   display: block;
   flex: 0 0 auto;
@@ -102,6 +120,40 @@
   text-transform: lowercase;
   /* text-shadow: 0 0 9px rgba(129, 222, 255, 0.45); */
   white-space: nowrap;
+}
+
+/*
+ * Once a table is on screen the big header is wasted space. The logo image
+ * carries transparent padding (art spans 28%..72.5% of its height), so the
+ * compact header crops to the artwork instead of the whole bitmap.
+ */
+.page.compact {
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.page.compact .toolbar {
+  margin-bottom: 0;
+}
+
+.page.compact .logo-crop {
+  --art-height: 34px;
+  --image-height: calc(var(--art-height) / 0.4417);
+  height: var(--art-height);
+  overflow: hidden;
+  width: calc(var(--image-height) * 1.7778 * 0.925);
+}
+
+.page.compact .title-logo {
+  height: var(--image-height);
+  left: calc(var(--image-height) * 1.7778 * -0.036);
+  top: calc(var(--image-height) * -0.2833);
+}
+
+.page.compact .viewer-title {
+  font-size: 1.05rem;
+  margin-left: 6px;
+  top: 2px;
 }
 
 .dropzone {

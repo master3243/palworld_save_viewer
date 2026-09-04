@@ -1,13 +1,15 @@
-<main class="page">
+<main class="page" [class.compact]="hasData">
   <section class="toolbar">
-    <span class="logo-crop">
-      <img
-        class="title-logo"
-        src="https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/logo.png?t=1622889070"
-        alt="Palworld"
-      >
-    </span>
-    <span class="viewer-title">Storage Viewer</span>
+    <a class="title-link" href="./" aria-label="Palworld Storage Viewer home" title="Back to start">
+      <span class="logo-crop">
+        <img
+          class="title-logo"
+          src="https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/logo.png?t=1622889070"
+          alt="Palworld"
+        >
+      </span>
+      <span class="viewer-title">Storage Viewer</span>
+    </a>
   </section>
 
   <label
