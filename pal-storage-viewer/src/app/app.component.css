@@ -79,7 +79,7 @@
 
 .title-logo {
   display: block;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.48)) drop-shadow(0 0 18px rgba(116, 220, 255, 0.48));
+  /* filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.48)) drop-shadow(0 0 18px rgba(116, 220, 255, 0.48)); */
   height: 100%;
   left: 0;
   object-fit: contain;
@@ -100,7 +100,7 @@
   position: relative;
   top: 3px;
   text-transform: lowercase;
-  text-shadow: 0 0 9px rgba(129, 222, 255, 0.45);
+  /* text-shadow: 0 0 9px rgba(129, 222, 255, 0.45); */
   white-space: nowrap;
 }
 
@@ -146,7 +146,7 @@
   color: #f7fcff;
   font-size: 1.15rem;
   font-weight: 750;
-  text-shadow: 0 1px 8px rgba(41, 173, 215, 0.45);
+  /* text-shadow: 0 1px 8px rgba(41, 173, 215, 0.45); */
 }
 
 .spinner {
