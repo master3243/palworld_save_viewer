@@ -1582,24 +1582,31 @@ td.where-cell {
   padding: 6px 8px;
 }
 
+/* Sized to sit inside the text line so it never changes the line height. */
 .faq-github {
   align-items: center;
   background: rgba(24, 68, 96, 0.6);
   border: 1px solid rgba(144, 226, 255, 0.35);
-  border-radius: 6px;
+  border-radius: 4px;
+  box-sizing: border-box;
   color: #9de3ff;
   display: inline-flex;
-  height: 22px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  gap: 4px;
+  height: 15px;
   justify-content: center;
-  margin: 0 2px;
-  vertical-align: middle;
-  width: 26px;
+  line-height: 0;
+  margin: 0 1px;
+  padding: 0 5px;
+  text-decoration: none;
+  vertical-align: -3px;
 }
 
 .faq-github svg {
   fill: currentColor;
-  height: 15px;
-  width: 15px;
+  height: 11px;
+  width: 11px;
 }
 
 .faq-github:hover {
