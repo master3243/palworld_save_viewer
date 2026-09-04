@@ -390,6 +390,19 @@
   color: #ff7085;
 }
 
+.chip[data-tone="favorite"] {
+  background: rgba(255, 224, 78, 0.16);
+  border-color: rgba(255, 224, 78, 0.85);
+  color: #fff3b0;
+}
+
+.chip-icon {
+  height: 15px;
+  margin: -3px 4px -3px -2px;
+  object-fit: contain;
+  width: 13px;
+}
+
 .chip[data-tone="female"] {
   background: rgba(255, 109, 159, 0.26);
   border-color: #ff6d9f;

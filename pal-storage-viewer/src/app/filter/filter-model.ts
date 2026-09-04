@@ -226,8 +226,13 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'alpha', label: 'Alpha', group: G.pal, kind: 'boolean', aliases: ['boss', 'pal_variant'], get: (row) => text(row, 'pal_variant').toLowerCase() === 'alpha' },
   { key: 'lucky', label: 'Lucky', group: G.pal, kind: 'boolean', aliases: ['is_lucky'], get: (row) => truthy(row, 'is_lucky') },
   {
-    key: 'favorite', label: 'Favorite', group: G.pal, kind: 'boolean', aliases: ['fav', 'favorite_index'],
+    key: 'favorite', label: 'Favorite', group: G.pal, kind: 'boolean', aliases: ['fav'],
     get: (row) => { const index = number(row, 'favorite_index'); return index !== null && index >= 1 && index <= 3; }
+  },
+  {
+    key: 'fav_slot', label: 'Favorite slot', group: G.pal, kind: 'number', aliases: ['favorite_slot', 'favorite_index'],
+    hint: 'Favorite marker I, II or III as 1, 2 or 3 (0 when not a favorite)',
+    get: (row) => { const index = number(row, 'favorite_index'); return index !== null && index >= 1 && index <= 3 ? index : 0; }
   },
   { key: 'level', label: 'Level', group: G.pal, kind: 'number', aliases: ['lvl', 'lv'], get: (row) => number(row, 'level') },
   { key: 'rank', label: 'Rank (stars)', group: G.pal, kind: 'number', aliases: ['stars', 'star'], hint: '0 to 4', get: displayRank },

@@ -11,6 +11,7 @@ import {
   ViewChild
 } from '@angular/core';
 
+import { OfflineImageService } from '../offline-image.service';
 import type { PalStorageRow } from '../save-parser.service';
 import { GenderIconComponent } from '../gender-icon.component';
 import { FilterBuilderComponent } from './filter-builder.component';
@@ -35,7 +36,9 @@ interface ChipState {
   /** Label shown while this state is active. */
   label: string;
   title: string;
-  tone: 'include' | 'exclude' | 'female' | 'male';
+  tone: 'include' | 'exclude' | 'female' | 'male' | 'favorite';
+  /** Optional asset path for an icon shown before the label. */
+  icon?: string;
   make: () => FilterRule;
 }
 
@@ -141,7 +144,17 @@ export class FilterBarComponent implements OnChanges {
         { label: '♀', title: 'Female only', tone: 'female', make: () => createRule('gender', 'is', ['Female']) }
       ]
     },
-    flagChip('Fav', 'Marked as favorite', 'favorite'),
+    {
+      label: 'Fav',
+      title: 'Favorite: click to cycle any, I, II, III, none',
+      states: [
+        { label: 'Fav', title: 'Any favorite', tone: 'include', make: () => createRule('favorite', 'is_true') },
+        { label: 'Fav', title: 'Favorite I', tone: 'favorite', icon: 'assets/ui/fav1.pog', make: () => createRule('fav_slot', 'eq', ['1']) },
+        { label: 'Fav', title: 'Favorite II', tone: 'favorite', icon: 'assets/ui/fav2.pog', make: () => createRule('fav_slot', 'eq', ['2']) },
+        { label: 'Fav', title: 'Favorite III', tone: 'favorite', icon: 'assets/ui/fav3.pog', make: () => createRule('fav_slot', 'eq', ['3']) },
+        { label: 'Fav', title: 'Not a favorite', tone: 'exclude', make: () => createRule('favorite', 'is_false') }
+      ]
+    },
     numberChip('4★', 'Max rank (4 stars)', 'rank', 'eq', ['4']),
     numberChip('=300 IV', 'Perfect IVs (100 / 100 / 100)', 'iv', 'eq', ['300']),
     numberChip('≥60 SR', 'Perfect soul ranks (HP + Attack + Defense at 60 or more)', 'sr', 'gte', ['60']),
@@ -173,8 +186,25 @@ export class FilterBarComponent implements OnChanges {
     { query: '(hp>=90 OR def>=90) -(is:alpha OR level<20)', meaning: 'parentheses and NOT groups' }
   ];
 
-  constructor(private readonly host: ElementRef<HTMLElement>) {
+  iconSources: Record<string, string> = {};
+
+  constructor(
+    private readonly host: ElementRef<HTMLElement>,
+    private readonly offlineImages: OfflineImageService
+  ) {
     this.presets = this.loadPresets();
+    for (const chip of this.quickChips) {
+      for (const state of chip.states) {
+        if (!state.icon) continue;
+        const path = state.icon;
+        void this.offlineImages.load(path).then((source) => { this.iconSources[path] = source; });
+      }
+    }
+  }
+
+  chipIcon(chip: QuickChip): string {
+    const icon = this.chipState(chip)?.icon;
+    return icon ? this.iconSources[icon] ?? '' : '';
   }
 
   get total(): number {
