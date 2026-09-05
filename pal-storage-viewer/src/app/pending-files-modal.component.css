@@ -1,0 +1,72 @@
+/* Multi-file confirmation ------------------------------------------- */
+.confirm-modal {
+  max-width: 560px;
+  width: min(92vw, 560px);
+}
+
+.confirm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 4px;
+  max-height: 50vh;
+  overflow: auto;
+  padding-right: 10px;
+  scrollbar-gutter: stable;
+  text-align: left;
+}
+
+.confirm-folder-name {
+  color: #9de3ff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.confirm-folder ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.confirm-folder li {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.confirm-file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.confirm-file-size {
+  color: rgba(200, 236, 255, 0.7);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.confirm-note {
+  color: rgba(200, 236, 255, 0.7);
+  font-size: 0.85rem;
+  margin: 6px 0 12px;
+  text-align: left;
+}
+
+.confirm-file-pals {
+  color: #9df0c0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  min-width: 64px;
+  text-align: right;
+}
+
+.confirm-file-pals.pending {
+  color: rgba(200, 236, 255, 0.5);
+}

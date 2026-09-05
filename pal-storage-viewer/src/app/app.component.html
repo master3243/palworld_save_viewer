@@ -113,127 +113,19 @@
     </span>
   </label>
 
-  <div
-    class="modal-backdrop help-backdrop"
-    *ngIf="isDropHelpOpen"
-    (click)="closeDropHelp()"
-  >
-    <div
-      class="modal help-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="dropHelpTitle"
-      (click)="$event.stopPropagation()"
-    >
-      <h2 class="modal-title faq-title" id="dropHelpTitle">FAQ</h2>
-      <div class="faq">
-        <details class="faq-item" open>
-          <summary>What is this?</summary>
-          <div class="faq-body">
-            <p>A local viewer for your Palworld save files that lists every Pal you own with all their stats in one searchable table.</p>
-            <p>Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, and dimensional storage.</p>
-            <p>The save folder (for Steam users) is:</p>
-            <code class="save-path">%LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\</code>
-            <p>Where <code>IDprofile</code> and <code>IDworld</code> are long random numbers. Inside it, <code>Level.sav</code> holds party, Pal Box and base Pals, <code>Players\xxx.sav</code> tells which container is whose, and <code>Players\xxx_dps.sav</code> is the dimensional storage.</p>
-            <p>You can also drop single files, and add files from other worlds later to compare them in one table. Or choose the demo save file (my personal dimensional storage).</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>What does the 100% Tracker track?</summary>
-          <div class="faq-body">
-            <p>Everything the game itself records in <code>Players\xxx.sav</code>: Paldeck entries, Pal Effigies of every type, tower bosses, alpha Pals, bounty targets, main and side missions, journals, fast travel points, discovered regions and one-time ruin pickups, plus counters such as dungeons cleared.</p>
-            <p>The save only lists what you have already obtained. The totals come from game data extracted from the Palworld files by <a class="faq-github" href="https://github.com/oMaN-Rod/palworld-save-pal" target="_blank" rel="noopener noreferrer">palworld-save-pal</a> and <a class="faq-github" href="https://github.com/deafdudecomputers/PalWorldSaveTools" target="_blank" rel="noopener noreferrer">PalWorldSaveTools</a>, so the tracker can list what is missing and where it is. Map coordinates are the ones the in-game map shows.</p>
-            <p>The overall figure is the plain average of the category percentages. Progress is per player, so a save with several players shows one tracker each.</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Can you fix X bug or implement Y feature?</summary>
-          <div class="faq-body">
-            <p>The project is open source on <a class="faq-github" href="https://github.com/master3243/palworld_save_viewer" target="_blank" rel="noopener noreferrer" aria-label="Open the project on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.72 1.27 3.38.97.1-.75.4-1.27.74-1.56-2.57-.29-5.27-1.29-5.27-5.68 0-1.25.45-2.28 1.2-3.08-.12-.29-.52-1.47.11-3.05 0 0 .97-.31 3.16 1.17a10.9 10.9 0 0 1 5.75 0c2.19-1.48 3.16-1.17 3.16-1.17.63 1.58.23 2.76.11 3.05.75.8 1.2 1.83 1.2 3.08 0 4.4-2.71 5.38-5.29 5.67.42.36.79 1.06.79 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"/></svg><span>GitHub</span></a>. Open an issue there and I will take a look. It also helps to include the save file that shows the bug/feature (if the my demo save file does not already do so).</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Will this steal my save data?</summary>
-          <div class="faq-body">
-            <p>No, that's impossible. The website runs completely inside your browser and there is no backend (check the network traffic yourself).</p>
-            <p>The codebase is open source on <a class="faq-github" href="https://github.com/master3243/palworld_save_viewer" target="_blank" rel="noopener noreferrer" aria-label="Open the project on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.72 1.27 3.38.97.1-.75.4-1.27.74-1.56-2.57-.29-5.27-1.29-5.27-5.68 0-1.25.45-2.28 1.2-3.08-.12-.29-.52-1.47.11-3.05 0 0 .97-.31 3.16 1.17a10.9 10.9 0 0 1 5.75 0c2.19-1.48 3.16-1.17 3.16-1.17.63 1.58.23 2.76.11 3.05.75.8 1.2 1.83 1.2 3.08 0 4.4-2.71 5.38-5.29 5.67.42.36.79 1.06.79 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"/></svg><span>GitHub</span></a>. It is hosted on GitHub Pages, which can only serve static websites that run entirely in your browser.</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Will this corrupt my save file?</summary>
-          <div class="faq-body">
-            <p>No, that's impossible. The browser can only read files, it can't edit/write files.</p>
-            <p>The tool is read-only, you can download a .csv if you want a local csv copy of what the website shows.</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Can I contribute a bug fix or a new feature?</summary>
-          <div class="faq-body">
-            <p>The project is open source on <a class="faq-github" href="https://github.com/master3243/palworld_save_viewer" target="_blank" rel="noopener noreferrer" aria-label="Open the project on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.72 1.27 3.38.97.1-.75.4-1.27.74-1.56-2.57-.29-5.27-1.29-5.27-5.68 0-1.25.45-2.28 1.2-3.08-.12-.29-.52-1.47.11-3.05 0 0 .97-.31 3.16 1.17a10.9 10.9 0 0 1 5.75 0c2.19-1.48 3.16-1.17 3.16-1.17.63 1.58.23 2.76.11 3.05.75.8 1.2 1.83 1.2 3.08 0 4.4-2.71 5.38-5.29 5.67.42.36.79 1.06.79 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"/></svg><span>GitHub</span></a> and I welcome fixes and features (please no AI slop).</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Can I donate?</summary>
-          <div class="faq-body">
-            <p>No. Donate to a charity instead.</p>
-            <p>I only created this tool for my own use, but I was told it was useful, so now it is public.</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Why did you make this?</summary>
-          <div class="faq-body">
-            <p>I was extremely frustrated with the in-game search lacking many criteria I needed, and I also wanted to search across multiple save files at once so I made this tool.</p>
-            <p>I reached a tipping point when I was farming a specific endgame party with perfect stats, accidentally sent a perfect Pal to the dimensional storage, and then wasted an hour going insane trying to find it (never again...)</p>
-            <p>It also literally took less time to make the first version of this tool than it took to find that one Pal.</p>
-          </div>
-        </details>
-      </div>
-      <div class="modal-actions faq-actions">
-        <a class="faq-github faq-footer-github" href="https://github.com/master3243/palworld_save_viewer" target="_blank" rel="noopener noreferrer" aria-label="Open the project on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.72 1.27 3.38.97.1-.75.4-1.27.74-1.56-2.57-.29-5.27-1.29-5.27-5.68 0-1.25.45-2.28 1.2-3.08-.12-.29-.52-1.47.11-3.05 0 0 .97-.31 3.16 1.17a10.9 10.9 0 0 1 5.75 0c2.19-1.48 3.16-1.17 3.16-1.17.63 1.58.23 2.76.11 3.05.75.8 1.2 1.83 1.2 3.08 0 4.4-2.71 5.38-5.29 5.67.42.36.79 1.06.79 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"/></svg><span>GitHub</span></a>
-        <button class="modal-primary" type="button" (click)="closeDropHelp()">Dismiss</button>
-      </div>
-    </div>
-  </div>
+  <app-faq-modal *ngIf="isDropHelpOpen" (closed)="closeDropHelp()"></app-faq-modal>
 
-  <div class="modal-backdrop" *ngIf="pendingFiles">
-    <div
-      class="modal confirm-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirmLoadTitle"
-      (click)="$event.stopPropagation()"
-    >
-      <h2 class="modal-title" id="confirmLoadTitle">
-        {{ pendingAppend ? 'Add' : 'Load' }} {{ pendingFileCount }} files from {{ pendingFolders.length }} {{ pendingFolders.length === 1 ? 'folder' : 'folders' }}?
-        <small class="modal-subtitle" *ngIf="pendingPalTotal !== null">{{ pendingPalTotal | number }} pals</small>
-      </h2>
-      <div class="confirm-list">
-        <div class="confirm-folder" *ngFor="let folder of pendingFolders; trackBy: trackPendingFolder">
-          <div class="confirm-folder-name" [title]="folder.folder">{{ folder.folder || 'Loose files' }}</div>
-          <ul>
-            <li *ngFor="let file of folder.files; trackBy: trackPendingFile">
-              <span class="source-kind" [attr.data-kind]="file.kind" [title]="kindTitle(file.kind)">{{ kindTag(file.kind) }}</span>
-              <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
-              <span class="confirm-file-pals" [class.pending]="file.pals === undefined">{{ pendingPalLabel(file) }}</span>
-              <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
-              <button
-                class="source-remove"
-                type="button"
-                [attr.aria-label]="'Leave out ' + file.name"
-                (click)="removePendingFile(file)"
-              >&times;</button>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <p class="confirm-note" *ngIf="pendingIgnored">{{ pendingIgnored }} {{ pendingIgnored === 1 ? 'file' : 'files' }} ignored (not Pal saves)</p>
-      <p class="confirm-note">Drop more files to add them to this list</p>
-      <div class="modal-actions">
-        <button class="modal-ghost" type="button" (click)="cancelPending()">Cancel</button>
-        <button class="modal-primary" type="button" (click)="confirmPending()">{{ pendingAppend ? 'Add' : 'Load' }}</button>
-      </div>
-    </div>
-  </div>
+  <app-pending-files-modal
+    *ngIf="pendingFiles"
+    [folders]="pendingFolders"
+    [append]="pendingAppend"
+    [fileCount]="pendingFileCount"
+    [palTotal]="pendingPalTotal"
+    [ignored]="pendingIgnored"
+    (removeFile)="removePendingFile($event)"
+    (cancel)="cancelPending()"
+    (confirm)="confirmPending()"
+  ></app-pending-files-modal>
 
   <p class="error" *ngIf="error">{{ error }}</p>
 
@@ -258,67 +150,17 @@
         <path d="M11 9v2H9"/>
       </svg>
     </div>
-    <div class="sources-bar" [class.open]="isSourcesOpen" aria-label="Loaded save files">
-      <div class="sources-row">
-        <button
-          class="sources-toggle"
-          type="button"
-          [attr.aria-expanded]="isSourcesOpen"
-          (click)="toggleSources()"
-        >
-          <span class="sources-caret" aria-hidden="true">{{ isSourcesOpen ? '▾' : '▸' }}</span>
-          <span class="sources-label">Sources</span>
-          <span class="sources-summary">{{ sourcesSummary }}</span>
-        </button>
-        <button class="add-source-button" type="button" (click)="openAddFilesPicker()">+ Files</button>
-        <button class="add-source-button" type="button" (click)="openFolderPicker($event)">+ Folder</button>
-        <span class="location-summary">
-          <span *ngFor="let item of locationCounts" class="location-pill" [attr.data-location]="item.location">
-            {{ item.location }} <b>{{ item.count | number }}</b>
-          </span>
-        </span>
-      </div>
-
-      <div class="sources-groups" *ngIf="isSourcesOpen">
-        <div class="source-group" *ngFor="let group of sourceGroups">
-          <div class="source-group-head">
-            <span class="save-letter" *ngIf="group.set?.letter">{{ group.set?.letter }}</span>
-            <span class="source-group-name">{{ group.set?.label || group.folder || 'Files' }}</span>
-            <span class="source-group-meta" [title]="group.folder">
-              <span *ngFor="let part of groupMeta(group)">{{ part }}</span>
-              <span class="source-group-count">{{ group.pals | number }} pals</span>
-            </span>
-            <button
-              class="group-remove"
-              type="button"
-              [attr.aria-label]="'Remove save ' + (group.set?.letter || group.set?.label || '')"
-              [title]="'Remove save file ' + (group.set?.letter || '')"
-              (click)="removeSaveGroup(group)"
-            ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-          </div>
-          <div class="source-group-files">
-            <span
-              *ngFor="let item of group.sources"
-              class="source-chip"
-              [attr.data-kind]="item.source.kind"
-              [class.muted]="!item.source.pals && item.source.kind !== 'player' && item.source.kind !== 'level_meta'"
-              [title]="item.source.file + ' · ' + sourceTitle(item.source)"
-            >
-              <span class="source-kind" [attr.data-kind]="item.source.kind" [title]="kindTitle(item.source.kind)">{{ sourceKindTag(item.source) }}</span>
-              <span class="source-name">{{ shortFileName(item.source.file) }}</span>
-              <span class="source-blurb">{{ kindBlurb(item.source.kind) }}</span>
-              <span class="source-count" *ngIf="item.source.pals">{{ item.source.pals | number }}</span>
-              <button
-                class="source-remove"
-                type="button"
-                [attr.aria-label]="'Remove ' + item.source.file"
-                (click)="removeSource(item.index)"
-              >&times;</button>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-sources-bar
+      [groups]="sourceGroups"
+      [summary]="sourcesSummary"
+      [locationCounts]="locationCounts"
+      [open]="isSourcesOpen"
+      (toggle)="toggleSources()"
+      (addFiles)="openAddFilesPicker()"
+      (addFolder)="openFolderPicker($event)"
+      (removeSource)="removeSource($event)"
+      (removeGroup)="removeSaveGroup($event)"
+    ></app-sources-bar>
     <ng-container *ngIf="view === 'pals' && hasRows">
     <div class="table-tools">
       <app-filter-bar [rows]="originalRows" (filtered)="onFilterChanged($event)"></app-filter-bar>

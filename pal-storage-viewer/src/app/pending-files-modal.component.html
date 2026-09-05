@@ -1,0 +1,39 @@
+<div class="modal-backdrop">
+  <div
+    class="modal confirm-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirmLoadTitle"
+    (click)="$event.stopPropagation()"
+  >
+    <h2 class="modal-title" id="confirmLoadTitle">
+      {{ append ? 'Add' : 'Load' }} {{ fileCount }} files from {{ folders.length }} {{ folders.length === 1 ? 'folder' : 'folders' }}?
+      <small class="modal-subtitle" *ngIf="palTotal !== null">{{ palTotal | number }} pals</small>
+    </h2>
+    <div class="confirm-list">
+      <div class="confirm-folder" *ngFor="let folder of folders; trackBy: trackFolder">
+        <div class="confirm-folder-name" [title]="folder.folder">{{ folder.folder || 'Loose files' }}</div>
+        <ul>
+          <li *ngFor="let file of folder.files; trackBy: trackFile">
+            <span class="source-kind" [attr.data-kind]="file.kind" [title]="kindTitle(file.kind)">{{ kindTag(file.kind) }}</span>
+            <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
+            <span class="confirm-file-pals" [class.pending]="file.pals === undefined">{{ palLabel(file) }}</span>
+            <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
+            <button
+              class="source-remove"
+              type="button"
+              [attr.aria-label]="'Leave out ' + file.name"
+              (click)="removeFile.emit(file)"
+            >&times;</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="confirm-note" *ngIf="ignored">{{ ignored }} {{ ignored === 1 ? 'file' : 'files' }} ignored (not Pal saves)</p>
+    <p class="confirm-note">Drop more files to add them to this list</p>
+    <div class="modal-actions">
+      <button class="modal-ghost" type="button" (click)="cancel.emit()">Cancel</button>
+      <button class="modal-primary" type="button" (click)="confirm.emit()">{{ append ? 'Add' : 'Load' }}</button>
+    </div>
+  </div>
+</div>

@@ -13,6 +13,7 @@
       >
         <span class="save-letter" *ngIf="option.letter">{{ option.letter }}</span>
         <span>{{ option.label }}</span>
+        <span class="percent-chip" *ngIf="option.percent !== null" [attr.data-tone]="percentTone(option.percent)">{{ option.percent }}%</span>
       </button>
     </div>
 

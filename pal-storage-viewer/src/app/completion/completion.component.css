@@ -92,6 +92,30 @@
   outline-offset: 2px;
 }
 
+.percent-chip {
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 7px;
+}
+
+.percent-chip[data-tone="low"] {
+  background: rgba(255, 123, 123, 0.18);
+  color: #ffa3a3;
+}
+
+.percent-chip[data-tone="mid"] {
+  background: rgba(255, 211, 122, 0.16);
+  color: #ffe3a3;
+}
+
+.percent-chip[data-tone="high"] {
+  background: rgba(142, 240, 194, 0.16);
+  color: #8ef0c2;
+}
+
 .save-letter {
   align-items: center;
   background: rgba(116, 230, 255, 0.18);

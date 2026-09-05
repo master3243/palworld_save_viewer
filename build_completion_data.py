@@ -339,11 +339,35 @@ def build(cache: Path) -> dict:
     }
 
 
+def dump_line_per_entry(data: dict) -> str:
+    """JSON with one list/dict entry per line, so git diffs show exactly which entries changed."""
+    compact = lambda value: json.dumps(value, separators=(",", ":"), ensure_ascii=False)  # noqa: E731
+    lines = ["{"]
+    sections = list(data.items())
+    for index, (key, value) in enumerate(sections):
+        comma = "," if index < len(sections) - 1 else ""
+        if isinstance(value, dict) and value and all(isinstance(v, (list, dict)) for v in value.values()):
+            entries = list(value.items())
+            lines.append(f"{compact(key)}:{{")
+            for i, (k, v) in enumerate(entries):
+                lines.append(f"{compact(k)}:{compact(v)}{',' if i < len(entries) - 1 else ''}")
+            lines.append(f"}}{comma}")
+        elif isinstance(value, list) and value and all(isinstance(v, (list, dict)) for v in value):
+            lines.append(f"{compact(key)}:[")
+            for i, v in enumerate(value):
+                lines.append(f"{compact(v)}{',' if i < len(value) - 1 else ''}")
+            lines.append(f"]{comma}")
+        else:
+            lines.append(f"{compact(key)}:{compact(value)}{comma}")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
 def main() -> None:
     cache = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "sandbox" / "completion_upstream"
     fetch_all(cache)
     data = build(cache)
-    OUT.write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
+    OUT.write_text(dump_line_per_entry(data), encoding="utf-8")
     print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB)")
     for key in ("relics", "fastTravel", "notes", "quests", "bosses", "towers", "areas", "ruinPickups", "paldeck", "technologies", "raids", "research", "skins"):
         print(f"  {key}: {len(data[key])}")

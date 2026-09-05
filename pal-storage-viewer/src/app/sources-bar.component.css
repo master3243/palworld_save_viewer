@@ -1,0 +1,239 @@
+.sources-bar {
+  background: rgba(5, 15, 25, 0.7);
+  border-bottom: 1px solid rgba(134, 220, 255, 0.12);
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 8px;
+}
+
+.sources-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 30px;
+}
+
+.sources-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #e8f8ff;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px 6px;
+}
+
+.sources-toggle:hover {
+  background: rgba(144, 226, 255, 0.1);
+}
+
+.sources-caret {
+  color: #9de3ff;
+  font-size: 0.8rem;
+  width: 10px;
+}
+
+.sources-summary {
+  color: rgba(200, 236, 255, 0.85);
+  font-size: 0.85rem;
+}
+
+.sources-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 40vh;
+  overflow: auto;
+  padding: 2px 0 6px;
+}
+
+.source-group {
+  border-left: 2px solid rgba(144, 226, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 8px;
+}
+
+.source-group-head {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.source-group-name {
+  color: #e8f8ff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.source-group-meta {
+  color: rgba(200, 236, 255, 0.7);
+  display: inline-flex;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  gap: 10px;
+}
+
+.source-group-folder {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-group-count {
+  color: #9df0c0;
+  font-variant-numeric: tabular-nums;
+}
+
+.source-group-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sources-label {
+  color: rgba(200, 236, 255, 0.7);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-right: 2px;
+  text-transform: uppercase;
+}
+
+.source-chip {
+  align-items: center;
+  background: rgba(24, 68, 96, 0.6);
+  border: 1px solid rgba(144, 226, 255, 0.3);
+  border-radius: 999px;
+  color: #e8f8ff;
+  display: inline-flex;
+  font-size: 0.82rem;
+  gap: 6px;
+  line-height: 1;
+  max-width: 100%;
+  padding: 4px 4px 4px 6px;
+}
+
+.source-chip.muted {
+  opacity: 0.55;
+}
+
+.source-group-head {
+  align-items: center;
+}
+
+.group-remove {
+  align-items: center;
+  background: rgba(255, 120, 120, 0.08);
+  border: 1px solid rgba(255, 120, 120, 0.35);
+  border-radius: 6px;
+  color: rgba(255, 190, 190, 0.9);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 26px;
+  justify-content: center;
+  margin-left: auto;
+  padding: 0;
+  width: 30px;
+}
+
+.group-remove svg {
+  fill: none;
+  height: 14px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2.4;
+  width: 14px;
+}
+
+.group-remove:hover {
+  background: rgba(255, 120, 120, 0.3);
+  color: #fff;
+}
+
+.source-name {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-count {
+  color: #9df0c0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.add-source-button {
+  background: rgba(24, 68, 96, 0.84);
+  border: 1px dashed rgba(144, 226, 255, 0.45);
+  border-radius: 999px;
+  color: #e8f8ff;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+}
+
+.add-source-button:hover {
+  background: rgba(34, 92, 128, 0.95);
+}
+
+.location-summary {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.location-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  color: rgba(232, 248, 255, 0.85);
+  font-size: 0.78rem;
+  padding: 3px 8px;
+}
+
+.location-pill b {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  margin-left: 2px;
+}
+
+.location-pill[data-location='Party'] { border: 1px solid rgba(255, 210, 120, 0.5); }
+
+.location-pill[data-location='Pal Box'] { border: 1px solid rgba(120, 220, 160, 0.5); }
+
+.location-pill[data-location='Dimensional Storage'] { border: 1px solid rgba(196, 150, 255, 0.5); }
+
+.location-pill[data-location^='Base'] { border: 1px solid rgba(144, 226, 255, 0.5); }
+
+.source-blurb {
+  color: rgba(200, 236, 255, 0.55);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.save-letter {
+  background: rgba(144, 226, 255, 0.18);
+  border: 1px solid rgba(144, 226, 255, 0.45);
+  border-radius: 4px;
+  color: #e8f8ff;
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-right: 6px;
+  min-width: 14px;
+  padding: 3px 5px;
+  text-align: center;
+}

@@ -1,0 +1,61 @@
+<div class="sources-bar" [class.open]="open" aria-label="Loaded save files">
+  <div class="sources-row">
+    <button
+      class="sources-toggle"
+      type="button"
+      [attr.aria-expanded]="open"
+      (click)="toggle.emit()"
+    >
+      <span class="sources-caret" aria-hidden="true">{{ open ? '▾' : '▸' }}</span>
+      <span class="sources-label">Sources</span>
+      <span class="sources-summary">{{ summary }}</span>
+    </button>
+    <button class="add-source-button" type="button" (click)="addFiles.emit()">+ Files</button>
+    <button class="add-source-button" type="button" (click)="addFolder.emit($event)">+ Folder</button>
+    <span class="location-summary">
+      <span *ngFor="let item of locationCounts" class="location-pill" [attr.data-location]="item.location">
+        {{ item.location }} <b>{{ item.count | number }}</b>
+      </span>
+    </span>
+  </div>
+
+  <div class="sources-groups" *ngIf="open">
+    <div class="source-group" *ngFor="let group of groups">
+      <div class="source-group-head">
+        <span class="save-letter" *ngIf="group.set?.letter">{{ group.set?.letter }}</span>
+        <span class="source-group-name">{{ group.set?.label || group.folder || 'Files' }}</span>
+        <span class="source-group-meta" [title]="group.folder">
+          <span *ngFor="let part of groupMeta(group)">{{ part }}</span>
+          <span class="source-group-count">{{ group.pals | number }} pals</span>
+        </span>
+        <button
+          class="group-remove"
+          type="button"
+          [attr.aria-label]="'Remove save ' + (group.set?.letter || group.set?.label || '')"
+          [title]="'Remove save file ' + (group.set?.letter || '')"
+          (click)="removeGroup.emit(group)"
+        ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="source-group-files">
+        <span
+          *ngFor="let item of group.sources"
+          class="source-chip"
+          [attr.data-kind]="item.source.kind"
+          [class.muted]="!item.source.pals && item.source.kind !== 'player' && item.source.kind !== 'level_meta'"
+          [title]="item.source.file + ' · ' + sourceTitle(item.source)"
+        >
+          <span class="source-kind" [attr.data-kind]="item.source.kind" [title]="kindTitle(item.source.kind)">{{ sourceKindTag(item.source) }}</span>
+          <span class="source-name">{{ shortFileName(item.source.file) }}</span>
+          <span class="source-blurb">{{ kindBlurb(item.source.kind) }}</span>
+          <span class="source-count" *ngIf="item.source.pals">{{ item.source.pals | number }}</span>
+          <button
+            class="source-remove"
+            type="button"
+            [attr.aria-label]="'Remove ' + item.source.file"
+            (click)="removeSource.emit(item.index)"
+          >&times;</button>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

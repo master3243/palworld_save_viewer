@@ -3,6 +3,9 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } fro
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
 import { CompletionComponent } from './completion/completion.component';
+import { FaqModalComponent } from './faq-modal.component';
+import { PendingFile, PendingFilesModalComponent, PendingFolder } from './pending-files-modal.component';
+import { LocationCount, SourceGroup, SourcesBarComponent } from './sources-bar.component';
 import { FilterBarComponent } from './filter/filter-bar.component';
 import { GenderIconComponent } from './gender-icon.component';
 import { APP_VERSION } from './app-version';
@@ -32,33 +35,6 @@ const TRACKER_HASH = '#tracker';
 /** Share of the progress bar covered by decoding and parsing in the worker. */
 const PARSE_SHARE = 0.95;
 
-interface LocationCount {
-  location: string;
-  count: number;
-}
-
-interface SourceGroup {
-  set: SaveSetSummary | null;
-  folder: string;
-  sources: { source: SaveSource; index: number }[];
-  pals: number;
-}
-
-interface PendingFile {
-  input: SaveInput;
-  folder: string;
-  name: string;
-  size: number;
-  kind: string;
-  /** undefined = still counting, null = holds no pals. */
-  pals?: number | null;
-}
-
-interface PendingFolder {
-  folder: string;
-  files: PendingFile[];
-}
-
 /** Minimal typing for the non-standard directory entry API used by drag and drop. */
 interface DirectoryEntryLike {
   isFile: boolean;
@@ -72,7 +48,7 @@ interface DirectoryEntryLike {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent, CompletionComponent],
+  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -135,33 +111,8 @@ export class AppComponent {
     this.pendingFolders = Array.from(folders.values());
   }
 
-  trackPendingFolder(_index: number, folder: PendingFolder): string {
-    return folder.folder;
-  }
-
-  trackPendingFile(_index: number, file: PendingFile): SaveInput {
-    return file.input;
-  }
-
   get pendingFileCount(): number {
     return this.pendingFiles?.length ?? 0;
-  }
-
-  /** Header details for a save group, minus anything its label already says. */
-  groupMeta(group: SourceGroup): string[] {
-    const set = group.set;
-    const label = set?.label ?? '';
-    const parts: string[] = [];
-    if (set?.host_player_name) parts.push(set.host_player_name);
-    if (set?.in_game_day !== null && set?.in_game_day !== undefined && !label.includes(`day ${set.in_game_day}`)) {
-      parts.push(`day ${set.in_game_day}`);
-    }
-    if (set?.saved_at && !label.includes(set.saved_at.replace('T', ' ').slice(0, 16))) {
-      parts.push(`saved ${this.savedAtLabel(set.saved_at)}`);
-    }
-    const tail = group.folder.replace(/\/+$/, '').split('/').pop() ?? '';
-    if (tail && !label.includes(tail)) parts.push(tail);
-    return parts;
   }
 
   get sourceGroups(): SourceGroup[] {
@@ -193,36 +144,8 @@ export class AppComponent {
     this.isSourcesOpen = !this.isSourcesOpen;
   }
 
-  /** Long player-id file names read as "…0001_dps.sav"; the full name stays in the tooltip. */
-  shortFileName(name: string): string {
-    const match = /^([0-9a-f]{32})(_dps)?\.sav$/i.exec(name);
-    return match ? `…${match[1].slice(-4)}${match[2] ?? ''}.sav` : name;
-  }
-
-  savedAtLabel(value: string | undefined): string {
-    if (!value) return '';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
-  }
-
-  /** Two or three words on what a file contributes; shown on chips and in the confirmation. */
-  kindBlurb(kind: string): string {
-    switch (kind) {
-      case 'level': return 'party · box · bases';
-      case 'dimensional_storage': return 'dimensional storage';
-      case 'player': return 'party / box ids · progress';
-      case 'level_meta': return 'world name · day';
-      default: return 'no pals';
-    }
-  }
-
   onDropzoneClick(event: Event): void {
     if (this.isParsing) event.preventDefault();
-  }
-
-  sourceKindTag(source: SaveSource): string {
-    return this.kindTag(source.kind);
   }
 
   /** Drop every file of one save at once. */
@@ -592,12 +515,6 @@ export class AppComponent {
     return files.reduce((sum, file) => sum + (file.pals ?? 0), 0);
   }
 
-  pendingPalLabel(file: PendingFile): string {
-    if (file.pals === undefined) return '…';
-    if (file.pals === null) return '';
-    return `${file.pals.toLocaleString()} pal${file.pals === 1 ? '' : 's'}`;
-  }
-
   removePendingFile(file: PendingFile): void {
     if (!this.pendingFiles) return;
     this.pendingFiles = this.pendingFiles.filter((entry) => entry !== file);
@@ -636,34 +553,6 @@ export class AppComponent {
     if (lower.endsWith('_dps.sav')) return 'dimensional_storage';
     if (/^[0-9a-f]{32}\.sav$/.test(lower)) return 'player';
     return 'unknown';
-  }
-
-  /** Short tag for a file kind, used on every chip. */
-  kindTag(kind: string): string {
-    switch (kind) {
-      case 'dimensional_storage': return 'DPS';
-      case 'level': return 'World';
-      case 'player': return 'Player';
-      case 'level_meta': return 'Info';
-      default: return 'Skip';
-    }
-  }
-
-  /** Tooltip explaining what a file kind is for. */
-  kindTitle(kind: string): string {
-    switch (kind) {
-      case 'level': return 'Data for every Pal (minus the dimensional storage)';
-      case 'dimensional_storage': return 'Dimensional Pal Storage.';
-      case 'player': return 'Maps containers to the player\'s party or Pal Box, and holds the player\'s progress record (bosses, effigies, journals, quests) for the 100% tracker.';
-      case 'level_meta': return 'Metadata used to label the save.';
-      default: return 'Not a pal save; ignored.';
-    }
-  }
-
-  formatSize(bytes: number): string {
-    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
-    return `${bytes} B`;
   }
 
   openFolderPicker(event: Event): void {
@@ -924,21 +813,6 @@ export class AppComponent {
       }
       return left.location.localeCompare(right.location, undefined, { numeric: true });
     });
-  }
-
-  sourceTitle(source: SaveSource): string {
-    const parts = [source.kind_label];
-    if (source.set) parts.push(`folder: ${source.set}`);
-    if (source.world_name) parts.push(`world: ${source.world_name}`);
-    if (source.players) parts.push(`${source.players} player${source.players === 1 ? '' : 's'}`);
-    if (source.bases) parts.push(`${source.bases} base${source.bases === 1 ? '' : 's'}`);
-    if (source.skipped?.wild_or_npc) parts.push(`${source.skipped.wild_or_npc} wild/NPC skipped`);
-    if (source.note) parts.push(source.note);
-    return parts.join(' · ');
-  }
-
-  trackSource(index: number): number {
-    return index;
   }
 
   toggleFullscreen(): void {

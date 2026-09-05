@@ -12,6 +12,7 @@ interface PlayerOption {
   completion: PlayerCompletion;
   world: WorldProgress;
   level: number | null;
+  percent: number | null;
 }
 
 /** Radius of the overall progress ring in its 120x120 view box. */
@@ -57,6 +58,7 @@ export class CompletionComponent implements OnChanges {
           completion: player.completion,
           world: { labs: set.labs ?? [] },
           level: player.level ?? null,
+          percent: null,
         });
       }
     }
@@ -133,8 +135,18 @@ export class CompletionComponent implements OnChanges {
     return item.id;
   }
 
+  percentTone(percent: number | null): string {
+    if (percent === null) return '';
+    if (percent >= 90) return 'high';
+    if (percent >= 50) return 'mid';
+    return 'low';
+  }
+
   private recompute(): void {
     const player = this.player;
+    if (this.data) {
+      for (const option of this.players) option.percent = summarize(option.completion, this.data, option.world).percent;
+    }
     this.summary = player && this.data ? summarize(player.completion, this.data, player.world) : null;
     if (this.summary && !this.summary.categories.some((category) => category.key === this.selectedCategory)) this.selectedCategory = '';
   }

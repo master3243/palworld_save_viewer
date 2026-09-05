@@ -281,7 +281,7 @@ function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Cat
     id, name, detail: pointId.startsWith('FTPoint') ? '' : pointId.replace(/_/g, ' '), state: unlocked.has(id) ? 'done' : 'todo',
     group: statue ? 'statue' : 'other', ...place(x, y), order: statue ? 0 : 1, no: null,
   }));
-  const names = new Map([['statue', 'Great Eagle Statue'], ['other', 'Other warp point']]);
+  const names = new Map([['statue', 'Great Eagle Statue'], ['other', 'Watchtower']]);
   return finish({
     key: 'fastTravel', title: 'Fast travel', items, groups: groupsOf(items, names),
     unknown: unknownIds(record.fast_travel, new Set(Object.keys(data.fastTravel))),
