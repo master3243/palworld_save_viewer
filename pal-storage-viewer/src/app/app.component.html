@@ -41,7 +41,7 @@
         [class.active]="view === 'pals'"
         [attr.aria-selected]="view === 'pals'"
         (click)="setView('pals')"
-      >Pals</button>
+      >Pal Table</button>
       <button
         type="button"
         role="tab"
@@ -65,7 +65,7 @@
     <input type="file" accept=".sav,.gvas" multiple [disabled]="isParsing" (change)="onFileInput($event)">
     <span class="drop-title" *ngIf="!isParsing">Drop save file/folder</span>
     <span class="drop-subtitle" *ngIf="!isParsing && view === 'pals'">Supported files: Level.sav / LevelMeta.sav / Player .sav / Player _dps.sav</span>
-    <span class="drop-subtitle" *ngIf="!isParsing && view === 'tracker'">Tracks bosses, effigies, journals, fast travel, Paldeck and missions from Players\xxx.sav (drop the save folder)</span>
+    <span class="drop-subtitle" *ngIf="!isParsing && view === 'tracker'">100% Tracker: must provide Players\xxx.sav file</span>
 
     <span
       class="progress-block"

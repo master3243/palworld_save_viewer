@@ -68,7 +68,6 @@
             <span class="bar-fill" [style.width.%]="category.percent"></span>
           </span>
           <span class="card-foot">
-            <span class="card-blurb">{{ category.blurb }}</span>
             <span class="card-pct">{{ category.percent }}%</span>
           </span>
         </button>
@@ -78,10 +77,6 @@
         <div class="detail-head">
           <h3>{{ open.title }} <span class="detail-count">{{ open.done | number }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
-            <div class="segmented" role="group" aria-label="Show">
-              <button type="button" [class.active]="!showAll" (click)="setShowAll(false)">Missing</button>
-              <button type="button" [class.active]="showAll" (click)="setShowAll(true)">All</button>
-            </div>
             <input
               class="detail-search"
               type="search"
@@ -127,14 +122,10 @@
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="open.hasCoords ? 4 : 3">
-                <ng-container *ngIf="hiddenDoneCount && !search">Everything here is done.</ng-container>
-                <ng-container *ngIf="!hiddenDoneCount || search">Nothing matches.</ng-container>
-              </td>
+              <td [attr.colspan]="open.hasCoords ? 4 : 3">Nothing matches.</td>
             </tr>
           </tbody>
         </table>
-        <p class="tracker-note muted" *ngIf="hiddenDoneCount && visibleItems.length">{{ hiddenDoneCount }} done {{ hiddenDoneCount === 1 ? 'item is' : 'items are' }} hidden. Choose "All" to see them.</p>
       </section>
     </ng-container>
   </div>

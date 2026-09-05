@@ -57,8 +57,6 @@ export interface TrackedGroup {
 export interface Category {
   key: string;
   title: string;
-  /** One line on what counts, shown under the title. */
-  blurb: string;
   done: number;
   total: number;
   percent: number;
@@ -112,10 +110,13 @@ function percentOf(done: number, total: number): number {
   return total > 0 ? Math.round((done / total) * 1000) / 10 : 0;
 }
 
+const STATE_RANK: Record<ItemState, number> = { active: 0, todo: 1, done: 2 };
+
 function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoords'>): Category {
   const done = category.items.filter((item) => item.state === 'done').length;
   const total = category.items.length;
-  category.items.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  // In progress first, then missing, then done; within a state by the category's own order.
+  category.items.sort((a, b) => STATE_RANK[a.state] - STATE_RANK[b.state] || a.order - b.order || a.name.localeCompare(b.name));
   return { ...category, done, total, percent: percentOf(done, total), hasCoords: category.items.some((item) => item.coords !== '') };
 }
 
@@ -133,6 +134,9 @@ function unknownIds(saveIds: Iterable<string>, known: Set<string>): string[] {
   return [...saveIds].filter((id) => !known.has(id)).sort();
 }
 
+/** Captures of one species that count toward its Paldeck capture bonus. */
+const CAPTURE_BONUS_MAX = 5;
+
 /** The save spells some ids differently from the game data (WereWolf vs Werewolf); match loosely. */
 function lowerKeys<T>(entries: Record<string, T>): Map<string, T> {
   return new Map(Object.entries(entries).map(([key, value]) => [key.toLowerCase(), value]));
@@ -147,12 +151,12 @@ function paldeckCategory(record: PlayerCompletion, data: CompletionData): Catego
     const caught = caughtBy.get(key) ?? 0;
     const bonus = bonusBy.get(key) ?? 0;
     const done = unlocked.has(key);
-    const detail = done ? `caught ${caught}${bonus >= 10 ? ' · capture bonus complete' : bonus ? ` · bonus ${bonus}/10` : ''}` : '';
-    return { id: tribe, name, detail, state: done ? 'done' : 'todo', group: '', coords: '', map: '', order: index };
+    const progress = done ? ` · caught ${caught}${bonus >= CAPTURE_BONUS_MAX ? ' · capture bonus complete' : ` · bonus ${bonus}/${CAPTURE_BONUS_MAX}`}` : '';
+    return { id: tribe, name, detail: `No. ${index}${progress}`, state: done ? 'done' : 'todo', group: '', coords: '', map: '', order: index };
   });
   const known = new Set(data.paldeck.map(([tribe]) => tribe.toLowerCase()));
   return finish({
-    key: 'paldeck', title: 'Paldeck', blurb: 'Pals registered in the Paldeck', items, groups: [],
+    key: 'paldeck', title: 'Paldeck', items, groups: [],
     unknown: record.paldeck.filter((tribe) => !known.has(tribe.toLowerCase())).sort(),
   });
 }
@@ -169,7 +173,7 @@ function relicCategory(record: PlayerCompletion, data: CompletionData): Category
     };
   });
   return finish({
-    key: 'relics', title: 'Pal Effigies', blurb: 'Effigies picked up in the world, all types', items,
+    key: 'relics', title: 'Pal Effigies', items,
     groups: groupsOf(items, names), unknown: unknownIds(obtained, new Set(Object.keys(data.relics))),
   });
 }
@@ -181,7 +185,7 @@ function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Cat
     group: '', ...place(x, y), order: 0,
   }));
   return finish({
-    key: 'fastTravel', title: 'Fast travel', blurb: 'Great Eagle statues and other warp points', items, groups: [],
+    key: 'fastTravel', title: 'Fast travel', items, groups: [],
     unknown: unknownIds(record.fast_travel, new Set(Object.keys(data.fastTravel))),
   });
 }
@@ -192,7 +196,7 @@ function noteCategory(record: PlayerCompletion, data: CompletionData): Category 
     id, name, detail: '', state: found.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0,
   }));
   return finish({
-    key: 'notes', title: 'Journals', blurb: 'Diaries and notes scattered around the world', items, groups: [],
+    key: 'notes', title: 'Journals', items, groups: [],
     unknown: unknownIds(record.notes, new Set(Object.keys(data.notes))),
   });
 }
@@ -219,9 +223,7 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
   const known = new Set(Object.keys(data.quests));
   const key = kind === 'Main' ? 'mainQuests' : 'sideQuests';
   return finish({
-    key, title: kind === 'Main' ? 'Main missions' : 'Side missions',
-    blurb: kind === 'Main' ? 'Story missions' : 'Missions from villagers and other NPCs',
-    items, groups: [], unknown: kind === 'Main' ? unknownIds(record.quests_completed, known) : [],
+    key, title: kind === 'Main' ? 'Main missions' : 'Side missions', items, groups: [], unknown: kind === 'Main' ? unknownIds(record.quests_completed, known) : [],
   });
 }
 
@@ -235,12 +237,12 @@ function towerCategory(record: PlayerCompletion, data: CompletionData): Category
     };
   });
   return finish({
-    key: 'towers', title: 'Tower bosses', blurb: 'Syndicate towers and the bosses that gate the story', items, groups: [],
+    key: 'towers', title: 'Tower bosses', items, groups: [],
     unknown: unknownIds(record.tower_bosses, new Set(Object.keys(data.towers))),
   });
 }
 
-function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: string[], key: string, title: string, blurb: string): Category {
+function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: string[], key: string, title: string): Category {
   const beaten = new Set(record.bosses);
   const items: TrackedItem[] = [];
   const seen = new Set<string>();
@@ -257,7 +259,7 @@ function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: str
   // Only report ids that no boss list knows, and only once (on the alpha category).
   const unknown = key === 'alphas' ? unknownIds(record.bosses, allKnown) : [];
   void known;
-  return finish({ key, title, blurb, items, groups: [], unknown });
+  return finish({ key, title, items, groups: [], unknown });
 }
 
 function areaCategory(record: PlayerCompletion, data: CompletionData): Category {
@@ -267,7 +269,7 @@ function areaCategory(record: PlayerCompletion, data: CompletionData): Category 
   }));
   const known = new Set(Object.keys(data.areas).map((id) => id.toLowerCase()));
   return finish({
-    key: 'areas', title: 'Regions', blurb: 'Named areas discovered on the map', items, groups: [],
+    key: 'areas', title: 'Regions', items, groups: [],
     unknown: record.areas.filter((area) => !known.has(area.toLowerCase())).sort(),
   });
 }
@@ -278,7 +280,7 @@ function ruinCategory(record: PlayerCompletion, data: CompletionData): Category 
     id, name: 'Ruin pickup', detail: '', state: taken.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0,
   }));
   return finish({
-    key: 'ruins', title: 'Ruin pickups', blurb: 'One-time item pickups in ancient ruins and towers', items, groups: [],
+    key: 'ruins', title: 'Ruin pickups', items, groups: [],
     unknown: unknownIds(record.item_pickups, new Set(Object.keys(data.ruinPickups))),
   });
 }
@@ -295,8 +297,8 @@ export function summarize(record: PlayerCompletion, data: CompletionData): Compl
     paldeckCategory(record, data),
     relicCategory(record, data),
     towerCategory(record, data),
-    bossCategory(record, data, ['alpha', 'boss'], 'alphas', 'Alpha Pals', 'Field bosses that respawn at fixed spots'),
-    bossCategory(record, data, ['bounty'], 'bounties', 'Bounty targets', 'Wanted humans from the bounty board'),
+    bossCategory(record, data, ['alpha', 'boss'], 'alphas', 'Alpha Pals'),
+    bossCategory(record, data, ['bounty'], 'bounties', 'Bounty targets'),
     questCategory(record, data, 'Main'),
     questCategory(record, data, 'Sub'),
     noteCategory(record, data),

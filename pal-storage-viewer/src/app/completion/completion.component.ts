@@ -32,7 +32,6 @@ export class CompletionComponent implements OnChanges {
   selectedPlayer = '';
   summary: CompletionSummary | null = null;
   selectedCategory = '';
-  showAll = false;
   search = '';
   groupFilter = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
@@ -70,21 +69,14 @@ export class CompletionComponent implements OnChanges {
     return this.summary?.categories.find((category) => category.key === this.selectedCategory) ?? null;
   }
 
-  /** Items of the open category after the missing/all toggle, group chips and search. */
+  /** Items of the open category after the group chips and search. */
   get visibleItems(): TrackedItem[] {
     const category = this.category;
     if (!category) return [];
     const needle = this.search.trim().toLowerCase();
     return category.items.filter((item) =>
-      (this.showAll || item.state !== 'done')
-      && (!this.groupFilter || item.group === this.groupFilter)
+      (!this.groupFilter || item.group === this.groupFilter)
       && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)));
-  }
-
-  get hiddenDoneCount(): number {
-    const category = this.category;
-    if (!category || this.showAll) return 0;
-    return category.items.filter((item) => item.state === 'done' && (!this.groupFilter || item.group === this.groupFilter)).length;
   }
 
   get ringOffset(): number {
@@ -102,10 +94,6 @@ export class CompletionComponent implements OnChanges {
     this.selectedCategory = this.selectedCategory === key ? '' : key;
     this.groupFilter = '';
     this.search = '';
-  }
-
-  setShowAll(showAll: boolean): void {
-    this.showAll = showAll;
   }
 
   setGroup(key: string): void {
