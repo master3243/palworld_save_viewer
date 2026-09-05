@@ -239,6 +239,10 @@
               [class.pal-name-cell]="column.key === 'pal_name'"
               [style.width.px]="column.key === 'pal_name' ? palNameWidth : null"
               [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
+                [class.trait-cell]="column.key === 'elements' || column.key === 'work'"
+                [class.type-cell]="column.key === 'elements'"
+                [class.work-cell]="column.key === 'work'"
+                [class.skills-cell]="column.key === 'skills'"
               [class.slot-cell]="isSlotNumber(column)"
               [class.where-cell]="isWhere(column)"
               [class.save-cell]="isSaveLetter(column)"
@@ -283,6 +287,10 @@
                 *ngFor="let column of displayedColumns; trackBy: trackColumn"
                 [class.pal-name-cell]="column.key === 'pal_name'"
                 [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
+                [class.trait-cell]="column.key === 'elements' || column.key === 'work'"
+                [class.type-cell]="column.key === 'elements'"
+                [class.work-cell]="column.key === 'work'"
+                [class.skills-cell]="column.key === 'skills'"
                 [class.slot-cell]="isSlotNumber(column)"
                 [class.where-cell]="isWhere(column)"
                 [class.save-cell]="isSaveLetter(column)"
@@ -332,7 +340,28 @@
                 <span class="table-rank-stars" *ngIf="column.key === 'rank'" [attr.aria-label]="cellDisplay(item.row, column) + ' of 4 stars'">
                   <i *ngFor="let filled of rankStarsFor(item.row)" [class.filled]="filled">★</i>
                 </span>
-                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank'">
+                <span class="trait-icons" *ngIf="column.key === 'elements'">
+                  <img *ngFor="let icon of elementIcons(item.row)" class="trait-icon" [src]="icon.src" [alt]="icon.name" [title]="icon.name">
+                </span>
+                <span class="trait-icons" *ngIf="column.key === 'work'" [class.overflowing]="workIcons(item.row).length > 7">
+                  <span class="work-badge" *ngFor="let icon of workIcons(item.row)" [title]="icon.name + ' ' + icon.rank + (icon.bonus ? ' (' + icon.bonus + ' gained)' : '')">
+                    <img class="trait-icon" [src]="icon.src" [alt]="icon.name">
+                    <b>{{ icon.rank }}</b>
+                    <svg *ngIf="icon.bonus" class="work-bonus" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 6 2.5l4 4M2 10.5l4-4 4 4"/></svg>
+                  </span>
+                </span>
+                <span class="passive-chips" *ngIf="column.key === 'skills'">
+                  <span
+                    *ngFor="let chip of passiveChips(item.row)"
+                    class="passive-chip"
+                    [attr.data-tone]="chip.tone"
+                    [title]="chip.name + (chip.rank ? ' (' + (chip.rank > 0 ? '+' : '') + chip.rank + ')' : '')"
+                  >
+                    <img *ngIf="chip.iconKey && passiveIconSrcs[chip.iconKey]" class="passive-chip-rank" [src]="passiveIconSrcs[chip.iconKey]" alt="">
+                    <span class="passive-chip-name">{{ chip.name }}</span>
+                  </span>
+                </span>
+                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank' && column.key !== 'elements' && column.key !== 'work' && column.key !== 'skills'">
                   {{ cellDisplay(item.row, column) }}
                 </ng-container>
               </td>

@@ -8,7 +8,36 @@ export interface LookupSources {
   passiveSkillsJson: string;
   passiveRanksLua: string;
   palNamesLua: string;
+  /** resources/pal_traits_lookup.json: element icon indexes and base work ranks per species. */
+  palTraitsJson: string;
 }
+
+/** Element icon indexes (into ELEMENT_NAMES) and base work ranks (in WORK_KEYS order) of a species. */
+export interface PalTraits {
+  e: number[];
+  w: number[];
+}
+
+/** In-game names of the nine elements, in icon order (T_Icon_element_s_00..08). */
+export const ELEMENT_NAMES = ['Neutral', 'Fire', 'Water', 'Electric', 'Grass', 'Dark', 'Dragon', 'Ground', 'Ice'];
+
+/** EPalWorkSuitability order minus OilExtraction, which the game dropped. Also the traits table order. */
+export const WORK_KEYS = [
+  'EmitFlame', 'Watering', 'Seeding', 'GenerateElectricity', 'Handcraft', 'Collection', 'Deforest',
+  'Mining', 'ProductMedicine', 'Cool', 'Transport', 'MonsterFarm',
+];
+
+/** In-game names of the work suitabilities, in WORK_KEYS order. */
+export const WORK_NAMES = [
+  'Kindling', 'Watering', 'Planting', 'Generating Electricity', 'Handiwork', 'Gathering', 'Lumbering',
+  'Mining', 'Medicine Production', 'Cooling', 'Transporting', 'Farming',
+];
+
+/** Row keys for the per-work columns, in WORK_KEYS order. */
+export const WORK_COLUMN_KEYS = [
+  'work_kindling', 'work_watering', 'work_planting', 'work_electricity', 'work_handiwork', 'work_gathering', 'work_lumbering',
+  'work_mining', 'work_medicine', 'work_cooling', 'work_transporting', 'work_farming',
+];
 
 export class Lookups {
   readonly activeSkills = new Map<string, string>();
@@ -17,6 +46,8 @@ export class Lookups {
   readonly palNames = new Map<string, string>();
   /** lower-case species id -> spelling used by the game data (drives image file names). */
   readonly palCanonical = new Map<string, string>();
+  /** lower-case species id -> elements and base work ranks. */
+  readonly palTraits = new Map<string, PalTraits>();
 
   constructor(sources: Partial<LookupSources>) {
     if (sources.activeSkillsJson) {
@@ -53,6 +84,10 @@ export class Lookups {
         }
       }
     }
+    if (sources.palTraitsJson) {
+      const parsed = JSON.parse(sources.palTraitsJson) as { pals?: Record<string, PalTraits> };
+      for (const [key, value] of Object.entries(parsed.pals ?? {})) this.palTraits.set(key.toLowerCase(), value);
+    }
     for (const key of this.palNames.keys()) {
       const lower = key.toLowerCase();
       if (lower !== key || !this.palCanonical.has(lower)) {
@@ -88,6 +123,13 @@ export class Lookups {
       if (display.endsWith(suffix)) display = display.slice(0, -suffix.length);
     }
     return [display, variant];
+  }
+
+  /** Elements and base work ranks of a species (boss and predator variants share the base species'). */
+  traitsFor(speciesId: string): PalTraits | null {
+    const lower = speciesId.toLowerCase();
+    const base = this.canonicalSpeciesId(speciesId).toLowerCase();
+    return this.palTraits.get(lower) ?? this.palTraits.get(base) ?? null;
   }
 
   canonicalSpeciesId(speciesId: string): string {

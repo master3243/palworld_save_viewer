@@ -1,4 +1,4 @@
-<div class="search" [class.active]="isActive" [class.has-warning]="unknownFields.length">
+<div class="search" [class.active]="isActive" [class.has-error]="queryErrors.length">
   <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
     <circle cx="11" cy="11" r="6.5"/>
     <path d="m20 20-4.2-4.2"/>
@@ -49,8 +49,8 @@
     </li>
   </ul>
 
-  <p class="search-warning" *ngIf="unknownFields.length">
-    Unknown field{{ unknownFields.length > 1 ? 's' : '' }}: {{ unknownFields.join(', ') }} (ignored)
+  <p class="search-warning" *ngIf="queryErrors.length" role="alert">
+    {{ queryErrors.join(' · ') }} (ignored)
   </p>
 
   <div class="help-popover" *ngIf="isHelpOpen" role="dialog" aria-label="Filter syntax help">

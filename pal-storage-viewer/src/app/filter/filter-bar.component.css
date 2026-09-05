@@ -35,8 +35,13 @@
   border-color: rgba(116, 230, 255, 0.62);
 }
 
-.search.has-warning {
-  border-color: rgba(255, 196, 92, 0.6);
+.search.has-error {
+  border-color: rgba(255, 123, 123, 0.85);
+  box-shadow: 0 0 0 1px rgba(255, 123, 123, 0.35);
+}
+
+.search.has-error .search-input {
+  color: #ffb4b4;
 }
 
 .search-icon {
@@ -152,7 +157,7 @@
 }
 
 .search-warning {
-  color: #ffd28a;
+  color: #ffa3a3;
   font-size: 0.68rem;
   left: 8px;
   margin: 0;

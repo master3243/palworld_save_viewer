@@ -202,13 +202,14 @@ function getOoz(): Promise<OozModule> {
 
 function getLookups(): Promise<Lookups> {
   lookupsPromise ??= (async () => {
-    const [activeSkillsJson, passiveSkillsJson, passiveRanksLua, palNamesLua] = await Promise.all([
+    const [activeSkillsJson, passiveSkillsJson, passiveRanksLua, palNamesLua, palTraitsJson] = await Promise.all([
       loadText('resources/active_skills_lookup.json'),
       loadText('resources/passive_skills_lookup.json'),
       loadText('resources/passive_ranks_lookup.lua'),
       loadText('resources/pal_names_lookup.lua'),
+      loadText('resources/pal_traits_lookup.json'),
     ]);
-    return new Lookups({ activeSkillsJson, passiveSkillsJson, passiveRanksLua, palNamesLua });
+    return new Lookups({ activeSkillsJson, passiveSkillsJson, passiveRanksLua, palNamesLua, palTraitsJson });
   })();
   return lookupsPromise;
 }

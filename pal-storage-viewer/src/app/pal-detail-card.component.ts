@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
+import { elementIcons, workTable } from './trait-icons';
 
 import { Game8LookupService } from './game8-lookup.service';
 import { GenderIconComponent } from './gender-icon.component';
@@ -21,6 +22,13 @@ export class PalDetailCardComponent implements OnChanges {
   @Input({ required: true }) row!: PalStorageRow;
   /** Show the save letter in the header (only useful with several saves loaded). */
   @Input() showSave = false;
+  readonly elementIcons = elementIcons;
+  readonly workTable = workTable;
+
+  /** True once the species is known to the traits lookup (otherwise every level would read 0). */
+  get hasWorkData(): boolean {
+    return typeof this.row['elements'] === 'string' && this.row['elements'] !== '' || workTable(this.row).some((work) => work.rank > 0);
+  }
   expandedFields = new Set<string>();
   palImageFailed = false;
   palImageSrc = '';
@@ -30,6 +38,8 @@ export class PalDetailCardComponent implements OnChanges {
   private readonly imageSources = new Map<string, string>();
 
   private readonly featuredKeys = new Set([
+    'elements', 'work', 'work_bonus', 'work_kindling', 'work_watering', 'work_planting', 'work_electricity', 'work_handiwork', 'work_gathering',
+    'work_lumbering', 'work_mining', 'work_medicine', 'work_cooling', 'work_transporting', 'work_farming',
     'pal_name', 'paldeck_no', 'pal_variant', 'species_id', 'nickname', 'filtered_nickname',
     'level', 'rank', 'gender', 'is_lucky', 'favorite_index', 'hp',
     'iv_hp', 'iv_attack', 'iv_defense', 'soul_rank_hp', 'soul_rank_attack',

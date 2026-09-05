@@ -16,6 +16,9 @@
             <app-gender-icon *ngIf="gender === 'Female' || gender === 'Male'; else genderText" [gender]="gender === 'Female' ? 'female' : 'male'"></app-gender-icon>
             <ng-template #genderText>{{ gender }}</ng-template>
           </span>
+          <span class="trait-line" *ngIf="elementIcons(row).length" title="Element type">
+            <img *ngFor="let icon of elementIcons(row)" class="trait-icon" [src]="icon.src" [alt]="icon.name" [title]="icon.name">
+          </span>
           <span class="save-badge" *ngIf="showSave && valueFor('save_id')" [title]="'Save ' + valueFor('save_id') + ': ' + valueFor('save')">Save {{ valueFor('save_id') }}</span>
           <span class="location-badge" *ngIf="valueFor('location')" [attr.data-location]="valueFor('location')" title="Where this Pal is">
             {{ valueFor('location') }}<small *ngIf="valueFor('location_detail')"> · {{ valueFor('location_detail') }}</small>
@@ -134,6 +137,22 @@
         </div>
       </div>
     </div>
+
+    <section class="work-panel" *ngIf="hasWorkData">
+      <h3>Work Suitability</h3>
+      <div class="work-grid">
+        <span
+          *ngFor="let work of workTable(row)"
+          class="work-chip"
+          [class.none]="work.rank === 0"
+          [title]="work.name + ' ' + work.rank + (work.bonus ? ' (' + work.bonus + ' gained by this Pal)' : '')"
+        >
+          <img class="trait-icon" [src]="work.src" [alt]="work.name">
+          <b class="work-rank">{{ work.rank }}</b>
+          <svg *ngIf="work.bonus" class="work-bonus" viewBox="0 0 12 12" aria-label="Raised above the species' level"><path d="M2 6.5 6 2.5l4 4M2 10.5l4-4 4 4"/></svg>
+        </span>
+      </div>
+    </section>
 
     <div class="skill-layout" *ngIf="passiveSkills.length || activeMoves.length">
       <section class="skill-group" *ngIf="passiveSkills.length">

@@ -30,7 +30,8 @@ import {
 interface Segment {
   text: string;
   quoted: boolean;
-  sep: ',' | '&' | null;
+  /** Separator before this value: ',' and '&' mean all of them, '|' means any. */
+  sep: ',' | '&' | '|' | null;
 }
 
 type Token =
@@ -40,7 +41,7 @@ type Token =
   | { type: 'term'; negated: boolean; field: string | null; symbol: string | null; segments: Segment[] };
 
 const OPERATOR_CHARS = ':=!<>~^';
-const VALUE_STOP = ' \t\n\r(),&"';
+const VALUE_STOP = ' \t\n\r(),&|"';
 
 export function tokenize(input: string): Token[] {
   const tokens: Token[] = [];
@@ -66,7 +67,7 @@ export function tokenize(input: string): Token[] {
 
   const readSegments = (): Segment[] => {
     const segments: Segment[] = [];
-    let sep: ',' | '&' | null = null;
+    let sep: ',' | '&' | '|' | null = null;
     for (;;) {
       let text = '';
       let quoted = false;
@@ -80,8 +81,8 @@ export function tokenize(input: string): Token[] {
         }
       }
       segments.push({ text, quoted, sep });
-      if (i < n && (input[i] === ',' || input[i] === '&')) {
-        sep = input[i] as ',' | '&';
+      if (i < n && (input[i] === ',' || input[i] === '&' || input[i] === '|')) {
+        sep = input[i] as ',' | '&' | '|';
         i += 1;
         continue;
       }
@@ -155,11 +156,14 @@ export function tokenize(input: string): Token[] {
 export interface ParseResult {
   root: FilterGroup;
   unknownFields: string[];
+  /** Rules that cannot do what they say (unknown field, text where a number is needed…); they are ignored. */
+  errors: string[];
 }
 
 export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
   const tokens = tokenize(input);
   const unknown = new Set<string>();
+  const errors: string[] = [];
   let position = 0;
 
   const peek = (): Token | undefined => tokens[position];
@@ -192,6 +196,7 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
         const field = lookup.resolve(value);
         if (!field) {
           unknown.add(value);
+          errors.push(`Unknown field "${value}"`);
           return createRule(value, 'is_true');
         }
         const op: Operator = field.kind === 'boolean' ? 'is_true' : 'not_empty';
@@ -202,7 +207,11 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
     const field = lookup.resolve(term.field);
     if (!field) {
       unknown.add(term.field);
+      errors.push(`Unknown field "${term.field}"`);
       return [createRule(term.field, 'contains', values)];
+    }
+    if (!star && values.length === 0) {
+      errors.push(`"${term.field}" needs a value`);
     }
 
     const symbol = term.symbol ?? ':';
@@ -224,6 +233,10 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
         op = 'between';
         ruleValues = [range[1], range[2]];
       } else {
+        for (const value of values) {
+          if (!/^-?\d+(\.\d+)?$/.test(value)) errors.push(`"${term.field}" expects a number, not "${value}"`);
+        }
+        if (symbol === '^' || symbol === '~') errors.push(`"${symbol}" does not work on numbers ("${term.field}")`);
         switch (symbol) {
           case '!=': op = 'neq'; break;
           case '>': op = 'gt'; break;
@@ -234,9 +247,12 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
         }
       }
     } else if (field.kind === 'list') {
-      const all = term.segments.some((segment) => segment.sep === '&');
-      op = symbol === '!=' ? 'has_none' : all ? 'has_all' : 'has_any';
+      // a,b and a&b need every value; a|b accepts any of them.
+      const any = term.segments.some((segment) => segment.sep === '|');
+      op = symbol === '!=' ? (any ? 'has_none' : 'not_has_all') : any ? 'has_any' : 'has_all';
+      if (symbol === '>' || symbol === '>=' || symbol === '<' || symbol === '<=') errors.push(`"${symbol}" does not work on "${term.field}"; use ${term.field}:a,b (all) or ${term.field}:a|b (any)`);
     } else {
+      if (symbol === '>' || symbol === '>=' || symbol === '<' || symbol === '<=') errors.push(`"${symbol}" does not work on text ("${term.field}")`);
       switch (symbol) {
         case '=': op = 'is'; break;
         case '!=': op = 'is_not'; break;
@@ -311,7 +327,7 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
   } else {
     root = createGroup('and', top);
   }
-  return { root, unknownFields: Array.from(unknown) };
+  return { root, unknownFields: Array.from(unknown), errors: Array.from(new Set(errors)) };
 }
 
 const KEYWORDS = /^(and|or|not)$/i;
@@ -343,7 +359,7 @@ export function serializeRule(rule: FilterRule, lookup: FieldLookup): string {
   const field = lookup.byKey.get(rule.field);
   const name = field ? field.key : rule.field;
   const values = rule.values.map((value) => value.trim());
-  const list = (sep: ',' | '&') => values.map(quoteValue).join(sep);
+  const list = (sep: ',' | '|') => values.map(quoteValue).join(sep);
   const single = quoteValue(values[0] ?? '');
 
   switch (rule.op) {
@@ -367,10 +383,10 @@ export function serializeRule(rule: FilterRule, lookup: FieldLookup): string {
     case 'lte': return `${name}<=${single}`;
     case 'between': return `${name}:${values[0] ?? ''}..${values[1] ?? ''}`;
     case 'not_between': return `-${name}:${values[0] ?? ''}..${values[1] ?? ''}`;
-    case 'has_any': return `${name}:${list(',')}`;
-    case 'has_all': return `${name}:${list('&')}`;
-    case 'has_none': return `-${name}:${list(',')}`;
-    case 'not_has_all': return `-${name}:${list('&')}`;
+    case 'has_any': return `${name}:${list('|')}`;
+    case 'has_all': return `${name}:${list(',')}`;
+    case 'has_none': return `-${name}:${list('|')}`;
+    case 'not_has_all': return `-${name}:${list(',')}`;
     case 'is_true': return field?.kind === 'boolean' ? `is:${name}` : `${name}:*`;
     case 'is_false': return field?.kind === 'boolean' ? `-is:${name}` : `-${name}:*`;
     case 'not_empty': return `${name}:*`;

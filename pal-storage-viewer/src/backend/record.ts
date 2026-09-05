@@ -9,7 +9,7 @@ import {
   readInt64, readName, readNameArray, readStr, readStructArrayProperty, readStructProperty, readUInt16,
   readVector, validatedPropertyNames, indexProperties
 } from './gvas';
-import { Lookups } from './lookups';
+import { Lookups, WORK_KEYS } from './lookups';
 
 export interface Identity {
   instance_id: string | null;
@@ -92,6 +92,12 @@ export interface PalRecord {
   };
   food: { status_effect_item: string | null; full_stomach_keep_item: string | null };
   work: { current_suitability: string; off_suitability_list: PropertyValue[]; add_ranks: Record<string, PropertyValue>[]; overflow_granted_ranks: Record<string, PropertyValue>[] };
+  /** Element icon indexes of the species (see ELEMENT_NAMES); empty when unknown. */
+  elements: number[];
+  /** Work rank per suitability in WORK_KEYS order: the species' base rank plus ranks gained by this pal. */
+  work_ranks: number[];
+  /** Ranks this pal gained on top of its species (condensing, handbooks), in WORK_KEYS order. */
+  work_bonus_ranks: number[];
   location: { last_jumped: { x: number; y: number; z: number } | null };
   migration: { exp_table_version: number | null };
   raw_property_names: string[];
@@ -188,6 +194,25 @@ export function buildRecord(
   const workOption = asDict(readStructProperty(buf, prop('WorkSuitabilityOptionInfo')));
   const arenaRestore = asDict(readStructProperty(buf, prop('ArenaRestoreParameter')));
   const offList = workOption['OffWorkSuitabilityList'];
+  const addRanks = suitabilityRankItems(readStructArrayProperty(buf, prop('GotWorkSuitabilityAddRankList')));
+  const traits = lookups.traitsFor(characterId);
+  const baseRanks = WORK_KEYS.map((_, index) => traits?.w[index] ?? 0);
+  const workBonus = WORK_KEYS.map((key) => {
+    let bonus = 0;
+    for (const item of addRanks) {
+      if (item['WorkSuitability'] === key && typeof item['Rank'] === 'number') bonus += item['Rank'];
+    }
+    return bonus;
+  });
+  // Condensing: each of the first three stars raises the next-highest suitability by one
+  // (highest first), and the fourth star raises every suitability the species has.
+  const stars = Math.max(0, Math.min(4, (readByte(buf, prop('Rank')) ?? 1) - 1));
+  const byLevel = baseRanks.map((rank, index) => ({ rank, index })).filter((entry) => entry.rank > 0).sort((a, b) => b.rank - a.rank || a.index - b.index);
+  for (let star = 0; star < Math.min(stars, 3); star++) {
+    if (byLevel[star]) workBonus[byLevel[star].index] += 1;
+  }
+  if (stars >= 4) for (const entry of byLevel) workBonus[entry.index] += 1;
+  const workRanks = WORK_KEYS.map((_, index) => baseRanks[index] + workBonus[index]);
 
   return {
     storage_index: storageIndex,
@@ -306,9 +331,12 @@ export function buildRecord(
     work: {
       current_suitability: readEnum(buf, prop('CurrentWorkSuitability'), 'EPalWorkSuitability::'),
       off_suitability_list: (Array.isArray(offList) ? offList : []).map((value) => (enumShort(value) ?? null) as PropertyValue),
-      add_ranks: suitabilityRankItems(readStructArrayProperty(buf, prop('GotWorkSuitabilityAddRankList'))),
+      add_ranks: addRanks,
       overflow_granted_ranks: suitabilityRankItems(readStructArrayProperty(buf, prop('WorkSuitabilityOverflowGrantedRankList'))),
     },
+    elements: traits?.e ?? [],
+    work_ranks: workRanks,
+    work_bonus_ranks: workBonus,
     location: { last_jumped: readVector(buf, prop('LastJumpedLocation')) },
     migration: { exp_table_version: readByte(buf, prop('ExpTableMigrationVersion')) },
     raw_property_names: validatedPropertyNames(buf, start, end),

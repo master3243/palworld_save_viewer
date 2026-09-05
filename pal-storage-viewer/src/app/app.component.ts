@@ -13,6 +13,8 @@ import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
 import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource } from './save-parser.service';
+import { elementIcons, workIcons } from './trait-icons';
+import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
 
 interface TableColumn {
   key: string;
@@ -374,6 +376,7 @@ export class AppComponent {
     'is_lucky',
     'favorite_index',
     'pal_name',
+    'elements',
     'nickname',
     'level',
     'rank',
@@ -383,6 +386,7 @@ export class AppComponent {
     'soul_rank_hp',
     'soul_rank_attack',
     'soul_rank_defense',
+    'work',
     'skills',
     'combat_moves',
     'learned_moves'
@@ -442,6 +446,12 @@ export class AppComponent {
     for (const favorite of [1, 2, 3]) {
       void this.offlineImages.load(`assets/ui/fav${favorite}.pog`).then((source) => {
         this.favoriteImageSrcs[favorite] = source;
+        this.changeDetector.markForCheck();
+      });
+    }
+    for (const key of PASSIVE_ICON_KEYS) {
+      void this.offlineImages.load(`assets/ui/${key}.pog`).then((source) => {
+        this.passiveIconSrcs[key] = source;
         this.changeDetector.markForCheck();
       });
     }
@@ -998,6 +1008,12 @@ export class AppComponent {
     return this.isIv(column) && Number(this.cellValue(row, column.key)) === 100;
   }
 
+  readonly elementIcons = elementIcons;
+  readonly workIcons = workIcons;
+  readonly passiveChips = passiveChips;
+  /** Rank arrow images for passive chips, by key, once loaded. */
+  passiveIconSrcs: Record<string, string> = {};
+
   isAlpha(row: PalStorageRow): boolean {
     return this.cellValue(row, 'pal_variant').toLowerCase() === 'alpha';
   }
@@ -1029,16 +1045,13 @@ export class AppComponent {
    * Measure the longest name up front and set the width explicitly instead.
    */
   private measurePalNameWidth(rows: PalStorageRow[]): number {
-    const minWidth = 116;
+    const minWidth = 96;
     const maxWidth = 320;
-    const cellPadding = 26;
+    const cellPadding = 14;
 
-    // Header is bold and carries the sort arrow, so it can be the widest thing.
-    let widest = this.measureText('Pal Name', 750) + 18;
-    for (const row of rows) {
-      widest = Math.max(widest, this.measureText(this.cellValue(row, 'pal_name'), 400));
-    }
-
+    // Fits fifteen characters of a typical name; longer names are cut with an ellipsis.
+    void rows;
+    const widest = Math.max(this.measureText('Pal Name', 750) + 18, this.measureText('Broncherry Aqua', 400));
     return Math.round(Math.min(maxWidth, Math.max(minWidth, widest + cellPadding)));
   }
 
@@ -1122,16 +1135,23 @@ export class AppComponent {
     if (key === 'source_file') return 'File';
     if (key === 'owner_name') return 'Owner';
     if (key === 'paldeck_no') return 'No';
+    if (key === 'elements') return 'Type';
+    if (key === 'work') return 'Work';
     if (key === 'favorite_index') return 'F';
     if (key === 'level') return 'LVL';
-    if (key === 'soul_rank_hp') return 'SR HP';
-    if (key === 'soul_rank_attack') return 'SR ATK';
-    if (key === 'soul_rank_defense') return 'SR DEF';
+    if (key === 'iv_hp') return 'IV H';
+    if (key === 'iv_attack') return 'IV A';
+    if (key === 'iv_defense') return 'IV D';
+    if (key === 'soul_rank_hp') return 'SR H';
+    if (key === 'soul_rank_attack') return 'SR A';
+    if (key === 'soul_rank_defense') return 'SR D';
     return this.toTitle(key);
   }
 
   private toTitle(key: string): string {
     if (key === 'paldeck_no') return 'Paldeck No.';
+    if (key === 'elements') return 'Element type(s)';
+    if (key === 'work') return 'Work suitability levels (base plus gained ranks)';
     if (key === 'pal_box_slot_index') return 'Pal Box slot';
     if (key === 'location') return 'Location';
     if (key === 'location_detail') return 'Location detail';

@@ -395,9 +395,40 @@ def dump_line_per_entry(data: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+# Element order of the game's icon set (T_Icon_element_s_00..08) and work suitability order
+# (EPalWorkSuitability, T_icon_palwork_00..12).
+ELEMENTS = ["Normal", "Fire", "Water", "Electricity", "Leaf", "Dark", "Dragon", "Earth", "Ice"]
+# OilExtraction is still in the enum but no longer in the game, so it is left out.
+WORK_KEYS = ["EmitFlame", "Watering", "Seeding", "GenerateElectricity", "Handcraft", "Collection", "Deforest",
+             "Mining", "ProductMedicine", "Cool", "Transport", "MonsterFarm"]
+TRAITS_OUT = HERE.parent / "pal_traits_lookup.json"
+
+
+def build_pal_traits(cache: Path) -> None:
+    """resources/pal_traits_lookup.json: species id -> element icon indexes and base work ranks."""
+    pals = load(cache, "psp/pals.json")
+    traits = {}
+    for pal_id, value in sorted(pals.items()):
+        if not value.get("is_pal"):
+            continue
+        elements = [ELEMENTS.index(e) for e in value.get("element_types") or [] if e in ELEMENTS]
+        work = [(value.get("work_suitability") or {}).get(key) or 0 for key in WORK_KEYS]
+        if not elements and not any(work):
+            continue
+        traits[pal_id] = {"e": elements, "w": work}
+    lines = ["{", f'"elements":{json.dumps(ELEMENTS)},', f'"work":{json.dumps(WORK_KEYS)},', '"pals":{']
+    items = list(traits.items())
+    for i, (pal_id, value) in enumerate(items):
+        lines.append(f'{json.dumps(pal_id)}:{json.dumps(value, separators=(",", ":"))}{"," if i < len(items) - 1 else ""}')
+    lines += ["}", "}"]
+    TRAITS_OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"wrote {TRAITS_OUT} ({len(traits)} pals)")
+
+
 def main() -> None:
     cache = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "sandbox" / "completion_upstream"
     fetch_all(cache)
+    build_pal_traits(cache)
     data = build(cache)
     OUT.write_text(dump_line_per_entry(data), encoding="utf-8")
     print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB)")

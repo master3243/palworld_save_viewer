@@ -495,9 +495,9 @@ th,
 td {
   border-bottom: 1px solid rgba(169, 226, 255, 0.12);
   max-width: 360px;
-  padding: 8px 10px;
+  padding: 6px 6px;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 th {
@@ -618,8 +618,8 @@ td {
 
 th.pal-name-cell,
 td.pal-name-cell {
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -683,18 +683,18 @@ td.rank-cell {
 th.level-cell,
 td.level-cell {
   box-sizing: border-box;
-  max-width: 58px;
-  min-width: 58px;
-  padding-left: 5px;
-  padding-right: 5px;
+  max-width: 44px;
+  min-width: 44px;
+  padding-left: 4px;
+  padding-right: 4px;
   text-align: center;
-  width: 58px;
+  width: 44px;
 }
 
 th.level-cell.sorted {
-  max-width: 74px;
-  min-width: 74px;
-  width: 74px;
+  max-width: 58px;
+  min-width: 58px;
+  width: 58px;
 }
 
 th.rank-cell.sorted {
@@ -728,19 +728,19 @@ td.iv-cell,
 th.soul-rank-cell,
 td.soul-rank-cell {
   box-sizing: border-box;
-  max-width: 58px;
-  min-width: 58px;
-  padding-left: 4px;
-  padding-right: 4px;
+  max-width: 46px;
+  min-width: 46px;
+  padding-left: 3px;
+  padding-right: 3px;
   text-align: center;
-  width: 58px;
+  width: 46px;
 }
 
 th.iv-cell.sorted,
 th.soul-rank-cell.sorted {
-  max-width: 72px;
-  min-width: 72px;
-  width: 72px;
+  max-width: 60px;
+  min-width: 60px;
+  width: 60px;
 }
 
 td.iv-cell.iv-high {
@@ -772,7 +772,7 @@ td.icon-cell {
   display: inline-flex;
   font-size: 1rem;
   line-height: 1;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .gender-icon.female {
@@ -781,6 +781,175 @@ td.icon-cell {
 
 .gender-icon.male {
   color: #42c8ff;
+}
+
+.trait-icons {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.trait-icon {
+  display: block;
+  height: 18px;
+  width: 18px;
+}
+
+/* One work suitability: the icon with its level in the corner and a chevron when raised. */
+.work-badge {
+  display: inline-block;
+  height: 22px;
+  position: relative;
+  width: 22px;
+}
+
+.work-badge .trait-icon {
+  height: 22px;
+  width: 22px;
+}
+
+.work-badge b {
+  background: rgba(5, 15, 25, 0.92);
+  border-radius: 3px;
+  bottom: -2px;
+  color: #f1fbff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 1px 2px;
+  position: absolute;
+  right: -3px;
+}
+
+.work-badge .work-bonus {
+  height: 9px;
+  position: absolute;
+  right: -3px;
+  top: -4px;
+  width: 9px;
+}
+
+th.trait-cell,
+td.trait-cell {
+  max-width: none;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+th.type-cell,
+td.type-cell {
+  box-sizing: border-box;
+  max-width: 48px;
+  min-width: 48px;
+  padding-left: 3px;
+  padding-right: 3px;
+  text-align: center;
+  width: 48px;
+}
+
+th.type-cell.sorted {
+  max-width: 62px;
+  min-width: 62px;
+  width: 62px;
+}
+
+td.type-cell .trait-icons {
+  justify-content: center;
+}
+
+/* Four passive chips side by side. */
+th.skills-cell,
+td.skills-cell {
+  max-width: 360px;
+  min-width: 360px;
+  overflow: hidden;
+  width: 360px;
+}
+
+.passive-chips {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  width: 100%;
+}
+
+/* Same tones as the pal card, squeezed to one line. */
+.passive-chip {
+  align-items: center;
+  background: #176f77;
+  border-left: 3px solid #4cf2e1;
+  border-radius: 2px;
+  color: #fff;
+  display: inline-flex;
+  /* Natural width; only chips that do not fit shrink and truncate. */
+  flex: 0 1 auto;
+  font-size: 0.66rem;
+  gap: 3px;
+  height: 20px;
+  min-width: 0;
+  padding: 0 6px 0 4px;
+}
+
+.passive-chip[data-tone="gold"] {
+  background: #7c6410;
+  border-color: #ffe04e;
+}
+
+.passive-chip[data-tone="platinum"] {
+  background: #396390;
+  border-color: #aee9ff;
+}
+
+.passive-chip[data-tone="negative"] {
+  background: #6b2934;
+  border-color: #ff7085;
+}
+
+.passive-chip-rank {
+  flex: 0 0 auto;
+  height: 12px;
+  object-fit: contain;
+  width: 12px;
+}
+
+.passive-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Seven badges, the most any pal has, fit exactly. */
+th.work-cell,
+td.work-cell {
+  min-width: 193px;
+  overflow: hidden;
+  width: 193px;
+}
+
+td.work-cell .trait-icons {
+  gap: 4px;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 3px 3px 2px 0;
+}
+
+/* Only rows with more badges than fit get the fade. */
+td.work-cell .trait-icons.overflowing {
+  mask-image: linear-gradient(to right, #000 88%, transparent);
+}
+
+.work-bonus {
+  fill: none;
+  height: 11px;
+  stroke: #ffd37a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 11px;
 }
 
 .alpha-icon {
@@ -1065,13 +1234,13 @@ td.save-cell {
 th.where-cell,
 td.where-cell {
   box-sizing: border-box;
-  max-width: 108px;
-  min-width: 96px;
+  max-width: 76px;
+  min-width: 76px;
   overflow: hidden;
   text-overflow: ellipsis;
   transition: width 160ms ease, min-width 160ms ease, max-width 160ms ease;
   white-space: nowrap;
-  width: 108px;
+  width: 76px;
 }
 
 /* Full screen table -------------------------------------------------- */

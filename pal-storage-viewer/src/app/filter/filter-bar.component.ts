@@ -122,6 +122,8 @@ export class FilterBarComponent implements OnChanges {
 
   queryText = '';
   unknownFields: string[] = [];
+  /** Problems with the typed query; shown in red under the box. */
+  queryErrors: string[] = [];
   matchCount = 0;
   isPanelOpen = false;
   isHelpOpen = false;
@@ -191,8 +193,9 @@ export class FilterBarComponent implements OnChanges {
     { query: 'anubis', meaning: 'name, nickname, passive or move contains "anubis"' },
     { query: 'level>=40 atk>=90', meaning: 'both conditions (space means AND)' },
     { query: 'hp>=90 OR def>=90', meaning: 'either condition' },
-    { query: 'skills:Legend,Musclehead', meaning: 'has any of these passives' },
-    { query: 'skills:Legend&Musclehead', meaning: 'has all of these passives' },
+    { query: 'skills:Legend,Musclehead', meaning: 'has all of these passives' },
+    { query: 'skills:Legend|Musclehead', meaning: 'has any of these passives' },
+    { query: 'work:mining,handiwork type:fire', meaning: 'work suitabilities and element types work the same way' },
     { query: '-skills:Brittle', meaning: 'does not have this passive' },
     { query: 'is:alpha -is:lucky', meaning: 'yes/no flags: alpha, lucky, favorite, male, female' },
     { query: 'gender=male', meaning: '= is exact, : is contains' },
@@ -268,6 +271,7 @@ export class FilterBarComponent implements OnChanges {
     this.queryText = '';
     this.root = createGroup();
     this.unknownFields = [];
+    this.queryErrors = [];
     // The parent is mid change-detection when inputs arrive; emit afterwards.
     void Promise.resolve().then(() => this.recompute());
   }
@@ -280,6 +284,7 @@ export class FilterBarComponent implements OnChanges {
     const result = parseQuery(this.queryText, this.lookup);
     this.root = result.root;
     this.unknownFields = result.unknownFields;
+    this.queryErrors = result.errors;
     this.recompute();
     this.suggestionsVisible = true;
     this.updateSuggestions(input);
@@ -346,6 +351,7 @@ export class FilterBarComponent implements OnChanges {
     const result = parseQuery(next, this.lookup);
     this.root = result.root;
     this.unknownFields = result.unknownFields;
+    this.queryErrors = result.errors;
     this.recompute();
     this.suggestionsVisible = true;
     this.updateSuggestions(target);
@@ -462,6 +468,7 @@ export class FilterBarComponent implements OnChanges {
   onTreeChanged(): void {
     this.queryText = serializeQuery(this.root, this.lookup);
     this.unknownFields = [];
+    this.queryErrors = [];
     this.recompute();
   }
 
@@ -482,6 +489,7 @@ export class FilterBarComponent implements OnChanges {
     this.root = createGroup();
     this.queryText = '';
     this.unknownFields = [];
+    this.queryErrors = [];
     this.suggestions = [];
     this.recompute();
     this.searchInput?.nativeElement.focus();
@@ -492,6 +500,7 @@ export class FilterBarComponent implements OnChanges {
     const result = parseQuery(query, this.lookup);
     this.root = result.root;
     this.unknownFields = result.unknownFields;
+    this.queryErrors = result.errors;
     this.recompute();
     this.isHelpOpen = false;
     this.searchInput?.nativeElement.focus();

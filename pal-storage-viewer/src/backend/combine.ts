@@ -3,6 +3,7 @@
  */
 import { PlayerCompletion } from './completion';
 import { PropertyValue } from './gvas';
+import { ELEMENT_NAMES, WORK_COLUMN_KEYS, WORK_NAMES } from './lookups';
 import { PalRecord } from './record';
 import { BaseCamp, ParsedFile, SaveKind } from './saves';
 
@@ -374,6 +375,10 @@ export function flattenRecord(item: PalRecord): Row {
     species_base_id: item.species_base_id,
     unique_npc_id: item.unique_npc_id,
     gender: item.gender,
+    elements: item.elements.map((index) => ELEMENT_NAMES[index] ?? '').filter(Boolean).join(', '),
+    work: item.work_ranks.map((rank, index) => (rank > 0 ? `${WORK_NAMES[index]} ${rank}` : '')).filter(Boolean).join(', '),
+    work_bonus: item.work_bonus_ranks.map((bonus, index) => (bonus > 0 ? `${WORK_NAMES[index]} ${bonus}` : '')).filter(Boolean).join(', '),
+    ...Object.fromEntries(WORK_COLUMN_KEYS.map((key, index) => [key, item.work_ranks[index] ?? 0])),
     nickname: item.nickname,
     filtered_nickname: item.filtered_nickname,
     level: item.level,

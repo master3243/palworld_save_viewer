@@ -198,6 +198,25 @@ function displayRank(row: PalStorageRow): number | null {
   return stored === null ? null : Math.max(0, Math.min(4, stored - 1));
 }
 
+/** One numeric field per work suitability (work_mining etc.), aliased by the in-game name. */
+const WORK_FIELDS: FilterField[] = [
+  ['work_kindling', 'Kindling', ['kindling', 'fire_work', 'emitflame']],
+  ['work_watering', 'Watering', ['watering']],
+  ['work_planting', 'Planting', ['planting', 'seeding']],
+  ['work_electricity', 'Generating Electricity', ['electricity', 'generating']],
+  ['work_handiwork', 'Handiwork', ['handiwork', 'handcraft']],
+  ['work_gathering', 'Gathering', ['gathering', 'collection']],
+  ['work_lumbering', 'Lumbering', ['lumbering', 'deforest']],
+  ['work_mining', 'Mining', ['mining']],
+  ['work_medicine', 'Medicine Production', ['medicine']],
+  ['work_cooling', 'Cooling', ['cooling', 'cool']],
+  ['work_transporting', 'Transporting', ['transporting', 'transport']],
+  ['work_farming', 'Farming', ['farming', 'ranch', 'monsterfarm']],
+].map(([key, label, aliases]) => ({
+  key: key as string, label: label as string, group: 'Work', kind: 'number', aliases: aliases as string[], hint: 'Work suitability level',
+  get: (row: PalStorageRow) => number(row, key as string),
+}));
+
 const G = {
   pal: 'Pal',
   iv: 'IV',
@@ -235,6 +254,14 @@ export const KNOWN_FIELDS: FilterField[] = [
     get: (row) => { const index = number(row, 'favorite_index'); return index !== null && index >= 1 && index <= 3 ? index : 0; }
   },
   { key: 'level', label: 'Level', group: G.pal, kind: 'number', aliases: ['lvl', 'lv'], get: (row) => number(row, 'level') },
+  { key: 'type', label: 'Element', group: G.pal, kind: 'list', aliases: ['element', 'elements', 'types'], suggest: true, hint: 'Fire, Water, Electric, Grass, Dark, Dragon, Ground, Ice, Neutral', get: (row) => text(row, 'elements') },
+  { key: 'work', label: 'Work suitability', group: 'Work', kind: 'list', aliases: ['works', 'suitability', 'suitabilities'], suggest: true, hint: 'work:mining&handiwork = has both, work:mining,handiwork = has either', get: (row) => text(row, 'work').replace(/ \d+/g, '') },
+  { key: 'type_count', label: 'Element count', group: G.pal, kind: 'number', aliases: ['types_count', 'element_count'], hint: '1 or 2', get: (row) => listCount(row, 'elements') },
+  {
+    key: 'work_count', label: 'Work count', group: 'Work', kind: 'number', aliases: ['works_count', 'suitability_count'], hint: 'How many work suitabilities the pal has',
+    get: (row) => WORK_FIELDS.reduce((count, field) => count + ((number(row, field.key) ?? 0) > 0 ? 1 : 0), 0)
+  },
+  ...WORK_FIELDS,
   { key: 'rank', label: 'Rank (stars)', group: G.pal, kind: 'number', aliases: ['stars', 'star'], hint: '0 to 4', get: displayRank },
 
   { key: 'hp', label: 'IV HP', group: G.iv, kind: 'number', aliases: ['iv_hp', 'ivhp'], get: (row) => number(row, 'iv_hp') },
@@ -295,7 +322,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'hunger_type', label: 'Hunger type', group: G.condition, kind: 'text', aliases: [], suggest: true, get: (row) => text(row, 'hunger_type') },
   { key: 'sick', label: 'Worker sickness', group: G.condition, kind: 'text', aliases: ['worker_sick'], suggest: true, get: (row) => text(row, 'worker_sick') },
   { key: 'friendship', label: 'Friendship points', group: G.condition, kind: 'number', aliases: ['trust', 'friendship_points'], get: (row) => number(row, 'friendship_points') },
-  { key: 'work', label: 'Current work', group: G.condition, kind: 'text', aliases: ['current_work_suitability', 'suitability'], suggest: true, get: (row) => text(row, 'current_work_suitability') },
+  { key: 'current_work', label: 'Current work', group: G.condition, kind: 'text', aliases: ['current_work_suitability', 'working', 'doing'], suggest: true, get: (row) => text(row, 'current_work_suitability') },
   { key: 'exp', label: 'Experience', group: G.condition, kind: 'number', aliases: ['xp'], get: (row) => number(row, 'exp') },
 
   { key: 'slot', label: 'Storage page', group: G.storage, kind: 'number', aliases: ['storage_slot', 'box', 'page'], get: (row) => number(row, 'storage_slot') },
@@ -314,7 +341,9 @@ const CONSUMED_KEYS = new Set([
   'soul_rank_craft_speed', 'skills', 'skill_colors', 'combat_moves', 'learned_moves', 'hp', 'full_stomach',
   'sanity', 'physical_health', 'hunger_type', 'worker_sick', 'friendship_points', 'current_work_suitability',
   'exp', 'storage_slot', 'pal_box_slot_index', 'skill_ranks', 'raw_property_names',
-  'location', 'save', 'save_id', 'owner_name', 'source_file'
+  'location', 'save', 'save_id', 'owner_name', 'source_file', 'elements', 'work', 'work_bonus',
+  'work_kindling', 'work_watering', 'work_planting', 'work_electricity', 'work_handiwork', 'work_gathering', 'work_lumbering',
+  'work_mining', 'work_medicine', 'work_cooling', 'work_transporting', 'work_farming'
 ]);
 
 function toTitle(key: string): string {
