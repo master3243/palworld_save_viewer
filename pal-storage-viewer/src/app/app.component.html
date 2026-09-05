@@ -1,6 +1,7 @@
 <main
   class="page"
   [class.compact]="hasData"
+  [class.fullscreen]="hasData && isFullscreen"
   [class.dragging-over]="hasData && isDragging"
   (drop)="onDrop($event)"
   (dragover)="onDragOver($event)"
@@ -203,13 +204,12 @@
         <small class="modal-subtitle" *ngIf="pendingPalTotal !== null">{{ pendingPalTotal | number }} pals</small>
       </h2>
       <div class="confirm-list">
-        <div class="confirm-folder" *ngFor="let folder of pendingFolders">
+        <div class="confirm-folder" *ngFor="let folder of pendingFolders; trackBy: trackPendingFolder">
           <div class="confirm-folder-name" [title]="folder.folder">{{ folder.folder || 'Loose files' }}</div>
           <ul>
-            <li *ngFor="let file of folder.files">
+            <li *ngFor="let file of folder.files; trackBy: trackPendingFile">
               <span class="source-kind" [attr.data-kind]="file.kind" [title]="kindTitle(file.kind)">{{ kindTag(file.kind) }}</span>
               <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
-              <span class="source-blurb">{{ kindBlurb(file.kind) }}</span>
               <span class="confirm-file-pals" [class.pending]="file.pals === undefined">{{ pendingPalLabel(file) }}</span>
               <span class="confirm-file-size">{{ formatSize(file.size) }}</span>
               <button
@@ -234,7 +234,29 @@
 
   <p class="error" *ngIf="error">{{ error }}</p>
 
-  <section class="table-shell" *ngIf="hasData">
+  <section class="table-shell" *ngIf="hasData" [style.max-width.px]="isFullscreen ? null : tableWidth">
+    <div
+      *ngIf="!isFullscreen"
+      class="resize-handle left"
+      [class.dragging]="resizing"
+      title="Drag to resize the table, double-click to reset"
+      (pointerdown)="startResize($event, 'left')"
+      (dblclick)="resetTableWidth()"
+    ></div>
+    <div
+      *ngIf="!isFullscreen"
+      class="resize-handle corner"
+      [class.dragging]="resizing"
+      title="Drag to resize the table width, double-click to reset"
+      (pointerdown)="startResize($event, 'right')"
+      (dblclick)="resetTableWidth()"
+    >
+      <svg viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M11 1v10H1"/>
+        <path d="M11 5v6H5"/>
+        <path d="M11 9v2H9"/>
+      </svg>
+    </div>
     <div class="sources-bar" [class.open]="isSourcesOpen" aria-label="Loaded save files">
       <div class="sources-row">
         <button
@@ -340,6 +362,21 @@
         (click)="toggleColumnMenu()"
       >
         &#9881;
+      </button>
+      <button
+        class="gear-button fullscreen-button"
+        type="button"
+        [attr.aria-label]="isFullscreen ? 'Exit full screen' : 'Full screen table'"
+        [attr.aria-pressed]="isFullscreen"
+        [title]="isFullscreen ? 'Exit full screen (Esc)' : 'Full screen table'"
+        (click)="toggleFullscreen()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="!isFullscreen">
+          <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>
+        </svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="isFullscreen">
+          <path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/>
+        </svg>
       </button>
 
       <div class="column-menu" *ngIf="isColumnMenuOpen">

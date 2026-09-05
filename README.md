@@ -4,23 +4,27 @@ A local viewer for your Palworld save files that lists every Pal you own with al
 
 Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, and dimensional storage.
 
-# BROWSER VERSION: https://master3243.github.io/palworld_save_viewer/
+# BROWSER VERSION:
+
+## [https://master3243.github.io/palworld_save_viewer/](https://master3243.github.io/palworld_save_viewer/)
 
 ## How do I use it?
 
-Simply open the browser a click the "demo" button (to load my personal save file).
+Simply open the link, click the "demo" then "Load" buttons to load my personal save file. Now you'll see all the Pals I have with detailed stats and support for arbitrarily complex search filters (even across multiple save files).
 
-If you want to actually use it, drop your save file/folder to see all the Pals with their stats.
+If you want to actually use it (not just a demo), drop your save file/folder to see all the Pals with their stats.
 
-For Steam: the save folder is located at:
+For Steam users, the save folder is located at:
 
 ```
 %LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\
 ```
 
-Where `IDprofile` and `IDworld` are long random numbers. Inside it, `Level.sav` holds party, Pal Box and base Pals, `Players\xxx.sav` tells which container is whose, and `Players\xxx_dps.sav` is the dimensional storage.
+Where `IDprofile` and `IDworld` are long random numbers. Inside it, `Level.sav` holds all Pal info (other than the dimensional storage), `Players\xxx_dps.sav` is the dimensional storage Pals, and `Players\xxx.sav` for tiny metadata mapping Pals to either a base or party.
 
-You can also drop single files, and add files from other worlds later to compare them in one table. Or choose the demo save file (my personal dimensional storage).
+For best results, drop these three items: the "Level.sav" file, "LevelMeta.sav" file, and the "Players" folder (contains 2 files).
+
+<img src="resources/paste.png" alt="Example of files to drop" width="500" />
 
 ## Can you fix X bug or implement Y feature?
 
@@ -62,32 +66,31 @@ Resources used while building the save decoder
 
 - [palworld-plm-tools](https://github.com/DYSCreations/palworld-plm-tools)
   - Used as a reference for the Palworld `PlM1` save wrapper and Oodle-compressed `GVAS` payload shape.
-
 - [pyooz](https://pypi.org/project/pyooz/)
   - Used by the Python extractor to decompress the Oodle/Kraken save payload locally.
-
 - [Palworld Server Manager active skills data](https://github.com/amantu-qbit/palworld-server-manager/blob/main/bridge/data/active_skills.json)
   - Map internal combat move IDs to readable names.
-
 - [Palworld Server Manager passive skills data](https://github.com/amantu-qbit/palworld-server-manager/blob/main/bridge/data/passive_skills.json)
   - Map internal passive skill IDs to in-game display names.
-
 - [AdminCommands Pal data](https://github.com/dkoz/AdminCommands/blob/main/AdminCommands/Scripts/enums/paldata.lua)
   - Map internal Pal species IDs to in-game Pal names.
-
 - [PalScouter passive ranks](https://github.com/tanguyannequin-dev/mod-palworld/blob/main/PalScouter/Scripts/passive_ranks.lua)
   - Map passive skill IDs to fixed rank/color tiers.
+
+
 
 ## Save files supported
 
 Dropping a whole world save folder onto the viewer provides the most complete view as it automatically decodes all relevant files (everything is decoded in the browser, nothing is uploaded).
 
-| File | Where it lives | What it contributes |
-| --- | --- | --- |
-| `Level.sav` | world folder | Every Pal in the world: party, Pal Box and base workers, plus base camps and player names |
-| `Players/<uid>.sav` | world folder | Which container is that player's party and which is their Pal Box |
-| `Players/<uid>_dps.sav` | world folder | Dimensional Pal Storage (up to 9,600 Pals) |
-| `LevelMeta.sav` | world folder | World name (used to label the save) |
-| `LocalData.sav`, `WorldOption.sav` | world folder | Skipped, they contain no Pals |
+
+| File                               | Where it lives | What it contributes                                                                                     |
+| ---------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------|
+| `Level.sav`                        | world folder   | Data for every Pal (minus the dimensional storage)                                                      |
+| `Players/<uid>_dps.sav`            | world folder   | Dimensional Pal Storage (up to 9,600 Pals)                                                              |
+| `Players/<uid>.sav`                | world folder   | Metadata mapping container to either player\'s party or Pal Box (mostly can be inferred and not needed) |
+| `LevelMeta.sav`                    | world folder   | Metadata used to label the save                                                                         |
+| `LocalData.sav`, `WorldOption.sav` | world folder   | Skipped, contain no useful info for us                                                                  |
+
 
 Files from different worlds can be loaded side by side and the table will show which save file each Pal belongs to.

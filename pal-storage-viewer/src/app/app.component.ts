@@ -112,7 +112,11 @@ export class AppComponent {
   pendingAppend = false;
   pendingIgnored = 0;
 
-  get pendingFolders(): PendingFolder[] {
+  /** Grouped view of pendingFiles. Rebuilt only when the list changes, so the rows keep
+   *  their DOM nodes between change-detection passes and clicks land on them. */
+  pendingFolders: PendingFolder[] = [];
+
+  private rebuildPendingFolders(): void {
     const folders = new Map<string, PendingFolder>();
     for (const file of this.pendingFiles ?? []) {
       let entry = folders.get(file.folder);
@@ -122,7 +126,15 @@ export class AppComponent {
       }
       entry.files.push(file);
     }
-    return Array.from(folders.values());
+    this.pendingFolders = Array.from(folders.values());
+  }
+
+  trackPendingFolder(_index: number, folder: PendingFolder): string {
+    return folder.folder;
+  }
+
+  trackPendingFile(_index: number, file: PendingFile): SaveInput {
+    return file.input;
   }
 
   get pendingFileCount(): number {
@@ -232,6 +244,56 @@ export class AppComponent {
   isDragging = false;
   isColumnMenuOpen = false;
   isExportMenuOpen = false;
+  isFullscreen = false;
+  /** User-chosen table width in px (null = the stylesheet default). Resets on reload. */
+  tableWidth: number | null = null;
+  resizing = false;
+  private resizeStart: { x: number; width: number; side: 'left' | 'right' } | null = null;
+  private static readonly MIN_TABLE_WIDTH = 720;
+
+  private readTableWidthLimit(): number {
+    // Keep the page's horizontal padding visible on both sides.
+    return Math.max(AppComponent.MIN_TABLE_WIDTH, window.innerWidth - 2 * 32);
+  }
+
+  startResize(event: PointerEvent, side: 'left' | 'right'): void {
+    if (event.button !== 0) return;
+    const shell = (event.currentTarget as HTMLElement).parentElement;
+    if (!shell) return;
+    event.preventDefault();
+    this.resizeStart = { x: event.clientX, width: shell.getBoundingClientRect().width, side };
+    this.resizing = true;
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    // Listen only for the duration of the drag; a permanent document listener would run
+    // change detection on every mouse move across the whole page.
+    document.addEventListener('pointermove', this.onResizeMove);
+    document.addEventListener('pointerup', this.onResizeEnd);
+    document.addEventListener('pointercancel', this.onResizeEnd);
+  }
+
+  private readonly onResizeMove = (event: PointerEvent): void => {
+    if (!this.resizeStart) return;
+    const pulled = (event.clientX - this.resizeStart.x) * (this.resizeStart.side === 'right' ? 1 : -1);
+    // The table is centred, so moving one edge out by d widens it by 2d to stay symmetric.
+    const width = this.resizeStart.width + pulled * 2;
+    this.tableWidth = Math.round(Math.min(this.readTableWidthLimit(), Math.max(AppComponent.MIN_TABLE_WIDTH, width)));
+    this.changeDetector.markForCheck();
+  };
+
+  private readonly onResizeEnd = (): void => {
+    document.removeEventListener('pointermove', this.onResizeMove);
+    document.removeEventListener('pointerup', this.onResizeEnd);
+    document.removeEventListener('pointercancel', this.onResizeEnd);
+    if (!this.resizeStart) return;
+    this.resizeStart = null;
+    this.resizing = false;
+    this.scheduleMeasure();
+  };
+
+  resetTableWidth(): void {
+    this.tableWidth = null;
+    this.scheduleMeasure();
+  }
   isDemoPromptOpen = false;
   isDropHelpOpen = false;
   openRowIndex: number | null = null;
@@ -480,6 +542,7 @@ export class AppComponent {
       added.push(file);
     }
     this.pendingFiles = pending;
+    this.rebuildPendingFolders();
     this.pendingAppend = this.pendingFiles && this.pendingAppend ? true : append;
     this.pendingIgnored += inputs.length - candidates.length;
     // Preview counts arrive one file at a time while the user reads the list.
@@ -507,7 +570,11 @@ export class AppComponent {
   removePendingFile(file: PendingFile): void {
     if (!this.pendingFiles) return;
     this.pendingFiles = this.pendingFiles.filter((entry) => entry !== file);
-    if (!this.pendingFiles.length) this.cancelPending();
+    if (!this.pendingFiles.length) {
+      this.cancelPending();
+      return;
+    }
+    this.rebuildPendingFolders();
   }
 
   async confirmPending(): Promise<void> {
@@ -519,6 +586,7 @@ export class AppComponent {
 
   cancelPending(): void {
     this.pendingFiles = null;
+    this.pendingFolders = [];
     this.pendingAppend = false;
     this.pendingIgnored = 0;
   }
@@ -553,10 +621,10 @@ export class AppComponent {
   /** Tooltip explaining what a file kind is for. */
   kindTitle(kind: string): string {
     switch (kind) {
-      case 'level': return 'Level.sav: the world save. Every pal in the party, Pal Box and bases, plus base camps and player names.';
-      case 'dimensional_storage': return 'Dimensional Pal Storage: the extra storage with up to 9,600 slots.';
-      case 'player': return 'Player save: says which container is this player\'s party and which is their Pal Box.';
-      case 'level_meta': return 'World info: world name, host and in-game day, used to label the save.';
+      case 'level': return 'Data for every Pal (minus the dimensional storage)';
+      case 'dimensional_storage': return 'Dimensional Pal Storage.';
+      case 'player': return 'Metadata mapping container to either player\'s party or Pal Box (mostly can be inferred and not needed).';
+      case 'level_meta': return 'Metadata used to label the save.';
       default: return 'Not a pal save; ignored.';
     }
   }
@@ -700,9 +768,15 @@ export class AppComponent {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    const hadOverlay = this.isDemoPromptOpen || this.pendingFiles !== null || this.isExportMenuOpen
+      || this.isColumnMenuOpen || this.isDropHelpOpen;
     this.closeDemoPrompt();
     this.cancelPending();
     this.isExportMenuOpen = false;
+    this.isColumnMenuOpen = false;
+    if (!hadOverlay && this.isFullscreen) {
+      this.toggleFullscreen();
+    }
   }
 
   async loadDemoSave(): Promise<void> {
@@ -847,6 +921,14 @@ export class AppComponent {
 
   trackSource(index: number): number {
     return index;
+  }
+
+  toggleFullscreen(): void {
+    this.isFullscreen = !this.isFullscreen;
+    this.isColumnMenuOpen = false;
+    this.isExportMenuOpen = false;
+    // The table's virtual scroller sizes itself from the viewport; remeasure after the layout change.
+    this.scheduleMeasure();
   }
 
   toggleColumnMenu(): void {

@@ -13,11 +13,17 @@
   border-radius: 8px;
   display: flex;
   /* Gives way before the chip row does, so chips stay on one line when they fit. */
-  flex: 1 2 300px;
+  flex: 1 2 320px;
   height: 32px;
-  max-width: 415px;
+  max-width: 440px;
   min-width: 200px;
   position: relative;
+}
+
+/* The full-screen table has room to spare, so let the search box stretch. */
+:host-context(.page.fullscreen) .search {
+  flex-basis: 520px;
+  max-width: 760px;
 }
 
 .search:focus-within {

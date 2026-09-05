@@ -262,7 +262,79 @@
   margin: 0 auto;
   max-width: 1440px;
   overflow: hidden;
+  position: relative;
   width: 100%;
+}
+
+/* Grab strips on both vertical edges; drag to widen or narrow the table. */
+.resize-handle {
+  bottom: 0;
+  cursor: ew-resize;
+  position: absolute;
+  top: 0;
+  touch-action: none;
+  width: 10px;
+  z-index: 6;
+}
+
+.resize-handle.left {
+  left: 0;
+}
+
+/* Bottom-right corner grip: the right edge itself is left free for the scrollbar. */
+.resize-handle.corner {
+  align-items: flex-end;
+  bottom: 0;
+  color: rgba(144, 226, 255, 0.55);
+  display: flex;
+  height: 22px;
+  justify-content: flex-end;
+  padding: 0 3px 3px 0;
+  right: 0;
+  top: auto;
+  width: 22px;
+}
+
+.resize-handle.corner svg {
+  fill: none;
+  height: 12px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+  width: 12px;
+}
+
+.resize-handle.corner:hover,
+.resize-handle.corner.dragging {
+  color: #9de3ff;
+}
+
+.resize-handle.corner::after {
+  display: none;
+}
+
+.resize-handle::after {
+  background: rgba(144, 226, 255, 0);
+  bottom: 0;
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 3px;
+}
+
+.resize-handle.left::after {
+  left: 0;
+}
+
+.resize-handle:hover::after,
+.resize-handle.dragging::after {
+  background: rgba(144, 226, 255, 0.75);
+}
+
+.page:has(.resize-handle.dragging) {
+  cursor: ew-resize;
+  user-select: none;
 }
 
 .table-tools {
@@ -1638,4 +1710,34 @@ td.where-cell {
 
 .faq-footer-github span {
   font-size: 0.85rem;
+}
+
+
+/* Full screen table -------------------------------------------------- */
+.fullscreen-button svg {
+  fill: none;
+  height: 18px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 18px;
+}
+
+.page.fullscreen {
+  gap: 0;
+  padding: 0;
+}
+
+.page.fullscreen .toolbar,
+.page.fullscreen .sources-bar,
+.page.fullscreen .github-meta {
+  display: none;
+}
+
+.page.fullscreen .table-shell {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: none;
 }
