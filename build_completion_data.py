@@ -37,6 +37,10 @@ FILES = {
     "psp/l10n/relics.json": (PSP, "l10n/en/relics.json"),
     "psp/l10n/towers.json": (PSP, "l10n/en/towers.json"),
     "psp/l10n/pals.json": (PSP, "l10n/en/pals.json"),
+    "psp/technologies.json": (PSP, "technologies.json"),
+    "psp/items.json": (PSP, "items.json"),
+    "psp/l10n/items.json": (PSP, "l10n/en/items.json"),
+    "psp/l10n/technologies.json": (PSP, "l10n/en/technologies.json"),
     "pwst/world_map_areas.json": (PWST, "world_map_areas.json"),
     "pwst/fast_travel_points.json": (PWST, "fast_travel_points.json"),
 }
@@ -228,6 +232,34 @@ def build(cache: Path) -> dict:
         paldeck.append([tribe, index, pal_name(tribe)])
     paldeck.sort(key=lambda p: (p[1], p[0]))
 
+    # Technologies: [id, name, required level, ancient?]; the save lists unlocked ids by name.
+    tech_raw = load(cache, "psp/technologies.json")
+    tech_l10n = load(cache, "psp/l10n/technologies.json")
+    technologies = []
+    for tech_id, value in tech_raw.items():
+        if value.get("disabled"):
+            continue
+        name = (tech_l10n.get(tech_id) or {}).get("localized_name") or humanize(tech_id)
+        technologies.append([tech_id, name, value.get("level_cap") or 0, 1 if value.get("is_boss_technology") else 0])
+    technologies.sort(key=lambda t: (t[2], t[3], t[1]))
+
+    # Raid bosses: one entry per summoning slab; the save counts defeats under the slab's item id.
+    items_raw = load(cache, "psp/items.json")
+    items_l10n = load(cache, "psp/l10n/items.json")
+    raids = []
+    for item_id, value in items_raw.items():
+        if not item_id.startswith("PalSummon_") or value.get("type_a") != "Consume" or value.get("disabled"):
+            continue
+        ultra = item_id.endswith("_2")
+        tribe = item_id[len("PalSummon_"):-2 if ultra else None]
+        l10n_entry = l10n_pals.get("RAID_" + tribe) or l10n_pals.get(tribe)
+        name = l10n_entry["localized_name"] if l10n_entry and l10n_entry.get("localized_name") else pal_name(tribe)
+        if name == humanize(tribe):
+            item_name = (items_l10n.get(item_id) or {}).get("localized_name") or name
+            name = re.sub(r"(\'s)? ?(Slab|Sigil)( \[Master\])?$", "", item_name).replace(" (Ultra)", "")
+        raids.append([item_id, f"{name} (Ultra)" if ultra else name, 1 if ultra else 0])
+    raids.sort(key=lambda r: (r[2], r[1]))
+
     return {
         "generated": "2026-09-05",
         "sources": {
@@ -244,6 +276,8 @@ def build(cache: Path) -> dict:
         "areas": areas,
         "ruinPickups": ruins,
         "paldeck": paldeck,
+        "technologies": technologies,
+        "raids": raids,
     }
 
 
@@ -253,7 +287,7 @@ def main() -> None:
     data = build(cache)
     OUT.write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB)")
-    for key in ("relics", "fastTravel", "notes", "quests", "bosses", "towers", "areas", "ruinPickups", "paldeck"):
+    for key in ("relics", "fastTravel", "notes", "quests", "bosses", "towers", "areas", "ruinPickups", "paldeck", "technologies", "raids"):
         print(f"  {key}: {len(data[key])}")
     print("  relic types:", [(t['key'], sum(1 for r in data['relics'].values() if r[0] == i)) for i, t in enumerate(data['relicTypes'])])
 

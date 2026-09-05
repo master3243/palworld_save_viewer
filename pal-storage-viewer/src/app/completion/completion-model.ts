@@ -27,6 +27,10 @@ export interface CompletionData {
   ruinPickups: Record<string, [number, number, number]>;
   /** [tribe id, paldeck number, name] */
   paldeck: [string, number, string][];
+  /** [technology id, name, required level, ancient (boss) technology?] */
+  technologies: [string, string, number, number][];
+  /** [summoning slab item id, boss name, ultra?] */
+  raids: [string, string, number][];
 }
 
 export type ItemState = 'done' | 'active' | 'todo';
@@ -45,6 +49,8 @@ export interface TrackedItem {
   map: string;
   /** Sort key within the category (paldeck number, level, name). */
   order: number;
+  /** Number shown in its own column (Paldeck number, technology tier), or null. */
+  no: number | null;
 }
 
 export interface TrackedGroup {
@@ -66,6 +72,10 @@ export interface Category {
   unknown: string[];
   /** Items with real coordinates, so the list can offer them. */
   hasCoords: boolean;
+  /** Items carry a number column. */
+  hasNumbers: boolean;
+  /** Header for the number column. */
+  numberLabel: string;
 }
 
 export interface StatEntry {
@@ -112,12 +122,17 @@ function percentOf(done: number, total: number): number {
 
 const STATE_RANK: Record<ItemState, number> = { active: 0, todo: 1, done: 2 };
 
-function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoords'>): Category {
+function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoords' | 'hasNumbers' | 'numberLabel'>, numberLabel = 'No.'): Category {
   const done = category.items.filter((item) => item.state === 'done').length;
   const total = category.items.length;
   // In progress first, then missing, then done; within a state by the category's own order.
   category.items.sort((a, b) => STATE_RANK[a.state] - STATE_RANK[b.state] || a.order - b.order || a.name.localeCompare(b.name));
-  return { ...category, done, total, percent: percentOf(done, total), hasCoords: category.items.some((item) => item.coords !== '') };
+  return {
+    ...category, done, total, percent: percentOf(done, total),
+    hasCoords: category.items.some((item) => item.coords !== ''),
+    hasNumbers: category.items.some((item) => item.no !== null),
+    numberLabel,
+  };
 }
 
 function groupsOf(items: TrackedItem[], names: Map<string, string>): TrackedGroup[] {
@@ -145,20 +160,46 @@ function lowerKeys<T>(entries: Record<string, T>): Map<string, T> {
 function paldeckCategory(record: PlayerCompletion, data: CompletionData): Category {
   const unlocked = new Set(record.paldeck.map((tribe) => tribe.toLowerCase()));
   const caughtBy = lowerKeys(record.capture_counts);
-  const bonusBy = lowerKeys(record.capture_bonus_counts);
   const items: TrackedItem[] = data.paldeck.map(([tribe, index, name]) => {
     const key = tribe.toLowerCase();
-    const caught = caughtBy.get(key) ?? 0;
-    const bonus = bonusBy.get(key) ?? 0;
     const done = unlocked.has(key);
-    const progress = done ? ` · caught ${caught}${bonus >= CAPTURE_BONUS_MAX ? ' · capture bonus complete' : ` · bonus ${bonus}/${CAPTURE_BONUS_MAX}`}` : '';
-    return { id: tribe, name, detail: `No. ${index}${progress}`, state: done ? 'done' : 'todo', group: '', coords: '', map: '', order: index };
+    const caught = caughtBy.get(key) ?? 0;
+    return { id: tribe, name, detail: done ? `caught ${caught}` : '', state: done ? 'done' : 'todo', group: '', coords: '', map: '', order: index, no: index };
   });
   const known = new Set(data.paldeck.map(([tribe]) => tribe.toLowerCase()));
   return finish({
     key: 'paldeck', title: 'Paldeck', items, groups: [],
     unknown: record.paldeck.filter((tribe) => !known.has(tribe.toLowerCase())).sort(),
   });
+}
+
+/** Catching several of each species fills the Paldeck capture bonus. */
+function captureBonusCategory(record: PlayerCompletion, data: CompletionData): Category {
+  const caughtBy = lowerKeys(record.capture_counts);
+  const bonusBy = lowerKeys(record.capture_bonus_counts);
+  const items: TrackedItem[] = data.paldeck.map(([tribe, index, name]) => {
+    const key = tribe.toLowerCase();
+    const bonus = Math.min(CAPTURE_BONUS_MAX, bonusBy.get(key) ?? 0);
+    const caught = caughtBy.get(key) ?? 0;
+    let state: ItemState = 'todo';
+    if (bonus >= CAPTURE_BONUS_MAX) state = 'done';
+    else if (bonus > 0) state = 'active';
+    return { id: tribe, name, detail: `caught ${caught} / ${CAPTURE_BONUS_MAX}`, state, group: '', coords: '', map: '', order: index, no: index };
+  });
+  return finish({ key: 'captureBonus', title: 'Capture bonus', items, groups: [], unknown: [] });
+}
+
+function technologyCategory(record: PlayerCompletion, data: CompletionData): Category {
+  const unlocked = new Set(record.technologies);
+  const items: TrackedItem[] = data.technologies.map(([id, name, level, ancient]) => ({
+    id, name, detail: '', state: unlocked.has(id) ? 'done' : 'todo', group: ancient ? 'ancient' : 'regular', coords: '', map: '', order: level, no: level,
+  }));
+  const names = new Map([['regular', 'Technology'], ['ancient', 'Ancient technology']]);
+  const known = new Set(data.technologies.map(([id]) => id));
+  return finish({
+    key: 'technologies', title: 'Technologies', items, groups: groupsOf(items, names),
+    unknown: record.technologies.filter((id) => !known.has(id)).sort(),
+  }, 'Level');
 }
 
 function relicCategory(record: PlayerCompletion, data: CompletionData): Category {
@@ -169,7 +210,7 @@ function relicCategory(record: PlayerCompletion, data: CompletionData): Category
     const type = data.relicTypes[typeIndex];
     return {
       id, name: type?.item ?? 'Effigy', detail: type?.name ?? '', state: obtained.has(id) ? 'done' : 'todo',
-      group: type?.key ?? '', ...place(x, y), order: typeIndex,
+      group: type?.key ?? '', ...place(x, y), order: typeIndex, no: null,
     };
   });
   return finish({
@@ -182,7 +223,7 @@ function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Cat
   const unlocked = new Set(record.fast_travel);
   const items: TrackedItem[] = Object.entries(data.fastTravel).map(([id, [name, x, y, , pointId]]) => ({
     id, name, detail: pointId.startsWith('FTPoint') ? '' : pointId.replace(/_/g, ' '), state: unlocked.has(id) ? 'done' : 'todo',
-    group: '', ...place(x, y), order: 0,
+    group: '', ...place(x, y), order: 0, no: null,
   }));
   return finish({
     key: 'fastTravel', title: 'Fast travel', items, groups: [],
@@ -193,7 +234,7 @@ function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Cat
 function noteCategory(record: PlayerCompletion, data: CompletionData): Category {
   const found = new Set(record.notes);
   const items: TrackedItem[] = Object.entries(data.notes).map(([id, [name, x, y]]) => ({
-    id, name, detail: '', state: found.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0,
+    id, name, detail: '', state: found.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null,
   }));
   return finish({
     key: 'notes', title: 'Journals', items, groups: [],
@@ -218,7 +259,7 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
       const progress = counters.map(([key, value]) => `${key.replace(/^QuestBlock_DeliveryItem_/, '').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()} ${value}`);
       detail = ['in progress', quest.block > 0 ? `step ${quest.block + 1}` : '', ...progress].filter(Boolean).join(' · ');
     }
-    items.push({ id, name, detail, state, group: '', coords: '', map: '', order: 0 });
+    items.push({ id, name, detail, state, group: '', coords: '', map: '', order: 0, no: null });
   }
   const known = new Set(Object.keys(data.quests));
   const key = kind === 'Main' ? 'mainQuests' : 'sideQuests';
@@ -227,18 +268,47 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
   });
 }
 
+/** Tower flags the save records that are not real towers (no Hard mode). */
+const EXTRA_TOWER_FLAGS = new Set([
+  'BOSS_BATTLE_NAME_KingWhaleBoss', 'BOSS_BATTLE_NAME_WorldTreeMiddleBoss1', 'BOSS_BATTLE_NAME_WorldTreeMiddleBoss2', 'BOSS_BATTLE_NAME_WorldTreeMiddleBoss3',
+]);
+
 function towerCategory(record: PlayerCompletion, data: CompletionData): Category {
   const beaten = new Set(record.tower_bosses);
   const items: TrackedItem[] = Object.entries(data.towers).map(([id, [name, x, y]]) => {
     const countKey = id.replace('BOSS_BATTLE_NAME_', '') + '_Normal';
     const count = record.tower_boss_counts[countKey];
     return {
-      id, name, detail: count ? `defeated ${count}×` : '', state: beaten.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0,
+      id, name, detail: count ? `defeated ${count}×` : '', state: beaten.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null,
     };
   });
   return finish({
     key: 'towers', title: 'Tower bosses', items, groups: [],
     unknown: unknownIds(record.tower_bosses, new Set(Object.keys(data.towers))),
+  });
+}
+
+/** Tower bosses beaten on Hard; only the eight real towers offer that difficulty. */
+function towerHardCategory(record: PlayerCompletion, data: CompletionData): Category {
+  const items: TrackedItem[] = Object.entries(data.towers)
+    .filter(([id]) => !EXTRA_TOWER_FLAGS.has(id))
+    .map(([id, [name, x, y]]) => {
+      const count = record.tower_boss_counts[id.replace('BOSS_BATTLE_NAME_', '') + '_Hard'] ?? 0;
+      return { id: `${id}_Hard`, name, detail: count ? `defeated ${count}×` : '', state: count > 0 ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null };
+    });
+  return finish({ key: 'towersHard', title: 'Tower bosses (Hard)', items, groups: [], unknown: [] });
+}
+
+function raidCategory(record: PlayerCompletion, data: CompletionData): Category {
+  const items: TrackedItem[] = data.raids.map(([id, name, ultra]) => {
+    const count = record.raid_boss_counts[id] ?? 0;
+    return { id, name, detail: count ? `defeated ${count}×` : '', state: count > 0 ? 'done' : 'todo', group: ultra ? 'ultra' : 'normal', coords: '', map: '', order: ultra, no: null };
+  });
+  const names = new Map([['normal', 'Normal'], ['ultra', 'Ultra']]);
+  const known = new Set(data.raids.map(([id]) => id));
+  return finish({
+    key: 'raids', title: 'Raid bosses', items, groups: groupsOf(items, names),
+    unknown: Object.keys(record.raid_boss_counts).filter((id) => !known.has(id)).sort(),
   });
 }
 
@@ -251,7 +321,7 @@ function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: str
     seen.add(spawner);
     items.push({
       id: spawner, name, detail: level ? `Lv. ${level}` : '', state: beaten.has(spawner) ? 'done' : 'todo',
-      group: kind, ...place(x, y), order: level,
+      group: kind, ...place(x, y), order: level, no: null,
     });
   }
   const known = new Set(data.bosses.filter(([, , , kind]) => kinds.includes(kind)).map(([spawner]) => spawner));
@@ -265,7 +335,7 @@ function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: str
 function areaCategory(record: PlayerCompletion, data: CompletionData): Category {
   const found = new Set(record.areas.map((area) => area.toLowerCase()));
   const items: TrackedItem[] = Object.entries(data.areas).map(([id, name]) => ({
-    id, name, detail: '', state: found.has(id.toLowerCase()) ? 'done' : 'todo', group: '', coords: '', map: '', order: 0,
+    id, name, detail: '', state: found.has(id.toLowerCase()) ? 'done' : 'todo', group: '', coords: '', map: '', order: 0, no: null,
   }));
   const known = new Set(Object.keys(data.areas).map((id) => id.toLowerCase()));
   return finish({
@@ -277,7 +347,7 @@ function areaCategory(record: PlayerCompletion, data: CompletionData): Category 
 function ruinCategory(record: PlayerCompletion, data: CompletionData): Category {
   const taken = new Set(record.item_pickups);
   const items: TrackedItem[] = Object.entries(data.ruinPickups).map(([id, [x, y]]) => ({
-    id, name: 'Ruin pickup', detail: '', state: taken.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0,
+    id, name: 'Ruin pickup', detail: '', state: taken.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null,
   }));
   return finish({
     key: 'ruins', title: 'Ruin pickups', items, groups: [],
@@ -295,8 +365,11 @@ function stat(label: string, value: number | null | undefined, title: string): S
 export function summarize(record: PlayerCompletion, data: CompletionData): CompletionSummary {
   const categories = [
     paldeckCategory(record, data),
+    captureBonusCategory(record, data),
     relicCategory(record, data),
     towerCategory(record, data),
+    towerHardCategory(record, data),
+    raidCategory(record, data),
     bossCategory(record, data, ['alpha', 'boss'], 'alphas', 'Alpha Pals'),
     bossCategory(record, data, ['bounty'], 'bounties', 'Bounty targets'),
     questCategory(record, data, 'Main'),
@@ -305,25 +378,23 @@ export function summarize(record: PlayerCompletion, data: CompletionData): Compl
     fastTravelCategory(record, data),
     areaCategory(record, data),
     ruinCategory(record, data),
+    technologyCategory(record, data),
   ];
   const counted = categories.filter((category) => category.total > 0);
   const percent = counted.length ? Math.round((counted.reduce((sum, category) => sum + category.percent, 0) / counted.length) * 10) / 10 : 0;
   const done = categories.reduce((sum, category) => sum + category.done, 0);
   const total = categories.reduce((sum, category) => sum + category.total, 0);
   const counters = record.counters;
-  const raids = Object.values(record.raid_boss_counts).reduce((sum, value) => sum + value, 0);
   const stats = [
     stat('Dungeons', counters.normal_dungeon_clears, 'Random dungeons cleared'),
     stat('Fixed dungeons', counters.fixed_dungeon_clears, 'Fixed (story) dungeons cleared'),
     stat('Oil rigs', counters.oilrig_clears, 'Oil rig raids cleared'),
     stat('Camps', counters.camps_conquered, 'Syndicate camps conquered'),
     stat('Treasures', counters.treasures_found, 'Treasure map spots dug up'),
-    stat('Raids', raids, 'Raid bosses summoned and defeated'),
     stat('Predators', counters.predator_defeats, 'Predator pals defeated'),
     stat('Mutations', counters.mutations, 'Mutated pals bred'),
     stat('Captures', counters.tribe_captures, 'Distinct pal species captured'),
     stat('Skins', record.skins.length, 'Pal skins owned'),
-    stat('Technologies', counters.unlocked_recipes, 'Technologies unlocked'),
     stat('Unspent effigies', counters.relics_unspent, 'Effigies not yet offered at a Statue of Power'),
   ].filter((entry): entry is StatEntry => entry !== null);
   return { categories, percent, done, total, stats };

@@ -461,6 +461,14 @@
   background: #ffd37a;
 }
 
+.no-col {
+  color: rgba(232, 248, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+  width: 56px;
+}
+
 .name-col {
   font-weight: 600;
 }

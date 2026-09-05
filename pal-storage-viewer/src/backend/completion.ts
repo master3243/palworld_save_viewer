@@ -52,6 +52,8 @@ export interface PlayerCompletion {
   quests_completed: string[];
   quests_active: ActiveQuest[];
   skins: string[];
+  /** Unlocked technology ids (UnlockedRecipeTechnologyNames). */
+  technologies: string[];
   counters: CompletionCounters;
 }
 
@@ -265,6 +267,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
   }
 
   const relicsUnspent = numbers(readScalarMap(buf, 'RelicPossessNumMap'), 'EPalRelicType::');
+  const technologies = readNameList(buf, 'UnlockedRecipeTechnologyNames');
   return {
     tower_bosses: trueKeys(readScalarMap(buf, 'TowerBossDefeatFlag')),
     tower_boss_counts: numbers(readScalarMap(buf, 'TowerBossDefeatCount')),
@@ -288,6 +291,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
     skins: readStructArrayWithMaps(buf, 'InGameData')
       .map((item) => item['SkinName'])
       .filter((name): name is string => typeof name === 'string' && name !== ''),
+    technologies,
     counters: {
       predator_defeats: readIntAt(buf, 'PredatorDefeatCount'),
       tribe_captures: readIntAt(buf, 'TribeCaptureCount'),
@@ -300,7 +304,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
       relics_unspent: Object.values(relicsUnspent).reduce((sum, value) => sum + value, 0),
       technology_points: readIntAt(buf, 'TechnologyPoint'),
       boss_technology_points: readIntAt(buf, 'bossTechnologyPoint'),
-      unlocked_recipes: readNameList(buf, 'UnlockedRecipeTechnologyNames').length,
+      unlocked_recipes: technologies.length,
     },
   };
 }
