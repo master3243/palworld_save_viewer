@@ -54,6 +54,8 @@ export interface PlayerCompletion {
   skins: string[];
   /** Unlocked technology ids (UnlockedRecipeTechnologyNames). */
   technologies: string[];
+  /** Star rank reached ('2'..'5') -> pals condensed to it. */
+  rankup_counts: Record<string, number>;
   counters: CompletionCounters;
 }
 
@@ -292,6 +294,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
       .map((item) => item['SkinName'])
       .filter((name): name is string => typeof name === 'string' && name !== ''),
     technologies,
+    rankup_counts: numbers(readScalarMap(buf, 'PalRankupCount')),
     counters: {
       predator_defeats: readIntAt(buf, 'PredatorDefeatCount'),
       tribe_captures: readIntAt(buf, 'TribeCaptureCount'),
@@ -307,4 +310,38 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
       unlocked_recipes: technologies.length,
     },
   };
+}
+
+/**
+ * Guild lab research progress from Level.sav: one map (research id -> work done) per
+ * guild's PalGuildLabSaveData block. Completion is decided against the research table.
+ */
+export function extractLabResearch(buf: SaveBuffer): Record<string, number>[] {
+  const labs: Record<string, number>[] = [];
+  const marker = 'PalGuildLabSaveData\0';
+  let pos = buf.find(marker);
+  while (pos !== -1) {
+    const raw = findPropertyStart(buf, 'RawData', pos, Math.min(buf.length, pos + 4096));
+    if (raw !== -1) {
+      try {
+        const [, value] = readPropertyValue(buf, raw);
+        if (value instanceof Uint8Array && value.length >= 4) {
+          const block = new SaveBuffer(value);
+          const count = block.i32(0);
+          let at = 4;
+          const progress: Record<string, number> = {};
+          for (let i = 0; i < count && at + 4 <= block.length; i++) {
+            const [id, next] = readFString(block, at);
+            progress[id] = block.f32(next);
+            at = next + 4;
+          }
+          labs.push(progress);
+        }
+      } catch {
+        // Unreadable block: skip it.
+      }
+    }
+    pos = buf.find(marker, pos + marker.length);
+  }
+  return labs;
 }

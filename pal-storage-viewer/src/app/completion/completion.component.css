@@ -312,6 +312,54 @@
   color: #8ef0c2;
 }
 
+.category-card.needs-file {
+  border-color: rgba(255, 123, 123, 0.55);
+}
+
+.category-card.needs-file .bar {
+  background: rgba(255, 123, 123, 0.18);
+}
+
+.card-needs {
+  color: #ffa3a3;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.level-stat.max b {
+  color: #8ef0c2;
+}
+
+.tag-col {
+  white-space: nowrap;
+  width: 70px;
+}
+
+.tag-chip {
+  background: rgba(116, 230, 255, 0.12);
+  border: 1px solid rgba(134, 220, 255, 0.28);
+  border-radius: 999px;
+  color: rgba(232, 248, 255, 0.85);
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  padding: 3px 8px;
+}
+
+.tag-chip[data-tag="Ultra"] {
+  background: rgba(255, 211, 122, 0.14);
+  border-color: rgba(255, 211, 122, 0.45);
+  color: #ffe3a3;
+}
+
+.item-table tr.uncounted td {
+  color: rgba(232, 248, 255, 0.45);
+  font-style: italic;
+}
+
 /* ------------------------------------------------------------ detail */
 
 .category-detail {

@@ -7,7 +7,7 @@ import {
 } from './gvas';
 import { Lookups } from './lookups';
 import { PalRecord, buildRecord } from './record';
-import { PlayerCompletion, extractPlayerCompletion } from './completion';
+import { PlayerCompletion, extractLabResearch, extractPlayerCompletion } from './completion';
 
 export type SaveKind = 'dimensional_storage' | 'level' | 'player' | 'level_meta' | 'world_option' | 'local_data' | 'unknown';
 
@@ -94,6 +94,8 @@ export interface LevelPayload {
   bases: BaseCamp[];
   containers: Record<string, { slots: number; occupied: number }>;
   skipped: { players: number; wild_or_npc: number; unreadable: number };
+  /** Guild lab research progress (research id -> work done), one entry per guild. */
+  labs: Record<string, number>[];
 }
 
 function decodeBaseCamp(raw: Uint8Array): Omit<BaseCamp, 'worker_container_id' | 'index'> | null {
@@ -193,7 +195,13 @@ export function extractLevel(buf: SaveBuffer, lookups: Lookups, progress?: Parse
     containers[typeof id === 'string' ? id : String(id)] = { slots: slots.length, occupied };
   }
 
-  return { records, players, bases, containers, skipped };
+  let labs: Record<string, number>[] = [];
+  try {
+    labs = extractLabResearch(buf);
+  } catch {
+    labs = [];
+  }
+  return { records, players, bases, containers, skipped, labs };
 }
 
 export interface PlayerPayload {

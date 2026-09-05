@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
-import { Category, CompletionData, CompletionSummary, TrackedItem, summarize } from './completion-model';
+import { Category, CompletionData, CompletionSummary, TrackedItem, WorldProgress, summarize } from './completion-model';
 
 interface PlayerOption {
   key: string;
@@ -10,6 +10,8 @@ interface PlayerOption {
   letter: string;
   save: string;
   completion: PlayerCompletion;
+  world: WorldProgress;
+  level: number | null;
 }
 
 /** Radius of the overall progress ring in its 120x120 view box. */
@@ -53,6 +55,8 @@ export class CompletionComponent implements OnChanges {
           letter: set.letter,
           save: set.label,
           completion: player.completion,
+          world: { labs: set.labs ?? [] },
+          level: player.level ?? null,
         });
       }
     }
@@ -77,6 +81,11 @@ export class CompletionComponent implements OnChanges {
     return category.items.filter((item) =>
       (!this.groupFilter || item.group === this.groupFilter)
       && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)));
+  }
+
+  get isMaxLevel(): boolean {
+    const level = this.player?.level;
+    return level !== null && level !== undefined && this.data !== null && level >= this.data.maxLevel;
   }
 
   get ringOffset(): number {
@@ -126,7 +135,7 @@ export class CompletionComponent implements OnChanges {
 
   private recompute(): void {
     const player = this.player;
-    this.summary = player && this.data ? summarize(player.completion, this.data) : null;
+    this.summary = player && this.data ? summarize(player.completion, this.data, player.world) : null;
     if (this.summary && !this.summary.categories.some((category) => category.key === this.selectedCategory)) this.selectedCategory = '';
   }
 

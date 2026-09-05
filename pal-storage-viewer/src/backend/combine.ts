@@ -51,7 +51,9 @@ export interface SaveSetSummary {
   saved_at: string;
   pals: number;
   bases: { index: number; location: { x: number; y: number; z: number } | null; workers: number }[];
-  players: { uid: string; name: string; completion: PlayerCompletion | null }[];
+  players: { uid: string; name: string; level: number | null; completion: PlayerCompletion | null }[];
+  /** Guild lab research progress from Level.sav, one map per guild. */
+  labs: Record<string, number>[];
   has_level: boolean;
   has_dimensional_storage: boolean;
 }
@@ -83,7 +85,9 @@ interface SaveSet {
   saved_at: string;
   players: Set<string>;
   player_names: Map<string, string>;
+  player_levels: Map<string, number | null>;
   completions: Map<string, PlayerCompletion>;
+  labs: Record<string, number>[];
   party_containers: Set<string>;
   pal_box_containers: Set<string>;
   base_containers: Map<string, BaseCamp>;
@@ -199,12 +203,16 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
   } else if (parsed.kind === 'level') {
     set.level_records.push(...parsed.payload.records);
     set.bases.push(...parsed.payload.bases);
+    set.labs.push(...parsed.payload.labs);
     Object.assign(set.containers, parsed.payload.containers);
     for (const base of parsed.payload.bases) {
       if (base.worker_container_id) set.base_containers.set(base.worker_container_id, base);
     }
     for (const player of parsed.payload.players) {
-      if (player.player_uid) set.player_names.set(player.player_uid, player.name ?? '');
+      if (player.player_uid) {
+        set.player_names.set(player.player_uid, player.name ?? '');
+        set.player_levels.set(player.player_uid, player.level);
+      }
     }
     source.pals = parsed.payload.records.length;
     source.players = parsed.payload.players.length;
@@ -238,7 +246,7 @@ export function combineSaves(entries: CombineEntry[]): CombinedSaves {
     if (!set) {
       set = {
         label, letter: '', world_name: '', host_player_name: '', in_game_day: null, saved_at: '',
-        players: new Set(), player_names: new Map(), completions: new Map(), party_containers: new Set(), pal_box_containers: new Set(),
+        players: new Set(), player_names: new Map(), player_levels: new Map(), completions: new Map(), labs: [], party_containers: new Set(), pal_box_containers: new Set(),
         base_containers: new Map(), bases: [], containers: {}, dps_records: [], level_records: [],
       };
       sets.set(label, set);
@@ -301,7 +309,8 @@ export function combineSaves(entries: CombineEntry[]): CombinedSaves {
         location: base.location ?? null,
         workers: set.level_records.filter((record) => record.pal_box.container_id === base.worker_container_id).length,
       })),
-      players: [...playerIds].sort().map((uid) => ({ uid, name: set.player_names.get(uid) ?? '', completion: set.completions.get(uid) ?? null })),
+      players: [...playerIds].sort().map((uid) => ({ uid, name: set.player_names.get(uid) ?? '', level: set.player_levels.get(uid) ?? null, completion: set.completions.get(uid) ?? null })),
+      labs: set.labs,
       has_level: set.level_records.length > 0 || sources.some((source) => source.kind === 'level' && source.set === label),
       has_dimensional_storage: sources.some((source) => source.kind === 'dimensional_storage' && source.set === label),
     });

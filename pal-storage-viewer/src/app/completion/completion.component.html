@@ -41,6 +41,10 @@
           <h2>{{ player?.label }}</h2>
           <p>{{ progress.done | number }} / {{ progress.total | number }}</p>
           <div class="stats" aria-label="Counters">
+            <span class="stat level-stat" *ngIf="player?.level !== null && player?.level !== undefined" [class.max]="isMaxLevel" title="Player level">
+              <b>Lv. {{ player?.level }}</b>
+              <span>{{ isMaxLevel ? 'max' : 'not max' }}</span>
+            </span>
             <span class="stat" *ngFor="let entry of progress.stats" [title]="entry.title">
               <b>{{ entry.value }}</b>
               <span>{{ entry.label }}</span>
@@ -56,7 +60,8 @@
           role="tab"
           class="category-card"
           [class.active]="category.key === selectedCategory"
-          [class.complete]="category.total > 0 && category.done === category.total"
+          [class.complete]="category.total > 0 && category.done === category.total && !category.needsFile"
+          [class.needs-file]="!!category.needsFile"
           [attr.aria-selected]="category.key === selectedCategory"
           (click)="selectCategory(category.key)"
         >
@@ -68,7 +73,8 @@
             <span class="bar-fill" [style.width.%]="category.percent"></span>
           </span>
           <span class="card-foot">
-            <span class="card-pct">{{ category.percent }}%</span>
+            <span class="card-needs" *ngIf="category.needsFile">{{ category.needsFile }} needed</span>
+            <span class="card-pct" *ngIf="!category.needsFile">{{ category.percent }}%</span>
           </span>
         </button>
       </div>
@@ -100,23 +106,26 @@
             <b>{{ group.done }}/{{ group.total }}</b>
           </button>
         </div>
+        <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" or "+ Folder" above.</p>
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
-        <table class="item-table">
+        <table class="item-table" *ngIf="!open.needsFile">
           <thead>
             <tr>
               <th class="state-col">Status</th>
               <th class="no-col" *ngIf="open.hasNumbers">{{ open.numberLabel }}</th>
+              <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
               <th>Details</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state">
+            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state" [class.uncounted]="item.counted === false">
               <td class="state-col"><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</td>
               <td class="no-col" *ngIf="open.hasNumbers">{{ item.no }}</td>
+              <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col">{{ item.name }}</td>
               <td class="detail-col">{{ item.detail }}</td>
               <td class="coords-col" *ngIf="open.hasCoords">
@@ -124,7 +133,7 @@
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="3 + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="3 + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
             </tr>
           </tbody>
         </table>

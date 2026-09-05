@@ -22,6 +22,7 @@ PAL_NAMES_LUA = HERE.parent / "pal_names_lookup.lua"
 
 PSP = ("oMaN-Rod/palworld-save-pal", "2d244ae9ea12f2f70a66523bf83764185e22fa83", "data/json")
 PWST = ("deafdudecomputers/PalWorldSaveTools", "1abd4b11756c9ca7774e9c35400fb8df4d12d966", "resources/game_data")
+KC = ("KrisCris/Palworld-Pal-Editor", "3efb2d4b5d1f5710ee672d449b5162fe63745229", "src/palworld_pal_editor/assets/data")
 
 FILES = {
     "psp/relics.json": (PSP, "relics.json"),
@@ -43,6 +44,10 @@ FILES = {
     "psp/l10n/technologies.json": (PSP, "l10n/en/technologies.json"),
     "pwst/world_map_areas.json": (PWST, "world_map_areas.json"),
     "pwst/fast_travel_points.json": (PWST, "fast_travel_points.json"),
+    "pwst/relic_data.json": (PWST, "relic_data.json"),
+    "psp/lab_research.json": (PSP, "lab_research.json"),
+    "kc/skin_data.json": (KC, "skin_data.json"),
+    "psp/l10n/lab_research.json": (PSP, "l10n/en/lab_research.json"),
 }
 
 # Journal owners, from the in-game journal titles.
@@ -177,10 +182,10 @@ def build(cache: Path) -> dict:
     for quest_id, value in sorted(quests_raw.items()):
         kind = value["quest_type"].replace("EPalQuestType::", "")
         name = (quests_l10n.get(quest_id) or {}).get("localized_name") or humanize(quest_id)
-        entry = [kind, name]
-        if value.get("disabled"):
-            entry.append(1)
-        quests[quest_id] = entry
+        # Replays repeat an already counted quest; disabled ones never appear in a save.
+        disabled = 1 if value.get("disabled") or quest_id.endswith("_Replay") else 0
+        location = value.get("location") or {}
+        quests[quest_id] = [kind, name, disabled, round(location.get("x") or 0), round(location.get("y") or 0)]
 
     bosses = []
     for value in load(cache, "psp/bosses.json").values():
@@ -260,6 +265,33 @@ def build(cache: Path) -> dict:
         raids.append([item_id, f"{name} (Ultra)" if ultra else name, 1 if ultra else 0])
     raids.sort(key=lambda r: (r[2], r[1]))
 
+    # Statue of Power: effigies needed per rank for each relic type (DT_PlayerStatusRankMasterDataTable).
+    statue = {}
+    for enum_name, value in load(cache, "pwst/relic_data.json").items():
+        statue[enum_name.replace("EPalRelicType::", "")] = value["per_rank"]
+
+    # Guild lab research: [id, name, category, work amount needed]; Level.sav stores work done per id.
+    lab_raw = load(cache, "psp/lab_research.json")
+    lab_l10n = load(cache, "psp/l10n/lab_research.json")
+    research = []
+    for research_id, value in lab_raw.items():
+        name = (lab_l10n.get(research_id) or {}).get("localized_name") or humanize(research_id)
+        research.append([research_id, name, value.get("category") or "", value.get("work_amount") or 0])
+    research.sort(key=lambda r: (r[2], r[0]))
+
+    # Pal skins: [id, name, paid?]. Paid ones are tied to a Steam DLC id; invalid rows are placeholders.
+    skins = []
+    for skin_id, value in load(cache, "kc/skin_data.json").items():
+        if value.get("Invalid"):
+            continue
+        name = (value.get("I18n") or {}).get("en") or humanize(skin_id)
+        skins.append([skin_id, name, 1 if value.get("PlatformItemID_Steam", -1) != -1 else 0])
+    skins.sort(key=lambda r: (r[2], r[1]))
+
+    # Player level cap: the exp table runs to 100 with placeholder rows past the cap (its
+    # curve restarts after 80), so the cap is taken as the highest level a technology needs.
+    max_level = max(value.get("level_cap") or 0 for value in tech_raw.values())
+
     return {
         "generated": "2026-09-05",
         "sources": {
@@ -278,6 +310,10 @@ def build(cache: Path) -> dict:
         "paldeck": paldeck,
         "technologies": technologies,
         "raids": raids,
+        "statueRanks": statue,
+        "research": research,
+        "skins": skins,
+        "maxLevel": max_level,
     }
 
 
@@ -287,8 +323,9 @@ def main() -> None:
     data = build(cache)
     OUT.write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB)")
-    for key in ("relics", "fastTravel", "notes", "quests", "bosses", "towers", "areas", "ruinPickups", "paldeck", "technologies", "raids"):
+    for key in ("relics", "fastTravel", "notes", "quests", "bosses", "towers", "areas", "ruinPickups", "paldeck", "technologies", "raids", "research", "skins"):
         print(f"  {key}: {len(data[key])}")
+    print("  max level:", data["maxLevel"])
     print("  relic types:", [(t['key'], sum(1 for r in data['relics'].values() if r[0] == i)) for i, t in enumerate(data['relicTypes'])])
 
 
