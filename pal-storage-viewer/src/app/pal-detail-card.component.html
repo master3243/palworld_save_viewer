@@ -4,6 +4,10 @@
       <div class="level-block">
         <span>Level</span>
         <strong>{{ valueFor('level') || '-' }}</strong>
+        <small class="next-exp" *ngIf="expNext as next" [title]="next.title">
+          <span>Next</span><b>{{ next.text }}</b>
+          <i class="exp-bar"><em [style.width.%]="next.percent"></em></i>
+        </small>
       </div>
 
       <div class="name-block">
@@ -116,12 +120,29 @@
       </div>
 
       <div class="vitals">
-        <div class="vital-row hp" *ngIf="valueFor('hp')">
-          <span class="vital-icon">♥</span>
-          <span class="vital-label">HP</span>
-          <strong>{{ valueFor('hp') }}</strong>
+        <div class="status-bars" *ngIf="trust || vitalBars.length">
+          <div class="bar-row trust" *ngIf="trust as trust" [title]="trust.title">
+            <span class="bar-icon">◈</span>
+            <span class="bar-label">Trust</span>
+            <span class="bar"><i [style.width.%]="trust.progress"></i></span>
+            <strong>{{ trust.rank }}</strong>
+          </div>
+          <div class="bar-row" *ngFor="let bar of vitalBars" [attr.data-tone]="bar.tone" [title]="bar.title">
+            <span class="bar-icon">{{ bar.icon }}</span>
+            <span class="bar-label">{{ bar.label }}</span>
+            <span class="bar"><i [style.width.%]="bar.percent"></i></span>
+            <strong>{{ bar.value }}</strong>
+          </div>
         </div>
         <div class="stat-panels">
+          <section class="stat-panel combat-panel" *ngIf="combatStats.length">
+            <h3>Stats</h3>
+            <div *ngFor="let stat of combatStats" class="stat" [title]="stat.title">
+              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small>
+              <strong>{{ stat.value }}<i class="delta" *ngIf="stat.delta" [class.down]="stat.delta < 0">{{ stat.delta > 0 ? '▲' : '▼' }}</i></strong>
+            </div>
+            <p class="stat-note" *ngIf="statNote">{{ statNote }}</p>
+          </section>
           <section class="stat-panel" *ngIf="ivStats.length">
             <h3>IV</h3>
             <div *ngFor="let stat of ivStats" class="stat">
@@ -137,6 +158,15 @@
         </div>
       </div>
     </div>
+
+    <section class="partner-panel" *ngIf="partnerSkill as partner">
+      <h3>Partner Skill</h3>
+      <div class="partner-line">
+        <strong>{{ partner.name }}</strong>
+        <span class="partner-level" *ngIf="partner.level" title="Partner skill level: condensing stars + 1">Lv.{{ partner.level }}</span>
+      </div>
+      <p class="partner-text" *ngIf="partner.text">{{ partner.text }}</p>
+    </section>
 
     <section class="work-panel" *ngIf="hasWorkData">
       <h3>Work Suitability</h3>
@@ -154,7 +184,7 @@
       </div>
     </section>
 
-    <div class="skill-layout" *ngIf="passiveSkills.length || activeMoves.length">
+    <div class="skill-layout" *ngIf="passiveSkills.length || activeSkillChips.length">
       <section class="skill-group" *ngIf="passiveSkills.length">
         <h3>Passive Skills</h3>
         <div class="skill-chips">
@@ -166,6 +196,7 @@
             target="_blank"
             rel="noopener noreferrer"
             [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
+            [title]="skill.description"
           >
             {{ skill.name }}
             <img
@@ -179,16 +210,25 @@
         </div>
       </section>
 
-      <section class="skill-group" *ngIf="activeMoves.length">
+      <section class="skill-group" *ngIf="activeSkillChips.length">
         <h3>Active Skills</h3>
         <div class="move-list">
           <a
-            *ngFor="let move of activeMoves"
-            [href]="activeSkillUrl(move)"
+            *ngFor="let skill of activeSkillChips"
+            class="move-chip"
+            [attr.data-element]="skill.elementIndex"
+            [href]="skill.url"
             target="_blank"
             rel="noopener noreferrer"
-            [attr.aria-label]="'Open ' + move + ' on Palworld Wiki'"
-          ><i>◆</i>{{ move }}</a>
+            [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
+            [title]="skill.tooltip"
+          >
+            <span class="move-name">{{ skill.name }}</span>
+            <span class="move-meta" *ngIf="skill.power">
+              <img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt="">
+              <b>{{ skill.power }}</b>
+            </span>
+          </a>
         </div>
       </section>
     </div>

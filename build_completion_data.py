@@ -52,6 +52,13 @@ FILES = {
     "psp/relics.json": (PSP, "relics.json"),
     "psp/technologies.json": (PSP, "technologies.json"),
     "psp/towers.json": (PSP, "towers.json"),
+    "psp/active_skills.json": (PSP, "active_skills.json"),
+    "psp/passive_skills.json": (PSP, "passive_skills.json"),
+    "psp/l10n/active_skills.json": (PSP, "l10n/en/active_skills.json"),
+    "psp/l10n/passive_skills.json": (PSP, "l10n/en/passive_skills.json"),
+    "psp/friendship.json": (PSP, "friendship.json"),
+    "psp/exp.json": (PSP, "exp.json"),
+    "pwst/characters.json": (PWST, "characters.json"),
     "pwst/fast_travel_points.json": (PWST, "fast_travel_points.json"),
     "pwst/relic_data.json": (PWST, "relic_data.json"),
     "pwst/world_map_areas.json": (PWST, "world_map_areas.json"),
@@ -404,9 +411,35 @@ WORK_KEYS = ["EmitFlame", "Watering", "Seeding", "GenerateElectricity", "Handcra
 TRAITS_OUT = HERE.parent / "pal_traits_lookup.json"
 
 
+SKILLS_OUT = HERE.parent / "skill_details_lookup.json"
+
+# Placeholders the partner skill text can carry; only the per-rank one can be filled in at runtime.
+PARTNER_PLACEHOLDER = re.compile(r"\{([^}]+)\}")
+PARTNER_TAG = re.compile(r"\[(?:ICON:[^\]]*|ELEM:([^\]]*)|EFFECT:([^\]]*))\]")
+
+
+def max_pal_level(cache: Path) -> int:
+    return max(value.get("level_cap") or 0 for value in load(cache, "psp/technologies.json").values())
+
+
+def partner_skill(entry: dict) -> list | None:
+    """[name, description or None, per-rank main values or None] from a PalWorldSaveTools character row."""
+    name = entry.get("partner_skill")
+    if not name:
+        return None
+    text = PARTNER_TAG.sub(lambda m: m.group(1) or m.group(2) or "", entry.get("description") or "")
+    text = re.sub(r"\s+", " ", text).strip()
+    values = entry.get("active_skill_main_value") or None
+    unresolved = [m for m in PARTNER_PLACEHOLDER.findall(text) if m != "ActiveSkillMainValueByRank" or not values]
+    return [name, text if text and not unresolved else None, values]
+
+
 def build_pal_traits(cache: Path) -> None:
-    """resources/pal_traits_lookup.json: species id -> element icon indexes and base work ranks."""
+    """resources/pal_traits_lookup.json: per species elements, base work ranks, stat scaling, hunger,
+    trust bonus rates and partner skill; plus the trust rank thresholds and the Pal exp table."""
     pals = load(cache, "psp/pals.json")
+    characters = {row["asset"]: row for row in load(cache, "pwst/characters.json")["pals"]}
+    by_lower = {key.lower(): key for key in characters}
     traits = {}
     for pal_id, value in sorted(pals.items()):
         if not value.get("is_pal"):
@@ -415,20 +448,87 @@ def build_pal_traits(cache: Path) -> None:
         work = [(value.get("work_suitability") or {}).get(key) or 0 for key in WORK_KEYS]
         if not elements and not any(work):
             continue
-        traits[pal_id] = {"e": elements, "w": work}
-    lines = ["{", f'"elements":{json.dumps(ELEMENTS)},', f'"work":{json.dumps(WORK_KEYS)},', '"pals":{']
+        scaling = value["scaling"]
+        entry = {"e": elements, "w": work, "s": [scaling["hp"], scaling["attack"], scaling["defense"]],
+                 "f": value.get("max_full_stomach") or 0,
+                 "t": [value.get("friendship_hp") or 0, value.get("friendship_shotattack") or 0, value.get("friendship_defense") or 0]}
+        character = characters.get(by_lower.get(pal_id.lower(), ""))
+        if character:
+            stats = character["stats"]
+            if [stats["hp"], stats["shot_attack"], stats["defense"]] != entry["s"]:
+                print(f"  stat scaling differs for {pal_id}: psp {entry['s']} vs pwst {[stats['hp'], stats['shot_attack'], stats['defense']]} (keeping psp)")
+            skill = partner_skill(character)
+            if skill:
+                entry["p"] = skill
+        traits[pal_id] = entry
+    # Alpha (BOSS_) and other variants only the PalWorldSaveTools table carries; they have their own HP scaling.
+    known = {key.lower() for key in traits}
+    for asset, character in sorted(characters.items()):
+        if asset.lower() in known or not character.get("stats"):
+            continue
+        stats = character["stats"]
+        elements = [ELEMENTS.index(e) for e in (character.get("elements") or {}) if e in ELEMENTS]
+        work = [(character.get("work_suitabilities") or {}).get(key) or 0 for key in WORK_KEYS]
+        if not elements and not any(work):
+            continue
+        entry = {"e": elements, "w": work, "s": [stats["hp"], stats["shot_attack"], stats["defense"]],
+                 "f": stats.get("max_full_stomach") or 0,
+                 "t": [character.get("friendship_hp") or 0, character.get("friendship_shotattack") or 0, character.get("friendship_defense") or 0]}
+        skill = partner_skill(character)
+        if skill:
+            entry["p"] = skill
+        traits[asset] = entry
+    friendship = sorted((v["rank"], v["required_point"]) for v in load(cache, "psp/friendship.json").values())
+    exp_table = load(cache, "psp/exp.json")
+    exp_totals = [exp_table[str(level)]["PalTotalEXP"] for level in range(1, len(exp_table) + 1)]
+    lines = ["{", f'"elements":{json.dumps(ELEMENTS)},', f'"work":{json.dumps(WORK_KEYS)},',
+             f'"maxLevel":{max_pal_level(cache)},', f'"friendship":{json.dumps(friendship, separators=(",", ":"))},',
+             f'"exp":{json.dumps(exp_totals, separators=(",", ":"))},', '"pals":{']
     items = list(traits.items())
     for i, (pal_id, value) in enumerate(items):
-        lines.append(f'{json.dumps(pal_id)}:{json.dumps(value, separators=(",", ":"))}{"," if i < len(items) - 1 else ""}')
+        lines.append(f'{json.dumps(pal_id)}:{json.dumps(value, separators=(",", ":"), ensure_ascii=False)}{"," if i < len(items) - 1 else ""}')
     lines += ["}", "}"]
     TRAITS_OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"wrote {TRAITS_OUT} ({len(traits)} pals)")
+    print(f"wrote {TRAITS_OUT} ({len(traits)} pals, {sum(1 for v in traits.values() if v.get('p'))} with partner skill, "
+          f"{sum(1 for v in traits.values() if v.get('p') and v['p'][1])} with partner text)")
+
+
+def build_skill_details(cache: Path) -> None:
+    """resources/skill_details_lookup.json: what the in-game skill cards show for active and passive skills."""
+    active = {}
+    names = load(cache, "psp/l10n/active_skills.json")
+    for skill_id, value in sorted(load(cache, "psp/active_skills.json").items()):
+        key = skill_id.replace("EPalWazaID::", "")
+        effects = [[e["type"], e["value"]] for e in value.get("effects") or [] if e.get("value")]
+        text = names.get(skill_id) or {}
+        active[key] = [text.get("localized_name") or key, ELEMENTS.index(value["element"]) if value.get("element") in ELEMENTS else -1,
+                       value.get("power") or 0, value.get("cool_time") or 0, "M" if value.get("type") == "Melee" else "S", effects,
+                       value.get("min_range") or 0, value.get("max_range") or 0, text.get("description") or ""]
+    passive = {}
+    passive_names = load(cache, "psp/l10n/passive_skills.json")
+    for skill_id, value in sorted(load(cache, "psp/passive_skills.json").items()):
+        effects = [[e["type"], e["value"]] for e in value.get("effects") or []]
+        description = (passive_names.get(skill_id) or {}).get("description") or ""
+        if effects or description:
+            passive[skill_id] = [effects, description]
+    lines = ['{', '"active":{']
+    items = list(active.items())
+    for i, (key, value) in enumerate(items):
+        lines.append(f'{json.dumps(key)}:{json.dumps(value, separators=(",", ":"), ensure_ascii=False)}{"," if i < len(items) - 1 else ""}')
+    lines += ['},', '"passive":{']
+    items = list(passive.items())
+    for i, (key, value) in enumerate(items):
+        lines.append(f'{json.dumps(key)}:{json.dumps(value, separators=(",", ":"))}{"," if i < len(items) - 1 else ""}')
+    lines += ['}', '}']
+    SKILLS_OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"wrote {SKILLS_OUT} ({len(active)} active, {len(passive)} passive)")
 
 
 def main() -> None:
     cache = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "sandbox" / "completion_upstream"
     fetch_all(cache)
     build_pal_traits(cache)
+    build_skill_details(cache)
     data = build(cache)
     OUT.write_text(dump_line_per_entry(data), encoding="utf-8")
     print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB)")

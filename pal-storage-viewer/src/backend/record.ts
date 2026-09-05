@@ -10,6 +10,7 @@ import {
   readVector, validatedPropertyNames, indexProperties
 } from './gvas';
 import { Lookups, WORK_KEYS } from './lookups';
+import { DerivedStats, deriveStats } from './stats';
 
 export interface Identity {
   instance_id: string | null;
@@ -67,6 +68,8 @@ export interface PalRecord {
   mastered_skill_ids: string[];
   learned_moves: string[];
   friendship: { points: number | null; otomo_seconds: number | null; active_otomo_seconds: number | null; basecamp_seconds: number | null };
+  /** Stats the game computes from the record and species data (see stats.ts). */
+  derived: DerivedStats;
   ownership: {
     owned_time: number | null; owner_player_uid: string | null; old_owner_player_uids: PropertyValue[];
     last_nickname_modifier_player_uid: string | null;
@@ -204,15 +207,22 @@ export function buildRecord(
     }
     return bonus;
   });
-  // Condensing: each of the first three stars raises the next-highest suitability by one
-  // (highest first), and the fourth star raises every suitability the species has.
+  // Condensing: the stars go round the species' suitabilities from the highest down (ties: the one
+  // listed last in the game's order), one rank each, starting over once every suitability got one.
+  // A single-suitability Pal therefore gets all four stars on it (4-star Omascul: Gathering 5 -> 9).
   const stars = Math.max(0, Math.min(4, (readByte(buf, prop('Rank')) ?? 1) - 1));
-  const byLevel = baseRanks.map((rank, index) => ({ rank, index })).filter((entry) => entry.rank > 0).sort((a, b) => b.rank - a.rank || a.index - b.index);
-  for (let star = 0; star < Math.min(stars, 3); star++) {
-    if (byLevel[star]) workBonus[byLevel[star].index] += 1;
-  }
-  if (stars >= 4) for (const entry of byLevel) workBonus[entry.index] += 1;
+  const byLevel = baseRanks.map((rank, index) => ({ rank, index })).filter((entry) => entry.rank > 0).sort((a, b) => b.rank - a.rank || b.index - a.index);
+  for (let star = 0; star < stars && byLevel.length; star++) workBonus[byLevel[star % byLevel.length].index] += 1;
   const workRanks = WORK_KEYS.map((_, index) => baseRanks[index] + workBonus[index]);
+  const derived = deriveStats({
+    species_id: characterId,
+    level: readByte(buf, prop('Level')),
+    exp: readInt64(buf, prop('Exp')),
+    rank: readByte(buf, prop('Rank')),
+    ivs: { hp: readByte(buf, prop('Talent_HP')), attack: readByte(buf, prop('Talent_Shot')), defense: readByte(buf, prop('Talent_Defense')) },
+    passive_skill_ids: passiveSkillIds,
+    friendship_points: readInt(buf, prop('FriendshipPoint')),
+  }, lookups);
 
   return {
     storage_index: storageIndex,
@@ -285,6 +295,7 @@ export function buildRecord(
       active_otomo_seconds: readInt(buf, prop('FriendshipActiveOtomoSec')),
       basecamp_seconds: readInt(buf, prop('FriendshipBasecampSec')),
     },
+    derived,
     ownership: {
       owned_time: readDateTime(buf, prop('OwnedTime')),
       owner_player_uid: readGuid(buf, prop('OwnerPlayerUId')),

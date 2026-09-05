@@ -303,6 +303,15 @@ export const KNOWN_FIELDS: FilterField[] = [
   },
   { key: 'sr_craft', label: 'Soul Rank Crafting', group: G.soul, kind: 'number', aliases: ['soul_craft', 'soul_rank_craft_speed'], get: (row) => number(row, 'soul_rank_craft_speed') },
 
+  { key: 'max_hp', label: 'Max HP', group: 'Stats', kind: 'number', aliases: ['maxhp', 'hp_max', 'total_hp'], hint: 'Computed like the game, without Trust and Pal Soul bonuses', get: (row) => number(row, 'max_hp') },
+  { key: 'attack_stat', label: 'Attack stat', group: 'Stats', kind: 'number', aliases: ['atk_stat', 'dmg', 'total_attack'], hint: 'Computed attack, passives included', get: (row) => number(row, 'attack') },
+  { key: 'defense_stat', label: 'Defense stat', group: 'Stats', kind: 'number', aliases: ['def_stat', 'total_defense'], hint: 'Computed defense, passives included', get: (row) => number(row, 'defense') },
+  { key: 'work_speed', label: 'Work speed', group: 'Stats', kind: 'number', aliases: ['ws', 'craft_speed', 'workspeed'], get: (row) => number(row, 'work_speed') },
+  { key: 'trust_rank', label: 'Trust rank', group: 'Stats', kind: 'number', aliases: ['trust_level', 'friendship_rank'], hint: '0 to 10', get: (row) => number(row, 'trust_rank') },
+  { key: 'trust_pct', label: 'Trust progress %', group: 'Stats', kind: 'number', aliases: ['trust_progress'], hint: 'Progress through the current trust rank', get: (row) => number(row, 'trust_progress') },
+  { key: 'exp_next', label: 'Exp to next level', group: 'Stats', kind: 'number', aliases: ['exp_to_next', 'next_exp'], hint: '0 at max level', get: (row) => number(row, 'exp_to_next') },
+  { key: 'partner', label: 'Partner skill', group: 'Stats', kind: 'text', aliases: ['partner_skill'], suggest: true, get: (row) => text(row, 'partner_skill') },
+
   { key: 'skills', label: 'Passive skills', group: G.passives, kind: 'list', aliases: ['skill', 'passive', 'passives', 'p'], suggest: true, get: (row) => text(row, 'skills') },
   { key: 'skill_count', label: 'Passive count', group: G.passives, kind: 'number', aliases: ['passives_count', 'skills_count'], get: (row) => listCount(row, 'skills') },
   { key: 'platinum', label: 'Platinum passives', group: G.passives, kind: 'number', aliases: ['plat', 'platinum_skills'], hint: 'Count of top tier passives', get: (row) => colorCount(row, 'platinum') },
