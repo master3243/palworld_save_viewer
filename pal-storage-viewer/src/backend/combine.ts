@@ -283,7 +283,8 @@ export function combineSaves(entries: CombineEntry[]): CombinedSaves {
       record.placement = { location, detail };
     }
     for (const record of set.dps_records) {
-      record.placement = { location: 'Dimensional Storage', detail: `slot ${record.storage_index}` };
+      const slot = record.storage_index;
+      record.placement = { location: 'Dimensional Storage', detail: `page ${Math.floor(slot / PAL_BOX_PAGE_SIZE) + 1}, slot ${slot % PAL_BOX_PAGE_SIZE + 1}` };
     }
     for (const record of [...set.level_records, ...set.dps_records]) {
       const owner = record.ownership.owner_player_uid;
