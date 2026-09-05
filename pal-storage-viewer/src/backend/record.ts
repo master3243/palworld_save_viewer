@@ -220,8 +220,14 @@ export function buildRecord(
     exp: readInt64(buf, prop('Exp')),
     rank: readByte(buf, prop('Rank')),
     ivs: { hp: readByte(buf, prop('Talent_HP')), attack: readByte(buf, prop('Talent_Shot')), defense: readByte(buf, prop('Talent_Defense')) },
+    soul_ranks: {
+      hp: readByte(buf, prop('Rank_HP')), attack: readByte(buf, prop('Rank_Attack')),
+      defense: readByte(buf, prop('Rank_Defence')), craft_speed: readByte(buf, prop('Rank_CraftSpeed')),
+    },
     passive_skill_ids: passiveSkillIds,
     friendship_points: readInt(buf, prop('FriendshipPoint')),
+    food_item: readName(buf, prop('FoodWithStatusEffect')),
+    food_seconds_left: readInt(buf, prop('Tiemr_FoodWithStatusEffect')),
   }, lookups);
 
   return {

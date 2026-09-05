@@ -94,6 +94,8 @@ export class Lookups {
   readonly activeDetails = new Map<string, ActiveSkillDetail>();
   /** Passive skill id -> [effect type, value] pairs. */
   readonly passiveEffects = new Map<string, [string, number][]>();
+  /** Food item id -> dish name and the stat percentages it grants while its effect lasts. */
+  readonly foodBuffs = new Map<string, { name: string; effects: [string, number][] }>();
 
   constructor(sources: Partial<LookupSources>) {
     if (sources.activeSkillsJson) {
@@ -133,7 +135,9 @@ export class Lookups {
     if (sources.palTraitsJson) {
       const parsed = JSON.parse(sources.palTraitsJson) as {
         pals?: Record<string, PalTraits>; maxLevel?: number; friendship?: FriendshipRanks; exp?: number[];
+        food?: Record<string, [string, [string, number][]]>;
       };
+      for (const [key, [name, effects]] of Object.entries(parsed.food ?? {})) this.foodBuffs.set(key, { name, effects });
       for (const [key, value] of Object.entries(parsed.pals ?? {})) this.palTraits.set(key.toLowerCase(), value);
       this.maxLevel = parsed.maxLevel ?? 0;
       this.friendshipRanks.push(...(parsed.friendship ?? []));

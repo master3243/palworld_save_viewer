@@ -1,8 +1,14 @@
 /**
  * Stats the game derives from a Pal's record and species data: max HP, attack, defense, work speed,
- * trust rank, exp to the next level and the partner skill. Formulas were fitted to in-game
- * screenshots of stored Pals (see the notes on each step); trust and Pal Soul bonuses are not
- * included yet because their rules have not been verified.
+ * trust rank, exp to the next level, the partner skill and any food effect. The formulas were fitted
+ * to in-game screenshots of stored Pals (29 of 30 numbers exact, one off by 2):
+ *
+ *   scaling' = species scaling + trust rate * trust rank            (trust adds to the species stat)
+ *   HP  = floor(500 + 5L + scaling'.hp * 0.5 * L * (1 + 0.3 IV/100))
+ *   ATK = floor(100 + scaling'.atk * 0.075 * L * (1 + 0.3 IV/100)), DEF the same from 50
+ *   then x (1 + 0.05 stars) -> floor, x (1 + 0.03 soul rank) -> floor, x (1 + passives %) -> round
+ *   work speed = floor((70 + 7 stars) * (1 + passives %))
+ *   a food status effect multiplies on top while its timer runs.
  */
 import { Lookups } from './lookups';
 
@@ -13,8 +19,11 @@ export interface StatInputs {
   /** Save `Rank` byte: condensing stars + 1. */
   rank: number | null;
   ivs: { hp: number | null; attack: number | null; defense: number | null };
+  soul_ranks: { hp: number | null; attack: number | null; defense: number | null; craft_speed: number | null };
   passive_skill_ids: string[];
   friendship_points: number | null;
+  food_item: string | null;
+  food_seconds_left: number | null;
 }
 
 export interface DerivedStats {
@@ -22,15 +31,25 @@ export interface DerivedStats {
   attack: number | null;
   defense: number | null;
   work_speed: number | null;
-  /** Species value after level, IV and condensing, before passives: what the game shows left of the arrow. */
+  /** After trust, condensing and souls, before passives and food: what the game shows left of the arrow. */
   max_hp_base: number | null;
   attack_base: number | null;
   defense_base: number | null;
+  /** How much of the base value the trust rank contributes. */
+  trust_hp: number | null;
+  trust_attack: number | null;
+  trust_defense: number | null;
   /** Summed passive skill percentages. */
   passive_hp_pct: number;
   passive_attack_pct: number;
   passive_defense_pct: number;
   passive_work_speed_pct: number;
+  /** Active food status effect. */
+  food_effect: string | null;
+  food_attack_pct: number;
+  food_defense_pct: number;
+  food_work_speed_pct: number;
+  food_seconds_left: number | null;
   hunger_max: number | null;
   trust_rank: number | null;
   /** Progress through the current trust rank, 0-100. */
@@ -48,7 +67,9 @@ export interface DerivedStats {
 const EMPTY: DerivedStats = {
   max_hp: null, attack: null, defense: null, work_speed: null,
   max_hp_base: null, attack_base: null, defense_base: null,
+  trust_hp: null, trust_attack: null, trust_defense: null,
   passive_hp_pct: 0, passive_attack_pct: 0, passive_defense_pct: 0, passive_work_speed_pct: 0,
+  food_effect: null, food_attack_pct: 0, food_defense_pct: 0, food_work_speed_pct: 0, food_seconds_left: null,
   hunger_max: null, trust_rank: null, trust_progress: null, trust_next: null,
   exp_to_next: null, exp_progress: null, partner_skill: null, partner_skill_level: null, partner_skill_text: null,
 };
@@ -89,6 +110,8 @@ export function trustRank(points: number, lookups: Lookups): { rank: number; pro
   return { rank: current[0], progress: span > 0 ? Math.min(100, Math.max(0, (points - current[1]) / span * 100)) : 0, next: next[1] };
 }
 
+const roundHalfUp = (value: number) => Math.floor(value + 0.5);
+
 export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   const traits = lookups.traitsFor(input.species_id);
   const out: DerivedStats = { ...EMPTY };
@@ -101,35 +124,54 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   out.passive_work_speed_pct = passives.workSpeed;
   out.hunger_max = traits?.f ?? null;
 
-  if (traits?.s && level !== null && level > 0) {
-    const [hpScale, attackScale, defenseScale] = traits.s;
-    const iv = (value: number | null) => 1 + 0.3 * (value ?? 0) / 100;
-    // Condensing adds 5% per star; passives add their percentages to the same multiplier
-    // (a 1-star Lamball with +30% defense passives reads 135 = 100 * 1.35, not 100 * 1.05 * 1.3).
-    const condense = 1 + 0.05 * stars;
-    const multiplier = (pct: number) => condense + pct / 100;
-    // HP and attack floor the species value before the multiplier; defense does not
-    // (fitted to stored Pals: Lamball 997 HP / 157 attack, Fuack 136 defense).
-    const hp = Math.floor(500 + 5 * level + hpScale * 0.5 * level * iv(input.ivs.hp));
-    const attack = Math.floor(100 + attackScale * 0.075 * level * iv(input.ivs.attack));
-    const defense = 50 + defenseScale * 0.075 * level * iv(input.ivs.defense);
-    out.max_hp_base = Math.floor(hp * condense);
-    out.attack_base = Math.floor(attack * condense);
-    out.defense_base = Math.floor(defense * condense);
-    out.max_hp = Math.floor(hp * multiplier(passives.hp));
-    out.attack = Math.floor(attack * multiplier(passives.attack));
-    out.defense = Math.floor(defense * multiplier(passives.defense));
-  }
-  if (level !== null && level > 0) {
-    // Work speed starts at 70 for every species, +7 per condensing star, then passives multiply.
-    out.work_speed = Math.floor((70 + 7 * stars) * (1 + passives.workSpeed / 100));
+  let trust = 0;
+  if (input.friendship_points !== null) {
+    const rank = trustRank(input.friendship_points, lookups);
+    out.trust_rank = rank.rank;
+    out.trust_progress = Math.round(rank.progress * 10) / 10;
+    out.trust_next = rank.next;
+    trust = Math.max(0, rank.rank);
   }
 
-  if (input.friendship_points !== null) {
-    const trust = trustRank(input.friendship_points, lookups);
-    out.trust_rank = trust.rank;
-    out.trust_progress = Math.round(trust.progress * 10) / 10;
-    out.trust_next = trust.next;
+  const food = input.food_item && (input.food_seconds_left ?? 0) > 0 ? lookups.foodBuffs.get(input.food_item) : undefined;
+  if (food) {
+    out.food_effect = food.name;
+    out.food_seconds_left = input.food_seconds_left;
+    for (const [type, value] of food.effects) {
+      if (type === 'Attack') out.food_attack_pct += value;
+      else if (type === 'Defense') out.food_defense_pct += value;
+      else if (type === 'WorkSpeed') out.food_work_speed_pct += value;
+    }
+  }
+
+  if (traits?.s && level !== null && level > 0) {
+    const [hpScale, attackScale, defenseScale] = traits.s;
+    const [hpRate, attackRate, defenseRate] = traits.t ?? [0, 0, 0];
+    const iv = (value: number | null) => 1 + 0.3 * (value ?? 0) / 100;
+    const condense = 1 + 0.05 * stars;
+    const souls = (rank: number | null) => 1 + 0.03 * (rank ?? 0);
+    const raw = {
+      hp: (scale: number) => Math.floor(500 + 5 * level + scale * 0.5 * level * iv(input.ivs.hp)),
+      attack: (scale: number) => Math.floor(100 + scale * 0.075 * level * iv(input.ivs.attack)),
+      defense: (scale: number) => Math.floor(50 + scale * 0.075 * level * iv(input.ivs.defense)),
+    };
+    const base = (value: number, soulRank: number | null) => Math.floor(Math.floor(value * condense) * souls(soulRank));
+    const hpBase = base(raw.hp(hpScale + hpRate * trust), input.soul_ranks.hp);
+    const attackBase = base(raw.attack(attackScale + attackRate * trust), input.soul_ranks.attack);
+    const defenseBase = base(raw.defense(defenseScale + defenseRate * trust), input.soul_ranks.defense);
+    out.max_hp_base = hpBase;
+    out.attack_base = attackBase;
+    out.defense_base = defenseBase;
+    out.trust_hp = hpBase - base(raw.hp(hpScale), input.soul_ranks.hp);
+    out.trust_attack = attackBase - base(raw.attack(attackScale), input.soul_ranks.attack);
+    out.trust_defense = defenseBase - base(raw.defense(defenseScale), input.soul_ranks.defense);
+    out.max_hp = roundHalfUp(hpBase * (1 + passives.hp / 100));
+    out.attack = roundHalfUp(attackBase * (1 + passives.attack / 100) * (1 + out.food_attack_pct / 100));
+    out.defense = roundHalfUp(defenseBase * (1 + passives.defense / 100) * (1 + out.food_defense_pct / 100));
+  }
+  if (level !== null && level > 0) {
+    // Work speed starts at 70 for every species, +7 per condensing star, then passives (and food) multiply.
+    out.work_speed = Math.floor((70 + 7 * stars) * (1 + passives.workSpeed / 100) * (1 + out.food_work_speed_pct / 100));
   }
 
   if (level !== null && input.exp !== null && lookups.expTotals.length > level) {

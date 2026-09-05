@@ -59,6 +59,7 @@ FILES = {
     "psp/friendship.json": (PSP, "friendship.json"),
     "psp/exp.json": (PSP, "exp.json"),
     "pwst/characters.json": (PWST, "characters.json"),
+    "pwst/foodbuffdata.json": (PWST, "foodbuffdata.json"),
     "pwst/fast_travel_points.json": (PWST, "fast_travel_points.json"),
     "pwst/relic_data.json": (PWST, "relic_data.json"),
     "pwst/world_map_areas.json": (PWST, "world_map_areas.json"),
@@ -479,11 +480,19 @@ def build_pal_traits(cache: Path) -> None:
             entry["p"] = skill
         traits[asset] = entry
     friendship = sorted((v["rank"], v["required_point"]) for v in load(cache, "psp/friendship.json").values())
+    # Food status effects that change the stats the card computes (the save names the dish the Pal ate).
+    item_names = load(cache, "psp/l10n/items.json")
+    food = {}
+    for item_id, value in sorted(load(cache, "pwst/foodbuffdata.json")["food_buffs"].items()):
+        effects = [[e["type"], e["value"]] for e in value.get("effects") or [] if e["type"] in ("Attack", "Defense", "WorkSpeed")]
+        if effects:
+            food[item_id] = [(item_names.get(item_id) or {}).get("localized_name") or item_id, effects]
     exp_table = load(cache, "psp/exp.json")
     exp_totals = [exp_table[str(level)]["PalTotalEXP"] for level in range(1, len(exp_table) + 1)]
     lines = ["{", f'"elements":{json.dumps(ELEMENTS)},', f'"work":{json.dumps(WORK_KEYS)},',
              f'"maxLevel":{max_pal_level(cache)},', f'"friendship":{json.dumps(friendship, separators=(",", ":"))},',
-             f'"exp":{json.dumps(exp_totals, separators=(",", ":"))},', '"pals":{']
+             f'"exp":{json.dumps(exp_totals, separators=(",", ":"))},',
+             f'"food":{json.dumps(food, separators=(",", ":"), ensure_ascii=False)},', '"pals":{']
     items = list(traits.items())
     for i, (pal_id, value) in enumerate(items):
         lines.append(f'{json.dumps(pal_id)}:{json.dumps(value, separators=(",", ":"), ensure_ascii=False)}{"," if i < len(items) - 1 else ""}')

@@ -4,10 +4,10 @@
       <div class="level-block">
         <span>Level</span>
         <strong>{{ valueFor('level') || '-' }}</strong>
-        <small class="next-exp" *ngIf="expNext as next" [title]="next.title">
-          <span>Next</span><b>{{ next.text }}</b>
+        <div class="next-exp" *ngIf="expNext as next" [title]="next.title">
+          <div class="next-line"><span>Next</span><b>{{ next.text }}</b></div>
           <i class="exp-bar"><em [style.width.%]="next.percent"></em></i>
-        </small>
+        </div>
       </div>
 
       <div class="name-block">
@@ -127,21 +127,29 @@
             <span class="bar"><i [style.width.%]="trust.progress"></i></span>
             <strong>{{ trust.rank }}</strong>
           </div>
-          <div class="bar-row" *ngFor="let bar of vitalBars" [attr.data-tone]="bar.tone" [title]="bar.title">
-            <span class="bar-icon">{{ bar.icon }}</span>
+          <div class="bar-row" *ngFor="let bar of vitalBars" [attr.data-tone]="bar.tone" [title]="bar.tooltip ? null : bar.title" [appTooltip]="bar.tooltip" tabindex="-1">
+            <span class="bar-icon" [attr.data-icon]="bar.icon" aria-hidden="true">
+              <ng-container *ngIf="bar.icon === 'hp'">♥</ng-container>
+              <ng-container *ngIf="bar.icon === 'san'">☺</ng-container>
+              <svg *ngIf="bar.icon === 'bread'" viewBox="0 0 24 24"><path d="M4 11c0-3 3-5 8-5s8 2 8 5c0 1.3-.8 2.2-2 2.6V19H6v-5.4C4.8 13.2 4 12.3 4 11z"/><path class="crust" d="M9 13l1.5 2 1.5-2 1.5 2 1.5-2" fill="none"/></svg>
+            </span>
             <span class="bar-label">{{ bar.label }}</span>
             <span class="bar"><i [style.width.%]="bar.percent"></i></span>
             <strong>{{ bar.value }}</strong>
+          </div>
+          <div class="food-line" *ngIf="foodEffect as food" title="Food status effect stored in the save">
+            <span class="bar-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11c0-3 3-5 8-5s8 2 8 5c0 1.3-.8 2.2-2 2.6V19H6v-5.4C4.8 13.2 4 12.3 4 11z"/><path class="crust" d="M9 13l1.5 2 1.5-2 1.5 2 1.5-2" fill="none"/></svg></span>
+            <span class="bar-label">Food</span>
+            <span class="food-text"><b>{{ food.name }}</b> · {{ food.effects }}<small *ngIf="food.timeLeft"> · {{ food.timeLeft }}</small></span>
           </div>
         </div>
         <div class="stat-panels">
           <section class="stat-panel combat-panel" *ngIf="combatStats.length">
             <h3>Stats</h3>
-            <div *ngFor="let stat of combatStats" class="stat" [title]="stat.title">
+            <div *ngFor="let stat of combatStats" class="stat" [appTooltip]="stat.tooltip" tabindex="-1">
               <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small>
               <strong>{{ stat.value }}<i class="delta" *ngIf="stat.delta" [class.down]="stat.delta < 0">{{ stat.delta > 0 ? '▲' : '▼' }}</i></strong>
             </div>
-            <p class="stat-note" *ngIf="statNote">{{ statNote }}</p>
           </section>
           <section class="stat-panel" *ngIf="ivStats.length">
             <h3>IV</h3>
@@ -161,7 +169,7 @@
 
     <section class="partner-panel" *ngIf="partnerSkill as partner">
       <h3>Partner Skill</h3>
-      <div class="partner-line">
+      <div class="partner-line" [appTooltip]="partner.tooltip" tabindex="-1">
         <strong>{{ partner.name }}</strong>
         <span class="partner-level" *ngIf="partner.level" title="Partner skill level: condensing stars + 1">Lv.{{ partner.level }}</span>
       </div>
@@ -184,7 +192,7 @@
       </div>
     </section>
 
-    <div class="skill-layout" *ngIf="passiveSkills.length || activeSkillChips.length">
+    <div class="skill-layout" *ngIf="passiveSkills.length || activeSkillChips.length || learnedSkillChips.length">
       <section class="skill-group" *ngIf="passiveSkills.length">
         <h3>Passive Skills</h3>
         <div class="skill-chips">
@@ -196,7 +204,7 @@
             target="_blank"
             rel="noopener noreferrer"
             [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
-            [title]="skill.description"
+            [appTooltip]="skill.tooltip"
           >
             {{ skill.name }}
             <img
@@ -210,25 +218,47 @@
         </div>
       </section>
 
-      <section class="skill-group" *ngIf="activeSkillChips.length">
+      <section class="skill-group moves-group" *ngIf="activeSkillChips.length || learnedSkillChips.length">
         <h3>Active Skills</h3>
-        <div class="move-list">
-          <a
-            *ngFor="let skill of activeSkillChips"
-            class="move-chip"
-            [attr.data-element]="skill.elementIndex"
-            [href]="skill.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
-            [title]="skill.tooltip"
-          >
-            <span class="move-name">{{ skill.name }}</span>
-            <span class="move-meta" *ngIf="skill.power">
-              <img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt="">
-              <b>{{ skill.power }}</b>
-            </span>
-          </a>
+        <div class="move-columns">
+          <div class="move-column">
+            <h4>Equipped</h4>
+            <div class="move-list">
+              <a
+                *ngFor="let skill of activeSkillChips"
+                class="move-chip"
+                [attr.data-element]="skill.elementIndex"
+                [href]="skill.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
+                [appTooltip]="skill.tooltip"
+              >
+                <span class="move-name">{{ skill.name }}</span>
+                <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
+              </a>
+              <span class="move-empty" *ngFor="let slot of emptySlots">Empty Skill Slot</span>
+            </div>
+          </div>
+          <div class="move-column">
+            <h4>Learned, not equipped</h4>
+            <div class="move-list">
+              <a
+                *ngFor="let skill of learnedSkillChips"
+                class="move-chip learned"
+                [attr.data-element]="skill.elementIndex"
+                [href]="skill.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
+                [appTooltip]="skill.tooltip"
+              >
+                <span class="move-name">{{ skill.name }}</span>
+                <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
+              </a>
+              <span class="move-empty" *ngIf="!learnedSkillChips.length">None</span>
+            </div>
+          </div>
         </div>
       </section>
     </div>

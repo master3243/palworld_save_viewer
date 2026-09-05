@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
 import { GameDataService } from './game-data.service';
+import { TooltipData, TooltipDirective } from './game-tooltip.component';
 
 import { Game8LookupService } from './game8-lookup.service';
 import { GenderIconComponent } from './gender-icon.component';
@@ -12,16 +13,17 @@ import { PalStorageRow } from './save-parser.service';
 
 interface DetailField { key: string; label: string; value: string; rawValue?: string; }
 interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense' | 'crafting'; }
-interface PassiveSkill { name: string; rank: string; color: string; rankMarker: string; rankIcon: string; description: string; }
-interface VitalBar { label: string; icon: string; value: string; percent: number; title: string; tone: string; }
-interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting'; delta: number; title: string; }
-interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: string; url: string; }
-interface PartnerSkill { name: string; level: string; text: string; }
+interface PassiveSkill { name: string; rank: string; color: string; rankMarker: string; rankIcon: string; tooltip: TooltipData; }
+interface VitalBar { label: string; icon: string; value: string; percent: number; title: string; tone: string; tooltip: TooltipData | null; }
+interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting'; delta: number; tooltip: TooltipData; }
+interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: TooltipData; url: string; }
+interface PartnerSkill { name: string; level: string; text: string; tooltip: TooltipData; }
+interface FoodEffect { name: string; effects: string; timeLeft: string; }
 
 @Component({
   selector: 'app-pal-detail-card',
   standalone: true,
-  imports: [CommonModule, GenderIconComponent],
+  imports: [CommonModule, GenderIconComponent, TooltipDirective],
   templateUrl: './pal-detail-card.component.html',
   styleUrl: './pal-detail-card.component.css'
 })
@@ -56,32 +58,58 @@ export class PalDetailCardComponent implements OnChanges {
     'max_hp', 'attack', 'defense', 'work_speed', 'max_hp_base', 'attack_base', 'defense_base',
     'passive_hp_pct', 'passive_attack_pct', 'passive_defense_pct', 'passive_work_speed_pct', 'hunger_max',
     'trust_rank', 'trust_progress', 'trust_next', 'exp_to_next', 'exp_progress',
-    'partner_skill', 'partner_skill_level', 'partner_skill_text'
+    'partner_skill', 'partner_skill_level', 'partner_skill_text',
+    'trust_hp', 'trust_attack', 'trust_defense', 'food_effect', 'food_attack_pct', 'food_defense_pct', 'food_work_speed_pct', 'food_seconds_left',
+    'food_status_effect_item', 'food_with_status_effect_timer'
   ]);
 
   /** HP, hunger and SAN as the game's status bars show them (current values are as of the save). */
-  get vitalBars(): VitalBar[] {
+  vitalBars: VitalBar[] = [];
+  private computeVitalBars(): VitalBar[] {
     const bars: VitalBar[] = [];
-    const bar = (label: string, icon: string, tone: string, current: number | null, max: number | null, title: string) => {
+    const bar = (label: string, icon: string, tone: string, current: number | null, max: number | null, title: string, tooltip: TooltipData | null) => {
       if (current === null && max === null) return;
       const shown = current ?? max ?? 0;
       const percent = max ? Math.min(100, Math.max(0, shown / max * 100)) : 100;
       if (max !== null && shown > max + 0.5) {
-        // Above the max we can compute: the game adds bonuses (Trust, Pal Souls) we do not model yet.
-        bars.push({ label, icon, tone, value: String(this.round(shown)), percent: 100, title: `${title} · max without Trust and Pal Soul bonuses: ${this.round(max)}` });
+        // Above the max we can compute: a bonus we do not model yet.
+        bars.push({ label, icon, tone, value: String(this.round(shown)), percent: 100, title: `${title} · computed max: ${this.round(max)}`, tooltip });
         return;
       }
       const value = max !== null ? `${this.round(shown)} / ${this.round(max)}` : String(this.round(shown));
-      bars.push({ label, icon, tone, value, percent, title });
+      bars.push({ label, icon, tone, value, percent, title, tooltip });
     };
-    bar('HP', '♥', 'hp', this.numberFor('hp'), this.numberFor('max_hp'), 'Current HP at save time / max HP');
+    bar('HP', 'hp', 'hp', this.numberFor('hp'), this.numberFor('max_hp'), 'Current HP at save time / max HP', this.statBreakdown('Max HP', 'max_hp', 'max_hp_base', 'trust_hp', 'passive_hp_pct', null));
     // SanityValue is only written once it drops, so a missing value is a full 100.
-    bar('Hunger', '◖', 'hunger', this.numberFor('full_stomach'), this.numberFor('hunger_max'), 'Hunger at save time / max');
-    if (this.numberFor('hp') !== null) bar('SAN', '☺', 'sanity', this.numberFor('sanity') ?? 100, 100, 'Sanity at save time');
+    bar('Hunger', 'bread', 'hunger', this.numberFor('full_stomach'), this.numberFor('hunger_max'), 'Hunger at save time / max', null);
+    if (this.numberFor('hp') !== null) bar('SAN', 'san', 'sanity', this.numberFor('sanity') ?? 100, 100, 'Sanity at save time', null);
     return bars;
   }
 
-  get trust(): { rank: string; progress: number; title: string } | null {
+  /** How the game arrives at a stat: species value, trust, condensing, souls, passives, food. */
+  private statBreakdown(label: string, key: string, baseKey: string, trustKey: string, pctKey: string, foodKey: string | null): TooltipData | null {
+    const value = this.numberFor(key);
+    const base = this.numberFor(baseKey);
+    if (value === null || base === null) return null;
+    const trust = this.numberFor(trustKey) ?? 0;
+    const stars = this.displayRank;
+    const soulKey = ({ max_hp: 'soul_rank_hp', attack: 'soul_rank_attack', defense: 'soul_rank_defense' } as Record<string, string>)[key] ?? '';
+    const souls = this.numberFor(soulKey) ?? 0;
+    const pct = this.numberFor(pctKey) ?? 0;
+    const foodPct = foodKey ? this.numberFor(foodKey) ?? 0 : 0;
+    const rows: [string, string][] = [['Species + level + IV', String(base - trust)]];
+    if (trust) rows.push([`Trust rank ${this.numberFor('trust_rank') ?? 0}`, `+${trust}`]);
+    if (stars) rows.push([`Condensing ${'★'.repeat(stars)}`, `+${stars * 5}%`]);
+    if (souls) rows.push([`Pal Souls (rank ${souls})`, `+${souls * 3}%`]);
+    if (trust || stars || souls) rows.push(['Base', String(base)]);
+    if (pct) rows.push(['Passive skills', `${pct > 0 ? '+' : ''}${pct}%`]);
+    if (foodPct) rows.push([`Food: ${this.valueFor('food_effect')}`, `${foodPct > 0 ? '+' : ''}${foodPct}%`]);
+    rows.push(['Total', String(value)]);
+    return { title: label, rows };
+  }
+
+  trust: { rank: string; progress: number; title: string } | null = null;
+  private computeTrust(): { rank: string; progress: number; title: string } | null {
     const points = this.numberFor('friendship_points');
     const rank = this.numberFor('trust_rank');
     if (points === null || rank === null) return null;
@@ -92,7 +120,8 @@ export class PalDetailCardComponent implements OnChanges {
     return { rank: String(rank), progress, title };
   }
 
-  get expNext(): { text: string; percent: number; title: string } | null {
+  expNext: { text: string; percent: number; title: string } | null = null;
+  private computeExpNext(): { text: string; percent: number; title: string } | null {
     const toNext = this.numberFor('exp_to_next');
     if (toNext === null) return null;
     const percent = this.numberFor('exp_progress') ?? 0;
@@ -100,62 +129,100 @@ export class PalDetailCardComponent implements OnChanges {
     return { text: toNext.toLocaleString(), percent, title: `${toNext.toLocaleString()} exp to the next level` };
   }
 
-  get combatStats(): CombatStat[] {
+  combatStats: CombatStat[] = [];
+  private computeCombatStats(): CombatStat[] {
     const stats: CombatStat[] = [];
-    const push = (label: string, icon: CombatStat['icon'], key: string, baseKey: string, pctKey: string) => {
+    const push = (label: string, icon: CombatStat['icon'], key: string, baseKey: string, trustKey: string, pctKey: string, foodKey: string) => {
       const value = this.numberFor(key);
-      if (value === null) return;
+      const tooltip = this.statBreakdown(label, key, baseKey, trustKey, pctKey, foodKey);
+      if (value === null || !tooltip) return;
       const base = this.numberFor(baseKey);
-      const pct = this.numberFor(pctKey) ?? 0;
-      const parts = [base !== null && base !== value ? `${base} → ${value}` : String(value)];
-      if (pct) parts.push(`Passive skills ${pct > 0 ? '+' : ''}${pct}%`);
-      stats.push({ label, value: String(value), icon, delta: base === null ? 0 : Math.sign(value - base), title: parts.join(' · ') });
+      stats.push({ label, value: String(value), icon, delta: base === null ? 0 : Math.sign(value - base), tooltip });
     };
-    push('Attack', 'attack', 'attack', 'attack_base', 'passive_attack_pct');
-    push('Defense', 'defense', 'defense', 'defense_base', 'passive_defense_pct');
+    push('Attack', 'attack', 'attack', 'attack_base', 'trust_attack', 'passive_attack_pct', 'food_attack_pct');
+    push('Defense', 'defense', 'defense', 'defense_base', 'trust_defense', 'passive_defense_pct', 'food_defense_pct');
     const workSpeed = this.numberFor('work_speed');
     if (workSpeed !== null) {
+      const stars = this.displayRank;
       const pct = this.numberFor('passive_work_speed_pct') ?? 0;
-      stats.push({ label: 'Work Speed', value: String(workSpeed), icon: 'crafting', delta: Math.sign(pct), title: pct ? `Passive skills ${pct > 0 ? '+' : ''}${pct}%` : '70 + 7 per condensing star' });
+      const foodPct = this.numberFor('food_work_speed_pct') ?? 0;
+      const rows: [string, string][] = [['Every Pal', '70']];
+      if (stars) rows.push([`Condensing ${'★'.repeat(stars)}`, `+${stars * 7}`]);
+      if (pct) rows.push(['Passive skills', `${pct > 0 ? '+' : ''}${pct}%`]);
+      if (foodPct) rows.push([`Food: ${this.valueFor('food_effect')}`, `+${foodPct}%`]);
+      rows.push(['Total', String(workSpeed)]);
+      stats.push({ label: 'Work Speed', value: String(workSpeed), icon: 'crafting', delta: Math.sign(pct + foodPct), tooltip: { title: 'Work Speed', rows } });
     }
     return stats;
   }
 
-  /** Bonuses the game applies that these numbers leave out. */
-  get statNote(): string {
-    const missing: string[] = [];
-    if ((this.numberFor('trust_rank') ?? 0) >= 1) missing.push('Trust');
-    if (['soul_rank_hp', 'soul_rank_attack', 'soul_rank_defense', 'soul_rank_craft_speed'].some((key) => (this.numberFor(key) ?? 0) > 0)) missing.push('Pal Soul');
-    return missing.length ? `${missing.join(' and ')} bonus not included` : '';
+  /** The dish whose status effect is still running. */
+  foodEffect: FoodEffect | null = null;
+  private computeFoodEffect(): FoodEffect | null {
+    const name = this.valueFor('food_effect');
+    if (!name) return null;
+    const parts: string[] = [];
+    for (const [label, key] of [['Attack', 'food_attack_pct'], ['Defense', 'food_defense_pct'], ['Work Speed', 'food_work_speed_pct']]) {
+      const pct = this.numberFor(key);
+      if (pct) parts.push(`${label} ${pct > 0 ? '+' : ''}${pct}%`);
+    }
+    const seconds = this.numberFor('food_seconds_left') ?? 0;
+    const timeLeft = seconds > 0 ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} left at save time` : '';
+    return { name, effects: parts.join(' · '), timeLeft };
   }
 
-  get partnerSkill(): PartnerSkill | null {
+  partnerSkill: PartnerSkill | null = null;
+  private computePartnerSkill(): PartnerSkill | null {
     const name = this.valueFor('partner_skill');
     if (!name) return null;
-    return { name, level: this.valueFor('partner_skill_level'), text: this.valueFor('partner_skill_text') };
+    const level = this.valueFor('partner_skill_level');
+    const text = this.valueFor('partner_skill_text');
+    return { name, level, text, tooltip: { title: `${name}${level ? ` Lv.${level}` : ''}`, lines: text ? [text] : [], note: text ? undefined : 'The game text for this skill needs data we do not have yet.' } };
   }
 
-  get activeSkillChips(): ActiveSkillChip[] {
-    const ids = this.listFor('active_skill_ids');
-    const names = this.listFor('combat_moves');
+  activeSkillChips: ActiveSkillChip[] = [];
+  learnedSkillChips: ActiveSkillChip[] = [];
+  emptySlots: number[] = [];
+  passiveSkills: PassiveSkill[] = [];
+
+  /** Recompute everything the template shows for the current row. */
+  private refresh(): void {
+    this.vitalBars = this.computeVitalBars();
+    this.trust = this.computeTrust();
+    this.expNext = this.computeExpNext();
+    this.combatStats = this.computeCombatStats();
+    this.foodEffect = this.computeFoodEffect();
+    this.partnerSkill = this.computePartnerSkill();
+    this.passiveSkills = this.computePassiveSkills();
+    this.activeSkillChips = this.skillChips(this.listFor('active_skill_ids'), this.listFor('combat_moves'));
+    this.learnedSkillChips = this.computeLearnedSkillChips();
+    this.emptySlots = Array.from({ length: Math.max(0, 3 - this.activeSkillChips.length) }, (_, index) => index);
+  }
+
+  /** Learned skills that are not in the three equipped slots. */
+  private computeLearnedSkillChips(): ActiveSkillChip[] {
+    const equipped = new Set(this.listFor('active_skill_ids'));
+    const ids = this.listFor('mastered_skill_ids');
+    const names = this.listFor('learned_moves');
+    const keep = ids.map((id, index) => [id, names[index] ?? id] as const).filter(([id]) => !equipped.has(id));
+    return this.skillChips(keep.map(([id]) => id), keep.map(([, name]) => name));
+  }
+
+  private skillChips(ids: string[], names: string[]): ActiveSkillChip[] {
     return names.map((name, index) => {
       const id = ids[index] ?? '';
       const detail = this.gameData.activeDetail(id);
       const elementIndex = detail?.element ?? -1;
-      const tooltip: string[] = [];
-      if (detail) {
-        tooltip.push(`${ELEMENT_NAMES[elementIndex] ?? ''} · Power ${detail.power} · Cooldown ${detail.cooldown}s${detail.melee ? ' · Melee' : ''}`);
-        for (const [effect, value] of detail.effects) tooltip.push(`${effect} ${value}`);
-      }
+      const iconSrc = elementIndex >= 0 ? `assets/icons/element_${String(elementIndex).padStart(2, '0')}.webp` : '';
       const description = this.gameData.activeDescription(id);
-      if (description) tooltip.push(description);
-      return {
-        name, elementIndex,
-        iconSrc: elementIndex >= 0 ? `assets/icons/element_${String(elementIndex).padStart(2, '0')}.webp` : '',
-        power: detail ? String(detail.power) : '',
-        tooltip: tooltip.join('\n'),
-        url: this.activeSkillUrl(name),
-      };
+      const tooltip: TooltipData = { title: name, lines: description ? [description] : [] };
+      if (detail) {
+        tooltip.badge = { text: ELEMENT_NAMES[elementIndex] ?? '', iconSrc, element: elementIndex };
+        tooltip.stats = [{ icon: 'clock', label: ':', value: String(detail.cooldown) }, { icon: 'power', label: 'Power:', value: String(detail.power) }];
+        const effects = detail.effects.map(([effect, value]) => `${effect} ${value}`);
+        if (detail.melee || effects.length) tooltip.note = [detail.melee ? 'Melee' : '', ...effects].filter(Boolean).join(' · ');
+      }
+      return { name, elementIndex, iconSrc, power: detail ? String(detail.power) : '', tooltip, url: this.activeSkillUrl(name) };
     });
   }
 
@@ -229,7 +296,7 @@ export class PalDetailCardComponent implements OnChanges {
     return stats.filter((stat) => stat.value !== '');
   }
 
-  get passiveSkills(): PassiveSkill[] {
+  private computePassiveSkills(): PassiveSkill[] {
     const names = this.listFor('skills');
     const ranks = this.listFor('skill_ranks');
     const colors = this.listFor('skill_colors');
@@ -243,7 +310,8 @@ export class PalDetailCardComponent implements OnChanges {
       const rankIcon = numericRank
         ? `assets/ui/passive_${direction}_${Math.abs(numericRank)}.pog`
         : '';
-      return { name, rank, color, rankMarker, rankIcon, description: this.gameData.passiveDescription(ids[index] ?? '') };
+      const description = this.gameData.passiveDescription(ids[index] ?? '');
+      return { name, rank, color, rankMarker, rankIcon, tooltip: { title: name, lines: description ? [description] : [], note: description ? undefined : 'No description in the game data.' } };
     });
   }
 
@@ -261,10 +329,14 @@ export class PalDetailCardComponent implements OnChanges {
     private readonly gameData: GameDataService,
     private readonly changeDetector: ChangeDetectorRef
   ) {
-    void this.gameData.load().then(() => this.changeDetector.markForCheck());
+    void this.gameData.load().then(() => {
+      if (this.row) this.refresh();
+      this.changeDetector.markForCheck();
+    });
   }
 
   ngOnChanges(): void {
+    this.refresh();
     this.palImageFailed = false;
     this.palImageSrc = '';
     const palPath = this.palImageUrl;
