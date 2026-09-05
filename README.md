@@ -8,6 +8,16 @@ Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, a
 
 ## [https://master3243.github.io/palworld_save_viewer/](https://master3243.github.io/palworld_save_viewer/)
 
+## Example
+
+Example of searching my save for Pals with perfect IVs and 4 diamond active skills:
+
+<img src="resources/perfectIVsearch.png" alt="Example of perfect IV search" width="500" />
+
+Example of searching my save for Male Bellanoir with perfect IVs and Serenity (for breeding):
+
+<img src="resources/perfectMaleBellanoirSerenity.png" alt="Example of male Bellanoir and Serenity search" width="500" />
+
 ## How do I use it?
 
 Simply open the link, click the "demo" then "Load" buttons to load my personal save file. Now you'll see all the Pals I have with detailed stats and support for arbitrarily complex search filters (even across multiple save files).
