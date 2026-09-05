@@ -625,7 +625,7 @@ export class AppComponent {
     switch (kind) {
       case 'level': return 'Data for every Pal (minus the dimensional storage)';
       case 'dimensional_storage': return 'Dimensional Pal Storage.';
-      case 'player': return 'Metadata mapping container to either player\'s party or Pal Box (mostly can be inferred and not needed).';
+      case 'player': return 'Metadata mapping container to either the player\'s party or Pal Box (mostly can be inferred and not needed).';
       case 'level_meta': return 'Metadata used to label the save.';
       default: return 'Not a pal save; ignored.';
     }

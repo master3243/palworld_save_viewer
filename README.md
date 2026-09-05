@@ -20,7 +20,7 @@ For Steam users, the save folder is located at:
 %LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\
 ```
 
-Where `IDprofile` and `IDworld` are long random numbers. Inside it, `Level.sav` holds all Pal info (other than the dimensional storage), `Players\xxx_dps.sav` is the dimensional storage Pals, and `Players\xxx.sav` for tiny metadata mapping Pals to either a base or party.
+Where `IDprofile` and `IDworld` are long random numbers. Inside it, `Level.sav` holds all Pal info (other than the dimensional storage), `Players\xxx_dps.sav` is the dimensional storage Pals, and `Players\xxx.sav` tiny metadata mapping container to either the player's party or Pal Box (mostly can be inferred and not needed).
 
 For best results, drop these three items: the "Level.sav" file, "LevelMeta.sav" file, and the "Players" folder (contains 2 files).
 
@@ -68,10 +68,8 @@ Resources used while building the save decoder
   - Used as a reference for the Palworld `PlM1` save wrapper and Oodle-compressed `GVAS` payload shape.
 - [pyooz](https://pypi.org/project/pyooz/)
   - Used by the Python extractor to decompress the Oodle/Kraken save payload locally.
-- [Palworld Server Manager active skills data](https://github.com/amantu-qbit/palworld-server-manager/blob/main/bridge/data/active_skills.json)
-  - Map internal combat move IDs to readable names.
-- [Palworld Server Manager passive skills data](https://github.com/amantu-qbit/palworld-server-manager/blob/main/bridge/data/passive_skills.json)
-  - Map internal passive skill IDs to in-game display names.
+- [Palworld Server Manager active skills data](https://github.com/amantu-qbit/palworld-server-manager/blob/main/bridge/data/)
+  - `active_skills.json` to map internal combat move IDs to readable names and `passive_skills.json` to map internal passive skill IDs to in-game display names.
 - [AdminCommands Pal data](https://github.com/dkoz/AdminCommands/blob/main/AdminCommands/Scripts/enums/paldata.lua)
   - Map internal Pal species IDs to in-game Pal names.
 - [PalScouter passive ranks](https://github.com/tanguyannequin-dev/mod-palworld/blob/main/PalScouter/Scripts/passive_ranks.lua)
@@ -84,13 +82,13 @@ Resources used while building the save decoder
 Dropping a whole world save folder onto the viewer provides the most complete view as it automatically decodes all relevant files (everything is decoded in the browser, nothing is uploaded).
 
 
-| File                               | Where it lives | What it contributes                                                                                     |
-| ---------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------|
-| `Level.sav`                        | world folder   | Data for every Pal (minus the dimensional storage)                                                      |
-| `Players/<uid>_dps.sav`            | world folder   | Dimensional Pal Storage (up to 9,600 Pals)                                                              |
-| `Players/<uid>.sav`                | world folder   | Metadata mapping container to either player\'s party or Pal Box (mostly can be inferred and not needed) |
-| `LevelMeta.sav`                    | world folder   | Metadata used to label the save                                                                         |
-| `LocalData.sav`, `WorldOption.sav` | world folder   | Skipped, contain no useful info for us                                                                  |
+| File                               | Contains Pals  | What it contributes                                                                                       |
+| ---------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------|
+| `Level.sav`                        | yes            | Data for every Pal (minus the dimensional storage)                                                        |
+| `Players/<uid>_dps.sav`            | yes            | Dimensional Pal Storage (up to 9,600 Pals)                                                                |
+| `Players/<uid>.sav`                | no             | Metadata mapping container to either the player's party or Pal Box (mostly can be inferred and not needed)|
+| `LevelMeta.sav`                    | no             | Metadata used to label the save                                                                           |
+| `LocalData.sav`, `WorldOption.sav` | no             | Skipped, contain no useful info for us                                                                    |
 
 
 Files from different worlds can be loaded side by side and the table will show which save file each Pal belongs to.
