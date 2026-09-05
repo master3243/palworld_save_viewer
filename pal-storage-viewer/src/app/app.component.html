@@ -234,8 +234,9 @@
         <thead>
           <tr>
             <th class="arrow-cell"></th>
+            <ng-container *ngFor="let column of displayedColumns; trackBy: trackColumn">
+            <th *ngIf="column.key === 'pal_name'" class="pal-icon-cell" title="Pal portrait"></th>
             <th
-              *ngFor="let column of displayedColumns; trackBy: trackColumn"
               [class.pal-name-cell]="column.key === 'pal_name'"
               [style.width.px]="column.key === 'pal_name' ? palNameWidth : null"
               [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
@@ -259,6 +260,7 @@
               <span class="sort-marker" *ngIf="sortMarker(column)">{{ sortMarker(column) }}</span>
               <span class="header-label">{{ column.label }}</span>
             </th>
+            </ng-container>
           </tr>
         </thead>
         <tbody>
@@ -283,8 +285,11 @@
                   <span class="row-arrow" [class.open]="isRowOpen(item.index)">&gt;</span>
                 </button>
               </td>
+              <ng-container *ngFor="let column of displayedColumns; trackBy: trackColumn">
+              <td *ngIf="column.key === 'pal_name'" class="pal-icon-cell">
+                <img *ngIf="palIconSrc(item.row) as icon" class="pal-icon" [src]="icon" alt="">
+              </td>
               <td
-                *ngFor="let column of displayedColumns; trackBy: trackColumn"
                 [class.pal-name-cell]="column.key === 'pal_name'"
                 [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
                 [class.trait-cell]="column.key === 'elements' || column.key === 'work'"
@@ -365,6 +370,7 @@
                   {{ cellDisplay(item.row, column) }}
                 </ng-container>
               </td>
+              </ng-container>
             </tr>
             <tr class="detail-row" *ngIf="isRowOpen(item.index)">
               <td [attr.colspan]="detailColspan">

@@ -5,6 +5,7 @@ import { elementIcons, workTable } from './trait-icons';
 import { Game8LookupService } from './game8-lookup.service';
 import { GenderIconComponent } from './gender-icon.component';
 import { OfflineImageService } from './offline-image.service';
+import { palImagePath } from './pal-image';
 import { PalStorageRow } from './save-parser.service';
 
 interface DetailField { key: string; label: string; value: string; rawValue?: string; }
@@ -73,8 +74,7 @@ export class PalDetailCardComponent implements OnChanges {
 
   get palImageUrl(): string {
     // The backend supplies the id as the game data spells it; saves vary in case.
-    const speciesId = this.valueFor('species_base_id') || this.imageSpeciesId(this.valueFor('species_id'));
-    return speciesId ? `assets/pals/${encodeURIComponent(speciesId)}.pog` : '';
+    return palImagePath(this.valueFor('species_base_id'), this.valueFor('species_id'));
   }
 
   get gender(): string { return this.valueFor('gender'); }
@@ -230,15 +230,6 @@ export class PalDetailCardComponent implements OnChanges {
       : new Date(value);
     if (Number.isNaN(date.getTime())) return value;
     return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
-  }
-
-  private imageSpeciesId(value: string): string {
-    return value
-      .replace(/^(?:BOSS_|Boss_|PREDATOR_|POLICE_|RAID_|SUMMON_)/, '')
-      .replace(/^Quest_Farmer03_/, '')
-      .replace(/_(?:BossRush|Oilrig|Tower|otomo|MAX)$/, '')
-      .replace(/_Quest(?:_Enemy|_Friend)?$/, '')
-      .replace(/_2$/, '');
   }
 
   private get wikiName(): string {

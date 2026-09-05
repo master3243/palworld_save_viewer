@@ -12,6 +12,7 @@ import { GithubIconComponent } from './github-icon.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
+import { palImagePath } from './pal-image';
 import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource } from './save-parser.service';
 import { elementIcons, workIcons } from './trait-icons';
 import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
@@ -304,7 +305,29 @@ export class AppComponent {
   }
 
   get detailColspan(): number {
-    return this.displayedColumns.length + 1;
+    // The arrow column plus the unsortable portrait column that precedes the Pal name.
+    return this.displayedColumns.length + 1 + (this.showsPalIcons ? 1 : 0);
+  }
+
+  get showsPalIcons(): boolean {
+    return this.displayedColumns.some((column) => column.key === 'pal_name');
+  }
+
+  /** Portrait data URLs keyed by asset path; filled lazily as rows scroll into view. */
+  private readonly palIconSrcs = new Map<string, string>();
+
+  palIconSrc(row: PalStorageRow): string {
+    const path = palImagePath(this.cellValue(row, 'species_base_id'), this.cellValue(row, 'species_id'));
+    if (!path) return '';
+    const cached = this.palIconSrcs.get(path);
+    if (cached !== undefined) return cached;
+    this.palIconSrcs.set(path, '');
+    void this.offlineImages.load(path).then((source) => {
+      if (!source) return;
+      this.palIconSrcs.set(path, source);
+      this.changeDetector.markForCheck();
+    });
+    return '';
   }
 
   get virtualStartIndex(): number {
