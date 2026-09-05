@@ -20,6 +20,8 @@ import urllib.request
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent / "resources" / "completion"
+# Hand-collected lists that no extraction project provides
+EXTRA_SOURCES = Path(__file__).resolve().parent / "completion_sources"
 OUT = HERE / "completion-data.json"
 PAL_NAMES_LUA = HERE.parent / "pal_names_lookup.lua"
 
@@ -92,8 +94,8 @@ QUEST_MAP_COORDS = {
 
 
 def map_to_world(map_x: int, map_y: int) -> tuple[int, int]:
-    """Inverse of the in-game map readout: world x, y in Unreal units."""
-    return (-map_y * 459 - 123930, map_x * 459 + 157935)
+    """Inverse of the in-game map readout (map x = (world y - 157935) / 459, map y = (world x + 123930) / 459)."""
+    return (map_y * 459 - 123930, map_x * 459 + 157935)
 
 
 # EPalRelicType enum name for each snake_case relic type key.
@@ -240,7 +242,15 @@ def build(cache: Path) -> dict:
 
     areas = {area: humanize(area) for area in load(cache, "pwst/world_map_areas.json")["areas"]}
 
-    ruins = {guid: coords(v) for guid, v in sorted(load(cache, "psp/ancient_ruins.json").items())}
+    # Ruin pickups: coordinates from the level data; what each one holds comes from paldb.cc
+    # item pages, keyed by in-game map coordinates.
+    ruin_items = json.loads((EXTRA_SOURCES / "ancient_ruins_paldb.json").read_text(encoding="utf-8"))["items"]
+    ruins = {}
+    for guid, value in sorted(load(cache, "psp/ancient_ruins.json").items()):
+        x, y, z = coords(value)
+        map_key = f"{round((y - 157935) / 459)},{round((x + 123930) / 459)}"
+        held = ruin_items.get(map_key) or {}
+        ruins[guid] = [x, y, z, held.get("name", ""), held.get("item", "")]
 
     # Paldeck: one entry per species/variant. The pal table also holds encounter clones
     # (quest, summon, oil rig and tower copies) that share a deck number; skip those.

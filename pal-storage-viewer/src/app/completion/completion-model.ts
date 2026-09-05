@@ -23,8 +23,8 @@ export interface CompletionData {
   towers: Record<string, [string, number, number, number]>;
   /** area id -> name */
   areas: Record<string, string>;
-  /** level object id -> [x, y, z] */
-  ruinPickups: Record<string, [number, number, number]>;
+  /** level object id -> [x, y, z, item name, item id] */
+  ruinPickups: Record<string, [number, number, number, string, string]>;
   /** [tribe id, paldeck number, name] */
   paldeck: [string, number, string][];
   /** [technology id, name, required level, ancient (boss) technology?] */
@@ -117,9 +117,9 @@ export interface CompletionSummary {
 
 /* ------------------------------------------------------------------ maps */
 
-/** Unreal world units -> the coordinates the in-game map shows. */
+/** Unreal world units -> the coordinates the in-game map shows (checked against paldb.cc markers). */
 export function worldToMap(x: number, y: number): { x: number; y: number } {
-  return { x: Math.round((y - 157935) / 459), y: -Math.round((x + 123930) / 459) };
+  return { x: Math.round((y - 157935) / 459), y: Math.round((x + 123930) / 459) };
 }
 
 const WORLD_TREE = { min: { x: 347351.5, y: -818197 }, max: { x: 689148.5, y: -476400 } };
@@ -412,8 +412,9 @@ function areaCategory(record: PlayerCompletion, data: CompletionData): Category 
 
 function ruinCategory(record: PlayerCompletion, data: CompletionData): Category {
   const taken = new Set(record.item_pickups);
-  const items: TrackedItem[] = Object.entries(data.ruinPickups).map(([id, [x, y]]) => ({
-    id, name: 'Ruin pickup', detail: '', state: taken.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null,
+  const items: TrackedItem[] = Object.entries(data.ruinPickups).map(([id, [x, y, , itemName]]) => ({
+    id, name: itemName || 'Ruin pickup', detail: itemName ? '' : 'contents unknown', state: taken.has(id) ? 'done' : 'todo',
+    group: '', ...place(x, y), order: itemName ? 0 : 1, no: null,
   }));
   return finish({
     key: 'ruins', title: 'Ruin pickups', items, groups: [],
