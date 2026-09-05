@@ -313,22 +313,23 @@ function raidCategory(record: PlayerCompletion, data: CompletionData): Category 
 }
 
 function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: string[], key: string, title: string): Category {
-  const beaten = new Set(record.bosses);
+  // Spawner ids are Unreal FNames, which compare case-insensitively; the save may spell
+  // them differently from the level data (BOSS_Police_old vs BOSS_Police_Old).
+  const beaten = new Set(record.bosses.map((spawner) => spawner.toLowerCase()));
   const items: TrackedItem[] = [];
   const seen = new Set<string>();
   for (const [spawner, name, level, kind, x, y] of data.bosses) {
-    if (!kinds.includes(kind) || seen.has(spawner)) continue;
-    seen.add(spawner);
+    const lower = spawner.toLowerCase();
+    if (!kinds.includes(kind) || seen.has(lower)) continue;
+    seen.add(lower);
     items.push({
-      id: spawner, name, detail: level ? `Lv. ${level}` : '', state: beaten.has(spawner) ? 'done' : 'todo',
+      id: spawner, name, detail: level ? `Lv. ${level}` : '', state: beaten.has(lower) ? 'done' : 'todo',
       group: kind, ...place(x, y), order: level, no: null,
     });
   }
-  const known = new Set(data.bosses.filter(([, , , kind]) => kinds.includes(kind)).map(([spawner]) => spawner));
-  const allKnown = new Set(data.bosses.map(([spawner]) => spawner));
+  const allKnown = new Set(data.bosses.map(([spawner]) => spawner.toLowerCase()));
   // Only report ids that no boss list knows, and only once (on the alpha category).
-  const unknown = key === 'alphas' ? unknownIds(record.bosses, allKnown) : [];
-  void known;
+  const unknown = key === 'alphas' ? record.bosses.filter((spawner) => !allKnown.has(spawner.toLowerCase())).sort() : [];
   return finish({ key, title, items, groups: [], unknown });
 }
 
