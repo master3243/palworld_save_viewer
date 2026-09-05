@@ -493,7 +493,11 @@
             </tr>
             <tr class="detail-row" *ngIf="isRowOpen(item.index)">
               <td [attr.colspan]="detailColspan">
-                <app-pal-detail-card [row]="item.row" [showSave]="saveSets.length > 1"></app-pal-detail-card>
+                <!-- Sticks to the visible part of a horizontally scrolled table and is as wide as
+                     that view, so the card inside can be centred in what the user actually sees. -->
+                <div class="detail-viewport" [style.width.px]="viewportWidth">
+                  <app-pal-detail-card [row]="item.row" [showSave]="saveSets.length > 1"></app-pal-detail-card>
+                </div>
               </td>
             </tr>
           </ng-container>

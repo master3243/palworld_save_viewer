@@ -829,7 +829,16 @@ tbody tr:hover {
 .detail-row td {
   background: rgba(3, 11, 20, 0.72);
   border-bottom: 1px solid rgba(169, 226, 255, 0.22);
+  /* Plain cells clip with overflow: hidden; that would make this cell the sticky
+     container for the card wrapper and stop it following horizontal scrolling. */
+  overflow: visible;
   padding: 0;
+}
+
+.detail-viewport {
+  left: 0;
+  max-width: 100%;
+  position: sticky;
 }
 
 .spacer-row td {

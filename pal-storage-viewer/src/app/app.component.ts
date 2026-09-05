@@ -301,6 +301,8 @@ export class AppComponent {
   sortDirection: SortDirection = null;
   scrollTop = 0;
   viewportHeight = 560;
+  /** Visible width of the table scroller; the open card is centred within it. */
+  viewportWidth: number | null = null;
   palNameWidth = 140;
   detailHeight = 0;
   alphaImageSrc = '';
@@ -1009,6 +1011,7 @@ export class AppComponent {
       if (row?.offsetHeight) this.rowHeight = row.offsetHeight;
 
       if (scroller.clientHeight) this.viewportHeight = scroller.clientHeight;
+      if (scroller.clientWidth) this.viewportWidth = scroller.clientWidth;
 
       const card = scroller.querySelector<HTMLElement>('.detail-row');
       this.detailHeight = this.openRowIndex === null ? 0 : card?.offsetHeight ?? 0;
