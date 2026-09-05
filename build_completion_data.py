@@ -71,10 +71,26 @@ EXTRA_TOWERS = {
     "BOSS_BATTLE_NAME_WorldTreeMiddleBoss1": ("WorldTree_MiddleBoss_1", "World Tree: Rotmist Root"),
     "BOSS_BATTLE_NAME_WorldTreeMiddleBoss2": ("WorldTree_MiddleBoss_2", "World Tree: Shinespore Root"),
     "BOSS_BATTLE_NAME_WorldTreeMiddleBoss3": ("WorldTree_MiddleBoss_3", "World Tree: Forbidden Laboratory"),
+    # Final World Tree boss (EPalBossType::WorldTreeBoss); no warp point of its own.
+    "BOSS_BATTLE_NAME_WorldTreeBoss": ("", "World Tree: final boss"),
 }
 
 # Pals the table marks disabled that the game still registers in the Paldeck.
 DISABLED_BUT_IN_PALDECK = {"KingWhale"}
+
+# Quest objective markers the extracted mission table lacks, as in-game map coordinates
+# (from palworld.gamevault.in mission pages, which read them from the game files).
+QUEST_MAP_COORDS = {
+    "Sub_PalDisplay_A_01": (-346, 191), "Sub_PalDisplay_B_01": (-318, 126), "Sub_PalDisplay_C_01": (-236, 190),
+    "Sub_PalDisplay_D_01": (-219, 226), "Sub_PalDisplay_E_01": (32, 323), "Sub_PalDisplay_F_01": (-416, -89),
+    "Sub_PalDisplay_G_01": (-118, 138), "Sub_PalDisplay_H_01": (-63, -54), "Sub_PalDisplay_I_01": (-589, -254),
+}
+
+
+def map_to_world(map_x: int, map_y: int) -> tuple[int, int]:
+    """Inverse of the in-game map readout: world x, y in Unreal units."""
+    return (-map_y * 459 - 123930, map_x * 459 + 157935)
+
 
 # EPalRelicType enum name for each snake_case relic type key.
 RELIC_ENUM = {
@@ -172,7 +188,8 @@ def build(cache: Path) -> dict:
     fast_travel = {}
     for guid, value in sorted(ft_raw.items()):
         name = (ft_l10n.get(guid) or {}).get("localized_name") or (ft_pwst.get(guid) or {}).get("localized_name") or humanize(value.get("id", ""))
-        fast_travel[guid] = [name, *coords(value), value.get("id", "")]
+        statue = 1 if "TowerFastTravelPoint" in value.get("class", "") else 0
+        fast_travel[guid] = [name, *coords(value), value.get("id", ""), statue]
 
     notes = {note_id: [note_name(note_id), *coords(v)] for note_id, v in sorted(load(cache, "psp/notes.json").items())}
 
@@ -185,7 +202,10 @@ def build(cache: Path) -> dict:
         # Replays repeat an already counted quest; disabled ones never appear in a save.
         disabled = 1 if value.get("disabled") or quest_id.endswith("_Replay") else 0
         location = value.get("location") or {}
-        quests[quest_id] = [kind, name, disabled, round(location.get("x") or 0), round(location.get("y") or 0)]
+        x, y = round(location.get("x") or 0), round(location.get("y") or 0)
+        if not (x or y) and quest_id in QUEST_MAP_COORDS:
+            x, y = map_to_world(*QUEST_MAP_COORDS[quest_id])
+        quests[quest_id] = [kind, name, disabled, x, y]
 
     bosses = []
     for value in load(cache, "psp/bosses.json").values():
@@ -210,6 +230,8 @@ def build(cache: Path) -> dict:
     by_ft_id = {v["id"]: v for v in ft_pwst.values()}
     for tid, (ft_id, name) in EXTRA_TOWERS.items():
         point = by_ft_id.get(ft_id)
+        if tid == "BOSS_BATTLE_NAME_WorldTreeBoss":
+            name = f"World Tree: {pal_name('GYM_WorldTreeDragon')}"
         towers[tid] = [name, *(coords(point) if point else [0, 0, 0])]
 
     areas = {area: humanize(area) for area in load(cache, "pwst/world_map_areas.json")["areas"]}

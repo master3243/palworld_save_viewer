@@ -11,8 +11,8 @@ export interface CompletionData {
   relicTypes: { key: string; enum: string; name: string; item: string; pal: string }[];
   /** level object id -> [relic type index, x, y, z] */
   relics: Record<string, [number, number, number, number]>;
-  /** level object id -> [name, x, y, z, point id] */
-  fastTravel: Record<string, [string, number, number, number, string]>;
+  /** level object id -> [name, x, y, z, point id, Great Eagle statue?] */
+  fastTravel: Record<string, [string, number, number, number, string, number]>;
   /** note id -> [name, x, y, z] */
   notes: Record<string, [string, number, number, number]>;
   /** quest id -> [Main|Sub|Hidden, name, disabled, quest giver x, y] */
@@ -277,12 +277,13 @@ function statueCategory(record: PlayerCompletion, data: CompletionData): Categor
 
 function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Category {
   const unlocked = new Set(record.fast_travel);
-  const items: TrackedItem[] = Object.entries(data.fastTravel).map(([id, [name, x, y, , pointId]]) => ({
+  const items: TrackedItem[] = Object.entries(data.fastTravel).map(([id, [name, x, y, , pointId, statue]]) => ({
     id, name, detail: pointId.startsWith('FTPoint') ? '' : pointId.replace(/_/g, ' '), state: unlocked.has(id) ? 'done' : 'todo',
-    group: '', ...place(x, y), order: 0, no: null,
+    group: statue ? 'statue' : 'other', ...place(x, y), order: statue ? 0 : 1, no: null,
   }));
+  const names = new Map([['statue', 'Great Eagle Statue'], ['other', 'Other warp point']]);
   return finish({
-    key: 'fastTravel', title: 'Fast travel', items, groups: [],
+    key: 'fastTravel', title: 'Fast travel', items, groups: groupsOf(items, names),
     unknown: unknownIds(record.fast_travel, new Set(Object.keys(data.fastTravel))),
   });
 }
@@ -333,8 +334,8 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
   });
 }
 
-/** Tower flags the save records that are not real towers (no Hard mode). */
-const EXTRA_TOWER_FLAGS = new Set([
+/** Main-boss flags with no Hard version (the pal table has GYM_*_2 hard variants for the other nine). */
+const NO_HARD_MODE = new Set([
   'BOSS_BATTLE_NAME_KingWhaleBoss', 'BOSS_BATTLE_NAME_WorldTreeMiddleBoss1', 'BOSS_BATTLE_NAME_WorldTreeMiddleBoss2', 'BOSS_BATTLE_NAME_WorldTreeMiddleBoss3',
 ]);
 
@@ -353,15 +354,15 @@ function towerCategory(record: PlayerCompletion, data: CompletionData): Category
   });
 }
 
-/** Tower bosses beaten on Hard; only the eight real towers offer that difficulty. */
+/** Main bosses beaten on Hard: the eight towers and the final World Tree boss. */
 function towerHardCategory(record: PlayerCompletion, data: CompletionData): Category {
   const items: TrackedItem[] = Object.entries(data.towers)
-    .filter(([id]) => !EXTRA_TOWER_FLAGS.has(id))
+    .filter(([id]) => !NO_HARD_MODE.has(id))
     .map(([id, [name, x, y]]) => {
       const count = record.tower_boss_counts[id.replace('BOSS_BATTLE_NAME_', '') + '_Hard'] ?? 0;
       return { id: `${id}_Hard`, name, detail: count ? `defeated ${count}×` : '', state: count > 0 ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null };
     });
-  return finish({ key: 'towersHard', title: 'Tower bosses (Hard)', items, groups: [], unknown: [] });
+  return finish({ key: 'towersHard', title: 'Main bosses (Hard)', items, groups: [], unknown: [] });
 }
 
 function raidCategory(record: PlayerCompletion, data: CompletionData): Category {
