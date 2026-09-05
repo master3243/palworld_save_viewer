@@ -8,6 +8,7 @@ import { PendingFile, PendingFilesModalComponent, PendingFolder } from './pendin
 import { LocationCount, SourceGroup, SourcesBarComponent } from './sources-bar.component';
 import { FilterBarComponent } from './filter/filter-bar.component';
 import { GenderIconComponent } from './gender-icon.component';
+import { GithubIconComponent } from './github-icon.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
 import { OfflineImageService } from './offline-image.service';
@@ -48,7 +49,7 @@ interface DirectoryEntryLike {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent],
+  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent, GithubIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

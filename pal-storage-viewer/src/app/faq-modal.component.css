@@ -109,10 +109,8 @@
   vertical-align: -3px;
 }
 
-.faq-github svg {
-  fill: currentColor;
-  height: 11px;
-  width: 11px;
+.faq-github app-github-icon {
+  font-size: 11px;
 }
 
 .faq-github:hover {
@@ -131,9 +129,8 @@
   vertical-align: baseline;
 }
 
-.faq-footer-github svg {
-  height: 16px;
-  width: 16px;
+.faq-footer-github app-github-icon {
+  font-size: 16px;
 }
 
 .faq-footer-github span {

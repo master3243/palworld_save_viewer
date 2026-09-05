@@ -83,9 +83,11 @@ Resources used while building the save decoder
 - [PalScouter passive ranks](https://github.com/tanguyannequin-dev/mod-palworld/blob/main/PalScouter/Scripts/passive_ranks.lua)
   - Map passive skill IDs to fixed rank/color tiers.
 - [palworld-save-pal game data](https://github.com/oMaN-Rod/palworld-save-pal/tree/main/data/json)
-  - Master lists for the 100% Tracker: effigies, fast travel points, journals, boss spawners, towers, ruin pickups, missions, Paldeck table.
+  - Master lists for the 100% Tracker.
 - [PalWorldSaveTools game data](https://github.com/deafdudecomputers/PalWorldSaveTools/tree/main/resources/game_data)
-  - World map area IDs and fast travel point names for the 100% Tracker.
+  - Some side lists for the 100% Tracker.
+- [Palworld-Pal-Editor skin data](https://github.com/KrisCris/Palworld-Pal-Editor/tree/develop/src/palworld_pal_editor/assets/data)
+  - Pal skin list for the 100% Tracker.
 
 
 

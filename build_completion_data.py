@@ -1,9 +1,12 @@
 """Build resources/completion/completion-data.json: the master lists ("denominators")
 for the 100% tracker, keyed by the same internal ids the player save uses.
 
-Sources (game data extracted from the Palworld pak files by two save-editor projects):
-  * oMaN-Rod/palworld-save-pal  data/json/*.json     (GPL-3.0; level objects, quests, pals)
-  * deafdudecomputers/PalWorldSaveTools resources/game_data/*.json (MIT; areas, fast travel)
+Sources (game data extracted from the Palworld pak files by three save-editor projects):
+  * oMaN-Rod/palworld-save-pal  data/json/*.json     (GPL-3.0; level objects, quests, pals,
+    technologies, lab research, items)
+  * deafdudecomputers/PalWorldSaveTools resources/game_data/*.json (MIT; areas, fast travel
+    names, Statue of Power rank table)
+  * KrisCris/Palworld-Pal-Editor assets/data/skin_data.json (GPL-3.0; pal skins)
 plus this repo's own pal name lookup. Every list was checked against a real save: every
 obtained id in the save exists in the corresponding list here.
 
@@ -23,31 +26,32 @@ PAL_NAMES_LUA = HERE.parent / "pal_names_lookup.lua"
 PSP = ("oMaN-Rod/palworld-save-pal", "2d244ae9ea12f2f70a66523bf83764185e22fa83", "data/json")
 PWST = ("deafdudecomputers/PalWorldSaveTools", "1abd4b11756c9ca7774e9c35400fb8df4d12d966", "resources/game_data")
 KC = ("KrisCris/Palworld-Pal-Editor", "3efb2d4b5d1f5710ee672d449b5162fe63745229", "src/palworld_pal_editor/assets/data")
+UPSTREAMS = {"palworld-save-pal": PSP, "PalWorldSaveTools": PWST, "Palworld-Pal-Editor": KC}
 
 FILES = {
-    "psp/relics.json": (PSP, "relics.json"),
-    "psp/fast_travel_points.json": (PSP, "fast_travel_points.json"),
-    "psp/notes.json": (PSP, "notes.json"),
-    "psp/missions.json": (PSP, "missions.json"),
-    "psp/bosses.json": (PSP, "bosses.json"),
-    "psp/towers.json": (PSP, "towers.json"),
     "psp/ancient_ruins.json": (PSP, "ancient_ruins.json"),
-    "psp/pals.json": (PSP, "pals.json"),
-    "psp/l10n/missions.json": (PSP, "l10n/en/missions.json"),
-    "psp/l10n/fast_travel_points.json": (PSP, "l10n/en/fast_travel_points.json"),
-    "psp/l10n/relics.json": (PSP, "l10n/en/relics.json"),
-    "psp/l10n/towers.json": (PSP, "l10n/en/towers.json"),
-    "psp/l10n/pals.json": (PSP, "l10n/en/pals.json"),
-    "psp/technologies.json": (PSP, "technologies.json"),
+    "psp/bosses.json": (PSP, "bosses.json"),
+    "psp/fast_travel_points.json": (PSP, "fast_travel_points.json"),
     "psp/items.json": (PSP, "items.json"),
+    "psp/l10n/fast_travel_points.json": (PSP, "l10n/en/fast_travel_points.json"),
     "psp/l10n/items.json": (PSP, "l10n/en/items.json"),
+    "psp/l10n/lab_research.json": (PSP, "l10n/en/lab_research.json"),
+    "psp/l10n/missions.json": (PSP, "l10n/en/missions.json"),
+    "psp/l10n/pals.json": (PSP, "l10n/en/pals.json"),
+    "psp/l10n/relics.json": (PSP, "l10n/en/relics.json"),
     "psp/l10n/technologies.json": (PSP, "l10n/en/technologies.json"),
-    "pwst/world_map_areas.json": (PWST, "world_map_areas.json"),
+    "psp/l10n/towers.json": (PSP, "l10n/en/towers.json"),
+    "psp/lab_research.json": (PSP, "lab_research.json"),
+    "psp/missions.json": (PSP, "missions.json"),
+    "psp/notes.json": (PSP, "notes.json"),
+    "psp/pals.json": (PSP, "pals.json"),
+    "psp/relics.json": (PSP, "relics.json"),
+    "psp/technologies.json": (PSP, "technologies.json"),
+    "psp/towers.json": (PSP, "towers.json"),
     "pwst/fast_travel_points.json": (PWST, "fast_travel_points.json"),
     "pwst/relic_data.json": (PWST, "relic_data.json"),
-    "psp/lab_research.json": (PSP, "lab_research.json"),
+    "pwst/world_map_areas.json": (PWST, "world_map_areas.json"),
     "kc/skin_data.json": (KC, "skin_data.json"),
-    "psp/l10n/lab_research.json": (PSP, "l10n/en/lab_research.json"),
 }
 
 # Journal owners, from the in-game journal titles.
@@ -316,10 +320,7 @@ def build(cache: Path) -> dict:
 
     return {
         "generated": "2026-09-05",
-        "sources": {
-            "palworld-save-pal": f"https://github.com/{PSP[0]}/tree/{PSP[1]}/{PSP[2]}",
-            "PalWorldSaveTools": f"https://github.com/{PWST[0]}/tree/{PWST[1]}/{PWST[2]}",
-        },
+        "sources": {name: f"https://github.com/{repo}/tree/{sha}/{folder}" for name, (repo, sha, folder) in UPSTREAMS.items()},
         "relicTypes": relic_types,
         "relics": relics,
         "fastTravel": fast_travel,

@@ -1,6 +1,6 @@
 {
 "generated":"2026-09-05",
-"sources":{"palworld-save-pal":"https://github.com/oMaN-Rod/palworld-save-pal/tree/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json","PalWorldSaveTools":"https://github.com/deafdudecomputers/PalWorldSaveTools/tree/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data"},
+"sources":{"palworld-save-pal":"https://github.com/oMaN-Rod/palworld-save-pal/tree/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json","PalWorldSaveTools":"https://github.com/deafdudecomputers/PalWorldSaveTools/tree/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data","Palworld-Pal-Editor":"https://github.com/KrisCris/Palworld-Pal-Editor/tree/3efb2d4b5d1f5710ee672d449b5162fe63745229/src/palworld_pal_editor/assets/data"},
 "relicTypes":[
 {"key":"capture_power","enum":"CapturePower","name":"Capture Power","item":"Lifmunk Effigy","pal":"Carbunclo"},
 {"key":"hunger_reduction","enum":"HungerReduction","name":"Satiety Duration","item":"Lamball Effigy","pal":"SheepBall"},

@@ -63,10 +63,8 @@
   width: 28px;
 }
 
-.github-link svg {
-  fill: currentColor;
-  height: 22px;
-  width: 22px;
+.github-link app-github-icon {
+  font-size: 22px;
 }
 
 .github-link:hover,
