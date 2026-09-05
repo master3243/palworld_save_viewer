@@ -34,6 +34,22 @@
       </span>
       <span class="viewer-title">Save Viewer</span>
     </a>
+    <div class="view-switch" role="tablist" aria-label="View">
+      <button
+        type="button"
+        role="tab"
+        [class.active]="view === 'pals'"
+        [attr.aria-selected]="view === 'pals'"
+        (click)="setView('pals')"
+      >Pals</button>
+      <button
+        type="button"
+        role="tab"
+        [class.active]="view === 'tracker'"
+        [attr.aria-selected]="view === 'tracker'"
+        (click)="setView('tracker')"
+      >100% Tracker</button>
+    </div>
   </section>
 
   <label
@@ -48,7 +64,8 @@
   >
     <input type="file" accept=".sav,.gvas" multiple [disabled]="isParsing" (change)="onFileInput($event)">
     <span class="drop-title" *ngIf="!isParsing">Drop save file/folder</span>
-    <span class="drop-subtitle" *ngIf="!isParsing">Supported files: Level.sav / LevelMeta.sav / Player .sav / Player _dps.sav</span>
+    <span class="drop-subtitle" *ngIf="!isParsing && view === 'pals'">Supported files: Level.sav / LevelMeta.sav / Player .sav / Player _dps.sav</span>
+    <span class="drop-subtitle" *ngIf="!isParsing && view === 'tracker'">Tracks bosses, effigies, journals, fast travel, Paldeck and missions from Players\xxx.sav (drop the save folder)</span>
 
     <span
       class="progress-block"
@@ -119,6 +136,14 @@
             <code class="save-path">%LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\</code>
             <p>Where <code>IDprofile</code> and <code>IDworld</code> are long random numbers. Inside it, <code>Level.sav</code> holds party, Pal Box and base Pals, <code>Players\xxx.sav</code> tells which container is whose, and <code>Players\xxx_dps.sav</code> is the dimensional storage.</p>
             <p>You can also drop single files, and add files from other worlds later to compare them in one table. Or choose the demo save file (my personal dimensional storage).</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What does the 100% Tracker track?</summary>
+          <div class="faq-body">
+            <p>Everything the game itself records in <code>Players\xxx.sav</code>: Paldeck entries, Pal Effigies of every type, tower bosses, alpha Pals, bounty targets, main and side missions, journals, fast travel points, discovered regions and one-time ruin pickups, plus counters such as dungeons cleared.</p>
+            <p>The save only lists what you have already obtained. The totals come from game data extracted from the Palworld files by <a class="faq-github" href="https://github.com/oMaN-Rod/palworld-save-pal" target="_blank" rel="noopener noreferrer">palworld-save-pal</a> and <a class="faq-github" href="https://github.com/deafdudecomputers/PalWorldSaveTools" target="_blank" rel="noopener noreferrer">PalWorldSaveTools</a>, so the tracker can list what is missing and where it is. Map coordinates are the ones the in-game map shows.</p>
+            <p>The overall figure is the plain average of the category percentages. Progress is per player, so a save with several players shows one tracker each.</p>
           </div>
         </details>
         <details class="faq-item">
@@ -294,6 +319,7 @@
         </div>
       </div>
     </div>
+    <ng-container *ngIf="view === 'pals' && hasRows">
     <div class="table-tools">
       <app-filter-bar [rows]="originalRows" (filtered)="onFilterChanged($event)"></app-filter-bar>
       <div class="export-wrap">
@@ -498,6 +524,12 @@
         </tbody>
       </table>
     </div>
+    </ng-container>
+    <div class="empty-view" *ngIf="view === 'pals' && !hasRows">
+      <p>These files hold no Pals.</p>
+      <span>They do carry player progress, so the <button type="button" class="link-button" (click)="setView('tracker')">100% Tracker</button> works. For the Pal table, add Level.sav or a _dps.sav file.</span>
+    </div>
+    <app-completion *ngIf="view === 'tracker'" [sets]="saveSets"></app-completion>
   </section>
 
   <div class="github-meta">

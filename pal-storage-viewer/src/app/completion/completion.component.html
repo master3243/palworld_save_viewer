@@ -1,0 +1,148 @@
+<div class="tracker" *ngIf="players.length; else noPlayers">
+  <div class="tracker-scroll">
+    <div class="player-picker" *ngIf="players.length > 1" role="tablist" aria-label="Player">
+      <button
+        *ngFor="let option of players; trackBy: trackPlayer"
+        type="button"
+        role="tab"
+        class="player-pill"
+        [class.active]="option.key === selectedPlayer"
+        [attr.aria-selected]="option.key === selectedPlayer"
+        [title]="option.save"
+        (click)="selectPlayer(option.key)"
+      >
+        <span class="save-letter" *ngIf="option.letter">{{ option.letter }}</span>
+        <span>{{ option.label }}</span>
+      </button>
+    </div>
+
+    <p class="tracker-note" *ngIf="!data && !loadError">Loading game data…</p>
+    <p class="tracker-note error" *ngIf="loadError">{{ loadError }}</p>
+
+    <ng-container *ngIf="summary as progress">
+      <header class="overall">
+        <div class="ring-wrap" [attr.aria-label]="progress.percent + '% complete'">
+          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+            <circle
+              class="ring-fill"
+              cx="60"
+              cy="60"
+              r="52"
+              [attr.stroke-dasharray]="ringCircumference"
+              [attr.stroke-dashoffset]="ringOffset"
+            ></circle>
+          </svg>
+          <div class="ring-text">
+            <strong>{{ progress.percent }}<small>%</small></strong>
+          </div>
+        </div>
+        <div class="overall-text">
+          <h2>{{ player?.label }}</h2>
+          <p>Average of {{ progress.categories.length }} categories · {{ progress.done | number }} of {{ progress.total | number }} items</p>
+          <div class="stats" aria-label="Counters">
+            <span class="stat" *ngFor="let entry of progress.stats" [title]="entry.title">
+              <b>{{ entry.value }}</b>
+              <span>{{ entry.label }}</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div class="category-grid" role="tablist" aria-label="Categories">
+        <button
+          *ngFor="let category of progress.categories; trackBy: trackCategory"
+          type="button"
+          role="tab"
+          class="category-card"
+          [class.active]="category.key === selectedCategory"
+          [class.complete]="category.total > 0 && category.done === category.total"
+          [attr.aria-selected]="category.key === selectedCategory"
+          (click)="selectCategory(category.key)"
+        >
+          <span class="card-head">
+            <span class="card-title">{{ category.title }}</span>
+            <span class="card-count">{{ category.done | number }} <i>/</i> {{ category.total | number }}</span>
+          </span>
+          <span class="bar" aria-hidden="true">
+            <span class="bar-fill" [style.width.%]="category.percent"></span>
+          </span>
+          <span class="card-foot">
+            <span class="card-blurb">{{ category.blurb }}</span>
+            <span class="card-pct">{{ category.percent }}%</span>
+          </span>
+        </button>
+      </div>
+
+      <section class="category-detail" *ngIf="category as open">
+        <div class="detail-head">
+          <h3>{{ open.title }} <span class="detail-count">{{ open.done | number }} of {{ open.total | number }}</span></h3>
+          <div class="detail-controls">
+            <div class="segmented" role="group" aria-label="Show">
+              <button type="button" [class.active]="!showAll" (click)="setShowAll(false)">Missing</button>
+              <button type="button" [class.active]="showAll" (click)="setShowAll(true)">All</button>
+            </div>
+            <input
+              class="detail-search"
+              type="search"
+              placeholder="Search"
+              [value]="search"
+              (input)="onSearch($event)"
+              aria-label="Search this category"
+            >
+          </div>
+        </div>
+        <div class="group-chips" *ngIf="open.groups.length" role="group" aria-label="Type">
+          <button
+            *ngFor="let group of open.groups"
+            type="button"
+            class="group-chip"
+            [class.active]="group.key === groupFilter"
+            [class.complete]="group.done === group.total"
+            (click)="setGroup(group.key)"
+          >
+            <span>{{ group.name }}</span>
+            <b>{{ group.done }}/{{ group.total }}</b>
+          </button>
+        </div>
+        <p class="tracker-note" *ngIf="open.unknown.length">
+          {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
+        </p>
+        <table class="item-table">
+          <thead>
+            <tr>
+              <th class="state-col">Status</th>
+              <th>Name</th>
+              <th>Details</th>
+              <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state">
+              <td class="state-col"><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</td>
+              <td class="name-col">{{ item.name }}</td>
+              <td class="detail-col">{{ item.detail }}</td>
+              <td class="coords-col" *ngIf="open.hasCoords">
+                <ng-container *ngIf="item.coords">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small></ng-container>
+              </td>
+            </tr>
+            <tr class="empty-row" *ngIf="!visibleItems.length">
+              <td [attr.colspan]="open.hasCoords ? 4 : 3">
+                <ng-container *ngIf="hiddenDoneCount && !search">Everything here is done.</ng-container>
+                <ng-container *ngIf="!hiddenDoneCount || search">Nothing matches.</ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="tracker-note muted" *ngIf="hiddenDoneCount && visibleItems.length">{{ hiddenDoneCount }} done {{ hiddenDoneCount === 1 ? 'item is' : 'items are' }} hidden. Choose "All" to see them.</p>
+      </section>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #noPlayers>
+  <div class="tracker tracker-empty">
+    <p>No player progress in these files.</p>
+    <span>The tracker reads <code>Players\xxx.sav</code> from your save folder. Drop the whole folder, or that file.</span>
+  </div>
+</ng-template>

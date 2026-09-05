@@ -7,6 +7,7 @@ import {
 } from './gvas';
 import { Lookups } from './lookups';
 import { PalRecord, buildRecord } from './record';
+import { PlayerCompletion, extractPlayerCompletion } from './completion';
 
 export type SaveKind = 'dimensional_storage' | 'level' | 'player' | 'level_meta' | 'world_option' | 'local_data' | 'unknown';
 
@@ -200,6 +201,8 @@ export interface PlayerPayload {
   instance_id: string | null;
   party_container_id: string | null;
   pal_box_container_id: string | null;
+  /** Bosses, effigies, journals, fast travel, Paldeck and quests; null if the file has no record. */
+  completion: PlayerCompletion | null;
 }
 
 export function extractPlayer(buf: SaveBuffer): PlayerPayload {
@@ -209,11 +212,18 @@ export function extractPlayer(buf: SaveBuffer): PlayerPayload {
     return guidOrNull(value);
   };
   const individual = asDict(readStructProperty(buf, findPropertyStart(buf, 'IndividualId')));
+  let completion: PlayerCompletion | null = null;
+  try {
+    completion = extractPlayerCompletion(buf);
+  } catch {
+    completion = null;
+  }
   return {
     player_uid: guidAt('PlayerUId'),
     instance_id: guidOrNull(individual['InstanceId']),
     party_container_id: guidAt('OtomoCharacterContainerId'),
     pal_box_container_id: guidAt('PalStorageContainerId'),
+    completion,
   };
 }
 

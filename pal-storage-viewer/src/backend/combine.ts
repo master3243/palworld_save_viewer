@@ -1,6 +1,7 @@
 /**
  * Merge parsed save files into one pal table with a location per pal.
  */
+import { PlayerCompletion } from './completion';
 import { PropertyValue } from './gvas';
 import { PalRecord } from './record';
 import { BaseCamp, ParsedFile, SaveKind } from './saves';
@@ -32,6 +33,8 @@ export interface SaveSource {
   bases?: number;
   skipped?: { players: number; wild_or_npc: number; unreadable: number };
   player_uid?: string | null;
+  /** A player save that carries the completion record (bosses, effigies, journals…). */
+  has_completion?: boolean;
   world_name?: string;
   host_player_name?: string;
   host_player_level?: number | null;
@@ -48,7 +51,7 @@ export interface SaveSetSummary {
   saved_at: string;
   pals: number;
   bases: { index: number; location: { x: number; y: number; z: number } | null; workers: number }[];
-  players: { uid: string; name: string }[];
+  players: { uid: string; name: string; completion: PlayerCompletion | null }[];
   has_level: boolean;
   has_dimensional_storage: boolean;
 }
@@ -80,6 +83,7 @@ interface SaveSet {
   saved_at: string;
   players: Set<string>;
   player_names: Map<string, string>;
+  completions: Map<string, PlayerCompletion>;
   party_containers: Set<string>;
   pal_box_containers: Set<string>;
   base_containers: Map<string, BaseCamp>;
@@ -210,7 +214,9 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
     if (parsed.payload.party_container_id) set.party_containers.add(parsed.payload.party_container_id);
     if (parsed.payload.pal_box_container_id) set.pal_box_containers.add(parsed.payload.pal_box_container_id);
     if (parsed.payload.player_uid) set.players.add(parsed.payload.player_uid);
+    if (parsed.payload.player_uid && parsed.payload.completion) set.completions.set(parsed.payload.player_uid, parsed.payload.completion);
     source.player_uid = parsed.payload.player_uid;
+    source.has_completion = parsed.payload.completion !== null;
   } else if (parsed.kind === 'level_meta') {
     set.world_name = parsed.payload.world_name || '';
     set.host_player_name = parsed.payload.host_player_name || '';
@@ -232,7 +238,7 @@ export function combineSaves(entries: CombineEntry[]): CombinedSaves {
     if (!set) {
       set = {
         label, letter: '', world_name: '', host_player_name: '', in_game_day: null, saved_at: '',
-        players: new Set(), player_names: new Map(), party_containers: new Set(), pal_box_containers: new Set(),
+        players: new Set(), player_names: new Map(), completions: new Map(), party_containers: new Set(), pal_box_containers: new Set(),
         base_containers: new Map(), bases: [], containers: {}, dps_records: [], level_records: [],
       };
       sets.set(label, set);
@@ -295,7 +301,7 @@ export function combineSaves(entries: CombineEntry[]): CombinedSaves {
         location: base.location ?? null,
         workers: set.level_records.filter((record) => record.pal_box.container_id === base.worker_container_id).length,
       })),
-      players: [...playerIds].sort().map((uid) => ({ uid, name: set.player_names.get(uid) ?? '' })),
+      players: [...playerIds].sort().map((uid) => ({ uid, name: set.player_names.get(uid) ?? '', completion: set.completions.get(uid) ?? null })),
       has_level: set.level_records.length > 0 || sources.some((source) => source.kind === 'level' && source.set === label),
       has_dimensional_storage: sources.some((source) => source.kind === 'dimensional_storage' && source.set === label),
     });

@@ -9,7 +9,7 @@ export interface SaveInput {
   path: string;
 }
 
-export type { CombinedSaves, SaveSetSummary, SaveSource } from '../backend';
+export type { CombinedSaves, PlayerCompletion, SaveSetSummary, SaveSource } from '../backend';
 import type { CombinedSaves } from '../backend';
 
 /** Files in a save folder that never contain pals; skipped before decoding. */
@@ -98,7 +98,8 @@ export class SaveParserService {
     } catch (error) {
       throw new Error(this.formatParseError(error));
     }
-    if (!result.rows.length) {
+    const hasCompletion = result.sets.some((set) => set.players.some((player) => player.completion !== null));
+    if (!result.rows.length && !hasCompletion) {
       const notes = result.sources.map((source) => source.note).filter(Boolean);
       throw new Error(notes[0] || this.wrongSaveMessage());
     }

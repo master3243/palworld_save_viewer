@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
+import { CompletionComponent } from './completion/completion.component';
 import { FilterBarComponent } from './filter/filter-bar.component';
 import { GenderIconComponent } from './gender-icon.component';
 import { APP_VERSION } from './app-version';
@@ -22,6 +23,11 @@ interface VirtualRow {
 }
 
 type SortDirection = 'asc' | 'desc' | null;
+
+/** The two things the page can show for a loaded save: the pal table or the 100% tracker. */
+type ViewMode = 'pals' | 'tracker';
+
+const TRACKER_HASH = '#tracker';
 
 /** Share of the progress bar covered by decoding and parsing in the worker. */
 const PARSE_SHARE = 0.95;
@@ -66,7 +72,7 @@ interface DirectoryEntryLike {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent],
+  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent, CompletionComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -205,7 +211,7 @@ export class AppComponent {
     switch (kind) {
       case 'level': return 'party · box · bases';
       case 'dimensional_storage': return 'dimensional storage';
-      case 'player': return 'party / box ids';
+      case 'player': return 'party / box ids · progress';
       case 'level_meta': return 'world name · day';
       default: return 'no pals';
     }
@@ -330,8 +336,32 @@ export class AppComponent {
     return this.columns.filter((column) => column.visible);
   }
 
+  /** Which view is open; kept in the URL hash so the tracker can be linked to. */
+  view: ViewMode = typeof location !== 'undefined' && location.hash === TRACKER_HASH ? 'tracker' : 'pals';
+
+  setView(view: ViewMode): void {
+    if (this.view === view) return;
+    this.view = view;
+    const url = `${location.pathname}${location.search}${view === 'tracker' ? TRACKER_HASH : ''}`;
+    history.replaceState(null, '', url);
+  }
+
+  @HostListener('window:hashchange')
+  onHashChange(): void {
+    this.view = location.hash === TRACKER_HASH ? 'tracker' : 'pals';
+  }
+
+  /** Something is loaded: pals for the table, or a player record for the tracker. */
   get hasData(): boolean {
+    return this.hasRows || this.hasCompletion;
+  }
+
+  get hasRows(): boolean {
     return this.originalRows.length > 0;
+  }
+
+  get hasCompletion(): boolean {
+    return this.saveSets.some((set) => set.players.some((player) => player.completion !== null));
   }
 
   get isFiltered(): boolean {
@@ -624,7 +654,7 @@ export class AppComponent {
     switch (kind) {
       case 'level': return 'Data for every Pal (minus the dimensional storage)';
       case 'dimensional_storage': return 'Dimensional Pal Storage.';
-      case 'player': return 'Metadata mapping container to either the player\'s party or Pal Box (mostly can be inferred and not needed).';
+      case 'player': return 'Maps containers to the player\'s party or Pal Box, and holds the player\'s progress record (bosses, effigies, journals, quests) for the 100% tracker.';
       case 'level_meta': return 'Metadata used to label the save.';
       default: return 'Not a pal save; ignored.';
     }
