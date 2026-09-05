@@ -253,19 +253,28 @@ export const KNOWN_FIELDS: FilterField[] = [
     get: (row) => { const values = ivs(row); return values.length ? Math.max(...values) : null; }
   },
 
-  { key: 'sr_hp', label: 'Soul HP', group: G.soul, kind: 'number', aliases: ['soul_hp', 'soul_rank_hp'], get: (row) => number(row, 'soul_rank_hp') },
-  { key: 'sr_atk', label: 'Soul Attack', group: G.soul, kind: 'number', aliases: ['soul_atk', 'soul_rank_attack'], get: (row) => number(row, 'soul_rank_attack') },
-  { key: 'sr_def', label: 'Soul Defense', group: G.soul, kind: 'number', aliases: ['soul_def', 'soul_rank_defense'], get: (row) => number(row, 'soul_rank_defense') },
+  { key: 'sr_hp', label: 'Soul Rank HP', group: G.soul, kind: 'number', aliases: ['soul_hp', 'soul_rank_hp'], get: (row) => number(row, 'soul_rank_hp') },
+  { key: 'sr_atk', label: 'Soul Rank Attack', group: G.soul, kind: 'number', aliases: ['soul_atk', 'soul_rank_attack'], get: (row) => number(row, 'soul_rank_attack') },
+  { key: 'sr_def', label: 'Soul Rank Defense', group: G.soul, kind: 'number', aliases: ['soul_def', 'soul_rank_defense'], get: (row) => number(row, 'soul_rank_defense') },
   {
     key: 'sr', label: 'SR total', group: G.soul, kind: 'number', aliases: ['sr_total', 'soul_total', 'soul'],
-    hint: 'HP + Attack + Defense soul ranks (60 is max)',
+    hint: 'HP + Attack + Defense + Work speed soul ranks (80 is max)',
+    get: (row) => {
+      const values = ['soul_rank_hp', 'soul_rank_attack', 'soul_rank_defense', 'soul_rank_craft_speed']
+        .map((key) => number(row, key)).filter((value): value is number => value !== null);
+      return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
+    }
+  },
+  {
+    key: 'sr_combat', label: 'SR combat', group: G.soul, kind: 'number', aliases: ['sr3', 'soul_combat'],
+    hint: 'HP + Attack + Defense soul ranks, work speed left out (60 is max)',
     get: (row) => {
       const values = ['soul_rank_hp', 'soul_rank_attack', 'soul_rank_defense']
         .map((key) => number(row, key)).filter((value): value is number => value !== null);
       return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
     }
   },
-  { key: 'sr_craft', label: 'Soul Crafting', group: G.soul, kind: 'number', aliases: ['soul_craft', 'soul_rank_craft_speed'], get: (row) => number(row, 'soul_rank_craft_speed') },
+  { key: 'sr_craft', label: 'Soul Rank Crafting', group: G.soul, kind: 'number', aliases: ['soul_craft', 'soul_rank_craft_speed'], get: (row) => number(row, 'soul_rank_craft_speed') },
 
   { key: 'skills', label: 'Passive skills', group: G.passives, kind: 'list', aliases: ['skill', 'passive', 'passives', 'p'], suggest: true, get: (row) => text(row, 'skills') },
   { key: 'skill_count', label: 'Passive count', group: G.passives, kind: 'number', aliases: ['passives_count', 'skills_count'], get: (row) => listCount(row, 'skills') },

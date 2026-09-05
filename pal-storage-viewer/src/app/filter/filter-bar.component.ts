@@ -155,7 +155,7 @@ export class FilterBarComponent implements OnChanges {
     flagChip('★ Lucky', 'Lucky pals', 'lucky'),
     {
       label: '♂♀',
-      title: 'Gender: click to cycle male, female, any',
+      title: 'Gender',
       states: [
         { label: '♂', title: 'Male only', tone: 'male', make: () => createRule('gender', 'is', ['Male']) },
         { label: '♀', title: 'Female only', tone: 'female', make: () => createRule('gender', 'is', ['Female']) }
@@ -174,7 +174,7 @@ export class FilterBarComponent implements OnChanges {
     },
     numberChip('4★', 'Max rank (4 stars)', 'rank', 'eq', ['4']),
     numberChip('=300 IV', 'Perfect IVs (100 / 100 / 100)', 'iv', 'eq', ['300']),
-    numberChip('≥60 SR', 'Perfect soul ranks (HP + Attack + Defense at 60 or more)', 'sr', 'gte', ['60']),
+    numberChip('60 SR', 'Max HP + Attack + Defense soul rank', 'sr_combat', 'eq', ['60']),
     numberChip('4 platinum', 'Four platinum tier passives', 'platinum', 'eq', ['4']),
     numberChip('0 negatives', 'No negative passives', 'negative', 'eq', ['0']),
     {
@@ -299,9 +299,6 @@ export class FilterBarComponent implements OnChanges {
     if (event.key === 'Escape') {
       if (this.suggestions.length) {
         this.suggestions = [];
-        event.stopPropagation();
-      } else if (this.queryText) {
-        this.clear();
         event.stopPropagation();
       }
       return;

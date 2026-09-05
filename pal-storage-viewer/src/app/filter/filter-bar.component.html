@@ -22,7 +22,7 @@
     class="search-clear"
     type="button"
     aria-label="Clear filter"
-    title="Clear filter (Esc)"
+    title="Clear filter"
     *ngIf="queryText"
     (click)="clear()"
   >×</button>
@@ -91,7 +91,7 @@
   [class.open]="isPanelOpen"
   [class.active]="isActive"
   [attr.aria-expanded]="isPanelOpen"
-  title="Open the filter builder"
+  title="Filter builder"
   (click)="togglePanel()"
 >
   <svg viewBox="0 0 24 24" aria-hidden="true">
