@@ -16,34 +16,40 @@
   flex-direction: column;
   left: 26px;
   position: fixed;
-  width: 28px;
   z-index: 10;
 }
 
 .github-row {
   align-items: center;
   display: flex;
-  gap: 4px;
+  gap: 0;
 }
 
 .corner-help {
+  align-items: center;
   background: transparent;
-  border: 1px solid rgba(104, 201, 238, 0.45);
+  border: 2px solid rgba(104, 201, 238, 0.72);
   border-radius: 50%;
-  color: rgba(104, 201, 238, 0.8);
+  box-sizing: border-box;
+  color: #68c9ee;
   cursor: pointer;
-  font-size: 0.6rem;
+  display: inline-flex;
+  font-size: 0.78rem;
   font-weight: 700;
-  height: 14px;
+  height: 18px;
+  justify-content: center;
   line-height: 1;
+  margin: 0 0 0 3px;
+  opacity: 0.72;
   padding: 0;
-  width: 14px;
+  width: 18px;
 }
 
 .corner-help:hover,
 .corner-help:focus-visible {
   border-color: #8ee5ff;
   color: #8ee5ff;
+  opacity: 1;
   outline: none;
 }
 
@@ -1612,4 +1618,24 @@ td.where-cell {
 .faq-github:hover {
   background: rgba(34, 92, 128, 0.9);
   color: #e8f8ff;
+}
+
+.faq-actions {
+  align-items: center;
+}
+
+.faq-footer-github {
+  height: 34px;
+  margin-right: auto;
+  padding: 0 12px;
+  vertical-align: baseline;
+}
+
+.faq-footer-github svg {
+  height: 16px;
+  width: 16px;
+}
+
+.faq-footer-github span {
+  font-size: 0.85rem;
 }
