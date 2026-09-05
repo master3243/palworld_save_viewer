@@ -1,7 +1,3 @@
-# Python cache
-__pycache__/
-*.py[cod]
-
 # Angular dependencies and build output
 pal-storage-viewer/node_modules/
 pal-storage-viewer/dist/

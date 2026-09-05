@@ -294,7 +294,6 @@ export class AppComponent {
     this.tableWidth = null;
     this.scheduleMeasure();
   }
-  isDemoPromptOpen = false;
   isDropHelpOpen = false;
   openRowIndex: number | null = null;
   sortColumn: string | null = null;
@@ -705,12 +704,12 @@ export class AppComponent {
     this.isDragging = false;
   }
 
-  openDemoPrompt(event: Event): void {
+  startDemo(event: Event): void {
     // The dropzone is a <label> wrapping the file input, so a bare click here
-    // would also pop the OS file picker.
+    // would also pop the OS file picker. The file confirmation that follows
+    // offers Cancel, so no separate prompt is needed.
     event.preventDefault();
     event.stopPropagation();
-    // The file confirmation that follows already offers Cancel, so no separate prompt.
     void this.loadDemoSave();
   }
 
@@ -756,10 +755,6 @@ export class AppComponent {
     return `"${text.replace(/"/g, '""')}"`;
   }
 
-  closeDemoPrompt(): void {
-    this.isDemoPromptOpen = false;
-  }
-
   /** Menus close when the click lands anywhere outside their own control. */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -770,9 +765,7 @@ export class AppComponent {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    const hadOverlay = this.isDemoPromptOpen || this.pendingFiles !== null || this.isExportMenuOpen
-      || this.isColumnMenuOpen || this.isDropHelpOpen;
-    this.closeDemoPrompt();
+    const hadOverlay = this.pendingFiles !== null || this.isExportMenuOpen || this.isColumnMenuOpen || this.isDropHelpOpen;
     this.cancelPending();
     this.isExportMenuOpen = false;
     this.isColumnMenuOpen = false;
@@ -782,7 +775,6 @@ export class AppComponent {
   }
 
   async loadDemoSave(): Promise<void> {
-    this.isDemoPromptOpen = false;
     this.error = '';
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Downloading demo save', detail: '' };
@@ -842,7 +834,6 @@ export class AppComponent {
     this.resetData();
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Initializing\u2026', detail: '' };
-    performance.mark('pal:load-start');
     this.assignSaveLetters(merged);
     try {
       // The worker owns 0..95% of the bar; the table build takes the rest.
@@ -853,8 +844,6 @@ export class AppComponent {
         };
         this.changeDetector.markForCheck();
       }, this.saveLetters);
-      performance.mark('pal:worker-done');
-      console.debug('[pal] parse timing', JSON.stringify(this.parser.lastTiming));
       const rows: PalStorageRow[] = [];
       for (const [index, row] of result.rows.entries()) {
         rows.push({ ...row, paldeck_no: await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name')) });
@@ -868,7 +857,6 @@ export class AppComponent {
         }
       }
       this.progress = { fraction: 1, label: 'Done', detail: '' };
-      performance.mark('pal:enrich-done');
       this.loadedInputs = merged;
       this.sources = result.sources;
       this.saveSets = result.sets;
@@ -878,9 +866,7 @@ export class AppComponent {
       this.rows = [...rows];
       this.columns = this.buildColumns(rows);
       this.palNameWidth = this.measurePalNameWidth(rows);
-      performance.mark('pal:table-ready');
       this.scheduleMeasure();
-      requestAnimationFrame(() => performance.mark('pal:rendered'));
     } catch (error) {
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';
       if (append && previous.length) {

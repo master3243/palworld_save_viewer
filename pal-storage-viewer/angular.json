@@ -25,16 +25,6 @@
                 "output": "/"
               },
               {
-                "glob": "main.py",
-                "input": "..",
-                "output": "/python"
-              },
-              {
-                "glob": "data_manager.py",
-                "input": "..",
-                "output": "/python"
-              },
-              {
                 "glob": "**/*",
                 "input": "../resources",
                 "output": "/resources"

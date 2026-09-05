@@ -9,42 +9,8 @@ export interface SaveInput {
   path: string;
 }
 
-export interface SaveSource {
-  file: string;
-  set: string;
-  kind: string;
-  kind_label: string;
-  pals: number;
-  note: string;
-  players?: number;
-  bases?: number;
-  total_slots?: number;
-  world_name?: string;
-  host_player_name?: string;
-  saved_at?: string;
-  skipped?: { players: number; wild_or_npc: number; unreadable: number };
-}
-
-export interface SaveSetSummary {
-  label: string;
-  letter: string;
-  folder: string;
-  world_name: string;
-  host_player_name: string;
-  in_game_day: number | null;
-  saved_at: string;
-  pals: number;
-  bases: { index: number; location: { x: number; y: number; z: number } | null; workers: number }[];
-  players: { uid: string; name: string }[];
-  has_level: boolean;
-  has_dimensional_storage: boolean;
-}
-
-export interface CombinedSaves {
-  rows: PalStorageRow[];
-  sources: SaveSource[];
-  sets: SaveSetSummary[];
-}
+export type { CombinedSaves, SaveSetSummary, SaveSource } from '../backend';
+import type { CombinedSaves } from '../backend';
 
 /** Files in a save folder that never contain pals; skipped before decoding. */
 const IGNORED_FILE_NAMES = new Set(['localdata.sav', 'worldoption.sav']);
@@ -58,7 +24,7 @@ export interface ParseProgress {
 
 type WorkerResponse =
   | { type: 'progress'; id: number; fraction: number | null; label: string; detail: string }
-  | { type: 'result'; id: number; bytes: Uint8Array; timing: { pyStart: number; pyDone: number; posted: number } }
+  | { type: 'result'; id: number; data: CombinedSaves }
   | { type: 'error'; id: number; message: string }
   | { type: 'count'; id: number; index: number; kind: string; pals: number | null }
   | { type: 'count-done'; id: number };
@@ -68,12 +34,10 @@ export class SaveParserService {
   private worker?: Worker;
   private nextRequestId = 1;
   private readonly pending = new Map<number, {
-    resolve: (json: string) => void;
+    resolve: (data: CombinedSaves) => void;
     reject: (error: Error) => void;
     onProgress?: (progress: ParseProgress) => void;
   }>();
-  /** Durations of the last parse, in ms, for debugging slow loads. */
-  lastTiming: Record<string, number> = {};
   private readonly pendingCounts = new Map<number, {
     onEach: (index: number, kind: string, pals: number | null) => void;
     resolve: () => void;
@@ -89,7 +53,7 @@ export class SaveParserService {
     const id = this.nextRequestId++;
     return new Promise<void>((resolve) => {
       this.pendingCounts.set(id, { onEach, resolve });
-      worker.postMessage({ type: 'count', id, files: inputs.map((input) => ({ file: input.file, name: input.file.name })) });
+      worker.postMessage({ type: 'count', id, files: inputs.map((input) => ({ file: input.file, name: input.file.name, set: this.setLabel(input) })) });
     });
   }
 
@@ -97,7 +61,7 @@ export class SaveParserService {
     return (await this.parseMany([{ file, path: file.name }])).rows;
   }
 
-  /** Start the worker and its Python runtime now, so the first load skips that wait. */
+  /** Start the worker, its decoder and lookups now, so the first load skips that wait. */
   warmUp(): void {
     try {
       this.getWorker().postMessage({ type: 'init' });
@@ -112,7 +76,7 @@ export class SaveParserService {
    * player save and the dimensional storage file resolve each other's
    * container ids); loose files all go into one default set.
    *
-   * All heavy work (Oodle, Pyodide) runs in a Web Worker so the page never
+   * All heavy work (Oodle, parsing) runs in a Web Worker so the page never
    * freezes; `onProgress` receives real per-file, per-record progress.
    */
   async parseMany(
@@ -128,17 +92,12 @@ export class SaveParserService {
       const set = this.setLabel(input);
       return { file: input.file, name: input.file.name, set, letter: letters.get(set) ?? '' };
     });
-    let jsonText: string;
+    let result: CombinedSaves;
     try {
-      jsonText = await this.runInWorker(files, onProgress);
+      result = await this.runInWorker(files, onProgress);
     } catch (error) {
       throw new Error(this.formatParseError(error));
     }
-
-    const parseStart = Date.now();
-    const result = JSON.parse(jsonText) as CombinedSaves & { timing?: Record<string, number> };
-    this.lastTiming['jsonParse'] = Date.now() - parseStart;
-    Object.assign(this.lastTiming, result.timing ?? {});
     if (!result.rows.length) {
       const notes = result.sources.map((source) => source.note).filter(Boolean);
       throw new Error(notes[0] || this.wrongSaveMessage());
@@ -156,10 +115,10 @@ export class SaveParserService {
   private runInWorker(
     files: { file: File; name: string; set: string; letter: string }[],
     onProgress?: (progress: ParseProgress) => void
-  ): Promise<string> {
+  ): Promise<CombinedSaves> {
     const worker = this.getWorker();
     const id = this.nextRequestId++;
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<CombinedSaves>((resolve, reject) => {
       this.pending.set(id, { resolve, reject, onProgress });
       worker.postMessage({ type: 'parse', id, files });
     });
@@ -190,15 +149,7 @@ export class SaveParserService {
         request.onProgress?.({ fraction: message.fraction, label: message.label, detail: message.detail });
       } else if (message.type === 'result') {
         this.pending.delete(message.id);
-        const received = Date.now();
-        const jsonText = new TextDecoder().decode(message.bytes);
-        this.lastTiming = {
-          python: message.timing.pyDone - message.timing.pyStart,
-          transfer: received - message.timing.posted,
-          decode: Date.now() - received,
-          jsonBytes: message.bytes.byteLength
-        };
-        request.resolve(jsonText);
+        request.resolve(message.data);
       } else {
         this.pending.delete(message.id);
         request.reject(new Error(message.message));
@@ -228,13 +179,6 @@ export class SaveParserService {
 
   private formatParseError(error: unknown): string {
     const message = error instanceof Error ? error.message : String(error);
-    if (
-      message.includes('OverflowError') ||
-      message.includes('extract_records') ||
-      message.includes('PalIndividualCharacterSaveParameter')
-    ) {
-      return this.wrongSaveMessage();
-    }
     return message.split('\n')[0] || 'Could not load this save file.';
   }
 

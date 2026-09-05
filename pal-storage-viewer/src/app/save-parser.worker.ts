@@ -1,9 +1,13 @@
 /// <reference lib="webworker" />
 
 /**
- * Runs the Oodle decoder and the Pyodide-hosted Python parser off the main
- * thread, so big saves never freeze the page, and reports real progress.
+ * Runs the Oodle decoder and the save backend off the main thread so big saves never
+ * freeze the page, reports real progress, and caches parsed files so adding or
+ * removing one file does not re-parse the others.
  */
+import {
+  CombineEntry, CombinedSaves, Lookups, ParsedFile, combineSaves, decodeSave, palCount, parseSaveFile
+} from '../backend';
 
 export interface WorkerFile {
   file: File;
@@ -19,16 +23,37 @@ export interface ParseRequest {
   files: WorkerFile[];
 }
 
-/** Sent on page load so the runtime is ready before the first file arrives. */
+/** Sent on page load so the decoder and lookups are ready before the first file arrives. */
 export interface InitRequest {
   type: 'init';
 }
 
-/** Cheap pal counts for a confirmation preview; decompresses and scans, no parse. */
+/** Pal counts for a confirmation preview; parses (and caches) the files. */
 export interface CountRequest {
   type: 'count';
   id: number;
-  files: { file: File; name: string }[];
+  files: { file: File; name: string; set: string }[];
+}
+
+export interface ProgressMessage {
+  type: 'progress';
+  id: number;
+  /** 0..1 overall, or null while something with no progress events runs. */
+  fraction: number | null;
+  label: string;
+  detail: string;
+}
+
+export interface ResultMessage {
+  type: 'result';
+  id: number;
+  data: CombinedSaves;
+}
+
+export interface ErrorMessage {
+  type: 'error';
+  id: number;
+  message: string;
 }
 
 export interface CountMessage {
@@ -44,66 +69,29 @@ export interface CountDoneMessage {
   id: number;
 }
 
-export interface ProgressMessage {
-  type: 'progress';
-  id: number;
-  /** 0..1 overall, or null while the runtime downloads (no progress events available). */
-  fraction: number | null;
-  label: string;
-  detail: string;
-}
-
-export interface ResultMessage {
-  type: 'result';
-  id: number;
-  /** UTF-8 JSON, transferred rather than copied. */
-  bytes: Uint8Array;
-  /** Wall-clock stamps (ms since epoch) so the main thread can attribute the wait. */
-  timing: { pyStart: number; pyDone: number; posted: number };
-}
-
-export interface ErrorMessage {
-  type: 'error';
-  id: number;
-  message: string;
-}
-
 export type WorkerResponse = ProgressMessage | ResultMessage | ErrorMessage | CountMessage | CountDoneMessage;
 
 type OozModule = { decompress(data: Uint8Array, rawSize: number): Uint8Array };
 
-type PyBytesProxy = { toJs(): Uint8Array; destroy(): void };
-
-type PyodideRuntime = {
-  FS: {
-    mkdirTree(path: string): void;
-    writeFile(path: string, data: string | Uint8Array): void;
-    unlink(path: string): void;
-  };
-  globals: { set(name: string, value: unknown): void; delete(name: string): void };
-  runPythonAsync<T = unknown>(code: string): Promise<T>;
-};
-
-const PYODIDE_VERSION = '0.26.4';
-const PYODIDE_BASE = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
 /** The worker chunk is emitted next to index.html, so this is the app base URL. */
 const APP_BASE = new URL('./', self.location.href);
 
-/** Share of the bar given to each stage; the runtime download has no events. */
+/** Share of the bar given to each stage. */
 const READ_SHARE = 0.1;
 const PARSE_SHARE = 0.85;
 
-const scope = self as unknown as DedicatedWorkerGlobalScope;
-let pyodidePromise: Promise<PyodideRuntime> | undefined;
-let oozPromise: Promise<OozModule> | undefined;
+/** Parsed files kept after they are removed, so re-adding one is instant. */
+const STALE_CACHE_LIMIT = 6;
 
-/** Decoded byte size of every file already parsed and cached inside Python, by file key. */
-const parsedWeights = new Map<string, number>();
+const scope = self as unknown as DedicatedWorkerGlobalScope;
+let oozPromise: Promise<OozModule> | undefined;
+let lookupsPromise: Promise<Lookups> | undefined;
+const parsedCache = new Map<string, ParsedFile | { error: string }>();
 
 scope.addEventListener('message', (event: MessageEvent<ParseRequest | InitRequest | CountRequest>) => {
   const request = event.data;
   if (request?.type === 'init') {
-    void Promise.all([getPyodide(), getOoz()]).catch(() => { /* reported on first parse */ });
+    void Promise.all([getOoz(), getLookups()]).catch(() => { /* reported on first parse */ });
     return;
   }
   if (request?.type === 'count') {
@@ -117,13 +105,32 @@ scope.addEventListener('message', (event: MessageEvent<ParseRequest | InitReques
   });
 });
 
-/** Stable identity for a picked file; the same file picked again hits the parse cache. */
-function fileKey(entry: WorkerFile): string {
-  return `${entry.set}|${entry.name}|${entry.file.size}|${entry.file.lastModified}`;
-}
-
 function post(message: WorkerResponse): void {
   scope.postMessage(message);
+}
+
+/** Stable identity for a picked file; the same file picked again hits the cache. */
+function fileKey(set: string, file: File): string {
+  return `${set}|${file.name}|${file.size}|${file.lastModified}`;
+}
+
+async function parseInto(
+  key: string,
+  file: File,
+  progress?: (done: number, total: number, found: number, unit: string) => void
+): Promise<ParsedFile | { error: string }> {
+  const cached = parsedCache.get(key);
+  if (cached) return cached;
+  const [ooz, lookups] = await Promise.all([getOoz(), getLookups()]);
+  let parsed: ParsedFile | { error: string };
+  try {
+    const decoded = decodeSave(new Uint8Array(await file.arrayBuffer()), ooz);
+    parsed = parseSaveFile(decoded, lookups, progress);
+  } catch (error) {
+    parsed = { error: error instanceof Error ? error.message : String(error) };
+  }
+  parsedCache.set(key, parsed);
+  return parsed;
 }
 
 async function handleParse(request: ParseRequest): Promise<void> {
@@ -131,142 +138,60 @@ async function handleParse(request: ParseRequest): Promise<void> {
   const progress = (fraction: number | null, label: string, detail = '') =>
     post({ type: 'progress', id, fraction, label, detail });
 
-  const runtimeReady = Boolean(pyodidePromise && oozPromise);
-  if (!runtimeReady) progress(null, 'Initializing\u2026', '');
-  const [pyodide, ooz] = await Promise.all([getPyodide(), getOoz()]);
-  pyodide.FS.mkdirTree('/app/input');
+  if (!(oozPromise && lookupsPromise)) progress(null, 'Initializing…', '');
+  await Promise.all([getOoz(), getLookups()]);
 
-  // Stage 1: read + decompress every file that Python has not already parsed.
-  const manifest: { key: string; path: string; name: string; set: string; letter: string }[] = [];
-  const weights: number[] = [];
-  const written: string[] = [];
-  const keys = files.map(fileKey);
-  for (const [index, entry] of files.entries()) {
-    const key = keys[index];
-    const cachedWeight = parsedWeights.get(key);
-    if (cachedWeight !== undefined) {
-      manifest.push({ key, path: '', name: entry.name, set: entry.set, letter: entry.letter });
-      weights.push(cachedWeight);
-      continue;
-    }
-    progress((index / files.length) * READ_SHARE, 'Decompressing', `${entry.name} (${index + 1} of ${files.length})`);
-    const bytes = new Uint8Array(await entry.file.arrayBuffer());
-    const decoded = decodeSave(bytes, ooz);
-    const path = `/app/input/${index}_${entry.name.replace(/[^A-Za-z0-9._-]/g, '_')}`;
-    pyodide.FS.writeFile(path, decoded);
-    written.push(path);
-    manifest.push({ key, path, name: entry.name, set: entry.set, letter: entry.letter });
-    weights.push(decoded.byteLength);
-  }
+  const weights = files.map((entry) => entry.file.size || 1);
   const totalWeight = weights.reduce((sum, weight) => sum + weight, 0) || 1;
-
-  // Stage 2: parse in Python, which calls back with per-file record counts.
   const fileFractions = files.map(() => 0);
-  const onProgress = (stage: string, fileIndex: number, done: number, total: number, found: number, unit: string) => {
-    if (stage === 'combine') {
-      fileFractions.fill(1);
-      progress(READ_SHARE + PARSE_SHARE, 'Resolving locations', '');
-      return;
-    }
-    if (stage === 'flatten') {
-      const share = total > 0 ? done / total : 1;
-      progress(READ_SHARE + PARSE_SHARE + share * (1 - READ_SHARE - PARSE_SHARE), 'Formatting results', `${done.toLocaleString()} of ${total.toLocaleString()} pals`);
-      return;
-    }
-    for (let index = 0; index < fileIndex; index++) fileFractions[index] = 1;
-    if (fileIndex < fileFractions.length) {
-      fileFractions[fileIndex] = stage === 'done' ? 1 : total > 0 ? done / total : 0;
-    }
-    const weighted = fileFractions.reduce((sum, fraction, index) => sum + fraction * weights[index], 0) / totalWeight;
-    const name = files[fileIndex]?.name ?? '';
-    let detail = name;
-    if (stage === 'parse' && total > 0) {
-      const pals = `${found.toLocaleString()} pal${found === 1 ? '' : 's'}`;
-      detail = unit === 'entries'
-        ? `${name}: ${done.toLocaleString()} of ${total.toLocaleString()} entries, ${pals}`
-        : `${name}: ${done.toLocaleString()} of ${total.toLocaleString()} pals`;
-    }
-    progress(READ_SHARE + weighted * PARSE_SHARE, 'Reading pals', detail);
+  const report = (label: string, detail: string) => {
+    const weighted = fileFractions.reduce((sum, fraction, i) => sum + fraction * weights[i], 0) / totalWeight;
+    progress(READ_SHARE + weighted * PARSE_SHARE, label, detail);
   };
-  pyodide.globals.set('progress_cb', onProgress);
 
-  let bytes: Uint8Array;
-  const pyStart = Date.now();
-  try {
-    const proxy = await pyodide.runPythonAsync<PyBytesProxy>(`
-import importlib
-import sys
-sys.path.insert(0, '/app')
-main = importlib.import_module('main')
-main.combine_decoded_saves_to_json_bytes(${JSON.stringify(JSON.stringify(manifest))}, '/app/resources', progress=progress_cb)
-`);
-    bytes = proxy.toJs();
-    proxy.destroy();
-  } finally {
-    pyodide.globals.delete('progress_cb');
-    for (const path of written) {
-      try { pyodide.FS.unlink(path); } catch { /* already gone */ }
+  const entries: CombineEntry[] = [];
+  for (const [index, entry] of files.entries()) {
+    const key = fileKey(entry.set, entry.file);
+    if (!parsedCache.has(key)) {
+      progress(READ_SHARE * (index / files.length), 'Decompressing', `${entry.name} (${index + 1} of ${files.length})`);
     }
+    const parsed = await parseInto(key, entry.file, (done, total, found, unit) => {
+      fileFractions[index] = total > 0 ? done / total : 0;
+      const pals = `${found.toLocaleString()} pal${found === 1 ? '' : 's'}`;
+      const detail = unit === 'entries'
+        ? `${entry.name}: ${done.toLocaleString()} of ${total.toLocaleString()} entries, ${pals}`
+        : `${entry.name}: ${done.toLocaleString()} of ${total.toLocaleString()} pals`;
+      report('Reading pals', detail);
+    });
+    fileFractions[index] = 1;
+    entries.push({ key, name: entry.name, set: entry.set, letter: entry.letter, parsed });
   }
-  // Python now caches these; mirror the set so the next request skips them.
-  parsedWeights.clear();
-  keys.forEach((key, index) => parsedWeights.set(key, weights[index]));
-  const pyDone = Date.now();
+
+  progress(READ_SHARE + PARSE_SHARE, 'Resolving locations', '');
+  const data = combineSaves(entries);
+
+  // Keep a few recently removed files so re-adding them is instant, but bound memory.
+  const live = new Set(entries.map((entry) => entry.key));
+  const stale = [...parsedCache.keys()].filter((key) => !live.has(key));
+  for (const key of stale.slice(0, Math.max(0, stale.length - STALE_CACHE_LIMIT))) parsedCache.delete(key);
+
   progress(1, 'Building table', '');
-  const message: ResultMessage = { type: 'result', id, bytes, timing: { pyStart, pyDone, posted: Date.now() } };
-  scope.postMessage(message, [bytes.buffer]);
+  post({ type: 'result', id, data });
 }
 
 async function handleCount(request: CountRequest): Promise<void> {
-  const [pyodide, ooz] = await Promise.all([getPyodide(), getOoz()]);
-  pyodide.FS.mkdirTree('/app/input');
   for (const [index, entry] of request.files.entries()) {
-    let kind = 'unknown';
-    let pals: number | null = null;
-    const path = `/app/input/count_${index}`;
-    try {
-      const decoded = decodeSave(new Uint8Array(await entry.file.arrayBuffer()), ooz);
-      pyodide.FS.writeFile(path, decoded);
-      const result = await pyodide.runPythonAsync<{ toJs(opts: { dict_converter: typeof Object.fromEntries }): { kind: string; pals: number | null }; destroy(): void }>(`
-import importlib
-import sys
-sys.path.insert(0, '/app')
-main = importlib.import_module('main')
-main.quick_count(${JSON.stringify(path)})
-`);
-      const plain = result.toJs({ dict_converter: Object.fromEntries });
-      result.destroy();
-      kind = plain.kind;
-      pals = plain.pals ?? null;
-    } catch {
-      // Unreadable file: leave the count unknown; the real load reports the error.
-    } finally {
-      try { pyodide.FS.unlink(path); } catch { /* never written */ }
-    }
-    post({ type: 'count', id: request.id, index, kind, pals });
+    // Same cache key the parse will use, so the preview does the real work up front.
+    const parsed = await parseInto(fileKey(entry.set, entry.file), entry.file);
+    post({
+      type: 'count',
+      id: request.id,
+      index,
+      kind: 'error' in parsed ? 'unknown' : parsed.kind,
+      pals: 'error' in parsed ? null : palCount(parsed),
+    });
   }
   post({ type: 'count-done', id: request.id });
-}
-
-function decodeSave(bytes: Uint8Array, ooz: OozModule): Uint8Array {
-  if (startsWith(bytes, [0x47, 0x56, 0x41, 0x53])) {
-    return bytes;
-  }
-  if (!startsWith(bytes.subarray(8, 12), [0x50, 0x6c, 0x4d, 0x31])) {
-    throw new Error('This does not look like a Palworld PlM1/GVAS save file.');
-  }
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const uncompressedLength = view.getUint32(0, true);
-  const compressedLength = view.getUint32(4, true);
-  const decoded = new Uint8Array(ooz.decompress(bytes.subarray(12, 12 + compressedLength), uncompressedLength));
-  if (!startsWith(decoded, [0x47, 0x56, 0x41, 0x53])) {
-    throw new Error('The save decoded, but the result was not a GVAS payload.');
-  }
-  return decoded;
-}
-
-function startsWith(bytes: Uint8Array, signature: number[]): boolean {
-  return signature.every((byte, index) => bytes[index] === byte);
 }
 
 function getOoz(): Promise<OozModule> {
@@ -275,29 +200,22 @@ function getOoz(): Promise<OozModule> {
   return oozPromise;
 }
 
-function getPyodide(): Promise<PyodideRuntime> {
-  pyodidePromise ??= (async () => {
-    const loaderUrl = `${PYODIDE_BASE}pyodide.mjs`;
-    const module = await import(/* @vite-ignore */ loaderUrl) as {
-      loadPyodide(config: { indexURL: string }): Promise<PyodideRuntime>;
-    };
-    const pyodide = await module.loadPyodide({ indexURL: PYODIDE_BASE });
-    pyodide.FS.mkdirTree('/app/resources');
-    await Promise.all([
-      writeTextFile(pyodide, '/app/main.py', 'python/main.py'),
-      writeTextFile(pyodide, '/app/data_manager.py', 'python/data_manager.py'),
-      writeTextFile(pyodide, '/app/resources/active_skills_lookup.json', 'resources/active_skills_lookup.json'),
-      writeTextFile(pyodide, '/app/resources/passive_skills_lookup.json', 'resources/passive_skills_lookup.json'),
-      writeTextFile(pyodide, '/app/resources/passive_ranks_lookup.lua', 'resources/passive_ranks_lookup.lua'),
-      writeTextFile(pyodide, '/app/resources/pal_names_lookup.lua', 'resources/pal_names_lookup.lua')
+function getLookups(): Promise<Lookups> {
+  lookupsPromise ??= (async () => {
+    const [activeSkillsJson, passiveSkillsJson, passiveRanksLua, palNamesLua] = await Promise.all([
+      loadText('resources/active_skills_lookup.json'),
+      loadText('resources/passive_skills_lookup.json'),
+      loadText('resources/passive_ranks_lookup.lua'),
+      loadText('resources/pal_names_lookup.lua'),
     ]);
-    return pyodide;
+    return new Lookups({ activeSkillsJson, passiveSkillsJson, passiveRanksLua, palNamesLua });
   })();
-  return pyodidePromise;
+  return lookupsPromise;
 }
 
-async function writeTextFile(pyodide: PyodideRuntime, path: string, relativeUrl: string): Promise<void> {
+async function loadText(relativeUrl: string): Promise<string> {
   const response = await fetch(new URL(relativeUrl, APP_BASE));
   if (!response.ok) throw new Error(`Could not load ${relativeUrl} (${response.status}).`);
-  pyodide.FS.writeFile(path, await response.text());
+  return response.text();
 }
+

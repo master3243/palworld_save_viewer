@@ -5,5 +5,5 @@
     "lib": ["es2022", "webworker"],
     "types": []
   },
-  "include": ["src/**/*.worker.ts"]
+  "include": ["src/**/*.worker.ts", "src/backend/**/*.ts"]
 }
