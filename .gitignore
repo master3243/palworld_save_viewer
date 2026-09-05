@@ -1,3 +1,5 @@
+__pycache__/
+
 # Angular dependencies and build output
 pal-storage-viewer/node_modules/
 pal-storage-viewer/dist/

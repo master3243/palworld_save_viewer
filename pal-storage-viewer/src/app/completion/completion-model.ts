@@ -21,8 +21,8 @@ export interface CompletionData {
   bosses: [string, string, number, string, number, number, number][];
   /** tower flag -> [name, x, y, z] */
   towers: Record<string, [string, number, number, number]>;
-  /** area id -> name */
-  areas: Record<string, string>;
+  /** area id -> [name, x, y] (0, 0 when the region has no known position) */
+  areas: Record<string, [string, number, number]>;
   /** level object id -> [x, y, z, item name, item id] */
   ruinPickups: Record<string, [number, number, number, string, string]>;
   /** [tribe id, paldeck number, name] */
@@ -39,6 +39,8 @@ export interface CompletionData {
   skins: [string, string, number][];
   /** Player level cap. */
   maxLevel: number;
+  /** In-game map coordinates of the nine Pal Critics (which one is which area is unknown). */
+  palCritics: [number, number][];
 }
 
 /** World-level (guild) progress that lives in Level.sav rather than the player save. */
@@ -314,6 +316,8 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
     const areaMatch = /_([A-Z])_\d+$/.exec(id);
     const suffix = areaMatch ? `area ${areaMatch[1]}` : id.replace(/^(Main|Sub|Hidden)_/, '').replace(/_/g, ' ');
     const name = (nameCounts.get(baseName) ?? 0) > 1 ? `${baseName} (${suffix})` : baseName;
+    // The Pal Critic requests have no marker of their own; list where the critics stand.
+    const critics = id.includes('PalDisplay') && data.palCritics.length ? `critics at ${data.palCritics.map(([cx, cy]) => `${cx}, ${cy}`).join(' · ')}` : '';
     let state: ItemState = 'todo';
     let detail = '';
     if (completed.has(id)) {
@@ -325,6 +329,7 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
       const progress = counters.map(([key, value]) => `${key.replace(/^QuestBlock_DeliveryItem_/, '').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()} ${value}`);
       detail = ['in progress', quest.block > 0 ? `step ${quest.block + 1}` : '', ...progress].filter(Boolean).join(' · ');
     }
+    if (critics) detail = [detail, critics].filter(Boolean).join(' · ');
     items.push({ id, name, detail, state, group: '', ...place(x, y), order: 0, no: null });
   }
   const known = new Set(Object.keys(data.quests));
@@ -400,8 +405,8 @@ function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: str
 
 function areaCategory(record: PlayerCompletion, data: CompletionData): Category {
   const found = new Set(record.areas.map((area) => area.toLowerCase()));
-  const items: TrackedItem[] = Object.entries(data.areas).map(([id, name]) => ({
-    id, name, detail: '', state: found.has(id.toLowerCase()) ? 'done' : 'todo', group: '', coords: '', map: '', order: 0, no: null,
+  const items: TrackedItem[] = Object.entries(data.areas).map(([id, [name, x, y]]) => ({
+    id, name, detail: '', state: found.has(id.toLowerCase()) ? 'done' : 'todo', group: '', ...place(x, y), order: x || y ? 0 : 1, no: null,
   }));
   const known = new Set(Object.keys(data.areas).map((id) => id.toLowerCase()));
   return finish({

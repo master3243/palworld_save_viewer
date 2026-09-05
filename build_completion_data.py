@@ -7,7 +7,7 @@ Sources (game data extracted from the Palworld pak files by three save-editor pr
   * deafdudecomputers/PalWorldSaveTools resources/game_data/*.json (MIT; areas, fast travel
     names, Statue of Power rank table)
   * KrisCris/Palworld-Pal-Editor assets/data/skin_data.json (GPL-3.0; pal skins)
-plus this repo's own pal name lookup. Every list was checked against a real save: every
+plus this repo's own pal name lookup and the paldb.cc map dumps. Every list was checked against a real save: every
 obtained id in the save exists in the corresponding list here.
 
 Usage:  python3 build_completion_data.py            (downloads pinned upstream files)
@@ -18,6 +18,8 @@ import re
 import sys
 import urllib.request
 from pathlib import Path
+
+from clean_paldb_map_dump import reduce_all
 
 HERE = Path(__file__).resolve().parent / "resources" / "completion"
 # Hand-collected lists that no extraction project provides
@@ -84,13 +86,8 @@ EXTRA_TOWERS = {
 # Pals the table marks disabled that the game still registers in the Paldeck.
 DISABLED_BUT_IN_PALDECK = {"KingWhale"}
 
-# Quest objective markers the extracted mission table lacks, as in-game map coordinates
-# (from palworld.gamevault.in mission pages, which read them from the game files).
-QUEST_MAP_COORDS = {
-    "Sub_PalDisplay_A_01": (-346, 191), "Sub_PalDisplay_B_01": (-318, 126), "Sub_PalDisplay_C_01": (-236, 190),
-    "Sub_PalDisplay_D_01": (-219, 226), "Sub_PalDisplay_E_01": (32, 323), "Sub_PalDisplay_F_01": (-416, -89),
-    "Sub_PalDisplay_G_01": (-118, 138), "Sub_PalDisplay_H_01": (-63, -54), "Sub_PalDisplay_I_01": (-589, -254),
-}
+def world_to_map(x: int, y: int) -> list[int]:
+    return [round((y - 157935) / 459), round((x + 123930) / 459)]
 
 
 def map_to_world(map_x: int, map_y: int) -> tuple[int, int]:
@@ -143,14 +140,27 @@ def note_name(note_id: str) -> str:
         if note_id.startswith(prefix):
             rest = note_id[len(prefix):]
             if prefix == "Day":
-                label = "day ??" if rest == "-xx" else f"day {rest.replace('-', ', part ')}"
-                return f"{owner}, {label}"
-            return f"{owner} {rest}" if rest else owner
+                return f"{owner} - Day {'XX' if rest == '-xx' else rest}"
+            return f"{owner} - {rest}" if rest else owner
     return humanize(note_id)
+
+
+def region_key(identifier: str) -> frozenset[str]:
+    """Tokens that identify a region in both the game's area ids and paldb's REGION_ ids
+    (Grass_001_Crunch vs REGION_Grass_1_Church, PvPIsland_001 vs REGION_PvP_1)."""
+    text = identifier.lower().removeprefix("region_")
+    for old, new in (("pvpisland", "pvp"), ("crunch", "church"), ("sakurajima_", ""), ("sakurajim_", "")):
+        text = text.replace(old, new)
+    return frozenset(token.lstrip("0") or "0" for token in re.findall(r"[a-z]+|\d+", text))
 
 
 def build(cache: Path) -> dict:
     names = pal_names()
+    # paldb map markers for every map, merged (ruins, journals and regions never overlap between maps).
+    paldb = {"ruins": [], "journals": [], "regions": [], "palCritics": []}
+    for data in reduce_all(EXTRA_SOURCES).values():
+        for key in paldb:
+            paldb[key].extend(data[key])
     l10n_pals = load(cache, "psp/l10n/pals.json")
 
     def pal_name(pal_id: str) -> str:
@@ -197,7 +207,12 @@ def build(cache: Path) -> dict:
         statue = 1 if "TowerFastTravelPoint" in value.get("class", "") else 0
         fast_travel[guid] = [name, *coords(value), value.get("id", ""), statue]
 
-    notes = {note_id: [note_name(note_id), *coords(v)] for note_id, v in sorted(load(cache, "psp/notes.json").items())}
+    # Journals: official titles from the paldb map where it has them (Palpagos), else built from the id.
+    journal_titles = {tuple(j["map"]): j["title"] for j in paldb["journals"]}
+    notes = {}
+    for note_id, value in sorted(load(cache, "psp/notes.json").items()):
+        x, y, z = coords(value)
+        notes[note_id] = [journal_titles.get(tuple(world_to_map(x, y))) or note_name(note_id), x, y, z]
 
     quests_raw = load(cache, "psp/missions.json")
     quests_l10n = load(cache, "psp/l10n/missions.json")
@@ -208,10 +223,7 @@ def build(cache: Path) -> dict:
         # Replays repeat an already counted quest; disabled ones never appear in a save.
         disabled = 1 if value.get("disabled") or quest_id.endswith("_Replay") else 0
         location = value.get("location") or {}
-        x, y = round(location.get("x") or 0), round(location.get("y") or 0)
-        if not (x or y) and quest_id in QUEST_MAP_COORDS:
-            x, y = map_to_world(*QUEST_MAP_COORDS[quest_id])
-        quests[quest_id] = [kind, name, disabled, x, y]
+        quests[quest_id] = [kind, name, disabled, round(location.get("x") or 0), round(location.get("y") or 0)]
 
     bosses = []
     for value in load(cache, "psp/bosses.json").values():
@@ -240,17 +252,25 @@ def build(cache: Path) -> dict:
             name = f"World Tree: {pal_name('GYM_WorldTreeDragon')}"
         towers[tid] = [name, *(coords(point) if point else [0, 0, 0])]
 
-    areas = {area: humanize(area) for area in load(cache, "pwst/world_map_areas.json")["areas"]}
+    # Regions: ids from the area table; names and positions from the paldb map where the ids match.
+    paldb_regions = {region_key(r["id"]): r for r in paldb["regions"] if r["name"] and r["name"] != "-"}
+    areas = {}
+    for area in load(cache, "pwst/world_map_areas.json")["areas"]:
+        match = paldb_regions.get(region_key(area))
+        if match:
+            x, y = map_to_world(*match["map"])
+            areas[area] = [match["name"], x, y]
+        else:
+            areas[area] = [humanize(area), 0, 0]
+    print(f"  regions named from paldb: {sum(1 for v in areas.values() if v[1] or v[2])} / {len(areas)}")
+    print("  paldb regions without an area id:", [r["id"] for k, r in paldb_regions.items() if k not in {region_key(a) for a in areas}])
 
-    # Ruin pickups: coordinates from the level data; what each one holds comes from paldb.cc
-    # item pages, keyed by in-game map coordinates.
-    ruin_items = json.loads((EXTRA_SOURCES / "ancient_ruins_paldb.json").read_text(encoding="utf-8"))["items"]
+    # Ruin pickups: coordinates from the level data; what each one holds from the paldb map.
+    ruin_items = {tuple(r["map"]): r["item"] for r in paldb["ruins"]}
     ruins = {}
     for guid, value in sorted(load(cache, "psp/ancient_ruins.json").items()):
         x, y, z = coords(value)
-        map_key = f"{round((y - 157935) / 459)},{round((x + 123930) / 459)}"
-        held = ruin_items.get(map_key) or {}
-        ruins[guid] = [x, y, z, held.get("name", ""), held.get("item", "")]
+        ruins[guid] = [x, y, z, ruin_items.get(tuple(world_to_map(x, y)), "")]
 
     # Paldeck: one entry per species/variant. The pal table also holds encounter clones
     # (quest, summon, oil rig and tower copies) that share a deck number; skip those.
@@ -347,6 +367,7 @@ def build(cache: Path) -> dict:
         "research": research,
         "skins": skins,
         "maxLevel": max_level,
+        "palCritics": paldb["palCritics"],
     }
 
 

@@ -88,6 +88,8 @@ Resources used while building the save decoder
   - Some side lists for the 100% Tracker.
 - [Palworld-Pal-Editor skin data](https://github.com/KrisCris/Palworld-Pal-Editor/tree/develop/src/palworld_pal_editor/assets/data)
   - Pal skin list for the 100% Tracker.
+- [paldb.cc map data](https://paldb.cc/en/Map)
+  - Map location data for the 100% Tracker.
 
 
 
