@@ -5,6 +5,7 @@
         <div class="stars" [attr.aria-label]="'Rank ' + displayRank + ' of 4'" [title]="'Condensing: ' + displayRank + ' of 4 stars'">
           <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
         </div>
+        <div class="identity-rest">
         <div class="spirit" title="Pal Souls spent (sum of the soul ranks)">
           <img *ngIf="uiIcons['spirit']" [src]="uiIcons['spirit']" alt="Pal Souls"><b>+{{ soulTotal }}</b>
         </div>
@@ -84,6 +85,7 @@
               </svg>
             </a>
           </span>
+        </div>
       </div>
       <div class="identity-main">
         <div class="level-block">
