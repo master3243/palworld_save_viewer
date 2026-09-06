@@ -27,11 +27,6 @@ export function elementIcons(row: PalStorageRow): TraitIcon[] {
   });
 }
 
-/** Work icons with their level, from the per-work columns; only suitabilities the pal has. */
-export function workIcons(row: PalStorageRow): TraitIcon[] {
-  return workTable(row).filter((work) => work.rank > 0);
-}
-
 /** Every work suitability, in game order, with the pal's level (0 when it lacks it) and gained ranks. */
 export function workTable(row: PalStorageRow): TraitIcon[] {
   const bonusText = typeof row['work_bonus'] === 'string' ? row['work_bonus'] : '';

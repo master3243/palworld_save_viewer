@@ -1,6 +1,7 @@
 /** Types shared by the table (AppComponent) and its OnPush rows (PalRowComponent). */
-import type { elementIcons, workIcons } from './trait-icons';
-import type { passiveChips } from './passive-chips';
+import type { elementIcons, TraitIcon } from './trait-icons';
+import type { PassiveChip } from './passive-chips';
+import type { TooltipData } from './game-tooltip.component';
 
 export interface TableColumn {
   key: string;
@@ -20,9 +21,10 @@ export interface CellView {
 /** Cached per-row view data for the table (see AppComponent.rowView). */
 export interface RowView {
   elements: ReturnType<typeof elementIcons>;
-  works: ReturnType<typeof workIcons>;
-  passives: ReturnType<typeof passiveChips>;
-  moves: { name: string; element: number; iconSrc: string; power: string; title: string }[];
+  works: TraitIcon[];
+  workTooltip: TooltipData | null;
+  passives: (PassiveChip & { tooltip: TooltipData })[];
+  moves: { name: string; element: number; iconSrc: string; power: string; tooltip: TooltipData }[];
   stars: boolean[];
   cells: Record<string, CellView | undefined>;
   alpha: boolean;

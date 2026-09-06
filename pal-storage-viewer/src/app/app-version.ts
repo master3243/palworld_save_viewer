@@ -1,2 +1,2 @@
 /** Update this single value when publishing a new viewer version. */
-export const APP_VERSION = 'v0.9.15';
+export const APP_VERSION = 'v0.9.16';

@@ -6,13 +6,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { GenderIconComponent } from './gender-icon.component';
+import { TooltipDirective } from './game-tooltip.component';
 import type { PalStorageRow } from './save-parser.service';
 import type { RowView, TableColumn } from './table-model';
 
 @Component({
   selector: 'tr[app-pal-row]',
   standalone: true,
-  imports: [CommonModule, GenderIconComponent],
+  imports: [CommonModule, GenderIconComponent, TooltipDirective],
   templateUrl: './pal-row.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'data-row', '[class.open]': 'open', '[attr.data-row-index]': 'index' },

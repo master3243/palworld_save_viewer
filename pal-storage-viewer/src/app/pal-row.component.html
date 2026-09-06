@@ -7,6 +7,7 @@
     [class.iv-high]="view.cells[column.key]?.iv === 'high'"
     [class.iv-perfect]="view.cells[column.key]?.iv === 'perfect'"
     [class.sorted-column]="sortColumn === column.key"
+    [appTooltip]="column.key === 'work' ? view.workTooltip : null"
   >
     <span
       *ngIf="column.key === 'pal_variant' && view.alpha"
@@ -45,7 +46,7 @@
       <img *ngFor="let icon of view.elements" class="trait-icon" [src]="icon.src" [alt]="icon.name" [title]="icon.name" decoding="async">
     </span>
     <span class="trait-icons" *ngIf="column.key === 'work'" [class.overflowing]="view.works.length > 7">
-      <span class="work-badge" *ngFor="let icon of view.works" [title]="icon.name + ' ' + icon.rank + (icon.bonus ? ' (' + icon.bonus + ' gained)' : '')">
+      <span class="work-badge" *ngFor="let icon of view.works">
         <img class="trait-icon" [src]="icon.src" [alt]="icon.name">
         <b>{{ icon.rank }}</b>
         <svg *ngIf="icon.bonus" class="work-bonus" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 6 2.5l4 4M2 10.5l4-4 4 4"/></svg>
@@ -56,14 +57,14 @@
         *ngFor="let chip of view.passives"
         class="passive-chip"
         [attr.data-tone]="chip.tone"
-        [title]="chip.name + (chip.rank ? ' (' + (chip.rank > 0 ? '+' : '') + chip.rank + ')' : '')"
+        [appTooltip]="chip.tooltip"
       >
         <img *ngIf="chip.iconKey && passiveIcons[chip.iconKey]" class="passive-chip-rank" [src]="passiveIcons[chip.iconKey]" alt="">
         <span class="passive-chip-name">{{ chip.name }}</span>
       </span>
     </span>
     <span class="move-chips" *ngIf="column.key === 'combat_moves'">
-      <span *ngFor="let chip of view.moves" class="move-mini" [attr.data-element]="chip.element" [title]="chip.title">
+      <span *ngFor="let chip of view.moves" class="move-mini" [attr.data-element]="chip.element" [appTooltip]="chip.tooltip">
         <span class="move-mini-name">{{ chip.name }}</span>
         <span class="move-mini-meta" *ngIf="chip.power"><img *ngIf="chip.iconSrc" [src]="chip.iconSrc" alt=""><b>{{ chip.power }}</b></span>
       </span>

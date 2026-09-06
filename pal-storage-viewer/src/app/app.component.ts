@@ -14,8 +14,8 @@ import { GameDataService } from './game-data.service';
 import { OfflineImageService } from './offline-image.service';
 import { palImagePath } from './pal-image';
 import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource } from './save-parser.service';
-import { elementIcons, workIcons } from './trait-icons';
-import { ELEMENT_NAMES } from '../backend/lookups';
+import { elementIcons, workTable } from './trait-icons';
+import { activeSkillTooltip, passiveSkillTooltip, workSuitabilityTooltip } from './pal-tooltips';
 import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
 import { PalRowComponent } from './pal-row.component';
 import { CellView, RowView, TableColumn } from './table-model';
@@ -1064,7 +1064,7 @@ export class AppComponent {
   }
 
   /** Equipped active skills as mini chips: name plus the element tab with icon and power. */
-  moveChips(row: PalStorageRow): { name: string; element: number; iconSrc: string; power: string; title: string }[] {
+  moveChips(row: PalStorageRow): RowView['moves'] {
     const ids = this.cellValue(row, 'active_skill_ids').split(', ').filter(Boolean);
     const names = this.cellValue(row, 'combat_moves').split(', ').filter(Boolean);
     return names.map((name, index) => {
@@ -1074,7 +1074,7 @@ export class AppComponent {
         name, element,
         iconSrc: element >= 0 ? `assets/icons/element_${String(element).padStart(2, '0')}.webp` : '',
         power: detail ? String(detail.power) : '',
-        title: detail ? `${name} · ${ELEMENT_NAMES[element] ?? ''} · Power ${detail.power} · Cooldown ${detail.cooldown}s` : name,
+        tooltip: activeSkillTooltip(name, this.gameData.activeDescription(ids[index] ?? ''), detail),
       };
     });
   }
@@ -1097,10 +1097,15 @@ export class AppComponent {
           iv: this.isIv(column) ? (value === 100 ? 'perfect' : value >= 70 ? 'high' : '') : '',
         };
       }
+      const works = workTable(row);
+      const passiveIds = this.cellValue(row, 'passive_skill_ids').split(', ').filter(Boolean);
       view = {
         elements: elementIcons(row),
-        works: workIcons(row),
-        passives: passiveChips(row),
+        works: works.filter((work) => work.rank > 0),
+        workTooltip: workSuitabilityTooltip(row, works),
+        passives: passiveChips(row).map((chip, index) => ({
+          ...chip, tooltip: passiveSkillTooltip(chip.name, this.gameData.passiveDescription(passiveIds[index] ?? '')),
+        })),
         moves: this.moveChips(row),
         stars: this.rankStarsFor(row),
         cells,

@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
-import { condenseWorkBonus } from '../backend/stats';
 import { GameDataService } from './game-data.service';
-import { TooltipData, TooltipDirective, TextSegment, LevelLine, WorkLevelRow } from './game-tooltip.component';
+import { activeSkillTooltip, passiveSkillTooltip, workSuitabilityTooltip } from './pal-tooltips';
+import { TooltipData, TooltipDirective, TextSegment, LevelLine } from './game-tooltip.component';
 import { ElementChartComponent } from './element-chart.component';
 
 import { Game8LookupService } from './game8-lookup.service';
@@ -16,11 +16,6 @@ import { PalStorageRow } from './save-parser.service';
 interface DetailField { key: string; label: string; value: string; rawValue?: string; }
 interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense' | 'crafting'; tone?: 'high' | 'perfect'; }
 
-/** Status ailment names as the game's skill cards show them. */
-const STATUS_NAMES: Record<string, string> = {
-  Burn: 'Burn', Wetness: 'Soak', Freeze: 'Freeze', Electrical: 'Electrify', Darkness: 'Blind',
-  Poison: 'Poison', Muddy: 'Muddy', IvyCling: 'Ivy-Covered', Stun: 'Stun',
-};
 interface PassiveSkill { name: string; rank: string; color: string; rankMarker: string; rankIcon: string; tooltip: TooltipData; }
 interface VitalBar { label: string; icon: string; value: string; percent: number; title: string; tone: string; tooltip: TooltipData | null; }
 interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting'; delta: number; tooltip: TooltipData; }
@@ -321,42 +316,14 @@ export class PalDetailCardComponent implements OnChanges {
     this.learnedSkillChips = this.computeLearnedSkillChips();
     this.emptySlots = Array.from({ length: Math.max(0, 3 - this.activeSkillChips.length) }, (_, index) => index);
     this.works = workTable(this.row);
-    this.workTooltip = this.computeWorkTooltip();
+    this.workTooltip = workSuitabilityTooltip(this.row, this.works);
+    if (this.workTooltip) this.workTooltip.fit = 'host';
     this.elementChips = this.computeElementChips();
     this.rankStars = this.computeRankStars();
     this.foodGauge = this.computeFoodGauge();
     this.ivStats = this.computeIvStats();
     this.soulStats = this.computeSoulStats();
     this.fields = this.computeFields();
-  }
-
-  /** The whole work panel opens one grid: the Pal's suitability line at each condensing rank
-   * (handbook ranks kept), each level-up in gold. */
-  private computeWorkTooltip(): TooltipData | null {
-    const species = this.listFor('work_species').map(Number);
-    const stars = this.displayRank;
-    if (species.length !== this.works.length || !species.every((rank) => Number.isFinite(rank))) return null;
-    const current = condenseWorkBonus(species, stars);
-    const handbook = this.works.map((work, index) => work.rank - species[index] - current[index]);
-    const able = this.works.map((work, index) => index);
-    if (!this.works.some((work) => work.rank > 0)) return null;
-    const rankAt = (count: number) => { const bonus = condenseWorkBonus(species, count); return able.map((index) => species[index] + handbook[index] + bonus[index]); };
-    const perStar = [0, 1, 2, 3, 4].map(rankAt);
-    const rows: WorkLevelRow[] = perStar.map((ranks, count) => ({
-      stars: count,
-      current: count === stars,
-      // Gold once a level is above the unstarred value, and it stays gold at every higher rank.
-      items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: rank > perStar[0][slot], none: rank === 0 })),
-    }));
-    const extra = handbook.reduce((sum, value) => sum + Math.max(0, value), 0);
-    return {
-      title: 'Work Suitability',
-      titleRight: `${'★'.repeat(stars)}${'☆'.repeat(4 - stars)}`,
-      intro: ['Levels at each condensing rank:'],
-      work: rows,
-      fit: 'host',
-      note: extra > 0 ? `Includes +${extra} from handbooks or items.` : undefined,
-    };
   }
 
   /** Skills the Pal could swap in: mastered plus the species learnset, minus the three equipped slots. */
@@ -375,15 +342,7 @@ export class PalDetailCardComponent implements OnChanges {
       const elementIndex = detail?.element ?? -1;
       const iconSrc = elementIndex >= 0 ? `assets/icons/element_${String(elementIndex).padStart(2, '0')}.webp` : '';
       const description = this.gameData.activeDescription(id);
-      // One width for every skill card, like the game's, whatever the description length.
-      const tooltip: TooltipData = { title: name, lines: description ? [description] : [], width: 360 };
-      if (detail) {
-        tooltip.badge = { text: ELEMENT_NAMES[elementIndex] ?? '', iconSrc, element: elementIndex };
-        tooltip.stats = [{ icon: 'clock', label: ':', value: String(detail.cooldown) }, { icon: 'power', label: 'Power:', value: String(detail.power) }];
-        const [effect] = detail.effects;
-        if (effect) tooltip.effect = { label: `Aggregate: ${STATUS_NAMES[effect[0]] ?? effect[0]}`, value: String(effect[1]) };
-        if (detail.melee) tooltip.note = 'Melee';
-      }
+      const tooltip = activeSkillTooltip(name, description, detail);
       return { name, elementIndex, iconSrc, power: detail ? String(detail.power) : '', tooltip, url: this.activeSkillUrl(name) };
     });
   }
@@ -507,18 +466,8 @@ export class PalDetailCardComponent implements OnChanges {
         ? `assets/ui/passive_${direction}_${Math.abs(numericRank)}.pog`
         : '';
       const description = this.gameData.passiveDescription(ids[index] ?? '');
-      const inline = this.passiveLines(description);
-      return { name, rank, color, rankMarker, rankIcon, tooltip: { title: name, inline, note: description ? undefined : 'No description in the game data.' } };
+      return { name, rank, color, rankMarker, rankIcon, tooltip: passiveSkillTooltip(name, description) };
     });
-  }
-
-  /** The game lists one effect per line with every figure in blue ("Max stamina +50.0%" then
-   * "*This effect is only valid for rideable pals."). The data has the effects run together in one
-   * string, so a new line starts after a figure wherever a capitalised word, "*" or "(" follows. */
-  private passiveLines(description: string): TextSegment[][] {
-    if (!description) return [];
-    const lines = description.split(/(?<=\d%?|\d\))\s+(?=[A-Z*(])/).map((line) => line.trim()).filter(Boolean);
-    return lines.map((line) => line.split(/(\d+(?:\.\d+)?)/).filter(Boolean).map((text) => ({ text, value: /^\d/.test(text) })));
   }
 
   activeSkillUrl(move: string): string {
