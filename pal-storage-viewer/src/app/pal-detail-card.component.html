@@ -101,7 +101,7 @@
 
     <div class="profile-body">
       <div class="portrait" aria-hidden="true">
-        <div class="portrait-rank" *ngIf="valueFor('rank')">
+        <div class="portrait-rank" *ngIf="valueFor('level')" [title]="'Condensing: ' + displayRank + ' of 4 stars'">
           <span>Rank</span>
           <div class="stars" [attr.aria-label]="'Rank ' + displayRank + ' of 4'">
             <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
@@ -117,6 +117,10 @@
           <ng-template #portraitFallback><span>{{ initials }}</span></ng-template>
         </div>
         <small>{{ valueFor('species_id') }}</small>
+        <div class="food-gauge" *ngIf="foodGauge.length" [title]="'Appetite: eats ' + valueFor('food_amount') + ' of 10'">
+          <span>Food</span>
+          <i *ngFor="let filled of foodGauge" [class.filled]="filled"></i>
+        </div>
       </div>
 
       <div class="vitals">
@@ -148,11 +152,11 @@
             <h3>Stats</h3>
             <div *ngFor="let stat of combatStats" class="stat" [appTooltip]="stat.tooltip" tabindex="-1">
               <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small>
-              <strong>{{ stat.value }}<i class="delta" *ngIf="stat.delta" [class.down]="stat.delta < 0">{{ stat.delta > 0 ? '▲' : '▼' }}</i></strong>
+              <strong>{{ stat.value }}<i class="delta" [class.down]="stat.delta < 0" [class.hidden]="!stat.delta">{{ stat.delta < 0 ? '▼' : '▲' }}</i></strong>
             </div>
           </section>
-          <section class="stat-panel" *ngIf="ivStats.length">
-            <h3>IV</h3>
+          <section class="stat-panel potential-panel" *ngIf="ivStats.length" title="Potential (IV): 0 to 100 per stat">
+            <h3>Potential</h3>
             <div *ngFor="let stat of ivStats" class="stat">
               <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small><strong [attr.data-tone]="stat.tone">{{ stat.value }}</strong>
             </div>

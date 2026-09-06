@@ -9,6 +9,10 @@ import {
 
 export interface TooltipData {
   title: string;
+  /** Figures shown right of the title, e.g. "687 ≫ 550". */
+  titleRight?: string;
+  /** Text shown first, before any rows. */
+  intro?: string[];
   /** Element chip like the game's skill card (index into the element icon set). */
   badge?: { text: string; iconSrc?: string; element?: number };
   /** Figures shown right of the badge, e.g. cooldown and power. */
@@ -27,7 +31,8 @@ export interface TooltipData {
   imports: [CommonModule],
   template: `
     <div class="tip" [style.left.px]="x" [style.top.px]="y" [class.ready]="ready">
-      <div class="tip-title">{{ data.title }}</div>
+      <div class="tip-title"><span>{{ data.title }}</span><b *ngIf="data.titleRight">{{ data.titleRight }}</b></div>
+      <p class="tip-intro" *ngFor="let line of data.intro">{{ line }}</p>
       <div class="tip-badges" *ngIf="data.badge || data.stats?.length">
         <span class="tip-badge" *ngIf="data.badge" [attr.data-element]="data.badge.element">
           <img *ngIf="data.badge.iconSrc" [src]="data.badge.iconSrc" alt="">{{ data.badge.text }}
@@ -36,7 +41,7 @@ export interface TooltipData {
       </div>
       <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
       <div class="tip-rows" *ngIf="data.rows?.length">
-        <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'"><span>{{ row[0] }}</span><b>{{ row[1] }}</b></div>
+        <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
       </div>
       <p class="tip-line" *ngFor="let line of data.lines">{{ line }}</p>
       <p class="tip-note" *ngIf="data.note">{{ data.note }}</p>
@@ -45,7 +50,12 @@ export interface TooltipData {
   styles: [`
     .tip { background: rgba(14, 24, 32, .96); border: 1px solid rgba(190, 220, 235, .35); box-shadow: 0 10px 30px rgba(0, 0, 0, .55); color: #e6f1f5; font-size: .78rem; left: 0; max-width: 380px; min-width: 220px; opacity: 0; pointer-events: none; position: fixed; top: 0; z-index: 1000; }
     .tip.ready { opacity: 1; }
-    .tip-title { background: linear-gradient(90deg, rgba(110, 125, 135, .55), rgba(60, 75, 85, .55)); color: #fff; font-size: .9rem; font-weight: 700; padding: 6px 12px; }
+    .tip-title { align-items: center; background: linear-gradient(90deg, rgba(110, 125, 135, .55), rgba(60, 75, 85, .55)); color: #fff; display: flex; font-size: .9rem; font-weight: 700; gap: 16px; justify-content: space-between; padding: 6px 12px; }
+    .tip-title b { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+    .tip-intro { line-height: 1.45; margin: 8px 12px 0; }
+    .tip-intro + .tip-intro { margin-top: 0; }
+    .tip-intro + .tip-rows, .tip-intro + .tip-badges { border-top: 1px solid rgba(190, 220, 235, .18); margin-top: 8px; padding-top: 6px; }
+    .tip-row b.negative { color: #ff5a5a; }
     .tip-badges { align-items: center; display: flex; gap: 10px; padding: 8px 12px 4px; }
     .tip-badge { align-items: center; background: #4a5a66; clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-size: .74rem; font-weight: 800; gap: 5px; padding: 3px 16px 3px 8px; }
     .tip-badge img { height: 15px; width: 15px; }

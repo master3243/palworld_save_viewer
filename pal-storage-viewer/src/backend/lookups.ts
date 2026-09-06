@@ -26,6 +26,10 @@ export interface PalTraits {
   t?: [number, number, number];
   /** Partner skill: name, description (null when the game text needs data we do not have), per-level main values. */
   p?: [string, string | null, number[] | null];
+  /** Appetite: how much of the 10-segment food gauge the species eats. */
+  a?: number;
+  /** Skills learned by level: skill id -> level. */
+  k?: Record<string, number>;
 }
 
 /** One active skill as the game's skill card shows it. */

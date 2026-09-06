@@ -67,6 +67,7 @@ export class PalDetailCardComponent implements OnChanges {
     'passive_hp_pct', 'passive_attack_pct', 'passive_defense_pct', 'passive_work_speed_pct', 'hunger_max',
     'trust_rank', 'trust_progress', 'trust_next', 'exp_to_next', 'exp_progress',
     'partner_skill', 'partner_skill_level', 'partner_skill_text',
+    'food_amount', 'known_skill_ids', 'known_moves',
     'trust_hp', 'trust_attack', 'trust_defense', 'food_effect', 'food_attack_pct', 'food_defense_pct', 'food_work_speed_pct', 'food_seconds_left',
     'food_status_effect_item', 'food_with_status_effect_timer'
   ]);
@@ -110,10 +111,11 @@ export class PalDetailCardComponent implements OnChanges {
     if (stars) rows.push([`Condensing ${'★'.repeat(stars)}`, `+${stars * 5}%`]);
     if (souls) rows.push([`Pal Souls (rank ${souls})`, `+${souls * 3}%`]);
     if (trust || stars || souls) rows.push(['Base', String(base)]);
-    if (pct) rows.push(['Passive skills', `${pct > 0 ? '+' : ''}${pct}%`]);
+    if (pct) rows.push(['Passive Skills', `${pct > 0 ? '+' : ''}${pct}%`]);
     if (foodPct) rows.push([`Food: ${this.valueFor('food_effect')}`, `${foodPct > 0 ? '+' : ''}${foodPct}%`]);
     rows.push(['Total', String(value)]);
-    return { title: label, rows };
+    const intro = { 'Max HP': ["Pal's HP.", 'The Pal is knocked out when it reaches 0.'], Attack: ["Pal's Attack.", 'Damage dealt increases as Attack increases.'], Defense: ["Pal's Defense.", 'Damage taken decreases as defense increases.'] }[label];
+    return { title: label, titleRight: base !== value ? `${base} ≫ ${value}` : String(value), intro, rows };
   }
 
   trust: { rank: string; progress: number; title: string } | null = null;
@@ -159,7 +161,11 @@ export class PalDetailCardComponent implements OnChanges {
       if (pct) rows.push(['Passive skills', `${pct > 0 ? '+' : ''}${pct}%`]);
       if (foodPct) rows.push([`Food: ${this.valueFor('food_effect')}`, `+${foodPct}%`]);
       rows.push(['Total', String(workSpeed)]);
-      stats.push({ label: 'Work Speed', value: String(workSpeed), icon: 'crafting', delta: Math.sign(pct + foodPct), tooltip: { title: 'Work Speed', rows } });
+      const base = 70 + 7 * stars;
+      stats.push({ label: 'Work Speed', value: String(workSpeed), icon: 'crafting', delta: Math.sign(pct + foodPct), tooltip: {
+        title: 'Work Speed', titleRight: base !== workSpeed ? `${base} ≫ ${workSpeed}` : String(workSpeed),
+        intro: ["Pal's Work Speed.", 'Affects the efficiency of working on various tasks at base.'], rows,
+      } });
     }
     return stats;
   }
@@ -207,11 +213,11 @@ export class PalDetailCardComponent implements OnChanges {
     this.emptySlots = Array.from({ length: Math.max(0, 3 - this.activeSkillChips.length) }, (_, index) => index);
   }
 
-  /** Learned skills that are not in the three equipped slots. */
+  /** Skills the Pal could swap in: mastered plus the species learnset, minus the three equipped slots. */
   private computeLearnedSkillChips(): ActiveSkillChip[] {
     const equipped = new Set(this.listFor('active_skill_ids'));
-    const ids = this.listFor('mastered_skill_ids');
-    const names = this.listFor('learned_moves');
+    const ids = this.listFor('known_skill_ids');
+    const names = this.listFor('known_moves');
     const keep = ids.map((id, index) => [id, names[index] ?? id] as const).filter(([id]) => !equipped.has(id));
     return this.skillChips(keep.map(([id]) => id), keep.map(([, name]) => name));
   }
@@ -280,6 +286,12 @@ export class PalDetailCardComponent implements OnChanges {
   get displayRank(): number {
     const storedRank = Number(this.valueFor('rank'));
     return Number.isFinite(storedRank) ? Math.max(0, Math.min(4, storedRank - 1)) : 0;
+  }
+
+  /** The game's 10-segment food gauge; filled segments are how much this species eats. */
+  get foodGauge(): boolean[] {
+    const amount = this.numberFor('food_amount');
+    return amount === null ? [] : Array.from({ length: 10 }, (_, index) => index < amount);
   }
 
   get rankStars(): boolean[] {

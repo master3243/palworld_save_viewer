@@ -335,7 +335,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'exp', label: 'Experience', group: G.condition, kind: 'number', aliases: ['xp'], get: (row) => number(row, 'exp') },
 
   { key: 'slot', label: 'Storage page', group: G.storage, kind: 'number', aliases: ['storage_slot', 'box', 'page'], get: (row) => number(row, 'storage_slot') },
-  { key: 'index', label: 'Pal Box slot index', group: G.storage, kind: 'number', aliases: ['pal_box_slot_index', 'slot_index', 'box_slot', 'ind'], get: (row) => number(row, 'pal_box_slot_index') },
+  { key: 'index', label: 'Slot index (1-based)', group: G.storage, kind: 'number', aliases: ['pal_box_slot_index', 'slot_index', 'box_slot', 'ind'], hint: 'Position within the party, Pal Box page or base, starting at 1', get: (row) => { const value = number(row, 'pal_box_slot_index'); return value === null ? null : value + 1; } },
   { key: 'where', label: 'Location', group: G.storage, kind: 'text', aliases: ['location', 'loc', 'place', 'at'], suggest: true, hint: 'Party, Pal Box, Base 1, Dimensional Storage', get: (row) => text(row, 'location') },
   { key: 'save', label: 'Save (letter)', group: G.storage, kind: 'text', aliases: ['save_id'], suggest: true, hint: 'A, B, …', get: (row) => text(row, 'save_id') },
   { key: 'save_name', label: 'Save name', group: G.storage, kind: 'text', aliases: ['world'], suggest: true, get: (row) => text(row, 'save') },

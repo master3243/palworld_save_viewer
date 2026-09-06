@@ -452,7 +452,9 @@ def build_pal_traits(cache: Path) -> None:
         scaling = value["scaling"]
         entry = {"e": elements, "w": work, "s": [scaling["hp"], scaling["attack"], scaling["defense"]],
                  "f": value.get("max_full_stomach") or 0,
-                 "t": [value.get("friendship_hp") or 0, value.get("friendship_shotattack") or 0, value.get("friendship_defense") or 0]}
+                 "t": [value.get("friendship_hp") or 0, value.get("friendship_shotattack") or 0, value.get("friendship_defense") or 0],
+                 "a": value.get("food_amount") or 0,
+                 "k": {skill: level for skill, level in (value.get("skill_set") or {}).items()}}
         character = characters.get(by_lower.get(pal_id.lower(), ""))
         if character:
             stats = character["stats"]

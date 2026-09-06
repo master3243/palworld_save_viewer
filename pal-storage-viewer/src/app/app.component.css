@@ -819,8 +819,8 @@ td.icon-cell {
 
 .trait-icon {
   display: block;
-  height: 18px;
-  width: 18px;
+  height: 22px;
+  width: 22px;
 }
 
 /* One work suitability: the icon with its level in the corner and a chevron when raised. */
@@ -867,18 +867,18 @@ td.trait-cell {
 th.type-cell,
 td.type-cell {
   box-sizing: border-box;
-  max-width: 48px;
-  min-width: 48px;
+  max-width: 56px;
+  min-width: 56px;
   padding-left: 3px;
   padding-right: 3px;
   text-align: center;
-  width: 48px;
+  width: 56px;
 }
 
 th.type-cell.sorted {
-  max-width: 62px;
-  min-width: 62px;
-  width: 62px;
+  max-width: 70px;
+  min-width: 70px;
+  width: 70px;
 }
 
 td.type-cell .trait-icons {

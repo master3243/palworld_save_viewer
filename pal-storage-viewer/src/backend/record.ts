@@ -225,6 +225,8 @@ export function buildRecord(
       defense: readByte(buf, prop('Rank_Defence')), craft_speed: readByte(buf, prop('Rank_CraftSpeed')),
     },
     passive_skill_ids: passiveSkillIds,
+    active_skill_ids: activeSkillIds,
+    mastered_skill_ids: masteredSkillIds,
     friendship_points: readInt(buf, prop('FriendshipPoint')),
     food_item: readName(buf, prop('FoodWithStatusEffect')),
     food_seconds_left: readInt(buf, prop('Tiemr_FoodWithStatusEffect')),

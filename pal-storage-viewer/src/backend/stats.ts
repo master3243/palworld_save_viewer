@@ -21,6 +21,8 @@ export interface StatInputs {
   ivs: { hp: number | null; attack: number | null; defense: number | null };
   soul_ranks: { hp: number | null; attack: number | null; defense: number | null; craft_speed: number | null };
   passive_skill_ids: string[];
+  active_skill_ids: string[];
+  mastered_skill_ids: string[];
   friendship_points: number | null;
   food_item: string | null;
   food_seconds_left: number | null;
@@ -62,6 +64,11 @@ export interface DerivedStats {
   partner_skill: string | null;
   partner_skill_level: number | null;
   partner_skill_text: string | null;
+  /** Appetite on the game's 10-segment food gauge. */
+  food_amount: number | null;
+  /** Every skill the Pal can equip: the save's mastered list plus the species learnset up to its level. */
+  known_skill_ids: string[];
+  known_moves: string[];
 }
 
 const EMPTY: DerivedStats = {
@@ -72,6 +79,7 @@ const EMPTY: DerivedStats = {
   food_effect: null, food_attack_pct: 0, food_defense_pct: 0, food_work_speed_pct: 0, food_seconds_left: null,
   hunger_max: null, trust_rank: null, trust_progress: null, trust_next: null,
   exp_to_next: null, exp_progress: null, partner_skill: null, partner_skill_level: null, partner_skill_text: null,
+  food_amount: null, known_skill_ids: [], known_moves: [],
 };
 
 /** Percent of each stat a set of passives adds (negatives included). */
@@ -186,6 +194,19 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
       out.exp_progress = 100;
     }
   }
+
+  // Alpha (BOSS_) rows come from a table without appetite or learnset; fall back to the base species.
+  const baseTraits = lookups.traitsFor(lookups.canonicalSpeciesId(input.species_id));
+  out.food_amount = traits?.a ?? baseTraits?.a ?? null;
+  // The game's swap list: mastered skills plus everything the species learns by this level (the save
+  // only stores MasteredWaza once a skill fruit or similar adds one), ordered by element then power.
+  const learnset = traits?.k ?? baseTraits?.k ?? {};
+  const known = new Set(input.mastered_skill_ids);
+  for (const [skill, needed] of Object.entries(learnset)) if (level !== null && level >= needed) known.add(skill);
+  for (const skill of input.active_skill_ids) known.add(skill);
+  const sortKey = (id: string) => { const d = lookups.activeDetails.get(id); return [d?.element ?? 99, d?.power ?? 0]; };
+  out.known_skill_ids = [...known].sort((a, b) => { const [ea, pa] = sortKey(a); const [eb, pb] = sortKey(b); return ea - eb || pa - pb; });
+  out.known_moves = out.known_skill_ids.map((id) => lookups.activeSkills.get(id) ?? id);
 
   if (traits?.p) {
     const [name, text, values] = traits.p;

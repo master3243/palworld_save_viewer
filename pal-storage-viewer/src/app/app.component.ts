@@ -1008,6 +1008,8 @@ export class AppComponent {
     if (column.key === 'gender') return this.genderIcon(value);
     if (column.key === 'is_lucky') return this.isLucky(row) ? '★' : '';
     if (column.key === 'rank') return this.displayRank(value);
+    // Shown 1-based like the game's slot numbers; the save stores it 0-based.
+    if (column.key === 'pal_box_slot_index') return value === '' ? '' : String(Number(value) + 1);
     return this.formatSeparators(value);
   }
 
