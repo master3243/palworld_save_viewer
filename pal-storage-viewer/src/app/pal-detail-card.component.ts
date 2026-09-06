@@ -4,6 +4,7 @@ import { elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
 import { GameDataService } from './game-data.service';
 import { TooltipData, TooltipDirective } from './game-tooltip.component';
+import { ElementChartComponent } from './element-chart.component';
 
 import { Game8LookupService } from './game8-lookup.service';
 import { GenderIconComponent } from './gender-icon.component';
@@ -29,7 +30,7 @@ interface FoodEffect { name: string; effects: string; timeLeft: string; }
 @Component({
   selector: 'app-pal-detail-card',
   standalone: true,
-  imports: [CommonModule, GenderIconComponent, TooltipDirective],
+  imports: [CommonModule, GenderIconComponent, TooltipDirective, ElementChartComponent],
   templateUrl: './pal-detail-card.component.html',
   styleUrl: './pal-detail-card.component.css'
 })
@@ -200,6 +201,9 @@ export class PalDetailCardComponent implements OnChanges {
   emptySlots: number[] = [];
   passiveSkills: PassiveSkill[] = [];
   works: ReturnType<typeof workTable> = [];
+  /** Element chart popover, shown while the type chip is hovered. */
+  showElementChart = false;
+  get elementIndexes(): number[] { return this.elementChips.map((chip) => chip.index); }
   elementChips: { name: string; src: string; index: number }[] = [];
   rankStars: boolean[] = [];
   foodGauge: boolean[] = [];

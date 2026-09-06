@@ -3382,22 +3382,27 @@
  },
  "Munchill": {
   "skill": "Icy Maw",
-  "text": "While in party, reduces the weight of ingredient and food by {0}%. When paired with another Ice Pal, their Rot Speed also reduces by (-30~-80)%. (Does not stack)",
+  "text": "While in party, reduces the weight of ingredient and food by {0}%. When paired with another Ice Pal, their Rot Speed also reduces by {1}%. (Does not stack)",
   "levels": [
    [
-    "30"
+    "30",
+    "-30"
    ],
    [
-    "35"
+    "35",
+    "-42"
    ],
    [
-    "40"
+    "40",
+    "-54"
    ],
    [
-    "50"
+    "50",
+    "-66"
    ],
    [
-    "60"
+    "60",
+    "-80"
    ]
   ]
  },
@@ -5676,13 +5681,45 @@
  },
  "Woolipop": {
   "skill": "Candy Pop",
-  "text": "Sometimes drops Cotton Candy when assigned to Ranch. While at a base, reduces Hunger depletion rate of Base Pals by (-10~-20)%. (Does not stack)",
-  "levels": []
+  "text": "Sometimes drops Cotton Candy when assigned to Ranch. While at a base, reduces Hunger depletion rate of Base Pals by {0}%. (Does not stack)",
+  "levels": [
+   [
+    "-10"
+   ],
+   [
+    "-12"
+   ],
+   [
+    "-14"
+   ],
+   [
+    "-16"
+   ],
+   [
+    "-20"
+   ]
+  ]
  },
  "Woolipop Terra": {
   "skill": "Bitter Pop",
-  "text": "Sometimes drops Caramel Cotton Candy when assigned to Ranch. While at a base, reduces Hunger depletion rate of Base Pals by (-15~-25)%. (Does not stack)",
-  "levels": []
+  "text": "Sometimes drops Caramel Cotton Candy when assigned to Ranch. While at a base, reduces Hunger depletion rate of Base Pals by {0}%. (Does not stack)",
+  "levels": [
+   [
+    "-15"
+   ],
+   [
+    "-17"
+   ],
+   [
+    "-19"
+   ],
+   [
+    "-21"
+   ],
+   [
+    "-25"
+   ]
+  ]
  },
  "Wumpo": {
   "skill": "Guardian of the Snowy Mountain",

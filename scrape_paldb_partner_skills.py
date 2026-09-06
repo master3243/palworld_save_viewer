@@ -8,7 +8,7 @@ is completion_sources/paldb_partner_skills.json (tracked), keyed by the in-game 
                 "levels": [["30", "40"], ["35", "45"], ...],      # one list per partner skill level 1..5
                 "extra": ["", "(Damage Up: S)", ...] } }         # optional per-level suffix (awakening text)
 
-Usage: python3 scrape_paldb_partner_skills.py [--refresh]
+Usage: python3 scrape_paldb_partner_skills.py [--refresh | --reparse]
 """
 import html
 import json
@@ -24,7 +24,7 @@ OUT = HERE / "completion_sources" / "paldb_partner_skills.json"
 NAMES_LUA = HERE / "resources" / "pal_names_lookup.lua"
 UPSTREAM_NAMES = HERE / "sandbox" / "completion_upstream" / "psp" / "l10n" / "pals.json"
 
-RANGE = re.compile(r"\((\d+(?:\.\d+)?)~(\d+(?:\.\d+)?)(%?)\)")
+RANGE = re.compile(r"\((-?\d+(?:\.\d+)?)~(-?\d+(?:\.\d+)?)(%?)\)")
 
 
 def fetch(name: str, refresh: bool) -> str | None:
@@ -118,7 +118,8 @@ def pal_names() -> list[str]:
 
 def main() -> None:
     refresh = "--refresh" in sys.argv
-    result = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() and not refresh else {}
+    # --reparse rebuilds every entry from the cached pages without refetching.
+    result = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() and not refresh and "--reparse" not in sys.argv else {}
     names = pal_names()
     print(f"{len(names)} names")
     missing = []

@@ -109,8 +109,11 @@
               <i class="exp-bar"><em [style.width.%]="next.percent"></em></i>
               <b>{{ next.text }}</b>
             </div>
-            <span class="trait-line" *ngIf="elementChips.length" title="Element type">
+            <span class="trait-line" *ngIf="elementChips.length" (mouseenter)="showElementChart = true" (mouseleave)="showElementChart = false">
               <span *ngFor="let chip of elementChips" class="element-chip" [attr.data-element]="chip.index"><img [src]="chip.src" [alt]="chip.name">{{ chip.name }}</span>
+              <div class="element-popover" *ngIf="showElementChart">
+                <app-element-chart [highlight]="elementIndexes"></app-element-chart>
+              </div>
             </span>
           </div>
         </div>
