@@ -89,9 +89,7 @@ Resources used while building the save decoder
 - [Palworld-Pal-Editor skin data](https://github.com/KrisCris/Palworld-Pal-Editor/tree/develop/src/palworld_pal_editor/assets/data)
   - Pal skin list for the 100% Tracker.
 - [paldb.cc map data](https://paldb.cc/en/Map)
-  - Map location data for the 100% Tracker.
-- [paldb.cc icon CDN](https://cdn.paldb.cc/image/Pal/Texture/UI/InGame/)
-  - Element type and work suitability icons (`T_Icon_element_s_*`, `T_icon_palwork_*`), saved under `pal-storage-viewer/public/assets/icons/`. Per-species elements and base work levels come from the palworld-save-pal pal table via `build_completion_data.py` (`resources/pal_traits_lookup.json`).
+  - Map location data for the 100% Tracker, Partner skill info, icons, species specific stats.
 
 
 

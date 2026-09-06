@@ -183,6 +183,7 @@
       </div>
     </div>
 
+    <div class="panel-row">
     <section class="partner-panel" *ngIf="partnerSkill as partner">
       <h3>Partner Skill</h3>
       <div class="partner-line" [appTooltip]="partner.tooltip" tabindex="-1">
@@ -207,6 +208,7 @@
         </span>
       </div>
     </section>
+    </div>
 
     <div class="skill-layout" *ngIf="passiveSkills.length || activeSkillChips.length || learnedSkillChips.length">
       <section class="skill-group" *ngIf="passiveSkills.length">

@@ -232,12 +232,17 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   out.known_skill_ids = [...known].sort((a, b) => { const [ea, pa] = sortKey(a); const [eb, pb] = sortKey(b); return ea - eb || pa - pb; });
   out.known_moves = out.known_skill_ids.map((id) => lookups.activeSkills.get(id) ?? id);
 
-  if (traits?.p) {
-    const [name, text, values] = traits.p;
+  // A variant row may only know the skill name; the base species row has the text.
+  const partner = (traits?.p?.[1] ? traits.p : null) ?? (baseTraits?.p?.[1] ? baseTraits.p : null) ?? traits?.p ?? baseTraits?.p;
+  if (partner) {
+    const [name, text, levels, extra] = partner;
     out.partner_skill = name;
     out.partner_skill_level = stars + 1;
-    const value = values?.[Math.min(stars, values.length - 1)];
-    out.partner_skill_text = text ? text.replace('{ActiveSkillMainValueByRank}', value === undefined ? '?' : String(value)) : null;
+    const values = levels?.[Math.min(stars, levels.length - 1)] ?? [];
+    const suffix = extra?.[Math.min(stars, extra.length - 1)] ?? '';
+    out.partner_skill_text = text
+      ? `${text.replace(/\{(\d+)\}/g, (match, index) => values[Number(index)] ?? match)}${suffix ? ` ${suffix}` : ''}`
+      : null;
   }
   return out;
 }

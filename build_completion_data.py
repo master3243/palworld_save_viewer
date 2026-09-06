@@ -423,22 +423,34 @@ def max_pal_level(cache: Path) -> int:
     return max(value.get("level_cap") or 0 for value in load(cache, "psp/technologies.json").values())
 
 
-def partner_skill(entry: dict) -> list | None:
-    """[name, description or None, per-rank main values or None] from a PalWorldSaveTools character row."""
+PALDB_PARTNER = EXTRA_SOURCES / "paldb_partner_skills.json"
+
+
+def partner_skill(entry: dict, paldb: dict | None) -> list | None:
+    """[name, text with {k} placeholders or None, values per level or None, per-level suffix or None].
+
+    The paldb.cc scrape (scrape_paldb_partner_skills.py) has the resolved text and per-level values;
+    the PalWorldSaveTools row is the fallback for the name and for placeholder-free text."""
+    if paldb:
+        levels = paldb.get("levels") or None
+        return [paldb["skill"], paldb.get("text") or None, levels, paldb.get("extra") or None]
     name = entry.get("partner_skill")
     if not name:
         return None
     text = PARTNER_TAG.sub(lambda m: m.group(1) or m.group(2) or "", entry.get("description") or "")
     text = re.sub(r"\s+", " ", text).strip()
     values = entry.get("active_skill_main_value") or None
-    unresolved = [m for m in PARTNER_PLACEHOLDER.findall(text) if m != "ActiveSkillMainValueByRank" or not values]
-    return [name, text if text and not unresolved else None, values]
+    if values and "{ActiveSkillMainValueByRank}" in text:
+        return [name, text.replace("{ActiveSkillMainValueByRank}", "{0}"), [[str(v)] for v in values], None]
+    return [name, text if text and not PARTNER_PLACEHOLDER.search(text) else None, None, None]
 
 
 def build_pal_traits(cache: Path) -> None:
     """resources/pal_traits_lookup.json: per species elements, base work ranks, stat scaling, hunger,
     trust bonus rates and partner skill; plus the trust rank thresholds and the Pal exp table."""
     pals = load(cache, "psp/pals.json")
+    pal_l10n = load(cache, "psp/l10n/pals.json")
+    paldb_partner = json.loads(PALDB_PARTNER.read_text(encoding="utf-8")) if PALDB_PARTNER.exists() else {}
     characters = {row["asset"]: row for row in load(cache, "pwst/characters.json")["pals"]}
     by_lower = {key.lower(): key for key in characters}
     traits = {}
@@ -456,13 +468,14 @@ def build_pal_traits(cache: Path) -> None:
                  "a": value.get("food_amount") or 0,
                  "k": {skill: level for skill, level in (value.get("skill_set") or {}).items()}}
         character = characters.get(by_lower.get(pal_id.lower(), ""))
+        display_name = (pal_l10n.get(pal_id) or {}).get("localized_name") or (character or {}).get("name") or ""
         if character:
             stats = character["stats"]
             if [stats["hp"], stats["shot_attack"], stats["defense"]] != entry["s"]:
                 print(f"  stat scaling differs for {pal_id}: psp {entry['s']} vs pwst {[stats['hp'], stats['shot_attack'], stats['defense']]} (keeping psp)")
-            skill = partner_skill(character)
-            if skill:
-                entry["p"] = skill
+        skill = partner_skill(character or {}, paldb_partner.get(display_name))
+        if skill:
+            entry["p"] = skill
         traits[pal_id] = entry
     # Alpha (BOSS_) and other variants only the PalWorldSaveTools table carries; they have their own HP scaling.
     known = {key.lower() for key in traits}
@@ -477,7 +490,9 @@ def build_pal_traits(cache: Path) -> None:
         entry = {"e": elements, "w": work, "s": [stats["hp"], stats["shot_attack"], stats["defense"]],
                  "f": stats.get("max_full_stomach") or 0,
                  "t": [character.get("friendship_hp") or 0, character.get("friendship_shotattack") or 0, character.get("friendship_defense") or 0]}
-        skill = partner_skill(character)
+        base_id = re.sub(r"^(?:BOSS_|Boss_|PREDATOR_|RAID_|SUMMON_)", "", asset)
+        base_name = (pal_l10n.get(base_id) or {}).get("localized_name") or ""
+        skill = partner_skill(character, paldb_partner.get(character.get("name") or "") or paldb_partner.get(base_name))
         if skill:
             entry["p"] = skill
         traits[asset] = entry
@@ -510,7 +525,8 @@ def build_pal_traits(cache: Path) -> None:
     lines += ["}", "}"]
     TRAITS_OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"wrote {TRAITS_OUT} ({len(traits)} pals, {sum(1 for v in traits.values() if v.get('p'))} with partner skill, "
-          f"{sum(1 for v in traits.values() if v.get('p') and v['p'][1])} with partner text)")
+          f"{sum(1 for v in traits.values() if v.get('p') and v['p'][1])} with partner text, "
+          f"{sum(1 for v in traits.values() if v.get('p') and v['p'][2])} with per-level values)")
 
 
 def build_skill_details(cache: Path) -> None:

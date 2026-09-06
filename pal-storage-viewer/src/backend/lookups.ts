@@ -24,8 +24,8 @@ export interface PalTraits {
   f?: number;
   /** Trust bonus rates: HP, attack, defense (meaning not yet verified). */
   t?: [number, number, number];
-  /** Partner skill: name, description (null when the game text needs data we do not have), per-level main values. */
-  p?: [string, string | null, number[] | null];
+  /** Partner skill: name, text with {k} placeholders (or null), the values per level (1..5) that fill them, per-level suffix. */
+  p?: [string, string | null, string[][] | null, string[] | null];
   /** Appetite: how much of the 10-segment food gauge the species eats. */
   a?: number;
   /** Skills learned by level: skill id -> level. */
