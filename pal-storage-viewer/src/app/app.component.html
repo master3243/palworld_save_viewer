@@ -208,9 +208,9 @@
       <button
         class="gear-button fullscreen-button"
         type="button"
-        [attr.aria-label]="isFullscreen ? 'Exit full screen' : 'Full screen table'"
+        [attr.aria-label]="isFullscreen ? 'Exit full screen' : 'Full screen'"
         [attr.aria-pressed]="isFullscreen"
-        [title]="isFullscreen ? 'Exit full screen (Esc)' : 'Full screen table'"
+        [title]="isFullscreen ? 'Exit full screen (Esc)' : 'Full screen'"
         (click)="toggleFullscreen()"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="!isFullscreen">

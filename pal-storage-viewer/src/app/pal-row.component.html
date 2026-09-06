@@ -42,7 +42,7 @@
     <span class="table-rank-stars" *ngIf="column.key === 'rank'" [attr.aria-label]="view.cells[column.key]?.text + ' of 4 stars'">
       <i *ngFor="let filled of view.stars" [class.filled]="filled">★</i>
     </span>
-    <span class="trait-icons" *ngIf="column.key === 'elements'">
+    <span class="trait-icons" [class.dual]="view.elements.length === 2" *ngIf="column.key === 'elements'">
       <img *ngFor="let icon of view.elements" class="trait-icon" [src]="icon.src" [alt]="icon.name" [title]="icon.name" decoding="async">
     </span>
     <span class="trait-icons" *ngIf="column.key === 'work'" [class.overflowing]="view.works.length > 7">

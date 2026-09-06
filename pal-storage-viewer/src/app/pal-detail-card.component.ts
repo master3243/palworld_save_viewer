@@ -375,7 +375,8 @@ export class PalDetailCardComponent implements OnChanges {
       const elementIndex = detail?.element ?? -1;
       const iconSrc = elementIndex >= 0 ? `assets/icons/element_${String(elementIndex).padStart(2, '0')}.webp` : '';
       const description = this.gameData.activeDescription(id);
-      const tooltip: TooltipData = { title: name, lines: description ? [description] : [] };
+      // One width for every skill card, like the game's, whatever the description length.
+      const tooltip: TooltipData = { title: name, lines: description ? [description] : [], width: 360 };
       if (detail) {
         tooltip.badge = { text: ELEMENT_NAMES[elementIndex] ?? '', iconSrc, element: elementIndex };
         tooltip.stats = [{ icon: 'clock', label: ':', value: String(detail.cooldown) }, { icon: 'power', label: 'Power:', value: String(detail.power) }];

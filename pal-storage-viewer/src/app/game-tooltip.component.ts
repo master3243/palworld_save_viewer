@@ -33,6 +33,8 @@ export interface TooltipData {
   work?: WorkLevelRow[];
   /** 'host': the tooltip is as wide as the element it belongs to and lines up with its left edge. */
   fit?: 'host';
+  /** Fixed width in px, so a family of tooltips (e.g. every active skill card) shares one size. */
+  width?: number;
   /** Left-aligned lines with every figure marked, like the game's passive skill card ("Attack +30.0%"). */
   inline?: TextSegment[][];
   lines?: string[];
@@ -77,7 +79,7 @@ export interface TooltipData {
     </div>
   `,
   styles: [`
-    .tip { background: rgba(14, 24, 32, .96); border: 1px solid rgba(190, 220, 235, .35); box-shadow: 0 10px 30px rgba(0, 0, 0, .55); color: #e6f1f5; font-size: .78rem; left: 0; max-width: 380px; min-width: 220px; opacity: 0; pointer-events: none; position: fixed; top: 0; z-index: 1000; }
+    .tip { background: rgba(14, 24, 32, .96); border: 1px solid rgba(190, 220, 235, .35); box-shadow: 0 10px 30px rgba(0, 0, 0, .55); color: #e6f1f5; font-size: .78rem; left: 0; max-width: 380px; min-width: 220px; opacity: 0; padding-bottom: 9px; pointer-events: none; position: fixed; top: 0; z-index: 1000; }
     .tip.ready { opacity: 1; }
     .tip.fitted { max-width: none; }
     .tip-title { align-items: center; background: linear-gradient(90deg, rgba(110, 125, 135, .55), rgba(60, 75, 85, .55)); color: #fff; display: flex; font-size: .9rem; font-weight: 700; gap: 16px; justify-content: space-between; padding: 6px 12px; }
@@ -86,7 +88,7 @@ export interface TooltipData {
     .tip-intro + .tip-intro { margin-top: 0; }
     .tip-intro + .tip-rows, .tip-intro + .tip-badges { border-top: 1px solid rgba(190, 220, 235, .18); margin-top: 8px; padding-top: 6px; }
     .tip-row b.negative { color: #ff5a5a; }
-    .tip-badges { align-items: center; display: flex; gap: 10px; padding: 8px 12px 4px; }
+    .tip-badges { align-items: center; display: flex; gap: 10px; padding: 8px 12px 0; }
     .tip-badge { align-items: center; background: #4a5a66; clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-size: .74rem; font-weight: 800; gap: 5px; padding: 3px 16px 3px 8px; }
     .tip-badge img { height: 20px; width: 20px; }
     .tip-badge[data-element="0"] { background: #8f7a68; } .tip-badge[data-element="1"] { background: #c04a2c; } .tip-badge[data-element="2"] { background: #2f7fd6; }
@@ -98,17 +100,17 @@ export interface TooltipData {
     .tip-stat i { border: 1.5px solid #c9d8df; border-radius: 50%; display: inline-block; height: 10px; position: relative; width: 10px; }
     .tip-stat i[data-icon="clock"]::after { border-left: 1.5px solid #c9d8df; border-bottom: 1.5px solid #c9d8df; content: ''; height: 3px; left: 4px; position: absolute; top: 1px; width: 2px; }
     .tip-stat i[data-icon="power"] { border: 0; } .tip-stat i[data-icon="power"]::after { content: '✹'; font-size: 12px; font-style: normal; line-height: 10px; position: absolute; left: -1px; top: -1px; }
-    .tip-inline { line-height: 1.55; padding: 8px 12px 2px; }
+    .tip-inline { line-height: 1.55; padding: 8px 12px 0; }
     .tip-inline em { color: #5ecbff; font-style: normal; font-variant-numeric: tabular-nums; font-weight: 600; }
     .tip-inline + .tip-line, .tip-inline + .tip-note { margin-top: 4px; }
     .tip-effect { background: rgba(255, 255, 255, .06); display: flex; justify-content: space-between; margin: 4px 0 0; padding: 4px 12px; }
     .tip-effect span { color: #c9d8df; } .tip-effect b { color: #fff; }
-    .tip-rows { border-top: 1px solid rgba(190, 220, 235, .18); margin: 4px 12px 0; padding: 6px 0 2px; }
+    .tip-rows { border-top: 1px solid rgba(190, 220, 235, .18); margin: 4px 12px 0; padding: 6px 0 0; }
     .tip-row { display: flex; gap: 14px; justify-content: space-between; line-height: 1.5; }
     .tip-row span { color: #b9cbd4; } .tip-row b { color: #5ecbff; font-variant-numeric: tabular-nums; }
     .tip-row.total { border-top: 1px solid rgba(190, 220, 235, .18); margin-top: 3px; padding-top: 3px; } .tip-row.total b { color: #fff; }
     .tip-row.subtotal { border-top: 1px solid rgba(190, 220, 235, .12); margin-top: 2px; padding-top: 2px; }
-    .tip-work { border-top: 1px solid rgba(190, 220, 235, .18); margin: 6px 12px 0; padding: 6px 0 8px; }
+    .tip-work { border-top: 1px solid rgba(190, 220, 235, .18); margin: 6px 12px 0; padding: 6px 0 0; }
     .tip-work-row { align-items: center; border-left: 3px solid transparent; display: grid; gap: 10px; grid-template-columns: auto 1fr; margin-left: -12px; padding: 3px 0 3px 9px; }
     .tip-work-row.current { background: linear-gradient(90deg, rgba(255, 211, 122, .14), transparent); border-left-color: #ffd37a; }
     .tip-stars { display: inline-flex; font-size: .8rem; gap: 1px; letter-spacing: 0; }
@@ -119,11 +121,11 @@ export interface TooltipData {
     .tip-work-item.none { opacity: .3; }
     .tip-work-item.up b { color: #ffe08a; }
     .tip-work-row.current .tip-work-item b { color: #fff; } .tip-work-row.current .tip-work-item.up b { color: #ffe08a; }
-    .tip-line { border-top: 1px solid rgba(190, 220, 235, .18); line-height: 1.45; margin: 6px 12px 0; padding: 7px 0 8px; }
+    .tip-line { border-top: 1px solid rgba(190, 220, 235, .18); line-height: 1.45; margin: 6px 12px 0; padding: 7px 0 0; }
     .tip-line + .tip-line { border-top: 0; margin-top: 0; padding-top: 0; }
     .tip-rich { line-height: 1.45; margin-bottom: 8px; }
     .tip-rich em { color: #ffe08a; font-style: normal; font-weight: 700; }
-    .tip-levels { border-top: 1px solid rgba(190, 220, 235, .18); list-style: none; margin: 0 12px; padding: 6px 0 8px; }
+    .tip-levels { border-top: 1px solid rgba(190, 220, 235, .18); list-style: none; margin: 0 12px; padding: 6px 0 0; }
     .tip-levels li { border-left: 3px solid transparent; color: #a9bcc6; display: grid; gap: 10px; grid-template-columns: minmax(34px, max-content) 1fr; line-height: 1.4; padding: 2px 8px 2px 7px; }
     .tip-levels li.current { background: linear-gradient(90deg, rgba(255, 211, 122, .14), transparent); border-left-color: #ffd37a; color: #f2fbff; }
     .tip-level { color: #7fc9e6; font-size: .68rem; font-weight: 800; letter-spacing: .02em; padding-top: 1px; }
@@ -131,7 +133,7 @@ export interface TooltipData {
     .tip-level-text { font-variant-numeric: tabular-nums; }
     .tip-level-text em { color: #ffe08a; font-style: normal; font-weight: 700; }
     .tip-levels li.current .tip-level-text em { text-shadow: 0 0 6px rgba(255, 211, 122, .45); }
-    .tip-note { color: #ffd37a; font-size: .68rem; margin: 0 12px 8px; }
+    .tip-note { color: #ffd37a; font-size: .68rem; margin: 6px 12px 0; }
   `],
 })
 export class GameTooltipComponent {
@@ -176,6 +178,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
     ref.instance.data = this.data;
     const anchor = this.host.nativeElement.getBoundingClientRect();
     if (this.data.fit === 'host') ref.instance.width = Math.round(anchor.width);
+    else if (this.data.width) ref.instance.width = this.data.width;
     this.appRef.attachView(ref.hostView);
     document.body.appendChild(ref.location.nativeElement);
     ref.changeDetectorRef.detectChanges();

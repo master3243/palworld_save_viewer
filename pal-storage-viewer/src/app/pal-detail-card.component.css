@@ -56,6 +56,8 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .gender-image { height: 22px; object-fit: contain; width: 22px; }
 .element-chip { align-items: center; background: #4a5a66; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-size: .8rem; font-weight: 800; gap: 7px; height: 30px; padding: 0 20px 0 6px; }
 .element-chip img { height: 26px; width: 26px; }
+/* double type, make them diagonal of eachother */
+.trait-line .element-chip + .element-chip { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 10px 100%); margin-left: -12px; padding-left: 16px; }
 .element-chip[data-element="0"] { background: #8f7a68; }.element-chip[data-element="1"] { background: #c04a2c; }.element-chip[data-element="2"] { background: #2f7fd6; }.element-chip[data-element="3"] { background: #b8961c; }.element-chip[data-element="4"] { background: #5f9a2a; }.element-chip[data-element="5"] { background: #5d3c8f; }.element-chip[data-element="6"] { background: #7a3fb0; }.element-chip[data-element="7"] { background: #a0642c; }.element-chip[data-element="8"] { background: #3aa7c9; }
 .spirit { align-items: center; color: #eafaff; display: inline-flex; font-size: .85rem; font-weight: 700; gap: 3px; }.spirit img { height: 24px; width: 20px; }
 .alpha-badge { height: 21px; object-fit: contain; width: 21px; }

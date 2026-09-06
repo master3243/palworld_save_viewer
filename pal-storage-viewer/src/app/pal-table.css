@@ -525,11 +525,37 @@ table.pal-table {
   filter: drop-shadow(0 0 2px rgba(130, 220, 255, 0.9));
 }
 
-/* A lone element icon gets the room the column has; two share it. */
+/* A lone element icon gets the room the column has. */
 .pal-table td.type-cell .trait-icon:only-child {
   height: 32px;
   margin: -5px 0;
   width: 32px;
+}
+
+/* Two element diamonds sit corner to corner: the first low-left, the second high-right.
+ * The negative margin keeps the row at its fixed height. */
+.pal-table td.type-cell .trait-icons.dual {
+  display: block;
+  height: 33px;
+  margin: -5.5px auto;
+  position: relative;
+  width: 33px;
+}
+
+.pal-table td.type-cell .trait-icons.dual .trait-icon {
+  height: 22px;
+  position: absolute;
+  width: 22px;
+}
+
+.pal-table td.type-cell .trait-icons.dual .trait-icon:first-child {
+  bottom: 0;
+  left: 0;
+}
+
+.pal-table td.type-cell .trait-icons.dual .trait-icon:last-child {
+  right: 0;
+  top: 0;
 }
 
 /* Computed stats, centred like the IVs: HP/ATK/DEF fit five digits, SPD three. */

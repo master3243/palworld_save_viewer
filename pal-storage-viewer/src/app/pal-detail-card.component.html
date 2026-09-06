@@ -216,9 +216,10 @@
     </div>
 
     <div class="skill-layout" *ngIf="passiveSkills.length || activeSkillChips.length || learnedSkillChips.length">
-      <section class="skill-group" *ngIf="passiveSkills.length">
+      <section class="skill-group">
         <h3>Passive Skills</h3>
-        <div class="skill-chips">
+        <span class="move-empty" *ngIf="!passiveSkills.length">None</span>
+        <div class="skill-chips" *ngIf="passiveSkills.length">
           <a
             *ngFor="let skill of passiveSkills"
             class="skill-chip"
