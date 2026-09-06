@@ -1,6 +1,6 @@
 .page {
-  /* Fills a 1920px screen minus the page padding; every default column shows without a horizontal scroll. */
-  --content-width: 1840px;
+  /* No cap: the table and toolbar fill the page width minus its padding, the same limit the resize drag has. */
+  --content-width: none;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -754,12 +754,18 @@ td.iv-cell,
 th.soul-rank-cell,
 td.soul-rank-cell {
   box-sizing: border-box;
-  max-width: 46px;
-  min-width: 46px;
-  padding-left: 3px;
-  padding-right: 3px;
+  max-width: 38px;
+  min-width: 38px;
+  padding-left: 2px;
+  padding-right: 2px;
   text-align: center;
-  width: 46px;
+  width: 38px;
+}
+
+/* "SR H" is a touch wider than "IV H"; keep it on one line at 38px. */
+th.soul-rank-cell .header-label {
+  font-size: 0.78rem;
+  letter-spacing: -0.02em;
 }
 
 th.iv-cell.sorted,
@@ -896,10 +902,10 @@ td.type-cell .trait-icons {
 /* Up to four passive chips as a 2x2 grid, like the pal card, so names stay readable at 300px. */
 th.skills-cell,
 td.skills-cell {
-  max-width: 300px;
-  min-width: 300px;
+  max-width: 200px;
+  min-width: 200px;
   overflow: hidden;
-  width: 300px;
+  width: 200px;
 }
 
 .passive-chips {
@@ -1049,10 +1055,10 @@ th.stat-cell.speed-cell.sorted {
 /* Three equipped active skills as mini chips, like the pal card's. */
 th.moves-cell,
 td.moves-cell {
-  max-width: 390px;
-  min-width: 390px;
+  max-width: 350px;
+  min-width: 350px;
   overflow: hidden;
-  width: 390px;
+  width: 350px;
 }
 
 .move-chips {
@@ -1096,7 +1102,7 @@ td.moves-cell {
   font-weight: 800;
   gap: 3px;
   grid-template-columns: 16px 3ch;
-  padding: 0 5px 0 11px;
+  padding: 0 4px 0 6px;
 }
 
 .move-mini-meta img {
@@ -1356,27 +1362,27 @@ tbody tr:hover {
 th.save-cell,
 td.save-cell {
   box-sizing: border-box;
-  max-width: 48px;
-  min-width: 48px;
+  max-width: 40px;
+  min-width: 40px;
   padding-left: 4px;
   padding-right: 4px;
   text-align: center;
   transition: width 160ms ease, min-width 160ms ease, max-width 160ms ease;
-  width: 48px;
+  width: 40px;
 }
 
 th.save-cell.sorted,
 td.save-cell.sorted-column {
-  max-width: 64px;
-  min-width: 64px;
-  width: 64px;
+  max-width: 54px;
+  min-width: 54px;
+  width: 54px;
 }
 
 th.where-cell.sorted,
 td.where-cell.sorted-column {
-  max-width: 76px;
-  min-width: 76px;
-  width: 76px;
+  max-width: 66px;
+  min-width: 66px;
+  width: 66px;
 }
 
 td.save-cell {
@@ -1387,15 +1393,15 @@ td.save-cell {
 th.where-cell,
 td.where-cell {
   box-sizing: border-box;
-  max-width: 60px;
-  min-width: 60px;
+  max-width: 52px;
+  min-width: 52px;
   overflow: hidden;
   padding-left: 4px;
   padding-right: 4px;
   text-overflow: ellipsis;
   transition: width 160ms ease, min-width 160ms ease, max-width 160ms ease;
   white-space: nowrap;
-  width: 60px;
+  width: 52px;
 }
 
 /* Full screen table -------------------------------------------------- */
