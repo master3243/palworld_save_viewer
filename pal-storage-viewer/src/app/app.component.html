@@ -402,7 +402,7 @@
       </table>
     </div>
     </ng-container>
-    <div class="empty-view" *ngIf="view === 'pals' && !hasRows">
+    <div class="empty-view" *ngIf="view === 'pals' && !hasRows && !isParsing">
       <p>These files hold no Pals.</p>
       <span>They do carry player progress, so the <button type="button" class="link-button" (click)="setView('tracker')">100% Tracker</button> works. For the Pal table, add Level.sav or a _dps.sav file.</span>
     </div>

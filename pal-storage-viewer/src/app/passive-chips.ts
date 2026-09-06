@@ -13,8 +13,8 @@ export interface PassiveChip {
   iconKey: string;
 }
 
-/** The six rank arrow images, keyed as in assets/ui. */
-export const PASSIVE_ICON_KEYS = ['passive_plus_1', 'passive_plus_2', 'passive_plus_3', 'passive_minus_1', 'passive_minus_2', 'passive_minus_3'];
+/** The seven rank arrow images, keyed as in assets/ui. */
+export const PASSIVE_ICON_KEYS = ['passive_plus_1', 'passive_plus_2', 'passive_plus_3', 'passive_plus_4', 'passive_minus_1', 'passive_minus_2', 'passive_minus_3'];
 
 function listOf(row: PalStorageRow, key: string): string[] {
   const value = row[key];
@@ -28,7 +28,8 @@ export function passiveChips(row: PalStorageRow): PassiveChip[] {
   const tones = listOf(row, 'skill_colors');
   return names.filter(Boolean).map((name, index) => {
     const rank = Number(ranks[index] ?? 0) || 0;
-    const magnitude = Math.min(3, Math.abs(rank));
+    // Positive ranks go up to 4 (platinum, its own cyan chevrons); negative ones stop at 3.
+    const magnitude = Math.min(rank < 0 ? 3 : 4, Math.abs(rank));
     return {
       name,
       tone: tones[index] || 'regular',

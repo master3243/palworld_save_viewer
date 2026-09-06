@@ -58,7 +58,7 @@ export interface TooltipData {
     .tip-row b.negative { color: #ff5a5a; }
     .tip-badges { align-items: center; display: flex; gap: 10px; padding: 8px 12px 4px; }
     .tip-badge { align-items: center; background: #4a5a66; clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-size: .74rem; font-weight: 800; gap: 5px; padding: 3px 16px 3px 8px; }
-    .tip-badge img { height: 15px; width: 15px; }
+    .tip-badge img { height: 20px; width: 20px; }
     .tip-badge[data-element="0"] { background: #8f7a68; } .tip-badge[data-element="1"] { background: #c04a2c; } .tip-badge[data-element="2"] { background: #2f7fd6; }
     .tip-badge[data-element="3"] { background: #b8961c; } .tip-badge[data-element="4"] { background: #5f9a2a; } .tip-badge[data-element="5"] { background: #5d3c8f; }
     .tip-badge[data-element="6"] { background: #7a3fb0; } .tip-badge[data-element="7"] { background: #a0642c; } .tip-badge[data-element="8"] { background: #3aa7c9; }

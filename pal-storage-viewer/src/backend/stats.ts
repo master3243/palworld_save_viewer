@@ -202,7 +202,8 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   // only stores MasteredWaza once a skill fruit or similar adds one), ordered by element then power.
   const learnset = traits?.k ?? baseTraits?.k ?? {};
   const known = new Set(input.mastered_skill_ids);
-  for (const [skill, needed] of Object.entries(learnset)) if (level !== null && level >= needed) known.add(skill);
+  // A record without a Level property is a level 1 Pal in game.
+  for (const [skill, needed] of Object.entries(learnset)) if ((level ?? 1) >= needed) known.add(skill);
   for (const skill of input.active_skill_ids) known.add(skill);
   const sortKey = (id: string) => { const d = lookups.activeDetails.get(id); return [d?.element ?? 99, d?.power ?? 0]; };
   out.known_skill_ids = [...known].sort((a, b) => { const [ea, pa] = sortKey(a); const [eb, pb] = sortKey(b); return ea - eb || pa - pb; });

@@ -101,7 +101,7 @@
 
     <div class="profile-body">
       <div class="portrait" aria-hidden="true">
-        <div class="portrait-rank" *ngIf="valueFor('level')" [title]="'Condensing: ' + displayRank + ' of 4 stars'">
+        <div class="portrait-rank" *ngIf="valueFor('species_id')" [title]="'Condensing: ' + displayRank + ' of 4 stars'">
           <span>Rank</span>
           <div class="stars" [attr.aria-label]="'Rank ' + displayRank + ' of 4'">
             <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
