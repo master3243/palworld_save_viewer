@@ -446,6 +446,7 @@ export function flattenRecord(item: PalRecord): Row {
     food_amount: item.derived.food_amount,
     known_skill_ids: joinValues(item.derived.known_skill_ids),
     known_moves: joinValues(item.derived.known_moves),
+    unlearned_moves: item.derived.unlearned_moves,
     skills: joinValues(item.skills),
     skill_colors: joinValues(item.skill_colors),
     skill_ranks: joinValues(item.skill_ranks),
@@ -526,4 +527,3 @@ export function flattenRecord(item: PalRecord): Row {
     raw_property_names: joinValues(item.raw_property_names),
   };
 }
-

@@ -64,7 +64,7 @@ export class PalDetailCardComponent implements OnChanges {
     'passive_hp_pct', 'passive_attack_pct', 'passive_defense_pct', 'passive_work_speed_pct', 'hunger_max',
     'trust_rank', 'trust_progress', 'trust_next', 'exp_to_next', 'exp_progress',
     'partner_skill', 'partner_skill_level', 'partner_skill_text', 'partner_skill_levels', 'stat_parts', 'work_species',
-    'food_amount', 'known_skill_ids', 'known_moves', 'research_attack_pct', 'research_defense_pct',
+    'food_amount', 'known_skill_ids', 'known_moves', 'unlearned_moves', 'research_attack_pct', 'research_defense_pct',
     'trust_hp', 'trust_attack', 'trust_defense', 'food_effect', 'food_attack_pct', 'food_defense_pct', 'food_work_speed_pct', 'food_seconds_left',
     'food_status_effect_item', 'food_with_status_effect_timer'
   ]);
@@ -289,6 +289,7 @@ export class PalDetailCardComponent implements OnChanges {
 
   activeSkillChips: ActiveSkillChip[] = [];
   learnedSkillChips: ActiveSkillChip[] = [];
+  unlearnedSkillChips: (ActiveSkillChip & { unlockLevel: number })[] = [];
   emptySlots: number[] = [];
   passiveSkills: PassiveSkill[] = [];
   works: ReturnType<typeof workTable> = [];
@@ -332,6 +333,7 @@ export class PalDetailCardComponent implements OnChanges {
     this.passiveSkills = this.computePassiveSkills();
     this.activeSkillChips = this.skillChips(this.listFor('active_skill_ids'), this.listFor('combat_moves'));
     this.learnedSkillChips = this.computeLearnedSkillChips();
+    this.unlearnedSkillChips = this.computeUnlearnedSkillChips();
     this.emptySlots = Array.from({ length: Math.max(0, 3 - this.activeSkillChips.length) }, (_, index) => index);
     this.works = workTable(this.row);
     this.workTooltip = workSuitabilityTooltip(this.row, this.works);
@@ -363,6 +365,19 @@ export class PalDetailCardComponent implements OnChanges {
       const tooltip = activeSkillTooltip(name, description, detail);
       return { name, elementIndex, iconSrc, power: detail ? String(detail.power) : '', tooltip };
     });
+  }
+
+  private computeUnlearnedSkillChips(): (ActiveSkillChip & { unlockLevel: number })[] {
+    const raw = this.valueFor('unlearned_moves');
+    if (!raw) return [];
+    try {
+      const moves = JSON.parse(raw) as { id: string; name: string; level: number }[];
+      return this.skillChips(moves.map((move) => move.id), moves.map((move) => move.name)).map((chip, index) => {
+        const unlockLevel = moves[index].level;
+        chip.tooltip.note = [chip.tooltip.note, `Learnt at level ${unlockLevel}`].filter(Boolean).join(' · ');
+        return { ...chip, unlockLevel };
+      });
+    } catch { return []; }
   }
 
   private numberFor(key: string): number | null {

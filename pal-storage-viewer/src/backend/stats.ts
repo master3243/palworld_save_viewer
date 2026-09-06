@@ -73,6 +73,8 @@ export interface DerivedStats {
   /** Every skill the Pal can equip: the save's mastered list plus the species learnset up to its level. */
   known_skill_ids: string[];
   known_moves: string[];
+  /** JSON list of species moves still above this Pal's level and absent from its known skills. */
+  unlearned_moves: string | null;
 }
 
 const EMPTY: DerivedStats = {
@@ -83,7 +85,7 @@ const EMPTY: DerivedStats = {
   food_effect: null, food_attack_pct: 0, food_defense_pct: 0, food_work_speed_pct: 0, food_seconds_left: null,
   hunger_max: null, trust_rank: null, trust_progress: null, trust_next: null,
   exp_to_next: null, exp_progress: null, partner_skill: null, partner_skill_level: null, partner_skill_text: null, partner_skill_levels: null, stat_parts: null,
-  food_amount: null, known_skill_ids: [], known_moves: [],
+  food_amount: null, known_skill_ids: [], known_moves: [], unlearned_moves: null,
 };
 
 /** Percent of each stat a set of passives adds (negatives included). */
@@ -258,6 +260,11 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   const sortKey = (id: string) => { const d = lookups.activeDetails.get(id); return [d?.element ?? 99, d?.power ?? 0]; };
   out.known_skill_ids = [...known].sort((a, b) => { const [ea, pa] = sortKey(a); const [eb, pb] = sortKey(b); return ea - eb || pa - pb; });
   out.known_moves = out.known_skill_ids.map((id) => lookups.activeSkills.get(id) ?? id);
+  const unlearned = Object.entries(learnset)
+    .filter(([id, needed]) => needed > (level ?? 1) && !known.has(id))
+    .map(([id, needed]) => ({ id, name: lookups.activeSkills.get(id) || id, level: needed }))
+    .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+  if (unlearned.length) out.unlearned_moves = JSON.stringify(unlearned);
 
   // A variant row may only know the skill name; the base species row has the text.
   const partner = (traits?.p?.[1] ? traits.p : null) ?? (baseTraits?.p?.[1] ? baseTraits.p : null) ?? traits?.p ?? baseTraits?.p;

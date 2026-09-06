@@ -219,17 +219,19 @@
     </section>
     </div>
 
-    <div class="skill-layout" *ngIf="passiveSkills.length || activeSkillChips.length || learnedSkillChips.length">
+    <div class="skill-layout" *ngIf="passiveSkills.length || activeSkillChips.length || learnedSkillChips.length || unlearnedSkillChips.length">
       <section class="skill-group">
         <h3>Passive Skills</h3>
         <span class="move-empty" *ngIf="!passiveSkills.length">None</span>
         <div class="skill-chips" *ngIf="passiveSkills.length">
-          <button
+          <a
             *ngFor="let skill of passiveSkills"
             class="skill-chip"
             [attr.data-tone]="skill.color"
-            type="button"
-            [attr.aria-label]="skill.name + ' details'"
+            [href]="skill.tooltip.wikiUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            [attr.aria-label]="skill.name"
             [appTooltip]="skill.tooltip"
           >
             {{ skill.name }}
@@ -239,45 +241,71 @@
               [src]="rankIconSource"
               [alt]="skill.rankMarker"
             >
-          </button>
+          </a>
         </div>
       </section>
 
-      <section class="skill-group moves-group" *ngIf="activeSkillChips.length || learnedSkillChips.length">
+      <section class="skill-group moves-group" *ngIf="activeSkillChips.length || learnedSkillChips.length || unlearnedSkillChips.length">
         <h3>Active Skills</h3>
         <div class="move-columns">
           <div class="move-column">
             <h4>Equipped</h4>
             <div class="move-list">
-              <button
+              <a
                 *ngFor="let skill of activeSkillChips"
                 class="move-chip"
                 [attr.data-element]="skill.elementIndex"
-                type="button"
-                [attr.aria-label]="skill.name + ' details'"
+                [href]="skill.tooltip.wikiUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                [attr.aria-label]="skill.name"
                 [appTooltip]="skill.tooltip"
               >
                 <span class="move-name">{{ skill.name }}</span>
                 <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
-              </button>
+              </a>
               <span class="move-empty" *ngFor="let slot of emptySlots">Empty Skill Slot</span>
             </div>
           </div>
           <div class="move-column">
             <h4>Learned, not equipped</h4>
             <div class="move-list">
-              <button
+              <a
                 *ngFor="let skill of learnedSkillChips"
                 class="move-chip learned"
                 [attr.data-element]="skill.elementIndex"
-                type="button"
-                [attr.aria-label]="skill.name + ' details'"
+                [href]="skill.tooltip.wikiUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                [attr.aria-label]="skill.name"
                 [appTooltip]="skill.tooltip"
               >
                 <span class="move-name">{{ skill.name }}</span>
                 <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
-              </button>
-              <span class="move-empty" *ngIf="!learnedSkillChips.length">None</span>
+              </a>
+              <span class="move-empty" *ngIf="!learnedSkillChips.length && !unlearnedSkillChips.length">None</span>
+              <details class="locked-moves" *ngIf="unlearnedSkillChips.length">
+                <summary>
+                  <svg class="move-lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
+                  <span>{{ unlearnedSkillChips.length }} Not Yet Learnt</span>
+                  <svg class="locked-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg>
+                </summary>
+                <div class="move-list">
+                  <a
+                    *ngFor="let skill of unlearnedSkillChips"
+                    class="move-chip unlearned"
+                    [attr.data-element]="skill.elementIndex"
+                    [href]="skill.tooltip.wikiUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    [attr.aria-label]="skill.name + ', learnt at level ' + skill.unlockLevel"
+                    [appTooltip]="skill.tooltip"
+                  >
+                    <span class="move-name">{{ skill.name }}<small class="move-unlock">Lv. {{ skill.unlockLevel }}</small></span>
+                    <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
+                  </a>
+                </div>
+              </details>
             </div>
           </div>
         </div>

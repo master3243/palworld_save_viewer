@@ -51,10 +51,10 @@ export interface TooltipData {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [class.fitted]="width !== null" [class.ready]="ready" [class.interactive]="!!data.wikiUrl">
+    <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [class.fitted]="width !== null" [class.ready]="ready" [class.interactive]="interactive">
       <div class="tip-title">
         <span>{{ data.title }}</span><b *ngIf="data.titleRight">{{ data.titleRight }}</b>
-        <a *ngIf="data.wikiUrl" class="tip-wiki" [href]="data.wikiUrl" target="_blank" rel="noopener noreferrer" title="palworld.wiki.gg" [attr.aria-label]="'Open ' + data.title + ' on Palworld Wiki'">
+        <a *ngIf="interactive && data.wikiUrl" class="tip-wiki" [href]="data.wikiUrl" target="_blank" rel="noopener noreferrer" title="palworld.wiki.gg" [attr.aria-label]="'Open ' + data.title + ' on Palworld Wiki'">
           <span>GG</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg>
         </a>
@@ -155,6 +155,7 @@ export interface TooltipData {
 })
 export class GameTooltipComponent {
   @Input({ required: true }) data!: TooltipData;
+  interactive = false;
   x = 0;
   y = 0;
   /** Fixed width when the tooltip is fitted to its host. */
@@ -168,19 +169,23 @@ export class TooltipDirective implements OnInit, OnDestroy {
   private ref: ComponentRef<GameTooltipComponent> | null = null;
   private static active: TooltipDirective | null = null;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
+  private get interactive(): boolean {
+    return !!this.data?.wikiUrl && window.matchMedia('(max-width: 720px)').matches;
+  }
   private readonly keepOpen = () => { clearTimeout(this.closeTimer); };
   private readonly show = () => { this.keepOpen(); this.open(); };
   private readonly hide = () => this.close();
   private readonly leave = () => {
     this.keepOpen();
-    if (this.data?.wikiUrl) this.closeTimer = setTimeout(this.hide, 200);
+    if (this.interactive) this.closeTimer = setTimeout(this.hide, 200);
     else this.close();
   };
   private readonly blur = (event: FocusEvent) => {
     if (!this.contains(event.relatedTarget)) this.leave();
   };
   private readonly click = (event: MouseEvent) => {
-    if (!this.data?.wikiUrl) return;
+    if (!this.interactive) return;
+    event.preventDefault();
     event.stopPropagation();
     this.show();
   };
@@ -189,7 +194,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
   };
   private readonly keydown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') this.close();
-    if (event.key === 'Tab' && !event.shiftKey && document.activeElement === this.host.nativeElement && this.data?.wikiUrl) {
+    if (event.key === 'Tab' && !event.shiftKey && document.activeElement === this.host.nativeElement && this.interactive) {
       event.preventDefault();
       this.ref?.location.nativeElement.querySelector('.tip-wiki')?.focus();
     }
@@ -226,6 +231,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
     TooltipDirective.active = this;
     const ref = createComponent(GameTooltipComponent, { environmentInjector: this.injector });
     ref.instance.data = this.data;
+    ref.instance.interactive = this.interactive;
     const anchor = this.host.nativeElement.getBoundingClientRect();
     if (this.data.fit === 'host') ref.instance.width = Math.round(anchor.width);
     else if (this.data.width) ref.instance.width = this.data.width;
@@ -240,6 +246,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
     popup.addEventListener('focusout', this.blur);
     document.addEventListener('pointerdown', this.outside, true);
     document.addEventListener('keydown', this.keydown);
+    window.addEventListener('resize', this.hide);
     const tip = (ref.location.nativeElement as HTMLElement).querySelector('.tip') as HTMLElement;
     const size = tip.getBoundingClientRect();
     const margin = 8;
@@ -257,6 +264,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
     if (!this.ref) return;
     document.removeEventListener('pointerdown', this.outside, true);
     document.removeEventListener('keydown', this.keydown);
+    window.removeEventListener('resize', this.hide);
     this.appRef.detachView(this.ref.hostView);
     this.ref.destroy();
     this.ref = null;
