@@ -188,9 +188,9 @@
 
     <div class="panel-row">
     <section class="partner-panel" *ngIf="partnerSkill as partner">
-      <h3>Partner Skill</h3>
       <div class="partner-body" [appTooltip]="partner.tooltip" tabindex="-1">
         <div class="partner-line">
+          <h3>Partner Skill</h3>
           <strong>{{ partner.name }}</strong>
           <span class="partner-level" *ngIf="partner.level">Lv.{{ partner.level }}</span>
         </div>
@@ -205,11 +205,12 @@
           *ngFor="let work of works"
           class="work-chip"
           [class.none]="work.rank === 0"
-          [attr.aria-label]="work.name + ' ' + work.rank"
+          [class.raised]="(work.bonus ?? 0) > 0"
+          [attr.aria-label]="work.name + ' ' + work.rank + (work.bonus ? ', raised above the species level' : '')"
         >
           <img class="trait-icon" [src]="work.src" [alt]="work.name">
-          <b class="work-rank">{{ work.rank }}</b>
-          <svg *ngIf="work.bonus" class="work-bonus" viewBox="0 0 12 12" aria-label="Raised above the species' level"><path d="M2 6.5 6 2.5l4 4M2 10.5l4-4 4 4"/></svg>
+          <b class="work-rank" *ngIf="work.rank">{{ work.rank }}</b>
+          <i class="work-raise" *ngIf="work.bonus" aria-hidden="true"></i>
         </span>
       </div>
     </section>
