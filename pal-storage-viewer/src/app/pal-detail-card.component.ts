@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
 import { GameDataService } from './game-data.service';
-import { TooltipData, TooltipDirective } from './game-tooltip.component';
+import { TooltipData, TooltipDirective, TextSegment, LevelLine } from './game-tooltip.component';
 import { ElementChartComponent } from './element-chart.component';
 
 import { Game8LookupService } from './game8-lookup.service';
@@ -24,7 +24,7 @@ interface PassiveSkill { name: string; rank: string; color: string; rankMarker: 
 interface VitalBar { label: string; icon: string; value: string; percent: number; title: string; tone: string; tooltip: TooltipData | null; }
 interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting'; delta: number; tooltip: TooltipData; }
 interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: TooltipData; url: string; }
-interface PartnerSkill { name: string; level: string; text: string; tooltip: TooltipData; }
+interface PartnerSkill { name: string; level: string; segments: TextSegment[]; tooltip: TooltipData; }
 interface FoodEffect { name: string; effects: string; timeLeft: string; }
 
 @Component({
@@ -66,7 +66,7 @@ export class PalDetailCardComponent implements OnChanges {
     'max_hp', 'attack', 'defense', 'work_speed', 'max_hp_base', 'attack_base', 'defense_base',
     'passive_hp_pct', 'passive_attack_pct', 'passive_defense_pct', 'passive_work_speed_pct', 'hunger_max',
     'trust_rank', 'trust_progress', 'trust_next', 'exp_to_next', 'exp_progress',
-    'partner_skill', 'partner_skill_level', 'partner_skill_text',
+    'partner_skill', 'partner_skill_level', 'partner_skill_text', 'partner_skill_levels',
     'food_amount', 'known_skill_ids', 'known_moves', 'research_attack_pct', 'research_defense_pct',
     'trust_hp', 'trust_attack', 'trust_defense', 'food_effect', 'food_attack_pct', 'food_defense_pct', 'food_work_speed_pct', 'food_seconds_left',
     'food_status_effect_item', 'food_with_status_effect_timer'
@@ -193,7 +193,53 @@ export class PalDetailCardComponent implements OnChanges {
     if (!name) return null;
     const level = this.valueFor('partner_skill_level');
     const text = this.valueFor('partner_skill_text');
-    return { name, level, text, tooltip: { title: `${name}${level ? ` Lv.${level}` : ''}`, lines: text ? [text] : [], note: text ? undefined : 'The game text for this skill needs data we do not have yet.' } };
+    const title = `${name}${level ? ` Lv.${level}` : ''}`;
+    const perLevel = this.partnerLevels(Number(level) || 1);
+    if (!perLevel) {
+      return { name, level, segments: text ? [{ text, value: false }] : [], tooltip: { title, lines: text ? [text] : [], note: text ? undefined : 'The game text for this skill needs data we do not have yet.' } };
+    }
+    const current = perLevel.find((line) => line.current) ?? perLevel[perLevel.length - 1];
+    // The tooltip repeats the current text once, then lists just the level-driven values per level.
+    const levels = perLevel.map((line) => {
+      const segments: TextSegment[] = [];
+      for (const seg of line.segments.filter((item) => item.value)) {
+        if (segments.length) segments.push({ text: ' · ', value: false });
+        segments.push(seg);
+      }
+      if (!segments.length) segments.push({ text: '—', value: false });
+      return { ...line, segments };
+    });
+    return { name, level, segments: current.segments, tooltip: { title, rich: current.segments, levels, note: 'Partner skill level = condensing stars + 1' } };
+  }
+
+  /** The partner skill text at every level (from the `{t, v, x}` JSON), or null when it never changes. */
+  private partnerLevels(level: number): LevelLine[] | null {
+    const raw = this.valueFor('partner_skill_levels');
+    if (!raw) return null;
+    let data: { t: string; v: string[][] | null; x: string[] | null };
+    try { data = JSON.parse(raw); } catch { return null; }
+    const count = Math.max(data.v?.length ?? 0, data.x?.length ?? 0);
+    if (!count) return null;
+    return Array.from({ length: count }, (_, index) => {
+      const values = data.v?.[Math.min(index, data.v.length - 1)] ?? [];
+      const suffix = data.x?.[Math.min(index, data.x.length - 1)] ?? '';
+      const segments: TextSegment[] = [];
+      const pattern = /\{(\d+)\}/g;
+      let last = 0;
+      for (let match = pattern.exec(data.t); match; match = pattern.exec(data.t)) {
+        // Take a leading "x"/"+" and a trailing "%" into the value so "x1.5" and "+30%" read as one figure.
+        let start = match.index;
+        let end = match.index + match[0].length;
+        if (start > last && /[x×+]/.test(data.t[start - 1]) && (start - 1 === 0 || /\s/.test(data.t[start - 2]))) start -= 1;
+        if (data.t[end] === '%') end += 1;
+        if (start > last) segments.push({ text: data.t.slice(last, start), value: false });
+        segments.push({ text: data.t.slice(start, match.index) + (values[Number(match[1])] ?? match[0]) + data.t.slice(match.index + match[0].length, end), value: true });
+        last = end;
+      }
+      if (last < data.t.length) segments.push({ text: data.t.slice(last), value: false });
+      if (suffix) segments.push({ text: ' ', value: false }, { text: suffix, value: true });
+      return { label: `Lv.${index + 1}`, segments, current: index + 1 === level };
+    });
   }
 
   activeSkillChips: ActiveSkillChip[] = [];

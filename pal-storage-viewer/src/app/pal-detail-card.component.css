@@ -85,7 +85,7 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .bar-row { align-items: center; display: grid; gap: 8px; grid-template-columns: 18px 46px 1fr 92px; }
 .bar-icon { align-items: center; color: #9be0f4; display: inline-flex; font-size: .85rem; justify-content: center; }
 .bar-icon svg { fill: #f0c070; height: 15px; width: 15px; }.bar-icon svg .crust { stroke: #8a5a1e; stroke-width: 1.4; stroke-linecap: round; }
-.bar-row[tabindex], .stat[tabindex], .partner-line[tabindex] { outline: none; }
+.bar-row[tabindex], .stat[tabindex], .partner-body[tabindex] { outline: none; }
 .food-line { align-items: center; color: #d9edf7; display: grid; font-size: .7rem; gap: 8px; grid-template-columns: 18px 46px 1fr; margin-top: 2px; }
 .food-line b { color: #ffd37a; }.food-line small { color: #8fb4c4; }.bar-label { color: #c8e9f2; font-size: .66rem; font-weight: 800; text-transform: uppercase; }
 .bar { background: rgba(255, 255, 255, .08); border-radius: 3px; display: block; height: 14px; overflow: hidden; }
@@ -104,7 +104,9 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .partner-panel { background: rgba(1, 11, 18, .55); border: 1px solid rgba(135, 220, 255, .18); min-width: 0; padding: 12px; }
 .partner-line { align-items: center; display: flex; gap: 10px; }.partner-line strong { color: #fff; font-size: .9rem; }
 .partner-level { background: rgba(255, 255, 255, .08); border: 1px solid rgba(144, 226, 255, .35); border-radius: 999px; color: #e8f8ff; font-size: .66rem; font-weight: 800; padding: 2px 8px; }
+.partner-body { cursor: default; }
 .partner-text { color: #d9edf7; font-size: .76rem; line-height: 1.45; margin: 8px 0 0; }
+.lv-value { color: #ffe08a; font-style: normal; font-weight: 700; text-shadow: 0 0 6px rgba(255, 211, 122, .35); }
 .vital-row { align-items: center; background: rgba(2, 13, 21, .45); border-left: 3px solid currentColor; display: grid; gap: 8px; grid-template-columns: 18px 52px auto; margin-bottom: 7px; max-width: 260px; padding: 7px 10px; }
 .vital-icon { font-size: .9rem; }.vital-label { color: #c8e9f2; font-size: .68rem; font-weight: 800; text-transform: uppercase; }.vital-row strong { font-size: .8rem; min-width: 32px; text-align: right; }
 .hp { color: #48e2a5; }
@@ -144,8 +146,8 @@ h3 { color: #71dcf8; font-size: .68rem; letter-spacing: .11em; margin: 0 0 9px; 
 .move-chip { align-items: stretch; background: rgba(4, 18, 28, .85); border: 1px solid rgba(135, 220, 255, .22); border-left: 3px solid #65dcff; color: #eafaff; display: flex; font-size: .8rem; min-height: 34px; text-decoration: none; }
 .move-chip:hover, .move-chip:focus-visible { border-color: #8de2f8; box-shadow: 0 0 6px rgba(101, 220, 255, .35); color: #fff; outline: none; }
 .move-name { align-self: center; flex: 1; padding: 4px 10px; }
-.move-meta { align-items: center; background: #4a5a66; clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%); color: #fff; display: grid; font-weight: 800; gap: 6px; grid-template-columns: 24px 3ch; padding: 0 8px 0 14px; }
-.move-meta img { height: 24px; justify-self: center; width: 24px; }.move-meta b { font-size: .95rem; font-variant-numeric: tabular-nums; text-align: right; }
+.move-meta { align-items: center; background: #4a5a66; clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-weight: 800; gap: 8px; justify-content: center; min-width: 78px; padding: 0 12px 0 16px; }
+.move-meta img { display: block; height: 24px; width: 24px; }.move-meta b { font-size: .95rem; font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; }
 .move-chip[data-element="0"] .move-meta { background: #8f7a68; }.move-chip[data-element="1"] .move-meta { background: #c04a2c; }.move-chip[data-element="2"] .move-meta { background: #2f7fd6; }.move-chip[data-element="3"] .move-meta { background: #b8961c; }.move-chip[data-element="4"] .move-meta { background: #5f9a2a; }.move-chip[data-element="5"] .move-meta { background: #5d3c8f; }.move-chip[data-element="6"] .move-meta { background: #7a3fb0; }.move-chip[data-element="7"] .move-meta { background: #a0642c; }.move-chip[data-element="8"] .move-meta { background: #3aa7c9; }
 
 .additional { background: linear-gradient(180deg, #081824, #06111a); padding: 16px 22px 22px; }

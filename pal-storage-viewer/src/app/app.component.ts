@@ -457,6 +457,7 @@ export class AppComponent {
     'exp_to_next',
     'partner_skill',
     'partner_skill_level',
+    'partner_skill_levels',
     'hunger_max',
     'shield_hp',
     'soul_rank_craft_speed',

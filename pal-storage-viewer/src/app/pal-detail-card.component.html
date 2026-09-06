@@ -189,11 +189,13 @@
     <div class="panel-row">
     <section class="partner-panel" *ngIf="partnerSkill as partner">
       <h3>Partner Skill</h3>
-      <div class="partner-line" [appTooltip]="partner.tooltip" tabindex="-1">
-        <strong>{{ partner.name }}</strong>
-        <span class="partner-level" *ngIf="partner.level" title="Partner skill level: condensing stars + 1">Lv.{{ partner.level }}</span>
+      <div class="partner-body" [appTooltip]="partner.tooltip" tabindex="-1">
+        <div class="partner-line">
+          <strong>{{ partner.name }}</strong>
+          <span class="partner-level" *ngIf="partner.level">Lv.{{ partner.level }}</span>
+        </div>
+        <p class="partner-text" *ngIf="partner.segments.length"><ng-container *ngFor="let seg of partner.segments"><em class="lv-value" *ngIf="seg.value; else plainSeg">{{ seg.text }}</em><ng-template #plainSeg>{{ seg.text }}</ng-template></ng-container></p>
       </div>
-      <p class="partner-text" *ngIf="partner.text">{{ partner.text }}</p>
     </section>
 
     <section class="work-panel" *ngIf="hasWorkData">

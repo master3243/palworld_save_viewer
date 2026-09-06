@@ -440,6 +440,7 @@ export function flattenRecord(item: PalRecord): Row {
     partner_skill: item.derived.partner_skill,
     partner_skill_level: item.derived.partner_skill_level,
     partner_skill_text: item.derived.partner_skill_text,
+    partner_skill_levels: item.derived.partner_skill_levels,
     food_amount: item.derived.food_amount,
     known_skill_ids: joinValues(item.derived.known_skill_ids),
     known_moves: joinValues(item.derived.known_moves),

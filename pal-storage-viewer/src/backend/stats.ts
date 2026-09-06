@@ -64,6 +64,8 @@ export interface DerivedStats {
   partner_skill: string | null;
   partner_skill_level: number | null;
   partner_skill_text: string | null;
+  /** JSON `{t, v, x}`: the text template with `{k}` placeholders, the values per level and per-level suffixes, for the card's per-level view. */
+  partner_skill_levels: string | null;
   /** Appetite on the game's 10-segment food gauge. */
   food_amount: number | null;
   /** Every skill the Pal can equip: the save's mastered list plus the species learnset up to its level. */
@@ -78,7 +80,7 @@ const EMPTY: DerivedStats = {
   passive_hp_pct: 0, passive_attack_pct: 0, passive_defense_pct: 0, passive_work_speed_pct: 0,
   food_effect: null, food_attack_pct: 0, food_defense_pct: 0, food_work_speed_pct: 0, food_seconds_left: null,
   hunger_max: null, trust_rank: null, trust_progress: null, trust_next: null,
-  exp_to_next: null, exp_progress: null, partner_skill: null, partner_skill_level: null, partner_skill_text: null,
+  exp_to_next: null, exp_progress: null, partner_skill: null, partner_skill_level: null, partner_skill_text: null, partner_skill_levels: null,
   food_amount: null, known_skill_ids: [], known_moves: [],
 };
 
@@ -243,6 +245,7 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
     out.partner_skill_text = text
       ? `${text.replace(/\{(\d+)\}/g, (match, index) => values[Number(index)] ?? match)}${suffix ? ` ${suffix}` : ''}`
       : null;
+    out.partner_skill_levels = text && (levels || extra) ? JSON.stringify({ t: text, v: levels, x: extra }) : null;
   }
   return out;
 }

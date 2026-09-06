@@ -30,18 +30,18 @@ const ARROWS: [number, number][] = [[2, 1], [1, 8], [8, 6], [6, 5], [5, 0], [1, 
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg viewBox="0 0 660 390" class="chart" role="img" aria-label="Element effectiveness chart">
+    <svg viewBox="0 0 660 372" class="chart" role="img" aria-label="Element effectiveness chart">
       <defs>
-        <marker id="element-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <marker id="element-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
           <path d="M0 0L10 5L0 10z" fill="#8ee6ff"/>
         </marker>
       </defs>
-      <line *ngFor="let arrow of arrows" [attr.x1]="arrow.x1" [attr.y1]="arrow.y1" [attr.x2]="arrow.x2" [attr.y2]="arrow.y2" stroke="#8ee6ff" stroke-width="5" stroke-linecap="round" marker-end="url(#element-arrow)"/>
+      <line *ngFor="let arrow of arrows" [attr.x1]="arrow.x1" [attr.y1]="arrow.y1" [attr.x2]="arrow.x2" [attr.y2]="arrow.y2" stroke="#8ee6ff" stroke-width="4" stroke-linecap="round" marker-end="url(#element-arrow)"/>
       <g *ngFor="let node of nodes" [attr.transform]="'translate(' + node.x + ' ' + node.y + ')'" [class.lit]="isHighlighted(node.index)">
-        <rect class="ring" x="-40" y="-40" width="80" height="80" rx="6" transform="rotate(45)"/>
-        <rect class="diamond" x="-30" y="-30" width="60" height="60" rx="4" transform="rotate(45)" [attr.fill]="node.color"/>
+        <rect class="ring" x="-31" y="-31" width="62" height="62" rx="5" transform="rotate(45)"/>
+        <rect class="diamond" x="-24" y="-24" width="48" height="48" rx="3" transform="rotate(45)" [attr.fill]="node.color"/>
         <image [attr.href]="iconOf(node.index)" x="-18" y="-18" width="36" height="36"/>
-        <text class="label" [attr.y]="node.labelAbove ? -52 : 64" text-anchor="middle">{{ node.name }}</text>
+        <text class="label" [attr.y]="node.labelAbove ? -46 : 58" text-anchor="middle">{{ node.name }}</text>
       </g>
     </svg>
   `,
@@ -63,7 +63,7 @@ export class ElementChartComponent {
     const a = NODES.find((n) => n.index === from)!;
     const b = NODES.find((n) => n.index === to)!;
     const dx = b.x - a.x; const dy = b.y - a.y; const length = Math.hypot(dx, dy);
-    const gap = 50; // start and end just outside the diamonds
+    const gap = 44; // start and end just outside the diamonds
     return { x1: a.x + dx / length * gap, y1: a.y + dy / length * gap, x2: b.x - dx / length * gap, y2: b.y - dy / length * gap };
   });
 

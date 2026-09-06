@@ -7,6 +7,11 @@ import {
   ApplicationRef, Component, ComponentRef, Directive, ElementRef, EnvironmentInjector, Input, NgZone, OnDestroy, OnInit, createComponent,
 } from '@angular/core';
 
+/** A run of tooltip text; `value` marks the part that changes with the skill level. */
+export interface TextSegment { text: string; value: boolean; }
+/** One partner-skill level in the tooltip's level list. */
+export interface LevelLine { label: string; segments: TextSegment[]; current: boolean; }
+
 export interface TooltipData {
   title: string;
   /** Figures shown right of the title, e.g. "687 ≫ 550". */
@@ -22,6 +27,10 @@ export interface TooltipData {
   /** Label/value rows, e.g. a stat breakdown. */
   rows?: [string, string][];
   lines?: string[];
+  /** Text with the level-driven parts marked, shown like an intro line. */
+  rich?: TextSegment[];
+  /** Partner skill values at every level, the Pal's current level marked. */
+  levels?: LevelLine[];
   note?: string;
 }
 
@@ -33,6 +42,7 @@ export interface TooltipData {
     <div class="tip" [style.left.px]="x" [style.top.px]="y" [class.ready]="ready">
       <div class="tip-title"><span>{{ data.title }}</span><b *ngIf="data.titleRight">{{ data.titleRight }}</b></div>
       <p class="tip-intro" *ngFor="let line of data.intro">{{ line }}</p>
+      <p class="tip-intro tip-rich" *ngIf="data.rich?.length"><ng-container *ngFor="let seg of data.rich"><em *ngIf="seg.value; else richPlain">{{ seg.text }}</em><ng-template #richPlain>{{ seg.text }}</ng-template></ng-container></p>
       <div class="tip-badges" *ngIf="data.badge || data.stats?.length">
         <span class="tip-badge" *ngIf="data.badge" [attr.data-element]="data.badge.element">
           <img *ngIf="data.badge.iconSrc" [src]="data.badge.iconSrc" alt="">{{ data.badge.text }}
@@ -44,6 +54,9 @@ export interface TooltipData {
         <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
       </div>
       <p class="tip-line" *ngFor="let line of data.lines">{{ line }}</p>
+      <ol class="tip-levels" *ngIf="data.levels?.length">
+        <li *ngFor="let level of data.levels" [class.current]="level.current"><span class="tip-level">{{ level.label }}</span><span class="tip-level-text"><ng-container *ngFor="let seg of level.segments"><em *ngIf="seg.value; else plain">{{ seg.text }}</em><ng-template #plain>{{ seg.text }}</ng-template></ng-container></span></li>
+      </ol>
       <p class="tip-note" *ngIf="data.note">{{ data.note }}</p>
     </div>
   `,
@@ -76,6 +89,16 @@ export interface TooltipData {
     .tip-row.total { border-top: 1px solid rgba(190, 220, 235, .18); margin-top: 3px; padding-top: 3px; } .tip-row.total b { color: #fff; }
     .tip-line { border-top: 1px solid rgba(190, 220, 235, .18); line-height: 1.45; margin: 6px 12px 0; padding: 7px 0 8px; }
     .tip-line + .tip-line { border-top: 0; margin-top: 0; padding-top: 0; }
+    .tip-rich { line-height: 1.45; margin-bottom: 8px; }
+    .tip-rich em { color: #ffe08a; font-style: normal; font-weight: 700; }
+    .tip-levels { border-top: 1px solid rgba(190, 220, 235, .18); list-style: none; margin: 0 12px; padding: 6px 0 8px; }
+    .tip-levels li { border-left: 3px solid transparent; color: #a9bcc6; display: grid; gap: 10px; grid-template-columns: 34px 1fr; line-height: 1.4; padding: 2px 8px 2px 7px; }
+    .tip-levels li.current { background: linear-gradient(90deg, rgba(255, 211, 122, .14), transparent); border-left-color: #ffd37a; color: #f2fbff; }
+    .tip-level { color: #7fc9e6; font-size: .68rem; font-weight: 800; letter-spacing: .02em; padding-top: 1px; }
+    .tip-levels li.current .tip-level { color: #ffd37a; }
+    .tip-level-text { font-variant-numeric: tabular-nums; }
+    .tip-level-text em { color: #ffe08a; font-style: normal; font-weight: 700; }
+    .tip-levels li.current .tip-level-text em { text-shadow: 0 0 6px rgba(255, 211, 122, .45); }
     .tip-note { color: #ffd37a; font-size: .68rem; margin: 0 12px 8px; }
   `],
 })
