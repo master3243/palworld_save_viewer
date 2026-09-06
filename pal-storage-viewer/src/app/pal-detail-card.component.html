@@ -234,7 +234,7 @@
             [attr.aria-label]="skill.name"
             [appTooltip]="skill.tooltip"
           >
-            {{ skill.name }}
+            <span class="skill-name">{{ skill.name }}</span>
             <img
               *ngIf="imageSource(skill.rankIcon) as rankIconSource"
               class="passive-rank-icon"
@@ -301,7 +301,7 @@
                     [attr.aria-label]="skill.name + ', learnt at level ' + skill.unlockLevel"
                     [appTooltip]="skill.tooltip"
                   >
-                    <span class="move-name">{{ skill.name }}<small class="move-unlock">Lv. {{ skill.unlockLevel }}</small></span>
+                    <span class="move-name">{{ skill.name }}</span><small class="move-unlock">Lv. {{ skill.unlockLevel }}</small>
                     <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
                   </a>
                 </div>

@@ -71,7 +71,12 @@ table.pal-table {
  */
 .pal-table .data-row {
   cursor: pointer;
-  height: 48px;
+  height: 40px;
+}
+
+.pal-table .data-row td {
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .pal-table .data-row.open {

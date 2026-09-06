@@ -281,7 +281,7 @@ export class AppComponent implements OnDestroy {
 
   // Measured from the DOM after render; 40 matches the CSS row height and is
   // only the value used before the first measurement lands.
-  private rowHeight = 48;
+  private rowHeight = 40;
   private readonly virtualBuffer = 12;
 
   private displayedColumnsCache: { source: TableColumn[]; version: number; value: TableColumn[] } | null = null;
