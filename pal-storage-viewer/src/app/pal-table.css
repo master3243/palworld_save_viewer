@@ -20,6 +20,12 @@ table.pal-table {
   vertical-align: middle;
 }
 
+.pal-table th,
+.pal-table .data-row td {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .pal-table th {
   background: linear-gradient(180deg, #214d72 0%, #153650 100%);
   color: #e9f9ff;

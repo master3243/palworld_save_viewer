@@ -216,8 +216,6 @@ dd { color: #eefaff; display: -webkit-box; font-size: .76rem; margin: 0; max-hei
 .work-raise::before { background: linear-gradient(to top, rgba(255, 211, 74, .5), rgba(255, 211, 74, 0)); bottom: 100%; content: ''; height: 16px; left: 0; pointer-events: none; position: absolute; right: 0; }
 
 
-.work-name { display: none; }
-
 /* Use the visible table area, including when its width is resized on a desktop. */
 @container pal-card (max-width: 1200px) {
   .card { width: calc(100% - 24px); }
@@ -308,11 +306,7 @@ dd { color: #eefaff; display: -webkit-box; font-size: .76rem; margin: 0; max-hei
   .partner-line h3::after { display: none; }
   .partner-line strong { flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .partner-level { flex-shrink: 0; }
-  .work-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 4px; padding: 2px 0; }
-  .work-chip { display: flex; flex-direction: column; align-items: center; padding: 0; }
-  .work-rank { bottom: auto; top: 19px; right: calc(50% - 18px); }
-  .work-raise { bottom: auto; top: 30px; left: calc(50% - 18px); right: calc(50% - 18px); }
-  .work-name { display: block; color: #c8e9f2; font-size: .6rem; line-height: 1.2; margin-top: 5px; text-align: center; overflow-wrap: anywhere; }
+  .work-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 4px; justify-items: center; padding: 2px 0; }
   .skill-layout { grid-area: skills; gap: 10px; }
   .skill-group { min-width: 0; }
   .passive-rank-icon { flex-shrink: 0; }
