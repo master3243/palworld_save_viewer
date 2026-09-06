@@ -140,7 +140,7 @@
 
       <div class="vitals">
         <div class="status-bars" *ngIf="trust || vitalBars.length">
-          <div class="bar-row trust" *ngIf="trust as trust" [title]="trust.title">
+          <div class="bar-row trust" *ngIf="trust as trust" [appTooltip]="trust.tooltip" tabindex="-1">
             <span class="bar-icon" aria-hidden="true"><img *ngIf="uiIcons['trust']; else trustGlyph" [src]="uiIcons['trust']" alt=""><ng-template #trustGlyph>◈</ng-template></span>
             <span class="bar-label">Trust</span>
             <span class="bar"><i [style.width.%]="trust.progress"></i></span>
@@ -202,10 +202,11 @@
       <h3>Work Suitability</h3>
       <div class="work-grid">
         <span
-          *ngFor="let work of works"
+          *ngFor="let work of workChips"
           class="work-chip"
           [class.none]="work.rank === 0"
-          [title]="work.name + ' ' + work.rank + (work.bonus ? ' (' + work.bonus + ' gained by this Pal)' : '')"
+          [appTooltip]="work.tooltip"
+          tabindex="-1"
         >
           <img class="trait-icon" [src]="work.src" [alt]="work.name">
           <b class="work-rank">{{ work.rank }}</b>

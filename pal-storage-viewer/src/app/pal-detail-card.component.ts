@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
-import { elementIcons, workTable } from './trait-icons';
+import { TraitIcon, elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
+import { condenseWorkBonus } from '../backend/stats';
 import { GameDataService } from './game-data.service';
 import { TooltipData, TooltipDirective, TextSegment, LevelLine } from './game-tooltip.component';
 import { ElementChartComponent } from './element-chart.component';
@@ -26,6 +27,8 @@ interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' 
 interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: TooltipData; url: string; }
 interface PartnerSkill { name: string; level: string; segments: TextSegment[]; tooltip: TooltipData; }
 interface FoodEffect { name: string; effects: string; timeLeft: string; }
+interface WorkChip extends TraitIcon { tooltip: TooltipData; }
+interface TrustBar { rank: string; progress: number; title: string; tooltip: TooltipData; }
 
 @Component({
   selector: 'app-pal-detail-card',
@@ -66,7 +69,7 @@ export class PalDetailCardComponent implements OnChanges {
     'max_hp', 'attack', 'defense', 'work_speed', 'max_hp_base', 'attack_base', 'defense_base',
     'passive_hp_pct', 'passive_attack_pct', 'passive_defense_pct', 'passive_work_speed_pct', 'hunger_max',
     'trust_rank', 'trust_progress', 'trust_next', 'exp_to_next', 'exp_progress',
-    'partner_skill', 'partner_skill_level', 'partner_skill_text', 'partner_skill_levels',
+    'partner_skill', 'partner_skill_level', 'partner_skill_text', 'partner_skill_levels', 'stat_parts', 'work_species',
     'food_amount', 'known_skill_ids', 'known_moves', 'research_attack_pct', 'research_defense_pct',
     'trust_hp', 'trust_attack', 'trust_defense', 'food_effect', 'food_attack_pct', 'food_defense_pct', 'food_work_speed_pct', 'food_seconds_left',
     'food_status_effect_item', 'food_with_status_effect_timer'
@@ -88,10 +91,24 @@ export class PalDetailCardComponent implements OnChanges {
       const value = max !== null ? `${this.round(shown)} / ${this.round(max)}` : String(this.round(shown));
       bars.push({ label, icon, tone, value, percent, title, tooltip });
     };
-    bar('HP', 'hp', 'hp', this.numberFor('hp'), this.numberFor('max_hp'), 'Current HP at save time / max HP', this.statBreakdown('Max HP', 'max_hp', 'max_hp_base', 'trust_hp', 'passive_hp_pct', null));
+    bar('HP', 'hp', 'hp', this.numberFor('hp'), this.numberFor('max_hp'), 'HP Current / Max', this.statBreakdown('Pal Vitality', 'max_hp', 'max_hp_base', 'trust_hp', 'passive_hp_pct', null));
+    // Bar texts are the game's own tooltips.
+    const hunger = this.numberFor('full_stomach');
+    const hungerMax = this.numberFor('hunger_max');
+    bar('Hunger', 'bread', 'hunger', hunger, hungerMax, 'Hunger Current / Max', {
+      title: "Pal's Hunger",
+      intro: ['SAN falls faster as this decreases.', 'Parameters decrease when starved.', 'Can be recovered by eating.'],
+      rows: hunger !== null ? [['Current', hungerMax !== null ? `${this.round(hunger)} / ${this.round(hungerMax)}` : String(this.round(hunger))]] : undefined,
+    });
     // SanityValue is only written once it drops, so a missing value is a full 100.
-    bar('Hunger', 'bread', 'hunger', this.numberFor('full_stomach'), this.numberFor('hunger_max'), 'Hunger at save time / max', null);
-    if (this.numberFor('hp') !== null) bar('SAN', 'san', 'sanity', this.numberFor('sanity') ?? 100, 100, 'Sanity at save time', null);
+    if (this.numberFor('hp') !== null) {
+      const sanity = this.numberFor('sanity') ?? 100;
+      bar('SAN', 'san', 'sanity', sanity, 100, 'Current Sanity', {
+        title: "Pal's Mental Stability",
+        intro: ["Pals' mental stability decreases when working, and recovers when slacking off or sleeping.", 'Hot springs and good meals can increase the rate of recovery.', "If a Pal's mental stability decreases too much, it could cause them to become sick or injured."],
+        rows: [['Current', `${this.round(sanity)} / 100`]],
+      });
+    }
     return bars;
   }
 
@@ -106,22 +123,49 @@ export class PalDetailCardComponent implements OnChanges {
     const souls = this.numberFor(soulKey) ?? 0;
     const pct = this.numberFor(pctKey) ?? 0;
     const foodPct = foodKey ? this.numberFor(foodKey) ?? 0 : 0;
-    const rows: [string, string][] = [['Species + level + IV', String(base - trust)]];
-    if (trust) rows.push([`Trust rank ${this.numberFor('trust_rank') ?? 0}`, `+${trust}`]);
+    const rows: [string, string][] = [];
+    const parts = this.statParts(key);
+    const level = this.numberFor('level') ?? 1;
+    const ivValue = this.numberFor(({ max_hp: 'iv_hp', attack: 'iv_attack', defense: 'iv_defense' } as Record<string, string>)[key] ?? '') ?? 0;
+    if (parts) {
+      const [flat, species, ivPart, scale] = parts;
+      rows.push([key === 'max_hp' ? `Starting value (500 + 5 × Lv.${level})` : 'Starting value', String(flat)]);
+      rows.push([`Species ${scale} × Lv.${level}`, `+${species}`]);
+      rows.push([`IV ${ivValue}`, `+${ivPart}`]);
+      if (trust || stars || souls) rows.push(['Species + level + IV', String(flat + species + ivPart)]);
+    } else {
+      rows.push(['Species + level + IV', String(base - trust)]);
+    }
     if (stars) rows.push([`Condensing ${'★'.repeat(stars)}`, `+${stars * 5}%`]);
     if (souls) rows.push([`Pal Souls (rank ${souls})`, `+${souls * 3}%`]);
+    if (trust) rows.push([`Bonus from Trust (rank ${this.numberFor('trust_rank') ?? 0})`, `+${trust}`]);
     if (trust || stars || souls) rows.push(['Base', String(base)]);
     if (pct) rows.push(['Passive Skills', `${pct > 0 ? '+' : ''}${pct}%`]);
     if (foodPct) rows.push([`Food: ${this.valueFor('food_effect')}`, `${foodPct > 0 ? '+' : ''}${foodPct}%`]);
     const researchPct = key === 'attack' ? this.numberFor('research_attack_pct') : key === 'defense' ? this.numberFor('research_defense_pct') : null;
     if (researchPct) rows.push(['Research Effects', `+${researchPct}%`]);
     rows.push(['Total', String(value)]);
-    const intro = { 'Max HP': ["Pal's HP.", 'The Pal is knocked out when it reaches 0.'], Attack: ["Pal's Attack.", 'Damage dealt increases as Attack increases.'], Defense: ["Pal's Defense.", 'Damage taken decreases as defense increases.'] }[label];
+    const intro = {
+      'Pal Vitality': ["When a Pal's vitality reaches 0, its strength is exhausted and it is incapacitated.", 'Place an incapacitated Pal in a Palbox to restore its health.'],
+      Attack: ["Pal's Attack.", 'Damage dealt increases as Attack increases.'],
+      Defense: ["Pal's Defense.", 'Damage taken decreases as defense increases.'],
+    }[label];
     return { title: label, titleRight: base !== value ? `${base} ≫ ${value}` : String(value), intro, rows };
   }
 
-  trust: { rank: string; progress: number; title: string } | null = null;
-  private computeTrust(): { rank: string; progress: number; title: string } | null {
+  /** [flat, species × level, IV part, species scaling, trust part] for a stat, from the parser's JSON. */
+  private statParts(key: string): number[] | null {
+    const raw = this.valueFor('stat_parts');
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as Record<string, number[]>;
+      const parts = parsed[key === 'max_hp' ? 'hp' : key];
+      return Array.isArray(parts) && parts.length >= 4 ? parts : null;
+    } catch { return null; }
+  }
+
+  trust: TrustBar | null = null;
+  private computeTrust(): TrustBar | null {
     const rank = this.numberFor('trust_rank');
     if (rank === null) return null;
     const points = this.numberFor('friendship_points') ?? 0;
@@ -129,7 +173,14 @@ export class PalDetailCardComponent implements OnChanges {
     const progress = this.numberFor('trust_progress') ?? 0;
     const title = next === null ? `Trust rank ${rank} (max) · ${points.toLocaleString()} points`
       : `Trust rank ${rank} · ${points.toLocaleString()} / ${next.toLocaleString()} points to the next rank`;
-    return { rank: String(rank), progress, title };
+    const rows: [string, string][] = [['Trust rank', next === null ? `${rank} (max)` : String(rank)], ['Current', points.toLocaleString()]];
+    if (next !== null) rows.push(['Next rank at', next.toLocaleString()]);
+    const tooltip: TooltipData = {
+      title: 'Trust',
+      intro: ["A measure of a Pal's trust in you.", 'Rises based on how the Pal is treated.', "Higher trust increases the Pal's stats."],
+      rows,
+    };
+    return { rank: String(rank), progress, title, tooltip };
   }
 
   expNext: { text: string; percent: number; title: string } | null = null;
@@ -183,7 +234,7 @@ export class PalDetailCardComponent implements OnChanges {
       if (pct) parts.push(`${label} ${pct > 0 ? '+' : ''}${pct}%`);
     }
     const seconds = this.numberFor('food_seconds_left') ?? 0;
-    const timeLeft = seconds > 0 ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} left at save time` : '';
+    const timeLeft = seconds > 0 ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} left` : '';
     return { name, effects: parts.join(' · '), timeLeft };
   }
 
@@ -247,6 +298,7 @@ export class PalDetailCardComponent implements OnChanges {
   emptySlots: number[] = [];
   passiveSkills: PassiveSkill[] = [];
   works: ReturnType<typeof workTable> = [];
+  workChips: WorkChip[] = [];
   /** Element chart popover, shown while the type chip is hovered. */
   showElementChart = false;
   get elementIndexes(): number[] { return this.elementChips.map((chip) => chip.index); }
@@ -270,12 +322,36 @@ export class PalDetailCardComponent implements OnChanges {
     this.learnedSkillChips = this.computeLearnedSkillChips();
     this.emptySlots = Array.from({ length: Math.max(0, 3 - this.activeSkillChips.length) }, (_, index) => index);
     this.works = workTable(this.row);
+    this.workChips = this.computeWorkChips();
     this.elementChips = this.computeElementChips();
     this.rankStars = this.computeRankStars();
     this.foodGauge = this.computeFoodGauge();
     this.ivStats = this.computeIvStats();
     this.soulStats = this.computeSoulStats();
     this.fields = this.computeFields();
+  }
+
+  /** Each work suitability with what it would be at every condensing level (handbook ranks kept). */
+  private computeWorkChips(): WorkChip[] {
+    const species = this.listFor('work_species').map(Number);
+    const stars = this.displayRank;
+    const known = species.length === this.works.length && species.every((rank) => Number.isFinite(rank));
+    const current = known ? condenseWorkBonus(species, stars) : [];
+    const perStar = known ? [0, 1, 2, 3, 4].map((count) => condenseWorkBonus(species, count)) : [];
+    return this.works.map((work, index) => {
+      const tooltip: TooltipData = { title: work.name, titleRight: work.rank ? `Lv.${work.rank}` : '—' };
+      if (!work.rank) tooltip.intro = ['This Pal is not suited to this work.'];
+      if (known && work.rank) {
+        const handbook = work.rank - species[index] - current[index];
+        tooltip.intro = ['Level at each condensing rank:'];
+        tooltip.levels = perStar.map((bonus, count) => {
+          const rank = species[index] + handbook + bonus[index];
+          return { label: `${count}★`, segments: [{ text: `Lv.${rank}`, value: true }], current: count === stars };
+        });
+        if (handbook > 0) tooltip.note = `Includes +${handbook} from handbooks or items.`;
+      }
+      return { ...work, tooltip };
+    });
   }
 
   /** Skills the Pal could swap in: mastered plus the species learnset, minus the three equipped slots. */
@@ -422,7 +498,18 @@ export class PalDetailCardComponent implements OnChanges {
         ? `assets/ui/passive_${direction}_${Math.abs(numericRank)}.pog`
         : '';
       const description = this.gameData.passiveDescription(ids[index] ?? '');
-      return { name, rank, color, rankMarker, rankIcon, tooltip: { title: name, lines: description ? [description] : [], note: description ? undefined : 'No description in the game data.' } };
+      const inline = this.passiveLines(description);
+      return { name, rank, color, rankMarker, rankIcon, tooltip: { title: name, inline, note: description ? undefined : 'No description in the game data.' } };
+    });
+  }
+
+  /** The game lists one effect per line with the figure in blue: "Attack +30.0%" / "Defense +5.0%". */
+  private passiveLines(description: string): [string, string][] {
+    if (!description) return [];
+    const pieces = description.split(/(?<=[+-]?\d+(?:\.\d+)?%?)\s+(?=[A-Z])/).map((piece) => piece.trim()).filter(Boolean);
+    return pieces.map((piece) => {
+      const match = /^(.*?)\s*([+-]?\d+(?:\.\d+)?%?)$/.exec(piece);
+      return match ? [match[1], match[2]] : [piece, ''];
     });
   }
 

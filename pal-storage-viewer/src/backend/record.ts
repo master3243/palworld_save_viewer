@@ -10,7 +10,7 @@ import {
   readVector, validatedPropertyNames, indexProperties
 } from './gvas';
 import { Lookups, WORK_KEYS } from './lookups';
-import { DerivedStats, deriveStats } from './stats';
+import { DerivedStats, condenseWorkBonus, deriveStats } from './stats';
 
 export interface Identity {
   instance_id: string | null;
@@ -101,6 +101,8 @@ export interface PalRecord {
   work_ranks: number[];
   /** Ranks this pal gained on top of its species (condensing, handbooks), in WORK_KEYS order. */
   work_bonus_ranks: number[];
+  /** The species' own ranks (WORK_KEYS order), before condensing and handbooks. */
+  work_species_ranks: number[];
   location: { last_jumped: { x: number; y: number; z: number } | null };
   migration: { exp_table_version: number | null };
   raw_property_names: string[];
@@ -207,12 +209,8 @@ export function buildRecord(
     }
     return bonus;
   });
-  // Condensing: the stars go round the species' suitabilities from the highest down (ties: the one
-  // listed last in the game's order), one rank each, starting over once every suitability got one.
-  // A single-suitability Pal therefore gets all four stars on it (4-star Omascul: Gathering 5 -> 9).
   const stars = Math.max(0, Math.min(4, (readByte(buf, prop('Rank')) ?? 1) - 1));
-  const byLevel = baseRanks.map((rank, index) => ({ rank, index })).filter((entry) => entry.rank > 0).sort((a, b) => b.rank - a.rank || b.index - a.index);
-  for (let star = 0; star < stars && byLevel.length; star++) workBonus[byLevel[star % byLevel.length].index] += 1;
+  condenseWorkBonus(baseRanks, stars).forEach((bonus, index) => { workBonus[index] += bonus; });
   const workRanks = WORK_KEYS.map((_, index) => baseRanks[index] + workBonus[index]);
   const derived = deriveStats({
     species_id: characterId,
@@ -359,6 +357,7 @@ export function buildRecord(
     elements: traits?.e ?? [],
     work_ranks: workRanks,
     work_bonus_ranks: workBonus,
+    work_species_ranks: baseRanks,
     location: { last_jumped: readVector(buf, prop('LastJumpedLocation')) },
     migration: { exp_table_version: readByte(buf, prop('ExpTableMigrationVersion')) },
     raw_property_names: validatedPropertyNames(buf, start, end),

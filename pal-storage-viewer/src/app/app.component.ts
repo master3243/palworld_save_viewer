@@ -458,6 +458,8 @@ export class AppComponent {
     'partner_skill',
     'partner_skill_level',
     'partner_skill_levels',
+    'stat_parts',
+    'work_species',
     'hunger_max',
     'shield_hp',
     'soul_rank_craft_speed',

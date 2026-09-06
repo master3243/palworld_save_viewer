@@ -26,6 +26,8 @@ export interface TooltipData {
   effect?: { label: string; value: string };
   /** Label/value rows, e.g. a stat breakdown. */
   rows?: [string, string][];
+  /** Left-aligned label + blue figure lines, like the game's passive skill card ("Attack +30.0%"). */
+  inline?: [string, string][];
   lines?: string[];
   /** Text with the level-driven parts marked, shown like an intro line. */
   rich?: TextSegment[];
@@ -49,6 +51,7 @@ export interface TooltipData {
         </span>
         <span class="tip-stat" *ngFor="let stat of data.stats"><i [attr.data-icon]="stat.icon"></i>{{ stat.label }}<b>{{ stat.value }}</b></span>
       </div>
+      <div class="tip-inline" *ngIf="data.inline?.length"><div *ngFor="let row of data.inline"><span>{{ row[0] }}</span><b *ngIf="row[1]">{{ row[1] }}</b></div></div>
       <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
       <div class="tip-rows" *ngIf="data.rows?.length">
         <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
@@ -81,6 +84,9 @@ export interface TooltipData {
     .tip-stat i { border: 1.5px solid #c9d8df; border-radius: 50%; display: inline-block; height: 10px; position: relative; width: 10px; }
     .tip-stat i[data-icon="clock"]::after { border-left: 1.5px solid #c9d8df; border-bottom: 1.5px solid #c9d8df; content: ''; height: 3px; left: 4px; position: absolute; top: 1px; width: 2px; }
     .tip-stat i[data-icon="power"] { border: 0; } .tip-stat i[data-icon="power"]::after { content: '✹'; font-size: 12px; font-style: normal; line-height: 10px; position: absolute; left: -1px; top: -1px; }
+    .tip-inline { line-height: 1.55; padding: 8px 12px 2px; }
+    .tip-inline span { color: #e6f1f5; } .tip-inline b { color: #5ecbff; font-variant-numeric: tabular-nums; font-weight: 600; margin-left: 6px; }
+    .tip-inline + .tip-line, .tip-inline + .tip-note { margin-top: 4px; }
     .tip-effect { background: rgba(255, 255, 255, .06); display: flex; justify-content: space-between; margin: 4px 0 0; padding: 4px 12px; }
     .tip-effect span { color: #c9d8df; } .tip-effect b { color: #fff; }
     .tip-rows { border-top: 1px solid rgba(190, 220, 235, .18); margin: 4px 12px 0; padding: 6px 0 2px; }
@@ -92,7 +98,7 @@ export interface TooltipData {
     .tip-rich { line-height: 1.45; margin-bottom: 8px; }
     .tip-rich em { color: #ffe08a; font-style: normal; font-weight: 700; }
     .tip-levels { border-top: 1px solid rgba(190, 220, 235, .18); list-style: none; margin: 0 12px; padding: 6px 0 8px; }
-    .tip-levels li { border-left: 3px solid transparent; color: #a9bcc6; display: grid; gap: 10px; grid-template-columns: 34px 1fr; line-height: 1.4; padding: 2px 8px 2px 7px; }
+    .tip-levels li { border-left: 3px solid transparent; color: #a9bcc6; display: grid; gap: 10px; grid-template-columns: minmax(34px, max-content) 1fr; line-height: 1.4; padding: 2px 8px 2px 7px; }
     .tip-levels li.current { background: linear-gradient(90deg, rgba(255, 211, 122, .14), transparent); border-left-color: #ffd37a; color: #f2fbff; }
     .tip-level { color: #7fc9e6; font-size: .68rem; font-weight: 800; letter-spacing: .02em; padding-top: 1px; }
     .tip-levels li.current .tip-level { color: #ffd37a; }

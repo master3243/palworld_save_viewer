@@ -64,6 +64,8 @@ export interface DerivedStats {
   partner_skill: string | null;
   partner_skill_level: number | null;
   partner_skill_text: string | null;
+  /** JSON per stat (hp/attack/defense): [flat, species part, IV part, species scaling, trust part] before condensing and souls, for the card's breakdown. */
+  stat_parts: string | null;
   /** JSON `{t, v, x}`: the text template with `{k}` placeholders, the values per level and per-level suffixes, for the card's per-level view. */
   partner_skill_levels: string | null;
   /** Appetite on the game's 10-segment food gauge. */
@@ -80,7 +82,7 @@ const EMPTY: DerivedStats = {
   passive_hp_pct: 0, passive_attack_pct: 0, passive_defense_pct: 0, passive_work_speed_pct: 0,
   food_effect: null, food_attack_pct: 0, food_defense_pct: 0, food_work_speed_pct: 0, food_seconds_left: null,
   hunger_max: null, trust_rank: null, trust_progress: null, trust_next: null,
-  exp_to_next: null, exp_progress: null, partner_skill: null, partner_skill_level: null, partner_skill_text: null, partner_skill_levels: null,
+  exp_to_next: null, exp_progress: null, partner_skill: null, partner_skill_level: null, partner_skill_text: null, partner_skill_levels: null, stat_parts: null,
   food_amount: null, known_skill_ids: [], known_moves: [],
 };
 
@@ -141,6 +143,18 @@ export function researchBonus(labs: Record<string, number>[], lookups: Lookups):
   return out;
 }
 
+/**
+ * Condensing: the stars go round the species' suitabilities from the highest down (ties: the one
+ * listed last in the game's order), one rank each, starting over once every suitability got one.
+ * A single-suitability Pal therefore gets all four stars on it (4-star Omascul: Gathering 5 -> 9).
+ */
+export function condenseWorkBonus(baseRanks: number[], stars: number): number[] {
+  const bonus = baseRanks.map(() => 0);
+  const byLevel = baseRanks.map((rank, index) => ({ rank, index })).filter((entry) => entry.rank > 0).sort((a, b) => b.rank - a.rank || b.index - a.index);
+  for (let star = 0; star < Math.max(0, Math.min(4, stars)) && byLevel.length; star++) bonus[byLevel[star % byLevel.length].index] += 1;
+  return bonus;
+}
+
 export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   const traits = lookups.traitsFor(input.species_id);
   const out: DerivedStats = { ...EMPTY };
@@ -195,6 +209,17 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
     out.max_hp_base = hpBase;
     out.attack_base = attackBase;
     out.defense_base = defenseBase;
+    // Raw pieces of each stat: flat amount, species × level, what the IV adds, and what trust adds.
+    const parts = (flat: number, scale: number, rate: number, factor: number, value: number | null, rawStat: (scale: number) => number) => {
+      const species = Math.floor(scale * factor * level);
+      const noTrust = rawStat(scale);
+      return [flat, species, noTrust - flat - species, scale, rawStat(scale + rate * trust) - noTrust];
+    };
+    out.stat_parts = JSON.stringify({
+      hp: parts(500 + 5 * level, hpScale, hpRate, 0.5, input.ivs.hp, raw.hp),
+      attack: parts(100, attackScale, attackRate, 0.075, input.ivs.attack, raw.attack),
+      defense: parts(50, defenseScale, defenseRate, 0.075, input.ivs.defense, raw.defense),
+    });
     out.trust_hp = hpBase - base(raw.hp(hpScale), input.soul_ranks.hp);
     out.trust_attack = attackBase - base(raw.attack(attackScale), input.soul_ranks.attack);
     out.trust_defense = defenseBase - base(raw.defense(defenseScale), input.soul_ranks.defense);
