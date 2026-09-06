@@ -46,12 +46,6 @@ table.pal-table {
 .pal-table th.icon-cell {
   padding-left: 2px;
   padding-right: 2px;
-  transition: width 160ms ease;
-}
-
-/* Room for the sort arrow next to a one-letter label. */
-.pal-table th.icon-cell.sorted {
-  width: 46px;
 }
 
 .pal-table th.icon-cell .header-label {
@@ -60,17 +54,14 @@ table.pal-table {
   text-overflow: clip;
 }
 
-.pal-table th.icon-cell .sort-marker {
-  font-size: 0.62rem;
-  margin-right: 2px;
-}
-
 .pal-table .sort-marker {
   color: #8ee8ff;
-  display: inline-block;
-  font-size: 0.72rem;
-  margin-right: 4px;
-  min-width: 0;
+  font-size: 0.55rem;
+  left: 50%;
+  line-height: 1;
+  position: absolute;
+  top: 1px;
+  transform: translateX(-50%);
 }
 
 /*
@@ -87,42 +78,15 @@ table.pal-table {
   background: rgba(61, 174, 217, 0.18);
 }
 
-.pal-table .row-arrow {
-  color: #8bdfff;
-  display: inline-block;
-  font-size: 0.86rem;
-  font-weight: 900;
-}
-
-.pal-table .row-toggle {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  color: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  height: 24px;
-  justify-content: center;
-  margin: -4px 0;
-  padding: 0;
-  width: 24px;
-}
-
-.pal-table .row-toggle:focus-visible {
-  outline: 1px solid #95f3ff;
-  outline-offset: 1px;
-}
-
-.pal-table .row-arrow.open {
-  transform: rotate(90deg);
-}
-
 .pal-table td {
   color: #d9edf7;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Fixed name width keeps the chosen columns within a 1920px viewport. */
+.pal-table th.pal-name-cell { width: 115px; }
 
 /* Unsortable portrait column that sits just left of the Pal name. */
 .pal-table th.pal-icon-cell,
@@ -172,13 +136,6 @@ table.pal-table {
   width: 42px;
 }
 
-.pal-table th.slot-cell.sorted,
-.pal-table td.slot-cell.sorted-column {
-  max-width: 58px;
-  min-width: 58px;
-  width: 58px;
-}
-
 .pal-table th.paldeck-cell,
 .pal-table td.paldeck-cell {
   box-sizing: border-box;
@@ -198,12 +155,6 @@ table.pal-table {
   padding-left: 7px;
   padding-right: 7px;
   width: 90px;
-}
-
-.pal-table th.nickname-cell.sorted {
-  max-width: 106px;
-  min-width: 106px;
-  width: 106px;
 }
 
 .pal-table th.rank-cell,
@@ -226,18 +177,6 @@ table.pal-table {
   padding-right: 4px;
   text-align: center;
   width: 44px;
-}
-
-.pal-table th.level-cell.sorted {
-  max-width: 58px;
-  min-width: 58px;
-  width: 58px;
-}
-
-.pal-table th.rank-cell.sorted {
-  max-width: 60px;
-  min-width: 60px;
-  width: 60px;
 }
 
 .pal-table .table-rank-stars {
@@ -277,13 +216,6 @@ table.pal-table {
 .pal-table th.soul-rank-cell .header-label {
   font-size: 0.78rem;
   letter-spacing: -0.02em;
-}
-
-.pal-table th.iv-cell.sorted,
-.pal-table th.soul-rank-cell.sorted {
-  max-width: 60px;
-  min-width: 60px;
-  width: 60px;
 }
 
 .pal-table td.iv-cell.iv-high {
@@ -398,12 +330,6 @@ table.pal-table {
   padding-right: 3px;
   text-align: center;
   width: 56px;
-}
-
-.pal-table th.type-cell.sorted {
-  max-width: 70px;
-  min-width: 70px;
-  width: 70px;
 }
 
 .pal-table td.type-cell .trait-icons {
@@ -570,23 +496,11 @@ table.pal-table {
   width: 58px;
 }
 
-.pal-table th.stat-cell.sorted {
-  max-width: 70px;
-  min-width: 70px;
-  width: 70px;
-}
-
 .pal-table th.stat-cell.speed-cell,
 .pal-table td.stat-cell.speed-cell {
   max-width: 46px;
   min-width: 46px;
   width: 46px;
-}
-
-.pal-table th.stat-cell.speed-cell.sorted {
-  max-width: 60px;
-  min-width: 60px;
-  width: 60px;
 }
 
 /* Three equipped active skills as mini chips, like the pal card's. */
@@ -716,7 +630,6 @@ table.pal-table {
   padding-left: 4px;
   padding-right: 4px;
   text-align: center;
-  transition: width 160ms ease, min-width 160ms ease, max-width 160ms ease;
   width: 40px;
 }
 
@@ -733,20 +646,6 @@ table.pal-table {
   letter-spacing: -0.02em;
 }
 
-.pal-table th.save-cell.sorted,
-.pal-table td.save-cell.sorted-column {
-  max-width: 54px;
-  min-width: 54px;
-  width: 54px;
-}
-
-.pal-table th.where-cell.sorted,
-.pal-table td.where-cell.sorted-column {
-  max-width: 66px;
-  min-width: 66px;
-  width: 66px;
-}
-
 .pal-table td.save-cell {
   font-weight: 600;
 }
@@ -761,7 +660,6 @@ table.pal-table {
   padding-left: 4px;
   padding-right: 4px;
   text-overflow: ellipsis;
-  transition: width 160ms ease, min-width 160ms ease, max-width 160ms ease;
   white-space: nowrap;
   width: 52px;
 }

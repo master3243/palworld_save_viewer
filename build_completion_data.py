@@ -1,70 +1,25 @@
-"""Build resources/completion/completion-data.json: the master lists ("denominators")
-for the 100% tracker, keyed by the same internal ids the player save uses.
+"""Rebuild the web app's game-data resources from completion_sources/raw, offline.
 
-Sources (game data extracted from the Palworld pak files by three save-editor projects):
-  * oMaN-Rod/palworld-save-pal  data/json/*.json     (GPL-3.0; level objects, quests, pals,
-    technologies, lab research, items)
-  * deafdudecomputers/PalWorldSaveTools resources/game_data/*.json (MIT; areas, fast travel
-    names, Statue of Power rank table)
-  * KrisCris/Palworld-Pal-Editor assets/data/skin_data.json (GPL-3.0; pal skins)
-plus this repo's own pal name lookup and the paldb.cc map dumps. Every list was checked against a real save: every
-obtained id in the save exists in the corresponding list here.
-
-Usage:  python3 build_completion_data.py            (downloads pinned upstream files)
-        python3 build_completion_data.py <cache_dir>  (reuse previously downloaded files)
+Usage: python3 build_completion_data.py
+Source URLs, pinned revisions and SHA-256 hashes are in completion_sources/sources.json;
+individual HTML sources are recorded inside raw/html.db.
+Raw inputs are never modified. Only resources/ contains generated outputs.
 """
+import html
 import json
 import re
-import sys
-import urllib.request
 from pathlib import Path
-
-from clean_paldb_map_dump import reduce_all
+from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent / "resources" / "completion"
-# Hand-collected lists that no extraction project provides
-EXTRA_SOURCES = Path(__file__).resolve().parent / "completion_sources"
+RAW = Path(__file__).resolve().parent / "completion_sources" / "raw"
 OUT = HERE / "completion-data.json"
-PAL_NAMES_LUA = HERE.parent / "pal_names_lookup.lua"
+PAL_NAMES_LUA = RAW / "admincommands" / "paldata.lua"
 
 PSP = ("oMaN-Rod/palworld-save-pal", "2d244ae9ea12f2f70a66523bf83764185e22fa83", "data/json")
 PWST = ("deafdudecomputers/PalWorldSaveTools", "1abd4b11756c9ca7774e9c35400fb8df4d12d966", "resources/game_data")
 KC = ("KrisCris/Palworld-Pal-Editor", "3efb2d4b5d1f5710ee672d449b5162fe63745229", "src/palworld_pal_editor/assets/data")
 UPSTREAMS = {"palworld-save-pal": PSP, "PalWorldSaveTools": PWST, "Palworld-Pal-Editor": KC}
-
-FILES = {
-    "psp/ancient_ruins.json": (PSP, "ancient_ruins.json"),
-    "psp/bosses.json": (PSP, "bosses.json"),
-    "psp/fast_travel_points.json": (PSP, "fast_travel_points.json"),
-    "psp/items.json": (PSP, "items.json"),
-    "psp/l10n/fast_travel_points.json": (PSP, "l10n/en/fast_travel_points.json"),
-    "psp/l10n/items.json": (PSP, "l10n/en/items.json"),
-    "psp/l10n/lab_research.json": (PSP, "l10n/en/lab_research.json"),
-    "psp/l10n/missions.json": (PSP, "l10n/en/missions.json"),
-    "psp/l10n/pals.json": (PSP, "l10n/en/pals.json"),
-    "psp/l10n/relics.json": (PSP, "l10n/en/relics.json"),
-    "psp/l10n/technologies.json": (PSP, "l10n/en/technologies.json"),
-    "psp/l10n/towers.json": (PSP, "l10n/en/towers.json"),
-    "psp/lab_research.json": (PSP, "lab_research.json"),
-    "psp/missions.json": (PSP, "missions.json"),
-    "psp/notes.json": (PSP, "notes.json"),
-    "psp/pals.json": (PSP, "pals.json"),
-    "psp/relics.json": (PSP, "relics.json"),
-    "psp/technologies.json": (PSP, "technologies.json"),
-    "psp/towers.json": (PSP, "towers.json"),
-    "psp/active_skills.json": (PSP, "active_skills.json"),
-    "psp/passive_skills.json": (PSP, "passive_skills.json"),
-    "psp/l10n/active_skills.json": (PSP, "l10n/en/active_skills.json"),
-    "psp/l10n/passive_skills.json": (PSP, "l10n/en/passive_skills.json"),
-    "psp/friendship.json": (PSP, "friendship.json"),
-    "psp/exp.json": (PSP, "exp.json"),
-    "pwst/characters.json": (PWST, "characters.json"),
-    "pwst/foodbuffdata.json": (PWST, "foodbuffdata.json"),
-    "pwst/fast_travel_points.json": (PWST, "fast_travel_points.json"),
-    "pwst/relic_data.json": (PWST, "relic_data.json"),
-    "pwst/world_map_areas.json": (PWST, "world_map_areas.json"),
-    "kc/skin_data.json": (KC, "skin_data.json"),
-}
 
 # Journal owners, from the in-game journal titles.
 NOTE_OWNERS = [
@@ -113,18 +68,6 @@ RELIC_ENUM = {
 }
 
 
-def fetch_all(cache: Path) -> None:
-    for rel, ((repo, sha, base), name) in FILES.items():
-        target = cache / rel
-        if target.exists():
-            continue
-        target.parent.mkdir(parents=True, exist_ok=True)
-        url = f"https://raw.githubusercontent.com/{repo}/{sha}/{base}/{name}"
-        print("fetch", url)
-        with urllib.request.urlopen(url) as response:
-            target.write_bytes(response.read())
-
-
 def load(cache: Path, rel: str):
     return json.loads((cache / rel).read_text(encoding="utf-8"))
 
@@ -162,13 +105,110 @@ def region_key(identifier: str) -> frozenset[str]:
     return frozenset(token.lstrip("0") or "0" for token in re.findall(r"[a-z]+|\d+", text))
 
 
+RANGE = re.compile(r"\((-?\d+(?:\.\d+)?)~(-?\d+(?:\.\d+)?)(%?)\)")
+
+
+def text_of(fragment: str) -> str:
+    fragment = re.sub(r"<img[^>]*>", "", fragment)
+    fragment = re.sub(r"<br\s*/?>", " ", fragment)
+    fragment = re.sub(r"<[^>]+>", "", fragment)
+    return re.sub(r"\s+", " ", html.unescape(fragment)).strip()
+
+
+def parse(page: str) -> dict | None:
+    block = re.search(r'<span data-i18n="common_coop_action">Partner Skill</span>:\s*(.*?)</h5>(.*?)<div class="card mt-3">', page, re.S)
+    if not block:
+        return None
+    skill = text_of(block.group(1))
+    body = block.group(2)
+    description = re.search(r'<div class="flex-grow-1">(.*)', body, re.S)
+    desc_html = description.group(1) if description else ""
+    # The text ends where the next block element (item icons, tables) begins.
+    cut = re.search(r"<div|<table", desc_html)
+    text = text_of(desc_html[: cut.start()] if cut else desc_html)
+    table = re.search(r"<table class=\"table\">(.*?)</table>", body, re.S)
+    rows = re.findall(r"<tr><td>(\d+)<td>(.*?)(?=<tr>|$)", table.group(1), re.S) if table else []
+    per_level: dict[int, list[str]] = {}
+    extra: dict[int, str] = {}
+    for level, cell in rows:
+        values: list[str] = []
+        for chunk in re.findall(r"<div>(.*?)</div>", cell, re.S):
+            plain = text_of(chunk)
+            if plain.startswith("Awakening"):
+                extra[int(level)] = plain.split(":", 1)[1].strip()
+                continue
+            values += re.findall(r"[-+]?\d+(?:\.\d+)?", plain)
+        per_level[int(level)] = values
+    return {"skill": skill, "text": text, "raw_levels": per_level, "extra": extra}
+
+
+def resolve(entry: dict) -> dict:
+    """Turn "(30~50)%" ranges into {k} placeholders with one value per level, matched by endpoints."""
+    levels = entry["raw_levels"]
+    top = max(levels) if levels else 0
+    columns: list[list[str]] = []
+    template = entry["text"]
+
+    def replace(match: re.Match) -> str:
+        low, high, pct = match.group(1), match.group(2), match.group(3)
+        first = levels.get(1, [])
+        last = levels.get(top, [])
+        for index, value in enumerate(first):
+            if index < len(last) and float(value) == float(low) and float(last[index]) == float(high):
+                columns.append([levels.get(level, [None] * (index + 1))[index] if index < len(levels.get(level, [])) else None for level in range(1, top + 1)])
+                return "{" + str(len(columns) - 1) + "}" + pct
+        return match.group(0)
+
+    template = RANGE.sub(replace, template)
+    resolved = [[column[level] for column in columns] for level in range(top)] if columns else []
+    out = {"skill": entry["skill"], "text": template, "levels": resolved}
+    if entry["extra"]:
+        out["extra"] = [entry["extra"].get(level, "") for level in range(1, top + 1)]
+    return out
+
+
+def partner_skills() -> dict:
+    result = {}
+    with ZipFile(RAW / "html.db") as archive:
+        pages = sorted(name for name in archive.namelist() if name.endswith(".html"))
+        if not pages:
+            raise ValueError("No partner skill pages in html.db")
+        for page in pages:
+            entry = parse(archive.read(page).decode("utf-8"))
+            if not entry:
+                raise ValueError(f"No partner skill in {page}")
+            if entry["skill"]:
+                result[Path(page).stem.replace("_", " ")] = resolve(entry)
+    return result
+
+
+def map_data() -> dict:
+    result = {"ruins": [], "journals": [], "regions": [], "palCritics": []}
+    for name in ("palpagos", "tree"):
+        src = (RAW / f"paldb_map_{name}.js").read_text(encoding="utf-8")
+
+        def grab(variable: str):
+            match = re.search(r"var\s+" + re.escape(variable) + r"\s*=\s*", src)
+            if not match:
+                raise ValueError(f"Missing {variable} in PalDB {name} map")
+            return json.JSONDecoder().raw_decode(src, match.end())[0]
+
+        for marker in grab("fixedDungeon"):
+            pos = marker["pos"]
+            position = world_to_map(pos["X"], pos["Y"])
+            if marker.get("type") == "Ancient Ruin":
+                result["ruins"].append({"map": position, "item": text_of(marker.get("comment") or "")})
+            elif marker.get("type") == "Journals":
+                result["journals"].append({"map": position, "title": text_of(marker["item"])})
+        result["regions"].extend({"id": r["id"], "name": text_of(r["item"]), "map": [r["ipos"]["X"], r["ipos"]["Y"]]} for r in grab("regionData"))
+        result["palCritics"].extend([e["ipos"]["X"], e["ipos"]["Y"]] for e in grab("extrasIngame") if e.get("type") == "Arrogant Pal Critic")
+    result["palCritics"].sort()
+    return result
+
+
 def build(cache: Path) -> dict:
     names = pal_names()
-    # paldb map markers for every map, merged (ruins, journals and regions never overlap between maps).
-    paldb = {"ruins": [], "journals": [], "regions": [], "palCritics": []}
-    for data in reduce_all(EXTRA_SOURCES).values():
-        for key in paldb:
-            paldb[key].extend(data[key])
+    paldb = map_data()
     l10n_pals = load(cache, "psp/l10n/pals.json")
 
     def pal_name(pal_id: str) -> str:
@@ -423,13 +463,10 @@ def max_pal_level(cache: Path) -> int:
     return max(value.get("level_cap") or 0 for value in load(cache, "psp/technologies.json").values())
 
 
-PALDB_PARTNER = EXTRA_SOURCES / "paldb_partner_skills.json"
-
-
 def partner_skill(entry: dict, paldb: dict | None) -> list | None:
     """[name, text with {k} placeholders or None, values per level or None, per-level suffix or None].
 
-    The paldb.cc scrape (scrape_paldb_partner_skills.py) has the resolved text and per-level values;
+    The raw paldb.cc pages supply the resolved text and per-level values;
     the PalWorldSaveTools row is the fallback for the name and for placeholder-free text."""
     if paldb:
         levels = paldb.get("levels") or None
@@ -450,7 +487,7 @@ def build_pal_traits(cache: Path) -> None:
     trust bonus rates and partner skill; plus the trust rank thresholds and the Pal exp table."""
     pals = load(cache, "psp/pals.json")
     pal_l10n = load(cache, "psp/l10n/pals.json")
-    paldb_partner = json.loads(PALDB_PARTNER.read_text(encoding="utf-8")) if PALDB_PARTNER.exists() else {}
+    paldb_partner = partner_skills()
     characters = {row["asset"]: row for row in load(cache, "pwst/characters.json")["pals"]}
     by_lower = {key.lower(): key for key in characters}
     traits = {}
@@ -547,7 +584,8 @@ def build_skill_details(cache: Path) -> None:
         description = (passive_names.get(skill_id) or {}).get("description") or ""
         if effects or description:
             passive[skill_id] = [effects, description]
-    lines = ['{', '"active":{']
+    ranks = {key.lower(): value['rank'] for key, value in load(cache, 'psp/passive_skills.json').items()}
+    lines = ['{', '"ranks":' + json.dumps(ranks, separators=(',', ':')) + ',', '"active":{']
     items = list(active.items())
     for i, (key, value) in enumerate(items):
         lines.append(f'{json.dumps(key)}:{json.dumps(value, separators=(",", ":"), ensure_ascii=False)}{"," if i < len(items) - 1 else ""}')
@@ -560,9 +598,30 @@ def build_skill_details(cache: Path) -> None:
     print(f"wrote {SKILLS_OUT} ({len(active)} active, {len(passive)} passive)")
 
 
+def paldeck_order(pal: dict) -> tuple:
+    """Numeric deck order, with variants after their base (5, 5B, 6); unnumbered last."""
+    number = re.fullmatch(r"(\d+)([A-Za-z]*)", pal["palno"])
+    if number:
+        return (int(number[1]), number[2].upper(), pal["name"])
+    return (float("inf"), "", pal["name"])
+
+
+def build_lookups(cache: Path) -> None:
+    catalog = load(cache, "game8_paldeck.json")["collectionArraySchema"]["collectionItems"]
+    game8 = {pal["name"]: {"number": pal["palno"] if pal["palno"] != "-" else "", "url": pal["url"]} for pal in sorted(catalog, key=paldeck_order)}
+    (HERE.parent / "game8_lookup.json").write_text(json.dumps(game8, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    for kind in ("active", "passive"):
+        data = load(cache, f"psp/l10n/{kind}_skills.json")
+        for key, value in load(cache, f"server-manager/{kind}_skills.json").items():
+            data[key] = {field: value.get(field) or data.get(key, {}).get(field) for field in ("localized_name", "description")}
+        (HERE.parent / f"{kind}_skills_lookup.json").write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (HERE.parent / "pal_names_lookup.json").write_text(json.dumps(pal_names(), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def main() -> None:
-    cache = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent / "sandbox" / "completion_upstream"
-    fetch_all(cache)
+    cache = RAW
+    HERE.mkdir(parents=True, exist_ok=True)
+    build_lookups(cache)
     build_pal_traits(cache)
     build_skill_details(cache)
     data = build(cache)

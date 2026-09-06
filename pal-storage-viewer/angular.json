@@ -27,6 +27,7 @@
               {
                 "glob": "**/*",
                 "input": "../resources",
+                "ignore": ["*.png"],
                 "output": "/resources"
               }
             ],

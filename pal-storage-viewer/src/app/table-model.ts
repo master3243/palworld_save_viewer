@@ -11,10 +11,9 @@ export interface TableColumn {
   cellClass: string;
 }
 
-/** Precomputed text, hover title and IV tone of one cell. */
+/** Precomputed text and IV tone of one cell. */
 export interface CellView {
   text: string;
-  title: string;
   iv: '' | 'high' | 'perfect';
 }
 

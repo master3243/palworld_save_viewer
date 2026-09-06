@@ -6,8 +6,7 @@
 export interface LookupSources {
   activeSkillsJson: string;
   passiveSkillsJson: string;
-  passiveRanksLua: string;
-  palNamesLua: string;
+  palNamesJson: string;
   /** resources/pal_traits_lookup.json: element icon indexes and base work ranks per species. */
   palTraitsJson: string;
   /** resources/skill_details_lookup.json: what the in-game skill cards show. */
@@ -114,28 +113,11 @@ export class Lookups {
         this.passiveSkills.set(key, value.localized_name ?? '');
       }
     }
-    if (sources.passiveRanksLua) {
-      for (const rawLine of sources.passiveRanksLua.split(/\r?\n/)) {
-        const line = rawLine.trim().replace(/,+$/, '');
-        if (!line.startsWith('[') || !line.includes('=')) continue;
-        const [keyPart, valuePart] = line.split(/=(.*)/s);
-        const key = keyPart.trim().replace(/^\[|\]$/g, '').replace(/^"|"$/g, '').toLowerCase();
-        const rank = Number.parseInt(valuePart.trim(), 10);
-        if (Number.isNaN(rank)) continue;
-        this.passiveRanks.set(key, rank);
-      }
-    }
-    if (sources.palNamesLua) {
-      for (const rawLine of sources.palNamesLua.split(/\r?\n/)) {
-        const line = rawLine.trim().replace(/,+$/, '');
-        if (!line.includes('=') || !line.includes('"')) continue;
-        const [keyPart, valuePart] = line.split(/=(.*)/s);
-        const key = keyPart.trim();
-        const value = valuePart.trim().replace(/^"|"$/g, '');
-        if (key && value) {
-          this.palNames.set(key, value);
-          this.palNames.set(key.toLowerCase(), value);
-        }
+    if (sources.palNamesJson) {
+      for (const [key, value] of Object.entries(JSON.parse(sources.palNamesJson) as Record<string, string>)) {
+        this.palNames.set(key, value);
+        this.palNames.set(key.toLowerCase(), value);
+        this.palCanonical.set(key.toLowerCase(), key);
       }
     }
     if (sources.palTraitsJson) {
@@ -155,18 +137,14 @@ export class Lookups {
       const parsed = JSON.parse(sources.skillDetailsJson) as {
         active?: Record<string, ActiveSkillRow>;
         passive?: Record<string, PassiveSkillRow>;
+        ranks?: Record<string, number>;
       };
+      for (const [key, rank] of Object.entries(parsed.ranks ?? {})) this.passiveRanks.set(key, rank);
       for (const [key, row] of Object.entries(parsed.active ?? {})) {
         this.activeDetails.set(key, activeSkillFromRow(row));
         if (!this.activeSkills.has(key)) this.activeSkills.set(key, row[0]);
       }
       for (const [key, [effects]] of Object.entries(parsed.passive ?? {})) this.passiveEffects.set(key, effects);
-    }
-    for (const key of this.palNames.keys()) {
-      const lower = key.toLowerCase();
-      if (lower !== key || !this.palCanonical.has(lower)) {
-        if (!this.palCanonical.has(lower)) this.palCanonical.set(lower, key);
-      }
     }
   }
 

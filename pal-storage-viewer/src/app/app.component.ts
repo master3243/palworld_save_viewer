@@ -194,7 +194,7 @@ export class AppComponent {
   private readTableWidthLimit(): number {
     // Keep the page's horizontal padding visible on both sides.
     // The page padding shrinks on narrow screens (see .page in the stylesheet).
-    return Math.max(AppComponent.MIN_TABLE_WIDTH, window.innerWidth - 2 * (window.innerWidth <= 1280 ? 8 : 32));
+    return Math.max(AppComponent.MIN_TABLE_WIDTH, window.innerWidth - 2 * (window.innerWidth <= 1280 ? 8 : 24));
   }
 
   startResize(event: PointerEvent, side: 'left' | 'right'): void {
@@ -243,7 +243,6 @@ export class AppComponent {
   viewportHeight = 560;
   /** Visible width of the table scroller; the open card is centred within it. */
   viewportWidth: number | null = null;
-  palNameWidth = 140;
   detailHeight = 0;
   alphaImageSrc = '';
   readonly appVersion = APP_VERSION;
@@ -260,7 +259,6 @@ export class AppComponent {
     '2026-09-01-21-50/Players/00000000000000000000000000000001_dps.sav'
   ];
 
-  private measureContext?: CanvasRenderingContext2D;
 
   // Measured from the DOM after render; 40 matches the CSS row height and is
   // only the value used before the first measurement lands.
@@ -863,7 +861,6 @@ export class AppComponent {
       this.filteredRows = this.originalRows;
       this.rows = [...this.originalRows];
       this.columns = this.buildColumns(rows);
-      this.palNameWidth = this.measurePalNameWidth(rows);
       this.scheduleMeasure();
     } catch (error) {
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';
@@ -1037,12 +1034,6 @@ export class AppComponent {
     return this.formatSeparators(value);
   }
 
-  cellTitle(row: PalStorageRow, column: TableColumn): string {
-    const value = this.cellValue(row, column.key);
-    if (column.key === 'rank' && value) return `${column.title}: ${this.displayRank(value)} of 4`;
-    return value ? `${column.title}: ${value}` : column.title;
-  }
-
   private displayRank(value: string): string {
     const storedRank = Number(value);
     return Number.isFinite(storedRank) ? String(Math.max(0, Math.min(4, storedRank - 1))) : value;
@@ -1088,16 +1079,6 @@ export class AppComponent {
     });
   }
 
-  isHighIv(row: PalStorageRow, column: TableColumn): boolean {
-    if (!this.isIv(column)) return false;
-    const value = Number(this.cellValue(row, column.key));
-    return value >= 70 && value < 100;
-  }
-
-  isPerfectIv(row: PalStorageRow, column: TableColumn): boolean {
-    return this.isIv(column) && Number(this.cellValue(row, column.key)) === 100;
-  }
-
   /**
    * Chips and icons of a row, built once and reused: the template's *ngFor loops keep the same
    * arrays across change detection, so Angular leaves their DOM alone instead of rebuilding every
@@ -1113,7 +1094,6 @@ export class AppComponent {
         const value = Number(this.cellValue(row, column.key));
         cells[column.key] = {
           text: this.cellDisplay(row, column),
-          title: this.cellTitle(row, column),
           iv: this.isIv(column) ? (value === 100 ? 'perfect' : value >= 70 ? 'high' : '') : '',
         };
       }
@@ -1165,32 +1145,6 @@ export class AppComponent {
     return Array.from({ length: 4 }, (_, index) => index < rank);
   }
 
-  /**
-   * The table is `table-layout: fixed`, so column widths never follow content.
-   * Measure the longest name up front and set the width explicitly instead.
-   */
-  private measurePalNameWidth(rows: PalStorageRow[]): number {
-    const minWidth = 96;
-    const maxWidth = 320;
-    const cellPadding = 14;
-
-    // Fits fifteen characters of a typical name; longer names are cut with an ellipsis.
-    void rows;
-    const widest = Math.max(this.measureText('Pal Name', 750) + 18, this.measureText('Broncherry Aqua', 400));
-    return Math.round(Math.min(maxWidth, Math.max(minWidth, widest + cellPadding)));
-  }
-
-  private measureText(text: string, weight: number): number {
-    this.measureContext ??= document.createElement('canvas').getContext('2d') ?? undefined;
-    if (!this.measureContext) return text.length * 7.4;
-
-    const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-    this.measureContext.font =
-      `${weight} ${0.84 * rootSize}px Inter, ui-sans-serif, system-ui, -apple-system, ` +
-      `BlinkMacSystemFont, "Segoe UI", sans-serif`;
-    return this.measureContext.measureText(text).width;
-  }
-
   private buildColumns(rows: PalStorageRow[]): TableColumn[] {
     const keys = new Set<string>();
     for (const row of rows) {
@@ -1202,13 +1156,11 @@ export class AppComponent {
       ...Array.from(keys).sort((left, right) => left.localeCompare(right))
     ];
 
-    const multiplePlayers = this.saveSets.some((set) => set.players.length > 1);
     return orderedKeys.map((key) => ({
       key,
       label: this.toLabel(key),
       title: this.toTitle(key),
-      visible: this.defaultVisibleColumns.has(key)
-        || (key === 'owner_name' && multiplePlayers),
+      visible: this.defaultVisibleColumns.has(key),
       cellClass: this.columnClass(key),
     }));
   }

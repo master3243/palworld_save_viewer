@@ -237,7 +237,6 @@
             <th *ngIf="column.key === 'pal_name'" class="pal-icon-cell" title="Pal portrait"></th>
             <th
               [class]="column.cellClass"
-              [style.width.px]="column.key === 'pal_name' ? palNameWidth : null"
               [class.sorted]="sortColumn === column.key"
               [title]="column.title"
               (click)="toggleSort(column)"

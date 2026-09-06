@@ -1,0 +1,569 @@
+{
+    "food_buffs": {
+        "JamBun": {
+            "duration": 0,
+            "effects": []
+        },
+        "Salad": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 30
+                }
+            ]
+        },
+        "Omelet": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "FriedVegetables": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "HotDog": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 30
+                }
+            ]
+        },
+        "Pancake": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "SANResist",
+                    "value": 25
+                }
+            ]
+        },
+        "MarinatedMushrooms": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Defense",
+                    "value": 10
+                }
+            ]
+        },
+        "MushroomSoup": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 25
+                }
+            ]
+        },
+        "Carbonara": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Defense",
+                    "value": 20
+                }
+            ]
+        },
+        "BLT": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 15
+                }
+            ]
+        },
+        "Hamburger": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 30
+                },
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "CheeseBurger": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 30
+                },
+                {
+                    "type": "Defense",
+                    "value": 10
+                }
+            ]
+        },
+        "Pizza": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 30
+                },
+                {
+                    "type": "HungerResist",
+                    "value": 25
+                }
+            ]
+        },
+        "MeatSauce": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "SANResist",
+                    "value": 20
+                },
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "MushroomStew": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 10
+                },
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "Opium": {
+            "duration": 10,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 200
+                },
+                {
+                    "type": "SANResist",
+                    "value": -25000
+                }
+            ]
+        },
+        "Narcotic": {
+            "duration": 10,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 400
+                },
+                {
+                    "type": "SANResist",
+                    "value": -50000
+                }
+            ]
+        },
+        "ChickenSaute": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 30
+                }
+            ]
+        },
+        "GrilledSheepHerbs": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Defense",
+                    "value": 10
+                }
+            ]
+        },
+        "GenghisKhan": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "SANResist",
+                    "value": 20
+                },
+                {
+                    "type": "WorkSpeed",
+                    "value": 30
+                }
+            ]
+        },
+        "Eaglestew": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "SANResist",
+                    "value": 20
+                }
+            ]
+        },
+        "BaconEggs": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "StewedIceDeer": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 25
+                }
+            ]
+        },
+        "FriedChicken": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 30
+                },
+                {
+                    "type": "SANResist",
+                    "value": 25
+                }
+            ]
+        },
+        "HotDog_2": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Defense",
+                    "value": 20
+                }
+            ]
+        },
+        "DeerLocoMoco": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 20
+                }
+            ]
+        },
+        "DeerStew": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Defense",
+                    "value": 20
+                }
+            ]
+        },
+        "Hamburger_2": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 50
+                },
+                {
+                    "type": "SANResist",
+                    "value": 25
+                }
+            ]
+        },
+        "Cheeseburger_2": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 20
+                },
+                {
+                    "type": "HungerResist",
+                    "value": 50
+                }
+            ]
+        },
+        "FriedKelpie": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Defense",
+                    "value": 10
+                },
+                {
+                    "type": "SANResist",
+                    "value": 50
+                }
+            ]
+        },
+        "Chowder": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 50
+                },
+                {
+                    "type": "HungerResist",
+                    "value": 25
+                }
+            ]
+        },
+        "Potion_Low": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Regene_Hp",
+                    "value": 3
+                }
+            ]
+        },
+        "Potion": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Regene_Hp",
+                    "value": 5
+                }
+            ]
+        },
+        "Potion_High": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Regene_Hp",
+                    "value": 10
+                }
+            ]
+        },
+        "MushroomJuice": {
+            "duration": 10,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 600
+                },
+                {
+                    "type": "SANResist",
+                    "value": -100000
+                }
+            ]
+        },
+        "PoisonMushroom": {
+            "duration": 60,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": -25
+                }
+            ]
+        },
+        "Gyoza": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 25
+                },
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "StirFriedVegetables": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 10
+                },
+                {
+                    "type": "Defense",
+                    "value": 10
+                }
+            ]
+        },
+        "PotatoChips": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "SANResist",
+                    "value": 25
+                }
+            ]
+        },
+        "Yakisoba": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 20
+                }
+            ]
+        },
+        "SpringRolls": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "SANResist",
+                    "value": 50
+                },
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "Gratin": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 50
+                },
+                {
+                    "type": "Defense",
+                    "value": 10
+                }
+            ]
+        },
+        "Minestrone": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "WorkSpeed",
+                    "value": 40
+                }
+            ]
+        },
+        "Curry": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Attack",
+                    "value": 25
+                }
+            ]
+        },
+        "MeatAndPotatoes": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Defense",
+                    "value": 25
+                }
+            ]
+        },
+        "Quiche": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "HungerResist",
+                    "value": 50
+                },
+                {
+                    "type": "SANResist",
+                    "value": 50
+                }
+            ]
+        },
+        "Potion_Extreme": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Regene_Hp",
+                    "value": 15
+                }
+            ]
+        },
+        "OctopusGirl_Takoyaki": {
+            "duration": 1800,
+            "effects": [
+                {
+                    "type": "Exp_Increase",
+                    "value": 10
+                }
+            ]
+        },
+        "JellyfishFairy_jelly": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Exp_Increase",
+                    "value": 10
+                },
+                {
+                    "type": "Attack",
+                    "value": 10
+                }
+            ]
+        },
+        "JellyfishGhost_jelly": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "Exp_Increase",
+                    "value": 10
+                },
+                {
+                    "type": "Defense",
+                    "value": 10
+                }
+            ]
+        },
+        "Seafood_Salada": {
+            "duration": 1800,
+            "effects": [
+                {
+                    "type": "Exp_Increase",
+                    "value": 20
+                }
+            ]
+        },
+        "Supplement": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "FullStomachKeep",
+                    "value": 100
+                }
+            ]
+        },
+        "GrilledSwordCutlassFish": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "LeanBackAndKnockbackInvalid",
+                    "value": 1
+                }
+            ]
+        },
+        "OctopusGirl_Takoyaki2": {
+            "duration": 600,
+            "effects": [
+                {
+                    "type": "ExplosionResist",
+                    "value": 100
+                }
+            ]
+        }
+    }
+}

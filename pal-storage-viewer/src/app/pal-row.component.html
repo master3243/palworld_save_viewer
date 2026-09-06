@@ -7,7 +7,6 @@
     [class.iv-high]="view.cells[column.key]?.iv === 'high'"
     [class.iv-perfect]="view.cells[column.key]?.iv === 'perfect'"
     [class.sorted-column]="sortColumn === column.key"
-    [title]="view.cells[column.key]?.title"
   >
     <span
       *ngIf="column.key === 'pal_variant' && view.alpha"

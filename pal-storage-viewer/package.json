@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "sh ./serve.local.sh",
+    "start": "ng serve",
     "build": "ng build --configuration production"
   },
   "dependencies": {

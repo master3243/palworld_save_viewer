@@ -44,13 +44,13 @@ The project is open source here. Open an issue there and I will take a look. It 
 
 No, that's impossible. The website runs completely inside your browser and there is no backend (check the network traffic yourself).
 
-The codebase is open source here. It is hosted on GitHub Pages, which can only serve static websites that run entirely in your browser.
+The codebase is open source here. It is hosted on GitHub Page.
 
 ## Will this corrupt my save file?
 
 No, that's impossible. The browser can only read files, it can't edit/write files.
 
-The tool is read-only, you can download a .csv if you want a local csv copy of what the website shows.
+The tool is read-only, you can download separately a .csv if you want a local csv copy of what the website shows.
 
 ## Can I contribute a bug fix or a new feature?
 
@@ -80,16 +80,16 @@ Resources used while building the save decoder
   - `active_skills.json` to map internal combat move IDs to readable names and `passive_skills.json` to map internal passive skill IDs to in-game display names.
 - [AdminCommands Pal data](https://github.com/dkoz/AdminCommands/blob/main/AdminCommands/Scripts/enums/paldata.lua)
   - Map internal Pal species IDs to in-game Pal names.
-- [PalScouter passive ranks](https://github.com/tanguyannequin-dev/mod-palworld/blob/main/PalScouter/Scripts/passive_ranks.lua)
-  - Map passive skill IDs to fixed rank/color tiers.
 - [palworld-save-pal game data](https://github.com/oMaN-Rod/palworld-save-pal/tree/main/data/json)
-  - Master lists for the 100% Tracker.
+  - Master lists for the 100% Tracker, base-game passive ranks, and species/skill stats.
 - [PalWorldSaveTools game data](https://github.com/deafdudecomputers/PalWorldSaveTools/tree/main/resources/game_data)
   - Some side lists for the 100% Tracker.
 - [Palworld-Pal-Editor skin data](https://github.com/KrisCris/Palworld-Pal-Editor/tree/develop/src/palworld_pal_editor/assets/data)
   - Pal skin list for the 100% Tracker.
 - [paldb.cc map data](https://paldb.cc/en/Map)
   - Map location data for the 100% Tracker, Partner skill info, icons, species specific stats.
+- [Game8 Palpedia](https://game8.co/games/Palworld/archives/439556)
+  - Paldeck numbers (including variant suffixes) and guide links from its catalog JSON.
 
 
 
@@ -108,3 +108,50 @@ Dropping a whole world save folder onto the viewer provides the most complete vi
 
 
 Files from different worlds can be loaded side by side and the table will show which save file each Pal belongs to.
+
+## Build locally
+
+Use Node.js 22 and Python 3.10 or newer. From the repository root:
+
+```sh
+python3 build_completion_data.py
+cd pal-storage-viewer
+npm ci
+npm start
+```
+
+`npm run build` produces the static website in `pal-storage-viewer/dist/pal-storage-viewer/browser`.
+The default table columns and their order target a 1920×1080 viewport at 100% browser zoom.
+Extra columns can be enabled from column settings and may need horizontal scrolling.
+
+## Rebuild game data
+
+`completion_sources/raw/` holds the source JSON, Lua, JavaScript map dumps, and `html.db`.
+`html.db` is a ZIP archive containing the original HTML partner-skill pages, preserving every page's bytes while keeping
+the file count small. The builder reads the archive directly without extracting it. These pages
+supply resolved partner-skill descriptions and per-level values missing from the other inputs.
+The pinned GitHub files match their upstream bytes; the PalDB pages and map dumps retain the existing
+local snapshots. `completion_sources/sources.json` records source URLs and SHA-256 hashes; its
+`html.db` entry contains only the archive hash. Inside `html.db`, `sources.json` records each HTML
+page's URL and hash. The generated Game8 lookup is sorted numerically by Paldeck number,
+with variants immediately after their base number (5, 5B, 6) and unnumbered entries last.
+
+`python3 build_completion_data.py` reads those inputs offline and regenerates every game-data lookup
+in `resources/`, plus `resources/completion/completion-data.json`. It does not download or modify raw
+files and needs no sandbox cache or third-party Python packages. The raw inputs and builder belong
+in the source distribution; Angular only packages the generated data and runtime assets. README
+screenshots are excluded from the website build.
+
+For a source update, save the original response bytes in `completion_sources/raw/`, update its URL
+and hash in `sources.json`, and run the builder. For partner pages, replace the corresponding member
+of `html.db` without editing its HTML, update its entry in the internal `sources.json`, then update
+the archive hash in `completion_sources/sources.json`. Review the generated differences before accepting
+them: a newer source is not automatically more accurate. The builder uses palworld-save-pal for
+base-game ranks and stats, PalWorldSaveTools for missing variants, and PalDB for resolved partner
+skill text. Server Manager supplies descriptions with readable species names; missing descriptions
+fall back to the pinned datamine. Game8 supplies guide links and Paldeck numbers, not combat stats.
+The old APSE mod rank table is no longer used for base-game skill colors.
+
+The tracker still contains explicit fallbacks for journal titles, extra bosses, disabled Paldeck
+entries, and the level cap inferred from the technology table. Those assumptions are kept in the
+builder rather than written into the raw sources.

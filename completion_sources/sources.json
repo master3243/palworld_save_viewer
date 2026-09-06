@@ -1,0 +1,160 @@
+{
+  "notes": {
+    "github": "Pinned snapshots; all JSON and Lua files verified byte-for-byte against their upstream URLs on 2026-09-06.",
+    "paldb": "Existing map and HTML snapshots preserved from the repository/local cache. Original capture dates were not recorded; hashes identify the snapshots. Live pages may change. The Palpagos map also matches its upstream JavaScript response byte-for-byte on 2026-09-06.",
+    "game8": "Unmodified public catalog JSON response saved on 2026-09-06. Only guide links and Paldeck numbers are used."
+  },
+  "files": {
+    "admincommands/paldata.lua": {
+      "url": "https://raw.githubusercontent.com/dkoz/AdminCommands/e72e637a62ff3967bf4c2cddc84ff2b1ac66732a/AdminCommands/Scripts/enums/paldata.lua",
+      "sha256": "2413d75701fe51c6073b8b60dc9a603b163cc96771600255022ab719910aa824"
+    },
+    "game8_paldeck.json": {
+      "url": "https://game8.co/api/tool_structural_mappings/810.json?updatedAt=1786614044",
+      "sha256": "1fa3e29197c445b24b6ce1cc0d49f232f07c36a58d95778bc117f7e6b94dc5bb"
+    },
+    "html.db": {
+      "sha256": "f739971626d84a4a6966b43f158c1d85bf8bc8ce51dd808a37fc706d7293f4b2"
+    },
+    "kc/skin_data.json": {
+      "url": "https://raw.githubusercontent.com/KrisCris/Palworld-Pal-Editor/3efb2d4b5d1f5710ee672d449b5162fe63745229/src/palworld_pal_editor/assets/data/skin_data.json",
+      "sha256": "7dde2c0a1a316c9d0b5eaa160d28b8fc6b544bbe072d767b6dfb791e2be4ca1d"
+    },
+    "paldb_map_palpagos.js": {
+      "url": "https://paldb.cc/js/map_data_en.js?_=1788084268",
+      "sha256": "fa066acd32931228e27d270bfd8f71788d2a52ff1228d4b78c934577a9daf9f5"
+    },
+    "paldb_map_tree.js": {
+      "url": "https://paldb.cc/en/Map",
+      "sha256": "0efa15b5a8e66ccb8230a33e9f9e3e29ce4e708db6fe3ad9e06d15ceaf0b4d0b"
+    },
+    "psp/active_skills.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/active_skills.json",
+      "sha256": "1a1f9453a2215d4c82e32f1dfff87e5ee0bbb37294b123a2c25e837ec538ddad"
+    },
+    "psp/ancient_ruins.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/ancient_ruins.json",
+      "sha256": "04006919ec5919bd383ac25c2b0afb61d8cf72a1bb3ff02747b9584d224ba466"
+    },
+    "psp/bosses.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/bosses.json",
+      "sha256": "4839e377b64f817672ceca208a38da6f44ff5dd431125af86714a701540d26de"
+    },
+    "psp/exp.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/exp.json",
+      "sha256": "7a5f695cd40411fe96c72e7ca7030d268e315b4e613f3aaed1919e6405dc4796"
+    },
+    "psp/fast_travel_points.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/fast_travel_points.json",
+      "sha256": "55ae36ca6a8c5d8cca32113e755f6c4f85691e3a4ee36bba007daf314b68ba18"
+    },
+    "psp/friendship.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/friendship.json",
+      "sha256": "a7ca52c4591bcaa22bdedefb467bc130c39ae18e9e4317b734bd1ef8b37814ee"
+    },
+    "psp/items.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/items.json",
+      "sha256": "25faa3bce9438502fa995166a799b4a47aa9cc3f41e5bd29235a7c84fd4d2670"
+    },
+    "psp/l10n/active_skills.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/active_skills.json",
+      "sha256": "a782edbb9f91fca8aba8d5d4f0055efc17f86cb59b894373a8dcf25171b2f0ce"
+    },
+    "psp/l10n/fast_travel_points.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/fast_travel_points.json",
+      "sha256": "61292cc474a45612ebacc04ec3b7b7ac87920dafaab68b544f416a3f405a02ce"
+    },
+    "psp/l10n/items.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/items.json",
+      "sha256": "4bd1f64b86d64b31cb0e596800b0d584b72fd313e7f8322aeb3588d53b2c3767"
+    },
+    "psp/l10n/lab_research.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/lab_research.json",
+      "sha256": "69c097666586edbcb7e7691b32186349fcda37d82df7b4a63f0d7927d530ab09"
+    },
+    "psp/l10n/missions.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/missions.json",
+      "sha256": "af81e3ddf241a2b241b3637738807fa372cd2e98eea78f634a6a096a6609bc5a"
+    },
+    "psp/l10n/pals.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/pals.json",
+      "sha256": "35ef9100abad65d64e33c6c0680bc44bc297f6454b03e388ffacca43a3d4c0bf"
+    },
+    "psp/l10n/passive_skills.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/passive_skills.json",
+      "sha256": "bcb46c35f1bc2fcf39b12afd29246b16b8699a86a51b970f78276c4bb0b393e0"
+    },
+    "psp/l10n/relics.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/relics.json",
+      "sha256": "f61434523f4802c7ed05cea9d45c43ff7390da0deb263d98e431f9187e1ba5c3"
+    },
+    "psp/l10n/technologies.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/technologies.json",
+      "sha256": "084fbd583f364a0dde5dd3d7fa388d0b57bd2c8386252e41eed811e868c9ac6a"
+    },
+    "psp/l10n/towers.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/l10n/en/towers.json",
+      "sha256": "29d424865009fa183e51427d96efbbca367df48b227f96a606d889e2f3927a56"
+    },
+    "psp/lab_research.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/lab_research.json",
+      "sha256": "c3fd23d942acb3fc10e8a7f5705e9b5bbf46723887cffbe32f3f69a65b198d2c"
+    },
+    "psp/missions.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/missions.json",
+      "sha256": "db68e53259546749a822ff68300606f861630e3a250662bdc69b1e72a1028893"
+    },
+    "psp/notes.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/notes.json",
+      "sha256": "d248486c39d6d343ce9f4062676d731f50423e24faaf7f1a6e4c398634bcdad8"
+    },
+    "psp/pals.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/pals.json",
+      "sha256": "dba30027f90b4024f26f1320faafe8d3dd46b3dacfba36a7de59364e6db57e46"
+    },
+    "psp/passive_skills.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/passive_skills.json",
+      "sha256": "2b8f2380b6b86e3f37575d5acac0d72b761efcf093df0506b93f7279c9632861"
+    },
+    "psp/relics.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/relics.json",
+      "sha256": "7e7878b70113a9da8a6a5a8a1e962a271fa73304425fbd4177ee4ca0101eb0b0"
+    },
+    "psp/technologies.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/technologies.json",
+      "sha256": "40f53e26ae13fee58a9d8cf37eed94acae3a3be68d5f85fa17f851b4b5a51d33"
+    },
+    "psp/towers.json": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json/towers.json",
+      "sha256": "d85f588bcc360df4ccb6a00e964b541a3e4b1cdeb20f8a1d50162739abf92eb0"
+    },
+    "pwst/characters.json": {
+      "url": "https://raw.githubusercontent.com/deafdudecomputers/PalWorldSaveTools/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data/characters.json",
+      "sha256": "39daa06810a247c8baa25a074f6d4b06c87695b4ddbd07df4356d1e76e29b41b"
+    },
+    "pwst/fast_travel_points.json": {
+      "url": "https://raw.githubusercontent.com/deafdudecomputers/PalWorldSaveTools/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data/fast_travel_points.json",
+      "sha256": "4361025dd056ba595b59a8bf76bf714437154e270f69f45e2c8c67bea2f42981"
+    },
+    "pwst/foodbuffdata.json": {
+      "url": "https://raw.githubusercontent.com/deafdudecomputers/PalWorldSaveTools/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data/foodbuffdata.json",
+      "sha256": "bb1897268917b50b2da33f1b2c383202cf0d359970720533c8ed746f0fd50f11"
+    },
+    "pwst/relic_data.json": {
+      "url": "https://raw.githubusercontent.com/deafdudecomputers/PalWorldSaveTools/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data/relic_data.json",
+      "sha256": "5d85304670c3b94bd282435f6b4ec05528a8fcdedcf97feac71d64ad567460f0"
+    },
+    "pwst/world_map_areas.json": {
+      "url": "https://raw.githubusercontent.com/deafdudecomputers/PalWorldSaveTools/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data/world_map_areas.json",
+      "sha256": "a6fbb258cc33890c3098b069d340a775bebb23f123b8ad79713fd68b086bcce4"
+    },
+    "server-manager/active_skills.json": {
+      "url": "https://raw.githubusercontent.com/amantu-qbit/palworld-server-manager/ef12f443a855c896ecd04e85e0fd0e871158a627/bridge/data/active_skills.json",
+      "sha256": "65d1ad5919bb584b5a4d7f5b8287836132fd416732c2305fedee0d1293f3bdd1"
+    },
+    "server-manager/passive_skills.json": {
+      "url": "https://raw.githubusercontent.com/amantu-qbit/palworld-server-manager/ef12f443a855c896ecd04e85e0fd0e871158a627/bridge/data/passive_skills.json",
+      "sha256": "f4e09c0cb6911625af29754b253ca8cf7e3a95d3396d85c8d1a0c8731b20bc42"
+    }
+  }
+}
