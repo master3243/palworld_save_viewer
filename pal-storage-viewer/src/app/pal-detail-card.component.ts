@@ -4,7 +4,7 @@ import { TraitIcon, elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
 import { condenseWorkBonus } from '../backend/stats';
 import { GameDataService } from './game-data.service';
-import { TooltipData, TooltipDirective, TextSegment, LevelLine } from './game-tooltip.component';
+import { TooltipData, TooltipDirective, TextSegment, LevelLine, WorkLevelRow } from './game-tooltip.component';
 import { ElementChartComponent } from './element-chart.component';
 
 import { Game8LookupService } from './game8-lookup.service';
@@ -123,7 +123,7 @@ export class PalDetailCardComponent implements OnChanges {
     const souls = this.numberFor(soulKey) ?? 0;
     const pct = this.numberFor(pctKey) ?? 0;
     const foodPct = foodKey ? this.numberFor(foodKey) ?? 0 : 0;
-    const rows: [string, string][] = [];
+    const rows: [string, string, string?][] = [];
     const parts = this.statParts(key);
     const level = this.numberFor('level') ?? 1;
     const ivValue = this.numberFor(({ max_hp: 'iv_hp', attack: 'iv_attack', defense: 'iv_defense' } as Record<string, string>)[key] ?? '') ?? 0;
@@ -132,14 +132,14 @@ export class PalDetailCardComponent implements OnChanges {
       rows.push([key === 'max_hp' ? `Starting value (500 + 5 × Lv.${level})` : 'Starting value', String(flat)]);
       rows.push([`Species ${scale} × Lv.${level}`, `+${species}`]);
       rows.push([`IV ${ivValue}`, `+${ivPart}`]);
-      if (trust || stars || souls) rows.push(['Species + level + IV', String(flat + species + ivPart)]);
+      if (trust || stars || souls) rows.push(['Species + level + IV', String(flat + species + ivPart), 'subtotal']);
     } else {
       rows.push(['Species + level + IV', String(base - trust)]);
     }
     if (stars) rows.push([`Condensing ${'★'.repeat(stars)}`, `+${stars * 5}%`]);
     if (souls) rows.push([`Pal Souls (rank ${souls})`, `+${souls * 3}%`]);
     if (trust) rows.push([`Bonus from Trust (rank ${this.numberFor('trust_rank') ?? 0})`, `+${trust}`]);
-    if (trust || stars || souls) rows.push(['Base', String(base)]);
+    if (trust || stars || souls) rows.push(['Base', String(base), 'subtotal']);
     if (pct) rows.push(['Passive Skills', `${pct > 0 ? '+' : ''}${pct}%`]);
     if (foodPct) rows.push([`Food: ${this.valueFor('food_effect')}`, `${foodPct > 0 ? '+' : ''}${foodPct}%`]);
     const researchPct = key === 'attack' ? this.numberFor('research_attack_pct') : key === 'defense' ? this.numberFor('research_defense_pct') : null;
@@ -331,25 +331,29 @@ export class PalDetailCardComponent implements OnChanges {
     this.fields = this.computeFields();
   }
 
-  /** Each work suitability with what it would be at every condensing level (handbook ranks kept). */
+  /** Every work chip opens the same grid: the Pal's whole suitability line at each condensing rank
+   * (handbook ranks kept), with the hovered work marked and each level-up in gold. */
   private computeWorkChips(): WorkChip[] {
     const species = this.listFor('work_species').map(Number);
     const stars = this.displayRank;
     const known = species.length === this.works.length && species.every((rank) => Number.isFinite(rank));
-    const current = known ? condenseWorkBonus(species, stars) : [];
-    const perStar = known ? [0, 1, 2, 3, 4].map((count) => condenseWorkBonus(species, count)) : [];
-    return this.works.map((work, index) => {
-      const tooltip: TooltipData = { title: work.name, titleRight: work.rank ? `Lv.${work.rank}` : '—' };
-      if (!work.rank) tooltip.intro = ['This Pal is not suited to this work.'];
-      if (known && work.rank) {
-        const handbook = work.rank - species[index] - current[index];
-        tooltip.intro = ['Level at each condensing rank:'];
-        tooltip.levels = perStar.map((bonus, count) => {
-          const rank = species[index] + handbook + bonus[index];
-          return { label: `${count}★`, segments: [{ text: `Lv.${rank}`, value: true }], current: count === stars };
-        });
-        if (handbook > 0) tooltip.note = `Includes +${handbook} from handbooks or items.`;
-      }
+    if (!known) return this.works.map((work) => ({ ...work, tooltip: { title: work.name, titleRight: work.rank ? `Lv.${work.rank}` : '—' } }));
+    const current = condenseWorkBonus(species, stars);
+    const handbook = this.works.map((work, index) => work.rank - species[index] - current[index]);
+    const able = this.works.map((work, index) => index).filter((index) => species[index] + handbook[index] > 0);
+    const rankAt = (count: number) => { const bonus = condenseWorkBonus(species, count); return able.map((index) => species[index] + handbook[index] + bonus[index]); };
+    const perStar = [0, 1, 2, 3, 4].map(rankAt);
+    const extra = handbook.reduce((sum, value) => sum + Math.max(0, value), 0);
+    return this.works.map((work, hovered) => {
+      const rows: WorkLevelRow[] = perStar.map((ranks, count) => ({
+        stars: count,
+        current: count === stars,
+        items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: count > 0 && rank > perStar[count - 1][slot], hot: able[slot] === hovered })),
+      }));
+      const tooltip: TooltipData = { title: 'Work Suitability', titleRight: `${'★'.repeat(stars)}${'☆'.repeat(4 - stars)}` };
+      if (!work.rank) tooltip.intro = [`${work.name}: this Pal is not suited to it.`];
+      if (able.length) { tooltip.intro = [...(tooltip.intro ?? []), 'Levels at each condensing rank:']; tooltip.work = rows; }
+      if (extra > 0) tooltip.note = `Includes +${extra} from handbooks or items.`;
       return { ...work, tooltip };
     });
   }

@@ -63,8 +63,12 @@ export class ElementChartComponent {
     const a = NODES.find((n) => n.index === from)!;
     const b = NODES.find((n) => n.index === to)!;
     const dx = b.x - a.x; const dy = b.y - a.y; const length = Math.hypot(dx, dy);
-    const gap = 44; // start and end just outside the diamonds
-    return { x1: a.x + dx / length * gap, y1: a.y + dy / length * gap, x2: b.x - dx / length * gap, y2: b.y - dy / length * gap };
+    const ux = dx / length; const uy = dy / length;
+    // A diamond is |x| + |y| <= half-diagonal, so its edge along this direction is that far divided by
+    // |ux| + |uy|; every arrow then starts and ends the same distance outside the edge.
+    const edge = 24 * Math.SQRT2 / (Math.abs(ux) + Math.abs(uy));
+    const gap = edge + 12;
+    return { x1: a.x + ux * gap, y1: a.y + uy * gap, x2: b.x - ux * gap, y2: b.y - uy * gap };
   });
 
   iconOf(index: number): string { return `assets/icons/element_${String(index).padStart(2, '0')}.webp`; }

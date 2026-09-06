@@ -12,6 +12,9 @@ export interface TextSegment { text: string; value: boolean; }
 /** One partner-skill level in the tooltip's level list. */
 export interface LevelLine { label: string; segments: TextSegment[]; current: boolean; }
 
+/** One condensing rank of the work grid: filled stars and every suitability's level at that rank. */
+export interface WorkLevelRow { stars: number; current: boolean; items: { src: string; name: string; rank: number; up: boolean; hot: boolean }[]; }
+
 export interface TooltipData {
   title: string;
   /** Figures shown right of the title, e.g. "687 ≫ 550". */
@@ -24,8 +27,10 @@ export interface TooltipData {
   stats?: { icon?: 'clock' | 'power'; label: string; value: string }[];
   /** Status effect line under the badge, like the game's "Aggregate: Burn   100". */
   effect?: { label: string; value: string };
-  /** Label/value rows, e.g. a stat breakdown. */
-  rows?: [string, string][];
+  /** Label/value rows, e.g. a stat breakdown; a third item 'subtotal' draws a divider above the row. */
+  rows?: [string, string, string?][];
+  /** Work suitability at each condensing rank. */
+  work?: WorkLevelRow[];
   /** Left-aligned label + blue figure lines, like the game's passive skill card ("Attack +30.0%"). */
   inline?: [string, string][];
   lines?: string[];
@@ -54,7 +59,13 @@ export interface TooltipData {
       <div class="tip-inline" *ngIf="data.inline?.length"><div *ngFor="let row of data.inline"><span>{{ row[0] }}</span><b *ngIf="row[1]">{{ row[1] }}</b></div></div>
       <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
       <div class="tip-rows" *ngIf="data.rows?.length">
-        <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
+        <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'" [class.subtotal]="row[2] === 'subtotal'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
+      </div>
+      <div class="tip-work" *ngIf="data.work?.length">
+        <div class="tip-work-row" *ngFor="let row of data.work" [class.current]="row.current">
+          <span class="tip-stars"><i *ngFor="let slot of [0, 1, 2, 3]" [class.on]="slot < row.stars">★</i></span>
+          <span class="tip-work-items"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [class.hot]="item.hot" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
+        </div>
       </div>
       <p class="tip-line" *ngFor="let line of data.lines">{{ line }}</p>
       <ol class="tip-levels" *ngIf="data.levels?.length">
@@ -93,6 +104,17 @@ export interface TooltipData {
     .tip-row { display: flex; gap: 14px; justify-content: space-between; line-height: 1.5; }
     .tip-row span { color: #b9cbd4; } .tip-row b { color: #5ecbff; font-variant-numeric: tabular-nums; }
     .tip-row.total { border-top: 1px solid rgba(190, 220, 235, .18); margin-top: 3px; padding-top: 3px; } .tip-row.total b { color: #fff; }
+    .tip-row.subtotal { border-top: 1px solid rgba(190, 220, 235, .12); margin-top: 2px; padding-top: 2px; }
+    .tip-work { border-top: 1px solid rgba(190, 220, 235, .18); margin: 6px 12px 0; padding: 6px 0 8px; }
+    .tip-work-row { align-items: center; border-left: 3px solid transparent; display: grid; gap: 10px; grid-template-columns: auto 1fr; margin-left: -12px; padding: 3px 0 3px 9px; }
+    .tip-work-row.current { background: linear-gradient(90deg, rgba(255, 211, 122, .14), transparent); border-left-color: #ffd37a; }
+    .tip-stars { display: inline-flex; font-size: .8rem; gap: 1px; letter-spacing: 0; }
+    .tip-stars i { color: rgba(190, 220, 235, .25); font-style: normal; } .tip-stars i.on { color: #ffd37a; text-shadow: 0 0 5px rgba(255, 211, 122, .5); }
+    .tip-work-items { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+    .tip-work-item { align-items: center; background: rgba(255, 255, 255, .05); border: 1px solid transparent; border-radius: 3px; color: #c9d8df; display: inline-flex; gap: 3px; padding: 1px 5px 1px 3px; }
+    .tip-work-item img { height: 16px; width: 16px; } .tip-work-item b { font-size: .78rem; font-variant-numeric: tabular-nums; }
+    .tip-work-item.up b { color: #ffe08a; } .tip-work-item.hot { background: rgba(94, 203, 255, .12); border-color: rgba(94, 203, 255, .45); }
+    .tip-work-row.current .tip-work-item b { color: #fff; } .tip-work-row.current .tip-work-item.up b { color: #ffe08a; }
     .tip-line { border-top: 1px solid rgba(190, 220, 235, .18); line-height: 1.45; margin: 6px 12px 0; padding: 7px 0 8px; }
     .tip-line + .tip-line { border-top: 0; margin-top: 0; padding-top: 0; }
     .tip-rich { line-height: 1.45; margin-bottom: 8px; }
