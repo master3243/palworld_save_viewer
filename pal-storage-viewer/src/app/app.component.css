@@ -11,6 +11,13 @@
   position: relative;
 }
 
+/* Narrow screens: give the table the width instead of the page margins. */
+@media (max-width: 1280px) {
+  .page {
+    padding: 12px 8px 16px;
+  }
+}
+
 .github-meta {
   align-items: center;
   bottom: 4px;
@@ -555,18 +562,6 @@ th.icon-cell .sort-marker {
   min-width: 0;
 }
 
-.arrow-cell {
-  padding-left: 3px;
-  padding-right: 3px;
-  text-align: center;
-  width: 34px;
-}
-
-th.arrow-cell,
-td.arrow-cell {
-  width: 34px;
-}
-
 /*
  * Fixed so every row is identical regardless of content: icon cells use a
  * larger font-size, so a row with a gender glyph would otherwise be taller
@@ -574,7 +569,7 @@ td.arrow-cell {
  */
 .data-row {
   cursor: pointer;
-  height: 40px;
+  height: 48px;
 }
 
 .data-row.open {
@@ -703,12 +698,12 @@ th.nickname-cell.sorted {
 th.rank-cell,
 td.rank-cell {
   box-sizing: border-box;
-  max-width: 58px;
-  min-width: 58px;
-  padding-left: 5px;
-  padding-right: 5px;
+  max-width: 45px;
+  min-width: 45px;
+  padding-left: 3px;
+  padding-right: 3px;
   text-align: center;
-  width: 58px;
+  width: 45px;
 }
 
 th.level-cell,
@@ -729,9 +724,9 @@ th.level-cell.sorted {
 }
 
 th.rank-cell.sorted {
-  max-width: 74px;
-  min-width: 74px;
-  width: 74px;
+  max-width: 60px;
+  min-width: 60px;
+  width: 60px;
 }
 
 .table-rank-stars {
@@ -898,20 +893,19 @@ td.type-cell .trait-icons {
   justify-content: center;
 }
 
-/* Four passive chips side by side. */
+/* Up to four passive chips as a 2x2 grid, like the pal card, so names stay readable at 300px. */
 th.skills-cell,
 td.skills-cell {
-  max-width: 360px;
-  min-width: 360px;
+  max-width: 300px;
+  min-width: 300px;
   overflow: hidden;
-  width: 360px;
+  width: 300px;
 }
 
 .passive-chips {
-  align-items: center;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
+  display: grid;
+  gap: 2px 4px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
@@ -925,9 +919,9 @@ td.skills-cell {
   display: inline-flex;
   /* Natural width; only chips that do not fit shrink and truncate. */
   flex: 0 1 auto;
-  font-size: 0.66rem;
+  font-size: 0.64rem;
   gap: 3px;
-  height: 20px;
+  height: 16px;
   min-width: 0;
   padding: 0 6px 0 4px;
 }
@@ -1380,25 +1374,28 @@ td.save-cell.sorted-column {
 
 th.where-cell.sorted,
 td.where-cell.sorted-column {
-  max-width: 124px;
-  min-width: 112px;
-  width: 124px;
+  max-width: 76px;
+  min-width: 76px;
+  width: 76px;
 }
 
 td.save-cell {
   font-weight: 600;
 }
 
+/* Fits "Where", "DimsPS", "Pal Box" and "Base 1". */
 th.where-cell,
 td.where-cell {
   box-sizing: border-box;
-  max-width: 76px;
-  min-width: 76px;
+  max-width: 60px;
+  min-width: 60px;
   overflow: hidden;
+  padding-left: 4px;
+  padding-right: 4px;
   text-overflow: ellipsis;
   transition: width 160ms ease, min-width 160ms ease, max-width 160ms ease;
   white-space: nowrap;
-  width: 76px;
+  width: 60px;
 }
 
 /* Full screen table -------------------------------------------------- */

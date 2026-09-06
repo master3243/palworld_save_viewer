@@ -233,7 +233,6 @@
       <table>
         <thead>
           <tr>
-            <th class="arrow-cell"></th>
             <ng-container *ngFor="let column of displayedColumns; trackBy: trackColumn">
             <th *ngIf="column.key === 'pal_name'" class="pal-icon-cell" title="Pal portrait"></th>
             <th
@@ -277,17 +276,6 @@
               [class.open]="isRowOpen(item.index)"
               (click)="toggleRow(item.index, $event)"
             >
-              <td class="arrow-cell">
-                <button
-                  class="row-toggle"
-                  type="button"
-                  [attr.aria-label]="isRowOpen(item.index) ? 'Collapse Pal details' : 'Expand Pal details'"
-                  [attr.aria-expanded]="isRowOpen(item.index)"
-                  (click)="$event.stopPropagation(); toggleRow(item.index, $event)"
-                >
-                  <span class="row-arrow" [class.open]="isRowOpen(item.index)">&gt;</span>
-                </button>
-              </td>
               <ng-container *ngFor="let column of displayedColumns; trackBy: trackColumn">
               <td *ngIf="column.key === 'pal_name'" class="pal-icon-cell">
                 <img *ngIf="palIconSrc(item.row) as icon" class="pal-icon" [src]="icon" alt="">

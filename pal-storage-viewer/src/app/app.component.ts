@@ -199,7 +199,8 @@ export class AppComponent {
 
   private readTableWidthLimit(): number {
     // Keep the page's horizontal padding visible on both sides.
-    return Math.max(AppComponent.MIN_TABLE_WIDTH, window.innerWidth - 2 * 32);
+    // The page padding shrinks on narrow screens (see .page in the stylesheet).
+    return Math.max(AppComponent.MIN_TABLE_WIDTH, window.innerWidth - 2 * (window.innerWidth <= 1280 ? 8 : 32));
   }
 
   startResize(event: PointerEvent, side: 'left' | 'right'): void {
@@ -269,7 +270,7 @@ export class AppComponent {
 
   // Measured from the DOM after render; 40 matches the CSS row height and is
   // only the value used before the first measurement lands.
-  private rowHeight = 40;
+  private rowHeight = 48;
   private readonly virtualBuffer = 12;
 
   get displayedColumns(): TableColumn[] {
@@ -318,8 +319,8 @@ export class AppComponent {
   }
 
   get detailColspan(): number {
-    // The arrow column plus the unsortable portrait column that precedes the Pal name.
-    return this.displayedColumns.length + 1 + (this.showsPalIcons ? 1 : 0);
+    // Plus the unsortable portrait column that precedes the Pal name.
+    return this.displayedColumns.length + (this.showsPalIcons ? 1 : 0);
   }
 
   get showsPalIcons(): boolean {
