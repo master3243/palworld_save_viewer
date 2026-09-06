@@ -248,7 +248,8 @@ export function buildRecord(
     gender: readEnum(buf, prop('Gender'), 'EPalGenderType::'),
     nickname: readStr(buf, prop('NickName')),
     filtered_nickname: readStr(buf, prop('FilteredNickName')),
-    level: readByte(buf, prop('Level')),
+    // The game omits Level until a Pal gains a level; it is 1 in game, so show 1 (user's choice).
+    level: readByte(buf, prop('Level')) ?? 1,
     exp: readInt64(buf, prop('Exp')),
     rank: readByte(buf, prop('Rank')),
     rank_up_exp: readUInt16(buf, prop('RankUpExp')),

@@ -823,6 +823,14 @@ td.icon-cell {
   width: 22px;
 }
 
+.ui-icon {
+  display: inline-block;
+  height: 20px;
+  object-fit: contain;
+  vertical-align: middle;
+  width: 20px;
+}
+
 /* One work suitability: the icon with its level in the corner and a chevron when raised. */
 .work-badge {
   display: inline-block;

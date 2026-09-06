@@ -6,7 +6,7 @@
  *   scaling' = species scaling + trust rate * trust rank            (trust adds to the species stat)
  *   HP  = floor(500 + 5L + scaling'.hp * 0.5 * L * (1 + 0.3 IV/100))
  *   ATK = floor(100 + scaling'.atk * 0.075 * L * (1 + 0.3 IV/100)), DEF the same from 50
- *   then x (1 + 0.05 stars) -> floor, x (1 + 0.03 soul rank) -> floor, x (1 + passives %) -> round
+ *   then x (1 + 0.05 stars) -> floor, x (1 + 0.03 soul rank) -> floor, x (1 + passives % + food % + research %) -> round
  *   work speed = floor((70 + 7 stars) * (1 + passives %))
  *   a food status effect multiplies on top while its timer runs.
  */
@@ -120,9 +120,10 @@ export function trustRank(points: number, lookups: Lookups): { rank: number; pro
 
 const roundHalfUp = (value: number) => Math.floor(value + 0.5);
 
-/** Base value with each percentage applied as its own multiplier, rounded like the game. */
+/** Base value with the percentages summed and applied once, rounded like the game
+ * (a base Bellanoir with Serenity +10% and research +8% reads 307 = 260 × 1.18, not 260 × 1.1 × 1.08). */
 export function finalStat(base: number, percents: number[]): number {
-  return roundHalfUp(percents.reduce((value, pct) => value * (1 + pct / 100), base));
+  return roundHalfUp(base * (1 + percents.reduce((sum, pct) => sum + pct, 0) / 100));
 }
 
 /** Attack and defense percentages a guild's completed lab research gives its base workers, with the items that count. */

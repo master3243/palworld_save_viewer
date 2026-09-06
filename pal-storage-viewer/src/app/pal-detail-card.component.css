@@ -40,7 +40,13 @@
 .trait-line, .alpha-badge, .favorite-badge { align-items: center; display: inline-flex; vertical-align: middle; }
 h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
 .gender { color: #58cfff; font-size: 1.25rem; font-weight: 900; }.gender.female { color: #ff6c9d; }
-.lucky-badge { background: rgba(255, 224, 111, .12); border: 1px solid rgba(255, 224, 111, .42); border-radius: 20px; color: #ffe06f; font-size: .68rem; font-weight: 800; padding: 3px 8px; text-transform: uppercase; }
+.lucky-badge { align-items: center; background: rgba(255, 224, 111, .12); border: 1px solid rgba(255, 224, 111, .42); border-radius: 20px; color: #ffe06f; display: inline-flex; font-size: .68rem; font-weight: 800; gap: 4px; padding: 2px 8px 2px 4px; text-transform: uppercase; }
+.lucky-badge img { height: 18px; width: 18px; }
+.gender-image { height: 22px; object-fit: contain; width: 22px; }
+.element-chip { align-items: center; background: #4a5a66; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-size: .78rem; font-weight: 800; gap: 6px; height: 26px; padding: 0 18px 0 8px; }
+.element-chip img { height: 20px; width: 20px; }
+.element-chip[data-element="0"] { background: #8f7a68; }.element-chip[data-element="1"] { background: #c04a2c; }.element-chip[data-element="2"] { background: #2f7fd6; }.element-chip[data-element="3"] { background: #b8961c; }.element-chip[data-element="4"] { background: #5f9a2a; }.element-chip[data-element="5"] { background: #5d3c8f; }.element-chip[data-element="6"] { background: #7a3fb0; }.element-chip[data-element="7"] { background: #a0642c; }.element-chip[data-element="8"] { background: #3aa7c9; }
+.spirit { align-items: center; color: #eafaff; display: inline-flex; font-size: .8rem; gap: 3px; margin-top: 4px; }.spirit img { height: 22px; width: 18px; }
 .alpha-badge { height: 21px; object-fit: contain; width: 21px; }
 .favorite-badge { height: 24px; object-fit: contain; width: 24px; }
 .wiki-links { display: inline-flex; gap: 7px; margin-left: auto; }
@@ -76,7 +82,7 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .bar i { background: #48e2a5; display: block; height: 100%; }
 .bar-row strong { font-size: .78rem; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .bar-icon img { height: 15px; object-fit: contain; width: 15px; }
-.bar-row.trust .bar-icon img { height: 18px; width: 18px; }.bar-row[data-tone="hunger"] .bar-icon img, .food-line .bar-icon img { height: 13px; width: 15px; }
+.bar-row.trust .bar-icon img { height: 17px; width: 18px; }.bar-row[data-tone="hunger"] .bar-icon img, .food-line .bar-icon img { height: 15px; width: 16px; }
 .bar-row[data-tone="hp"] .bar-icon, .bar-row[data-tone="sanity"] .bar-icon { font-size: 15px; }
 .bar-row[data-tone="hp"] .bar i { background: #2fcf8a; }.bar-row[data-tone="hunger"] .bar i { background: #e07a2a; }.bar-row[data-tone="sanity"] .bar i { background: #6ea9c9; }
 .bar-row.trust .bar { height: 6px; }.bar-row.trust .bar i { background: #ee7a94; }.bar-row.trust .bar-icon { color: #ee7a94; }
@@ -97,6 +103,8 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .stat-panel h3 { border-bottom: 1px solid rgba(126, 222, 248, .16); margin-bottom: 4px; padding-bottom: 6px; }
 .soul-panel { border-color: rgba(255, 215, 82, .3); }.soul-panel h3 { color: #ffdc62; }
 .stat { align-items: center; display: grid; gap: 7px; grid-template-columns: 16px 1fr auto; min-height: 25px; }
+.stat-icon.has-image { background: none; mask-image: none; -webkit-mask-image: none; }
+.stat-icon img { display: block; height: 16px; object-fit: contain; width: 16px; }
 .stat-icon { background: currentColor; color: #75e5ff; display: inline-block; height: 15px; mask-position: center; mask-repeat: no-repeat; mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; width: 15px; }.soul-panel .stat-icon { color: #ffdc62; }
 .stat-icon[data-icon="hp"] { mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.5S2.5 15.5 2.5 8.8C2.5 5.6 5 3.5 7.6 3.5c1.9 0 3.4 1 4.4 2.4 1-1.4 2.5-2.4 4.4-2.4 2.6 0 5.1 2.1 5.1 5.3 0 6.7-9.5 12.7-9.5 12.7z'/%3E%3C/svg%3E"); -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.5S2.5 15.5 2.5 8.8C2.5 5.6 5 3.5 7.6 3.5c1.9 0 3.4 1 4.4 2.4 1-1.4 2.5-2.4 4.4-2.4 2.6 0 5.1 2.1 5.1 5.3 0 6.7-9.5 12.7-9.5 12.7z'/%3E%3C/svg%3E"); }
 .stat-icon[data-icon="attack"] { mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5l1.9 5.2 4.9-2.4-2.4 4.9 5.2 1.9-5.2 1.9 2.4 4.9-4.9-2.4L12 22.5l-1.9-5.2-4.9 2.4 2.4-4.9L2.4 12l5.2-1.9-2.4-4.9 4.9 2.4z'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='black'/%3E%3C/svg%3E"); -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5l1.9 5.2 4.9-2.4-2.4 4.9 5.2 1.9-5.2 1.9 2.4 4.9-4.9-2.4L12 22.5l-1.9-5.2-4.9 2.4 2.4-4.9L2.4 12l5.2-1.9-2.4-4.9 4.9 2.4z'/%3E%3C/svg%3E"); }
@@ -109,7 +117,7 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .potential-panel::before, .potential-panel::after { border: 2px solid #7fdcff; content: ''; height: 10px; position: absolute; width: 10px; }
 .potential-panel::before { border-right: 0; border-bottom: 0; left: -1px; top: -1px; }.potential-panel::after { border-left: 0; border-top: 0; bottom: -1px; right: -1px; }
 .potential-panel .stat { grid-template-columns: 22px 1fr auto; }
-.potential-panel .stat-icon { background: #d6eaf2; height: 14px; margin: 0 4px; width: 14px; }
+.potential-panel .stat-icon { background: #d6eaf2; height: 14px; margin: 0 4px; width: 14px; }.potential-panel .stat-icon.has-image { background: none; }
 .potential-panel .stat { background: rgba(0, 0, 0, .25); margin-bottom: 3px; padding: 0 6px 0 0; }.potential-panel .stat small { display: none; }
 .potential-panel .stat strong { color: #7fdcff; font-size: .9rem; }
 .potential-panel .stat strong[data-tone="high"] { color: #63e6a3; }.potential-panel .stat strong[data-tone="perfect"] { color: #ff9a45; }

@@ -14,14 +14,17 @@
         <div class="name-line">
           <h2><span *ngIf="valueFor('paldeck_no')">{{ valueFor('paldeck_no') }}. </span>{{ name }}</h2>
           <img *ngIf="isAlpha && alphaImageSrc" class="alpha-badge" [src]="alphaImageSrc" alt="Alpha" title="Alpha Pal">
-          <span *ngIf="isLucky" class="lucky-badge" title="Lucky Pal">★ Lucky</span>
+          <span *ngIf="isLucky" class="lucky-badge" title="Lucky Pal"><img *ngIf="uiIcons['lucky']" [src]="uiIcons['lucky']" alt="">Lucky</span>
           <img *ngIf="favoriteImageSrc" class="favorite-badge" [src]="favoriteImageSrc" alt="" aria-label="Favorite" title="Favorite">
           <span *ngIf="gender" class="gender" [class.female]="gender === 'Female'">
-            <app-gender-icon *ngIf="gender === 'Female' || gender === 'Male'; else genderText" [gender]="gender === 'Female' ? 'female' : 'male'"></app-gender-icon>
+            <ng-container *ngIf="gender === 'Female' || gender === 'Male'; else genderText">
+              <img *ngIf="uiIcons[gender.toLowerCase()]; else genderSvg" class="gender-image" [src]="uiIcons[gender.toLowerCase()]" [alt]="gender" [title]="gender">
+              <ng-template #genderSvg><app-gender-icon [gender]="gender === 'Female' ? 'female' : 'male'"></app-gender-icon></ng-template>
+            </ng-container>
             <ng-template #genderText>{{ gender }}</ng-template>
           </span>
-          <span class="trait-line" *ngIf="elementIcons(row).length" title="Element type">
-            <img *ngFor="let icon of elementIcons(row)" class="trait-icon" [src]="icon.src" [alt]="icon.name" [title]="icon.name">
+          <span class="trait-line" *ngIf="elementChips.length" title="Element type">
+            <span *ngFor="let chip of elementChips" class="element-chip" [attr.data-element]="chip.index"><img [src]="chip.src" [alt]="chip.name">{{ chip.name }}</span>
           </span>
           <span class="save-badge" *ngIf="showSave && valueFor('save_id')" [title]="'Save ' + valueFor('save_id') + ': ' + valueFor('save')">Save {{ valueFor('save_id') }}</span>
           <span class="location-badge" *ngIf="valueFor('location')" [attr.data-location]="valueFor('location')" title="Where this Pal is">
@@ -106,6 +109,9 @@
           <div class="stars" [attr.aria-label]="'Rank ' + displayRank + ' of 4'">
             <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
           </div>
+          <div class="spirit" title="Pal Souls spent (sum of the soul ranks)">
+            <img *ngIf="uiIcons['spirit']" [src]="uiIcons['spirit']" alt="Pal Souls"><b>+{{ soulTotal }}</b>
+          </div>
         </div>
         <div class="portrait-ring">
           <img
@@ -126,7 +132,7 @@
       <div class="vitals">
         <div class="status-bars" *ngIf="trust || vitalBars.length">
           <div class="bar-row trust" *ngIf="trust as trust" [title]="trust.title">
-            <span class="bar-icon" aria-hidden="true"><img *ngIf="trustImageSrc; else trustGlyph" [src]="trustImageSrc" alt=""><ng-template #trustGlyph>◈</ng-template></span>
+            <span class="bar-icon" aria-hidden="true"><img *ngIf="uiIcons['trust']; else trustGlyph" [src]="uiIcons['trust']" alt=""><ng-template #trustGlyph>◈</ng-template></span>
             <span class="bar-label">Trust</span>
             <span class="bar"><i [style.width.%]="trust.progress"></i></span>
             <strong>{{ trust.rank }}</strong>
@@ -135,14 +141,14 @@
             <span class="bar-icon" [attr.data-icon]="bar.icon" aria-hidden="true">
               <ng-container *ngIf="bar.icon === 'hp'">♥</ng-container>
               <ng-container *ngIf="bar.icon === 'san'">☺</ng-container>
-              <ng-container *ngIf="bar.icon === 'bread'"><img *ngIf="breadImageSrc; else breadGlyph" [src]="breadImageSrc" alt=""><ng-template #breadGlyph>◖</ng-template></ng-container>
+              <ng-container *ngIf="bar.icon === 'bread'"><img *ngIf="uiIcons['hunger']; else breadGlyph" [src]="uiIcons['hunger']" alt=""><ng-template #breadGlyph>◖</ng-template></ng-container>
             </span>
             <span class="bar-label">{{ bar.label }}</span>
             <span class="bar"><i [style.width.%]="bar.percent"></i></span>
             <strong>{{ bar.value }}</strong>
           </div>
           <div class="food-line" *ngIf="foodEffect as food" title="Food status effect stored in the save">
-            <span class="bar-icon" aria-hidden="true"><img *ngIf="breadImageSrc" [src]="breadImageSrc" alt=""></span>
+            <span class="bar-icon" aria-hidden="true"><img *ngIf="uiIcons['hunger']" [src]="uiIcons['hunger']" alt=""></span>
             <span class="bar-label">Food</span>
             <span class="food-text"><b>{{ food.name }}</b> · {{ food.effects }}<small *ngIf="food.timeLeft"> · {{ food.timeLeft }}</small></span>
           </div>
@@ -151,20 +157,20 @@
           <section class="stat-panel combat-panel" *ngIf="combatStats.length">
             <h3>Stats</h3>
             <div *ngFor="let stat of combatStats" class="stat" [appTooltip]="stat.tooltip" tabindex="-1">
-              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small>
+              <span class="stat-icon" [attr.data-icon]="stat.icon" [class.has-image]="statIcon(stat.icon)" aria-hidden="true"><img *ngIf="statIcon(stat.icon) as src" [src]="src" alt=""></span><small>{{ stat.label }}</small>
               <strong>{{ stat.value }}<i class="delta" [class.down]="stat.delta < 0" [class.hidden]="!stat.delta">{{ stat.delta < 0 ? '▼' : '▲' }}</i></strong>
             </div>
           </section>
           <section class="stat-panel potential-panel" *ngIf="ivStats.length" title="Potential (IV): 0 to 100 per stat">
             <h3>Potential</h3>
             <div *ngFor="let stat of ivStats" class="stat">
-              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small><strong [attr.data-tone]="stat.tone">{{ stat.value }}</strong>
+              <span class="stat-icon" [attr.data-icon]="stat.icon" [class.has-image]="statIcon(stat.icon)" aria-hidden="true"><img *ngIf="statIcon(stat.icon) as src" [src]="src" alt=""></span><small>{{ stat.label }}</small><strong [attr.data-tone]="stat.tone">{{ stat.value }}</strong>
             </div>
           </section>
           <section class="stat-panel soul-panel" *ngIf="soulStats.length">
             <h3>SR</h3>
             <div *ngFor="let stat of soulStats" class="stat">
-              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small><strong>{{ stat.value }}</strong>
+              <span class="stat-icon" [attr.data-icon]="stat.icon" [class.has-image]="statIcon(stat.icon)" aria-hidden="true"><img *ngIf="statIcon(stat.icon) as src" [src]="src" alt=""></span><small>{{ stat.label }}</small><strong>{{ stat.value }}</strong>
             </div>
           </section>
         </div>

@@ -493,6 +493,12 @@ export class AppComponent {
         this.changeDetector.markForCheck();
       });
     }
+    for (const key of ['male', 'female', 'lucky']) {
+      void this.offlineImages.load(`assets/ui/${key}.pog`).then((source) => {
+        this.uiIcons[key] = source;
+        this.changeDetector.markForCheck();
+      });
+    }
     for (const key of PASSIVE_ICON_KEYS) {
       void this.offlineImages.load(`assets/ui/${key}.pog`).then((source) => {
         this.passiveIconSrcs[key] = source;
@@ -1058,6 +1064,8 @@ export class AppComponent {
   readonly passiveChips = passiveChips;
   /** Rank arrow images for passive chips, by key, once loaded. */
   passiveIconSrcs: Record<string, string> = {};
+  /** Game UI icons for the table cells (male, female, lucky). */
+  uiIcons: Record<string, string> = {};
 
   isAlpha(row: PalStorageRow): boolean {
     return this.cellValue(row, 'pal_variant').toLowerCase() === 'alpha';

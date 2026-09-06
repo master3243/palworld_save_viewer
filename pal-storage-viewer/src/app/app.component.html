@@ -320,19 +320,17 @@
                   *ngIf="column.key === 'gender' && isFemale(item.row)"
                   class="gender-icon female"
                   aria-label="Female"
-                ><app-gender-icon gender="female"></app-gender-icon></span>
+                ><img *ngIf="uiIcons['female']; else femaleSvg" class="ui-icon" [src]="uiIcons['female']" alt=""><ng-template #femaleSvg><app-gender-icon gender="female"></app-gender-icon></ng-template></span>
                 <span
                   *ngIf="column.key === 'gender' && isMale(item.row)"
                   class="gender-icon male"
                   aria-label="Male"
-                ><app-gender-icon gender="male"></app-gender-icon></span>
+                ><img *ngIf="uiIcons['male']; else maleSvg" class="ui-icon" [src]="uiIcons['male']" alt=""><ng-template #maleSvg><app-gender-icon gender="male"></app-gender-icon></ng-template></span>
                 <span
                   *ngIf="column.key === 'is_lucky' && isLucky(item.row)"
                   class="lucky-icon"
                   aria-label="Lucky"
-                >
-                  ★
-                </span>
+                ><img *ngIf="uiIcons['lucky']; else luckyGlyph" class="ui-icon" [src]="uiIcons['lucky']" alt=""><ng-template #luckyGlyph>★</ng-template></span>
                 <ng-container *ngIf="column.key === 'favorite_index' && favoriteIndex(item.row) as favorite">
                   <img
                     *ngIf="favoriteImageSrcs[favorite] as favoriteSource"

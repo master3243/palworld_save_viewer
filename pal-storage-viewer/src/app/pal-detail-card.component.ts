@@ -49,8 +49,9 @@ export class PalDetailCardComponent implements OnChanges {
   palImageSrc = '';
   alphaImageSrc = '';
   favoriteImageSrc = '';
-  breadImageSrc = '';
-  trustImageSrc = '';
+  /** Game UI icons from assets/ui (male, female, lucky, hunger, trust, IVA, IVD, IVW, spirit). */
+  uiIcons: Record<string, string> = {};
+  private static readonly UI_ICON_KEYS = ['male', 'female', 'lucky', 'hunger', 'trust', 'IVA', 'IVD', 'IVW', 'spirit'];
   game8Url = 'https://game8.co/games/Palworld/archives/439556';
   private readonly imageSources = new Map<string, string>();
 
@@ -296,6 +297,21 @@ export class PalDetailCardComponent implements OnChanges {
     return amount === null ? [] : Array.from({ length: 10 }, (_, index) => index < amount);
   }
 
+  /** Icon for a stat row: the game's attack, defense and work speed marks (HP keeps the heart). */
+  statIcon(icon: PalStat['icon'] | CombatStat['icon']): string {
+    return this.uiIcons[{ attack: 'IVA', defense: 'IVD', crafting: 'IVW' }[icon as string] ?? ''] ?? '';
+  }
+
+  /** Pal Souls spent, the "+N" the game shows next to the stars. */
+  get soulTotal(): number {
+    return ['soul_rank_hp', 'soul_rank_attack', 'soul_rank_defense', 'soul_rank_craft_speed'].reduce((sum, key) => sum + (this.numberFor(key) ?? 0), 0);
+  }
+
+  /** Element chips like the game's header tab: icon, name and element colour. */
+  get elementChips(): { name: string; src: string; index: number }[] {
+    return elementIcons(this.row).map((icon) => ({ name: icon.name, src: icon.src, index: ELEMENT_NAMES.indexOf(icon.name) }));
+  }
+
   get rankStars(): boolean[] {
     return Array.from({ length: 4 }, (_, index) => index < this.displayRank);
   }
@@ -386,14 +402,13 @@ export class PalDetailCardComponent implements OnChanges {
       this.alphaImageSrc = source;
       this.changeDetector.markForCheck();
     });
-    void this.offlineImages.load('assets/ui/bread.pog').then((source) => {
-      this.breadImageSrc = source;
-      this.changeDetector.markForCheck();
-    });
-    void this.offlineImages.load('assets/ui/trust.pog').then((source) => {
-      this.trustImageSrc = source;
-      this.changeDetector.markForCheck();
-    });
+    for (const key of PalDetailCardComponent.UI_ICON_KEYS) {
+      if (this.uiIcons[key]) continue;
+      void this.offlineImages.load(`assets/ui/${key}.pog`).then((source) => {
+        this.uiIcons[key] = source;
+        this.changeDetector.markForCheck();
+      });
+    }
     const favorite = Number(this.valueFor('favorite_index'));
     this.favoriteImageSrc = '';
     if (favorite >= 1 && favorite <= 3) {
