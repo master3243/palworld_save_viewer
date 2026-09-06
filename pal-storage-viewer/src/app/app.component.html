@@ -230,31 +230,14 @@
     </div>
 
     <div class="table-scroll" #tableScroll (scroll)="onTableScroll($event)">
-      <table>
+      <table class="pal-table">
         <thead>
           <tr>
             <ng-container *ngFor="let column of displayedColumns; trackBy: trackColumn">
             <th *ngIf="column.key === 'pal_name'" class="pal-icon-cell" title="Pal portrait"></th>
             <th
-              [class.pal-name-cell]="column.key === 'pal_name'"
+              [class]="column.cellClass"
               [style.width.px]="column.key === 'pal_name' ? palNameWidth : null"
-              [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
-                [class.trait-cell]="column.key === 'elements' || column.key === 'work'"
-                [class.type-cell]="column.key === 'elements'"
-                [class.work-cell]="column.key === 'work'"
-                [class.skills-cell]="column.key === 'skills'"
-              [class.moves-cell]="column.key === 'combat_moves'"
-              [class.stat-cell]="isStat(column)"
-              [class.speed-cell]="column.key === 'work_speed'"
-              [class.slot-cell]="isSlotNumber(column)"
-              [class.where-cell]="isWhere(column)"
-              [class.save-cell]="isSaveLetter(column)"
-              [class.paldeck-cell]="column.key === 'paldeck_no'"
-              [class.nickname-cell]="column.key === 'nickname'"
-              [class.level-cell]="column.key === 'level'"
-              [class.rank-cell]="column.key === 'rank'"
-              [class.iv-cell]="isIv(column)"
-              [class.soul-rank-cell]="isSoulRank(column)"
               [class.sorted]="sortColumn === column.key"
               [title]="column.title"
               (click)="toggleSort(column)"
@@ -271,105 +254,20 @@
           </tr>
           <ng-container *ngFor="let item of virtualRows; trackBy: trackVirtualRow">
             <tr
-              class="data-row"
-              [attr.data-row-index]="item.index"
-              [class.open]="isRowOpen(item.index)"
-              (click)="toggleRow(item.index, $event)"
-            >
-              <ng-container *ngFor="let column of displayedColumns; trackBy: trackColumn">
-              <td *ngIf="column.key === 'pal_name'" class="pal-icon-cell">
-                <img *ngIf="palIconSrc(item.row) as icon" class="pal-icon" [src]="icon" alt="">
-              </td>
-              <td
-                [class.pal-name-cell]="column.key === 'pal_name'"
-                [class.icon-cell]="column.key === 'pal_variant' || column.key === 'gender' || column.key === 'is_lucky' || column.key === 'favorite_index'"
-                [class.trait-cell]="column.key === 'elements' || column.key === 'work'"
-                [class.type-cell]="column.key === 'elements'"
-                [class.work-cell]="column.key === 'work'"
-                [class.skills-cell]="column.key === 'skills'"
-                [class.moves-cell]="column.key === 'combat_moves'"
-                [class.stat-cell]="isStat(column)"
-                [class.speed-cell]="column.key === 'work_speed'"
-                [class.slot-cell]="isSlotNumber(column)"
-                [class.where-cell]="isWhere(column)"
-                [class.save-cell]="isSaveLetter(column)"
-                [class.paldeck-cell]="column.key === 'paldeck_no'"
-                [class.nickname-cell]="column.key === 'nickname'"
-                [class.level-cell]="column.key === 'level'"
-                [class.rank-cell]="column.key === 'rank'"
-                [class.iv-cell]="isIv(column)"
-                [class.iv-high]="isHighIv(item.row, column)"
-                [class.iv-perfect]="isPerfectIv(item.row, column)"
-                [class.sorted-column]="sortColumn === column.key"
-                [class.soul-rank-cell]="isSoulRank(column)"
-                [title]="cellTitle(item.row, column)"
-              >
-                <span
-                  *ngIf="column.key === 'pal_variant' && isAlpha(item.row)"
-                  aria-label="Alpha"
-                >
-                  <img *ngIf="alphaImageSrc" class="alpha-icon" [src]="alphaImageSrc" alt="Alpha">
-                </span>
-                <span
-                  *ngIf="column.key === 'gender' && isFemale(item.row)"
-                  class="gender-icon female"
-                  aria-label="Female"
-                ><img *ngIf="uiIcons['female']; else femaleSvg" class="ui-icon" [src]="uiIcons['female']" alt=""><ng-template #femaleSvg><app-gender-icon gender="female"></app-gender-icon></ng-template></span>
-                <span
-                  *ngIf="column.key === 'gender' && isMale(item.row)"
-                  class="gender-icon male"
-                  aria-label="Male"
-                ><img *ngIf="uiIcons['male']; else maleSvg" class="ui-icon" [src]="uiIcons['male']" alt=""><ng-template #maleSvg><app-gender-icon gender="male"></app-gender-icon></ng-template></span>
-                <span
-                  *ngIf="column.key === 'is_lucky' && isLucky(item.row)"
-                  class="lucky-icon"
-                  aria-label="Lucky"
-                ><img *ngIf="uiIcons['lucky']; else luckyGlyph" class="ui-icon" [src]="uiIcons['lucky']" alt=""><ng-template #luckyGlyph>★</ng-template></span>
-                <ng-container *ngIf="column.key === 'favorite_index' && favoriteIndex(item.row) as favorite">
-                  <img
-                    *ngIf="favoriteImageSrcs[favorite] as favoriteSource"
-                    class="favorite-icon"
-                    [src]="favoriteSource"
-                    alt=""
-                    [attr.aria-label]="'Favorite ' + favorite"
-                  >
-                </ng-container>
-                <span class="table-rank-stars" *ngIf="column.key === 'rank'" [attr.aria-label]="cellDisplay(item.row, column) + ' of 4 stars'">
-                  <i *ngFor="let filled of rankStarsFor(item.row)" [class.filled]="filled">★</i>
-                </span>
-                <span class="trait-icons" *ngIf="column.key === 'elements'">
-                  <img *ngFor="let icon of elementIcons(item.row)" class="trait-icon" [src]="icon.src" [alt]="icon.name" [title]="icon.name">
-                </span>
-                <span class="trait-icons" *ngIf="column.key === 'work'" [class.overflowing]="workIcons(item.row).length > 7">
-                  <span class="work-badge" *ngFor="let icon of workIcons(item.row)" [title]="icon.name + ' ' + icon.rank + (icon.bonus ? ' (' + icon.bonus + ' gained)' : '')">
-                    <img class="trait-icon" [src]="icon.src" [alt]="icon.name">
-                    <b>{{ icon.rank }}</b>
-                    <svg *ngIf="icon.bonus" class="work-bonus" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 6 2.5l4 4M2 10.5l4-4 4 4"/></svg>
-                  </span>
-                </span>
-                <span class="passive-chips" *ngIf="column.key === 'skills'">
-                  <span
-                    *ngFor="let chip of passiveChips(item.row)"
-                    class="passive-chip"
-                    [attr.data-tone]="chip.tone"
-                    [title]="chip.name + (chip.rank ? ' (' + (chip.rank > 0 ? '+' : '') + chip.rank + ')' : '')"
-                  >
-                    <img *ngIf="chip.iconKey && passiveIconSrcs[chip.iconKey]" class="passive-chip-rank" [src]="passiveIconSrcs[chip.iconKey]" alt="">
-                    <span class="passive-chip-name">{{ chip.name }}</span>
-                  </span>
-                </span>
-                <span class="move-chips" *ngIf="column.key === 'combat_moves'">
-                  <span *ngFor="let chip of moveChips(item.row)" class="move-mini" [attr.data-element]="chip.element" [title]="chip.title">
-                    <span class="move-mini-name">{{ chip.name }}</span>
-                    <span class="move-mini-meta" *ngIf="chip.power"><img *ngIf="chip.iconSrc" [src]="chip.iconSrc" alt=""><b>{{ chip.power }}</b></span>
-                  </span>
-                </span>
-                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank' && column.key !== 'elements' && column.key !== 'work' && column.key !== 'skills' && column.key !== 'combat_moves'">
-                  {{ cellDisplay(item.row, column) }}
-                </ng-container>
-              </td>
-              </ng-container>
-            </tr>
+              app-pal-row
+              [row]="item.row"
+              [view]="rowView(item.row)"
+              [columns]="displayedColumns"
+              [sortColumn]="sortColumn"
+              [open]="isRowOpen(item.index)"
+              [index]="item.index"
+              [palIcon]="palIconSrc(item.row)"
+              [alphaIcon]="alphaImageSrc"
+              [uiIcons]="uiIcons"
+              [favoriteIcons]="favoriteImageSrcs"
+              [passiveIcons]="passiveIconSrcs"
+              (toggle)="toggleRow(item.index, $event)"
+            ></tr>
             <tr class="detail-row" *ngIf="isRowOpen(item.index)">
               <td [attr.colspan]="detailColspan">
                 <!-- Sticks to the visible part of a horizontally scrolled table and is as wide as

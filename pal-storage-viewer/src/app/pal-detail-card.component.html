@@ -196,7 +196,7 @@
       <h3>Work Suitability</h3>
       <div class="work-grid">
         <span
-          *ngFor="let work of workTable(row)"
+          *ngFor="let work of works"
           class="work-chip"
           [class.none]="work.rank === 0"
           [title]="work.name + ' ' + work.rank + (work.bonus ? ' (' + work.bonus + ' gained by this Pal)' : '')"
@@ -280,6 +280,7 @@
     </div>
   </section>
 
+  @defer (on idle) {
   <section class="additional" *ngIf="fields.length">
     <h3><span>Additional details</span></h3>
     <dl>
@@ -296,4 +297,5 @@
       </div>
     </dl>
   </section>
+  }
 </article>

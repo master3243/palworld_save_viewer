@@ -30,7 +30,7 @@
                 "output": "/resources"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": ["src/styles.css", "src/app/pal-table.css"]
           },
           "configurations": {
             "production": {

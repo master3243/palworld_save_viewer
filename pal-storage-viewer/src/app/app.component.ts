@@ -7,7 +7,6 @@ import { FaqModalComponent } from './faq-modal.component';
 import { PendingFile, PendingFilesModalComponent, PendingFolder } from './pending-files-modal.component';
 import { LocationCount, SourceGroup, SourcesBarComponent } from './sources-bar.component';
 import { FilterBarComponent } from './filter/filter-bar.component';
-import { GenderIconComponent } from './gender-icon.component';
 import { GithubIconComponent } from './github-icon.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
@@ -18,6 +17,8 @@ import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSumm
 import { elementIcons, workIcons } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
 import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
+import { PalRowComponent } from './pal-row.component';
+import { CellView, RowView, TableColumn } from './table-model';
 
 /** Sort weight of a location: party first, then the bases in order, the Pal Box, then dimensional storage. */
 export function locationRank(location: string): number {
@@ -28,13 +29,6 @@ export function locationRank(location: string): number {
   if (location === 'DimsPS') return 2000;
   if (!location || location === 'Unknown') return 4000;
   return 3000;
-}
-
-interface TableColumn {
-  key: string;
-  label: string;
-  title: string;
-  visible: boolean;
 }
 
 interface VirtualRow {
@@ -65,7 +59,7 @@ interface DirectoryEntryLike {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent, FilterBarComponent, GenderIconComponent, GithubIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent],
+  imports: [CommonModule, PalDetailCardComponent, PalRowComponent, FilterBarComponent, GithubIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -273,8 +267,16 @@ export class AppComponent {
   private rowHeight = 48;
   private readonly virtualBuffer = 12;
 
+  private displayedColumnsCache: { source: TableColumn[]; version: number; value: TableColumn[] } | null = null;
+  private columnsVersion = 0;
+
+  /** Visible columns; the same array until the columns or their visibility change (rows are OnPush). */
   get displayedColumns(): TableColumn[] {
-    return this.columns.filter((column) => column.visible);
+    const cache = this.displayedColumnsCache;
+    if (cache && cache.source === this.columns && cache.version === this.columnsVersion) return cache.value;
+    const value = this.columns.filter((column) => column.visible);
+    this.displayedColumnsCache = { source: this.columns, version: this.columnsVersion, value };
+    return value;
   }
 
   /** Which view is open; kept in the URL hash so the tracker can be linked to. */
@@ -349,9 +351,13 @@ export class AppComponent {
   }
 
   get virtualEndIndex(): number {
+    // Keep the window the same size whether or not a detail card is open: the rows the card pushes
+    // below the viewport stay rendered, so opening/closing it only adds/removes the card itself
+    // instead of tearing down and rebuilding a dozen rows each time.
+    const cardHeight = this.openRowIndex === null ? 0 : this.detailHeight;
     return Math.min(
       this.rows.length,
-      this.indexAtOffset(this.scrollTop + this.viewportHeight) + 1 + this.virtualBuffer
+      this.indexAtOffset(this.scrollTop + this.viewportHeight + cardHeight) + 1 + this.virtualBuffer
     );
   }
 
@@ -487,26 +493,30 @@ export class AppComponent {
     private readonly gameData: GameDataService,
     private readonly changeDetector: ChangeDetectorRef
   ) {
-    void this.gameData.load().then(() => this.changeDetector.markForCheck());
+    void this.gameData.load().then(() => {
+      // Move chips need the skill table; rebuild the cached row views once it is here.
+      this.rowViews = new WeakMap();
+      this.changeDetector.markForCheck();
+    });
     void this.offlineImages.load('assets/ui/alpha.pog').then((source) => {
       this.alphaImageSrc = source;
       this.changeDetector.markForCheck();
     });
     for (const favorite of [1, 2, 3]) {
       void this.offlineImages.load(`assets/ui/fav${favorite}.pog`).then((source) => {
-        this.favoriteImageSrcs[favorite] = source;
+        this.favoriteImageSrcs = { ...this.favoriteImageSrcs, [favorite]: source };
         this.changeDetector.markForCheck();
       });
     }
     for (const key of ['male', 'female', 'lucky']) {
       void this.offlineImages.load(`assets/ui/${key}.pog`).then((source) => {
-        this.uiIcons[key] = source;
+        this.uiIcons = { ...this.uiIcons, [key]: source };
         this.changeDetector.markForCheck();
       });
     }
     for (const key of PASSIVE_ICON_KEYS) {
       void this.offlineImages.load(`assets/ui/${key}.pog`).then((source) => {
-        this.passiveIconSrcs[key] = source;
+        this.passiveIconSrcs = { ...this.passiveIconSrcs, [key]: source };
         this.changeDetector.markForCheck();
       });
     }
@@ -896,6 +906,7 @@ export class AppComponent {
 
   toggleColumn(column: TableColumn): void {
     column.visible = !column.visible;
+    this.columnsVersion++;
   }
 
   toggleSort(column: TableColumn): void {
@@ -1084,9 +1095,42 @@ export class AppComponent {
     return this.isIv(column) && Number(this.cellValue(row, column.key)) === 100;
   }
 
-  readonly elementIcons = elementIcons;
-  readonly workIcons = workIcons;
-  readonly passiveChips = passiveChips;
+  /**
+   * Chips and icons of a row, built once and reused: the template's *ngFor loops keep the same
+   * arrays across change detection, so Angular leaves their DOM alone instead of rebuilding every
+   * chip (and re-decoding every image) on each click.
+   */
+  private rowViews = new WeakMap<PalStorageRow, RowView>();
+
+  rowView(row: PalStorageRow): RowView {
+    let view = this.rowViews.get(row);
+    if (!view) {
+      const cells: Record<string, CellView | undefined> = {};
+      for (const column of this.columns) {
+        const value = Number(this.cellValue(row, column.key));
+        cells[column.key] = {
+          text: this.cellDisplay(row, column),
+          title: this.cellTitle(row, column),
+          iv: this.isIv(column) ? (value === 100 ? 'perfect' : value >= 70 ? 'high' : '') : '',
+        };
+      }
+      view = {
+        elements: elementIcons(row),
+        works: workIcons(row),
+        passives: passiveChips(row),
+        moves: this.moveChips(row),
+        stars: this.rankStarsFor(row),
+        cells,
+        alpha: this.isAlpha(row),
+        male: this.isMale(row),
+        female: this.isFemale(row),
+        lucky: this.isLucky(row),
+        favorite: this.favoriteIndex(row),
+      };
+      this.rowViews.set(row, view);
+    }
+    return view;
+  }
   /** Rank arrow images for passive chips, by key, once loaded. */
   passiveIconSrcs: Record<string, string> = {};
   /** Game UI icons for the table cells (male, female, lucky). */
@@ -1161,8 +1205,34 @@ export class AppComponent {
       label: this.toLabel(key),
       title: this.toTitle(key),
       visible: this.defaultVisibleColumns.has(key)
-        || (key === 'owner_name' && multiplePlayers)
+        || (key === 'owner_name' && multiplePlayers),
+      cellClass: this.columnClass(key),
     }));
+  }
+
+  private columnClass(key: string): string {
+    const column = { key } as TableColumn;
+    const classes = [
+      key === 'pal_name' && 'pal-name-cell',
+      (key === 'pal_variant' || key === 'gender' || key === 'is_lucky' || key === 'favorite_index') && 'icon-cell',
+      (key === 'elements' || key === 'work') && 'trait-cell',
+      key === 'elements' && 'type-cell',
+      key === 'work' && 'work-cell',
+      key === 'skills' && 'skills-cell',
+      key === 'combat_moves' && 'moves-cell',
+      this.isStat(column) && 'stat-cell',
+      key === 'work_speed' && 'speed-cell',
+      this.isSlotNumber(column) && 'slot-cell',
+      this.isWhere(column) && 'where-cell',
+      this.isSaveLetter(column) && 'save-cell',
+      key === 'paldeck_no' && 'paldeck-cell',
+      key === 'nickname' && 'nickname-cell',
+      key === 'level' && 'level-cell',
+      key === 'rank' && 'rank-cell',
+      this.isIv(column) && 'iv-cell',
+      this.isSoulRank(column) && 'soul-rank-cell',
+    ];
+    return classes.filter(Boolean).join(' ');
   }
 
   private applySort(): void {

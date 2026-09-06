@@ -1,0 +1,76 @@
+  <ng-container *ngFor="let column of columns; trackBy: trackColumn">
+  <td *ngIf="column.key === 'pal_name'" class="pal-icon-cell">
+    <img *ngIf="palIcon as icon" class="pal-icon" [src]="icon" alt="" decoding="async">
+  </td>
+  <td
+    [class]="column.cellClass"
+    [class.iv-high]="view.cells[column.key]?.iv === 'high'"
+    [class.iv-perfect]="view.cells[column.key]?.iv === 'perfect'"
+    [class.sorted-column]="sortColumn === column.key"
+    [title]="view.cells[column.key]?.title"
+  >
+    <span
+      *ngIf="column.key === 'pal_variant' && view.alpha"
+      aria-label="Alpha"
+    >
+      <img *ngIf="alphaIcon" class="alpha-icon" [src]="alphaIcon" alt="Alpha">
+    </span>
+    <span
+      *ngIf="column.key === 'gender' && view.female"
+      class="gender-icon female"
+      aria-label="Female"
+    ><img *ngIf="uiIcons['female']; else femaleSvg" class="ui-icon" [src]="uiIcons['female']" alt=""><ng-template #femaleSvg><app-gender-icon gender="female"></app-gender-icon></ng-template></span>
+    <span
+      *ngIf="column.key === 'gender' && view.male"
+      class="gender-icon male"
+      aria-label="Male"
+    ><img *ngIf="uiIcons['male']; else maleSvg" class="ui-icon" [src]="uiIcons['male']" alt=""><ng-template #maleSvg><app-gender-icon gender="male"></app-gender-icon></ng-template></span>
+    <span
+      *ngIf="column.key === 'is_lucky' && view.lucky"
+      class="lucky-icon"
+      aria-label="Lucky"
+    ><img *ngIf="uiIcons['lucky']; else luckyGlyph" class="ui-icon" [src]="uiIcons['lucky']" alt=""><ng-template #luckyGlyph>★</ng-template></span>
+    <ng-container *ngIf="column.key === 'favorite_index' && view.favorite as favorite">
+      <img
+        *ngIf="favoriteIcons[favorite] as favoriteSource"
+        class="favorite-icon"
+        [src]="favoriteSource"
+        alt=""
+        [attr.aria-label]="'Favorite ' + favorite"
+      >
+    </ng-container>
+    <span class="table-rank-stars" *ngIf="column.key === 'rank'" [attr.aria-label]="view.cells[column.key]?.text + ' of 4 stars'">
+      <i *ngFor="let filled of view.stars" [class.filled]="filled">★</i>
+    </span>
+    <span class="trait-icons" *ngIf="column.key === 'elements'">
+      <img *ngFor="let icon of view.elements" class="trait-icon" [src]="icon.src" [alt]="icon.name" [title]="icon.name" decoding="async">
+    </span>
+    <span class="trait-icons" *ngIf="column.key === 'work'" [class.overflowing]="view.works.length > 7">
+      <span class="work-badge" *ngFor="let icon of view.works" [title]="icon.name + ' ' + icon.rank + (icon.bonus ? ' (' + icon.bonus + ' gained)' : '')">
+        <img class="trait-icon" [src]="icon.src" [alt]="icon.name">
+        <b>{{ icon.rank }}</b>
+        <svg *ngIf="icon.bonus" class="work-bonus" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5 6 2.5l4 4M2 10.5l4-4 4 4"/></svg>
+      </span>
+    </span>
+    <span class="passive-chips" *ngIf="column.key === 'skills'">
+      <span
+        *ngFor="let chip of view.passives"
+        class="passive-chip"
+        [attr.data-tone]="chip.tone"
+        [title]="chip.name + (chip.rank ? ' (' + (chip.rank > 0 ? '+' : '') + chip.rank + ')' : '')"
+      >
+        <img *ngIf="chip.iconKey && passiveIcons[chip.iconKey]" class="passive-chip-rank" [src]="passiveIcons[chip.iconKey]" alt="">
+        <span class="passive-chip-name">{{ chip.name }}</span>
+      </span>
+    </span>
+    <span class="move-chips" *ngIf="column.key === 'combat_moves'">
+      <span *ngFor="let chip of view.moves" class="move-mini" [attr.data-element]="chip.element" [title]="chip.title">
+        <span class="move-mini-name">{{ chip.name }}</span>
+        <span class="move-mini-meta" *ngIf="chip.power"><img *ngIf="chip.iconSrc" [src]="chip.iconSrc" alt=""><b>{{ chip.power }}</b></span>
+      </span>
+    </span>
+    <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank' && column.key !== 'elements' && column.key !== 'work' && column.key !== 'skills' && column.key !== 'combat_moves'">
+      {{ view.cells[column.key]?.text }}
+    </ng-container>
+  </td>
+  </ng-container>

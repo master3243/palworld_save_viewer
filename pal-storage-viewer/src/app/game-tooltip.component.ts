@@ -4,7 +4,7 @@
  */
 import { CommonModule } from '@angular/common';
 import {
-  ApplicationRef, Component, ComponentRef, Directive, ElementRef, EnvironmentInjector, HostListener, Input, OnDestroy, createComponent,
+  ApplicationRef, Component, ComponentRef, Directive, ElementRef, EnvironmentInjector, Input, NgZone, OnDestroy, OnInit, createComponent,
 } from '@angular/core';
 
 export interface TooltipData {
@@ -87,19 +87,33 @@ export class GameTooltipComponent {
 }
 
 @Directive({ selector: '[appTooltip]', standalone: true })
-export class TooltipDirective implements OnDestroy {
+export class TooltipDirective implements OnInit, OnDestroy {
   @Input('appTooltip') data: TooltipData | null = null;
   private ref: ComponentRef<GameTooltipComponent> | null = null;
+  private readonly show = () => this.open();
+  private readonly hide = () => this.close();
 
   constructor(
     private readonly host: ElementRef<HTMLElement>,
     private readonly appRef: ApplicationRef,
     private readonly injector: EnvironmentInjector,
+    private readonly zone: NgZone,
   ) {}
 
-  @HostListener('mouseenter')
-  @HostListener('focus')
-  show(): void {
+  ngOnInit(): void {
+    // Registered outside the zone: hovering a chip must not run change detection over the whole
+    // table. The tooltip component is checked by hand below.
+    this.zone.runOutsideAngular(() => {
+      const el = this.host.nativeElement;
+      el.addEventListener('mouseenter', this.show);
+      el.addEventListener('focus', this.show);
+      el.addEventListener('mouseleave', this.hide);
+      el.addEventListener('blur', this.hide);
+      window.addEventListener('scroll', this.hide, true);
+    });
+  }
+
+  private open(): void {
     if (!this.data || this.ref) return;
     const ref = createComponent(GameTooltipComponent, { environmentInjector: this.injector });
     ref.instance.data = this.data;
@@ -119,15 +133,20 @@ export class TooltipDirective implements OnDestroy {
     ref.changeDetectorRef.detectChanges();
   }
 
-  @HostListener('mouseleave')
-  @HostListener('blur')
-  @HostListener('window:scroll')
-  hide(): void {
+  private close(): void {
     if (!this.ref) return;
     this.appRef.detachView(this.ref.hostView);
     this.ref.destroy();
     this.ref = null;
   }
 
-  ngOnDestroy(): void { this.hide(); }
+  ngOnDestroy(): void {
+    const el = this.host.nativeElement;
+    el.removeEventListener('mouseenter', this.show);
+    el.removeEventListener('focus', this.show);
+    el.removeEventListener('mouseleave', this.hide);
+    el.removeEventListener('blur', this.hide);
+    window.removeEventListener('scroll', this.hide, true);
+    this.close();
+  }
 }

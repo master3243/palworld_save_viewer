@@ -37,12 +37,10 @@ export class PalDetailCardComponent implements OnChanges {
   @Input({ required: true }) row!: PalStorageRow;
   /** Show the save letter in the header (only useful with several saves loaded). */
   @Input() showSave = false;
-  readonly elementIcons = elementIcons;
-  readonly workTable = workTable;
 
   /** True once the species is known to the traits lookup (otherwise every level would read 0). */
   get hasWorkData(): boolean {
-    return typeof this.row['elements'] === 'string' && this.row['elements'] !== '' || workTable(this.row).some((work) => work.rank > 0);
+    return typeof this.row['elements'] === 'string' && this.row['elements'] !== '' || this.works.some((work) => work.rank > 0);
   }
   expandedFields = new Set<string>();
   palImageFailed = false;
@@ -201,6 +199,13 @@ export class PalDetailCardComponent implements OnChanges {
   learnedSkillChips: ActiveSkillChip[] = [];
   emptySlots: number[] = [];
   passiveSkills: PassiveSkill[] = [];
+  works: ReturnType<typeof workTable> = [];
+  elementChips: { name: string; src: string; index: number }[] = [];
+  rankStars: boolean[] = [];
+  foodGauge: boolean[] = [];
+  ivStats: PalStat[] = [];
+  soulStats: PalStat[] = [];
+  fields: DetailField[] = [];
 
   /** Recompute everything the template shows for the current row. */
   private refresh(): void {
@@ -214,6 +219,13 @@ export class PalDetailCardComponent implements OnChanges {
     this.activeSkillChips = this.skillChips(this.listFor('active_skill_ids'), this.listFor('combat_moves'));
     this.learnedSkillChips = this.computeLearnedSkillChips();
     this.emptySlots = Array.from({ length: Math.max(0, 3 - this.activeSkillChips.length) }, (_, index) => index);
+    this.works = workTable(this.row);
+    this.elementChips = this.computeElementChips();
+    this.rankStars = this.computeRankStars();
+    this.foodGauge = this.computeFoodGauge();
+    this.ivStats = this.computeIvStats();
+    this.soulStats = this.computeSoulStats();
+    this.fields = this.computeFields();
   }
 
   /** Skills the Pal could swap in: mastered plus the species learnset, minus the three equipped slots. */
@@ -292,7 +304,7 @@ export class PalDetailCardComponent implements OnChanges {
   }
 
   /** The game's 10-segment food gauge; filled segments are how much this species eats. */
-  get foodGauge(): boolean[] {
+  private computeFoodGauge(): boolean[] {
     const amount = this.numberFor('food_amount');
     return amount === null ? [] : Array.from({ length: 10 }, (_, index) => index < amount);
   }
@@ -316,15 +328,15 @@ export class PalDetailCardComponent implements OnChanges {
   }
 
   /** Element chips like the game's header tab: icon, name and element colour. */
-  get elementChips(): { name: string; src: string; index: number }[] {
+  private computeElementChips(): { name: string; src: string; index: number }[] {
     return elementIcons(this.row).map((icon) => ({ name: icon.name, src: icon.src, index: ELEMENT_NAMES.indexOf(icon.name) }));
   }
 
-  get rankStars(): boolean[] {
+  private computeRankStars(): boolean[] {
     return Array.from({ length: 4 }, (_, index) => index < this.displayRank);
   }
 
-  get ivStats(): PalStat[] {
+  private computeIvStats(): PalStat[] {
     // Same colouring as the table: 70+ is high, 100 is perfect.
     const tone = (value: string): PalStat['tone'] => Number(value) === 100 ? 'perfect' : Number(value) >= 70 ? 'high' : undefined;
     const stats: PalStat[] = [
@@ -335,7 +347,7 @@ export class PalDetailCardComponent implements OnChanges {
     return stats.filter((stat) => stat.value !== '');
   }
 
-  get soulStats(): PalStat[] {
+  private computeSoulStats(): PalStat[] {
     const stats: PalStat[] = [
       { label: 'HP', value: this.valueFor('soul_rank_hp'), icon: 'hp' },
       { label: 'Attack', value: this.valueFor('soul_rank_attack'), icon: 'attack' },
@@ -436,7 +448,7 @@ export class PalDetailCardComponent implements OnChanges {
 
   imageSource(path: string): string { return this.imageSources.get(path) || ''; }
 
-  get fields(): DetailField[] {
+  private computeFields(): DetailField[] {
     return Object.keys(this.row)
       .filter((key) => !this.featuredKeys.has(key) && this.formatValue(this.row[key]) !== '')
       .map((key) => {
