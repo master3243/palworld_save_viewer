@@ -13,6 +13,8 @@ export interface TooltipData {
   badge?: { text: string; iconSrc?: string; element?: number };
   /** Figures shown right of the badge, e.g. cooldown and power. */
   stats?: { icon?: 'clock' | 'power'; label: string; value: string }[];
+  /** Status effect line under the badge, like the game's "Aggregate: Burn   100". */
+  effect?: { label: string; value: string };
   /** Label/value rows, e.g. a stat breakdown. */
   rows?: [string, string][];
   lines?: string[];
@@ -32,6 +34,7 @@ export interface TooltipData {
         </span>
         <span class="tip-stat" *ngFor="let stat of data.stats"><i [attr.data-icon]="stat.icon"></i>{{ stat.label }}<b>{{ stat.value }}</b></span>
       </div>
+      <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
       <div class="tip-rows" *ngIf="data.rows?.length">
         <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'"><span>{{ row[0] }}</span><b>{{ row[1] }}</b></div>
       </div>
@@ -55,6 +58,8 @@ export interface TooltipData {
     .tip-stat i { border: 1.5px solid #c9d8df; border-radius: 50%; display: inline-block; height: 10px; position: relative; width: 10px; }
     .tip-stat i[data-icon="clock"]::after { border-left: 1.5px solid #c9d8df; border-bottom: 1.5px solid #c9d8df; content: ''; height: 3px; left: 4px; position: absolute; top: 1px; width: 2px; }
     .tip-stat i[data-icon="power"] { border: 0; } .tip-stat i[data-icon="power"]::after { content: '✹'; font-size: 12px; font-style: normal; line-height: 10px; position: absolute; left: -1px; top: -1px; }
+    .tip-effect { background: rgba(255, 255, 255, .06); display: flex; justify-content: space-between; margin: 4px 0 0; padding: 4px 12px; }
+    .tip-effect span { color: #c9d8df; } .tip-effect b { color: #fff; }
     .tip-rows { border-top: 1px solid rgba(190, 220, 235, .18); margin: 4px 12px 0; padding: 6px 0 2px; }
     .tip-row { display: flex; gap: 14px; justify-content: space-between; line-height: 1.5; }
     .tip-row span { color: #b9cbd4; } .tip-row b { color: #5ecbff; font-variant-numeric: tabular-nums; }

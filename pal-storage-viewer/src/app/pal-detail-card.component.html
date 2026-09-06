@@ -122,23 +122,23 @@
       <div class="vitals">
         <div class="status-bars" *ngIf="trust || vitalBars.length">
           <div class="bar-row trust" *ngIf="trust as trust" [title]="trust.title">
-            <span class="bar-icon">◈</span>
+            <span class="bar-icon" aria-hidden="true"><img *ngIf="trustImageSrc; else trustGlyph" [src]="trustImageSrc" alt=""><ng-template #trustGlyph>◈</ng-template></span>
             <span class="bar-label">Trust</span>
             <span class="bar"><i [style.width.%]="trust.progress"></i></span>
             <strong>{{ trust.rank }}</strong>
           </div>
-          <div class="bar-row" *ngFor="let bar of vitalBars" [attr.data-tone]="bar.tone" [title]="bar.tooltip ? null : bar.title" [appTooltip]="bar.tooltip" tabindex="-1">
+          <div class="bar-row" *ngFor="let bar of vitalBars" [attr.data-tone]="bar.tone" [attr.title]="bar.tooltip ? null : bar.title" [appTooltip]="bar.tooltip" tabindex="-1">
             <span class="bar-icon" [attr.data-icon]="bar.icon" aria-hidden="true">
               <ng-container *ngIf="bar.icon === 'hp'">♥</ng-container>
               <ng-container *ngIf="bar.icon === 'san'">☺</ng-container>
-              <svg *ngIf="bar.icon === 'bread'" viewBox="0 0 24 24"><path d="M4 11c0-3 3-5 8-5s8 2 8 5c0 1.3-.8 2.2-2 2.6V19H6v-5.4C4.8 13.2 4 12.3 4 11z"/><path class="crust" d="M9 13l1.5 2 1.5-2 1.5 2 1.5-2" fill="none"/></svg>
+              <ng-container *ngIf="bar.icon === 'bread'"><img *ngIf="breadImageSrc; else breadGlyph" [src]="breadImageSrc" alt=""><ng-template #breadGlyph>◖</ng-template></ng-container>
             </span>
             <span class="bar-label">{{ bar.label }}</span>
             <span class="bar"><i [style.width.%]="bar.percent"></i></span>
             <strong>{{ bar.value }}</strong>
           </div>
           <div class="food-line" *ngIf="foodEffect as food" title="Food status effect stored in the save">
-            <span class="bar-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11c0-3 3-5 8-5s8 2 8 5c0 1.3-.8 2.2-2 2.6V19H6v-5.4C4.8 13.2 4 12.3 4 11z"/><path class="crust" d="M9 13l1.5 2 1.5-2 1.5 2 1.5-2" fill="none"/></svg></span>
+            <span class="bar-icon" aria-hidden="true"><img *ngIf="breadImageSrc" [src]="breadImageSrc" alt=""></span>
             <span class="bar-label">Food</span>
             <span class="food-text"><b>{{ food.name }}</b> · {{ food.effects }}<small *ngIf="food.timeLeft"> · {{ food.timeLeft }}</small></span>
           </div>
@@ -154,7 +154,7 @@
           <section class="stat-panel" *ngIf="ivStats.length">
             <h3>IV</h3>
             <div *ngFor="let stat of ivStats" class="stat">
-              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small><strong>{{ stat.value }}</strong>
+              <span class="stat-icon" [attr.data-icon]="stat.icon" aria-hidden="true"></span><small>{{ stat.label }}</small><strong [attr.data-tone]="stat.tone">{{ stat.value }}</strong>
             </div>
           </section>
           <section class="stat-panel soul-panel" *ngIf="soulStats.length">

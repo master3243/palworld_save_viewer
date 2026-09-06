@@ -905,10 +905,10 @@ td.skills-cell {
 /* Same tones as the pal card, squeezed to one line. */
 .passive-chip {
   align-items: center;
-  background: #176f77;
-  border-left: 3px solid #4cf2e1;
+  background: rgba(255, 255, 255, 0.07);
+  border-left: 3px solid #e8f2f5;
   border-radius: 2px;
-  color: #fff;
+  color: #f2f8fa;
   display: inline-flex;
   /* Natural width; only chips that do not fit shrink and truncate. */
   flex: 0 1 auto;
@@ -920,18 +920,21 @@ td.skills-cell {
 }
 
 .passive-chip[data-tone="gold"] {
-  background: #7c6410;
+  background: rgba(255, 224, 78, 0.14);
   border-color: #ffe04e;
+  color: #ffe04e;
 }
 
 .passive-chip[data-tone="platinum"] {
-  background: #396390;
-  border-color: #aee9ff;
+  background: rgba(76, 242, 225, 0.14);
+  border-color: #4cf2e1;
+  color: #8ff7ec;
 }
 
 .passive-chip[data-tone="negative"] {
-  background: #6b2934;
-  border-color: #ff7085;
+  background: rgba(255, 90, 110, 0.14);
+  border-color: #ff5a6e;
+  color: #ff8a9a;
 }
 
 .passive-chip-rank {

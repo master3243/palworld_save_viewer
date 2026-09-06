@@ -12,7 +12,13 @@ import { palImagePath } from './pal-image';
 import { PalStorageRow } from './save-parser.service';
 
 interface DetailField { key: string; label: string; value: string; rawValue?: string; }
-interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense' | 'crafting'; }
+interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense' | 'crafting'; tone?: 'high' | 'perfect'; }
+
+/** Status ailment names as the game's skill cards show them. */
+const STATUS_NAMES: Record<string, string> = {
+  Burn: 'Burn', Wetness: 'Soak', Freeze: 'Freeze', Electrical: 'Electrify', Darkness: 'Blind',
+  Poison: 'Poison', Muddy: 'Muddy', IvyCling: 'Ivy-Covered', Stun: 'Stun',
+};
 interface PassiveSkill { name: string; rank: string; color: string; rankMarker: string; rankIcon: string; tooltip: TooltipData; }
 interface VitalBar { label: string; icon: string; value: string; percent: number; title: string; tone: string; tooltip: TooltipData | null; }
 interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting'; delta: number; tooltip: TooltipData; }
@@ -43,6 +49,8 @@ export class PalDetailCardComponent implements OnChanges {
   palImageSrc = '';
   alphaImageSrc = '';
   favoriteImageSrc = '';
+  breadImageSrc = '';
+  trustImageSrc = '';
   game8Url = 'https://game8.co/games/Palworld/archives/439556';
   private readonly imageSources = new Map<string, string>();
 
@@ -219,8 +227,9 @@ export class PalDetailCardComponent implements OnChanges {
       if (detail) {
         tooltip.badge = { text: ELEMENT_NAMES[elementIndex] ?? '', iconSrc, element: elementIndex };
         tooltip.stats = [{ icon: 'clock', label: ':', value: String(detail.cooldown) }, { icon: 'power', label: 'Power:', value: String(detail.power) }];
-        const effects = detail.effects.map(([effect, value]) => `${effect} ${value}`);
-        if (detail.melee || effects.length) tooltip.note = [detail.melee ? 'Melee' : '', ...effects].filter(Boolean).join(' · ');
+        const [effect] = detail.effects;
+        if (effect) tooltip.effect = { label: `Aggregate: ${STATUS_NAMES[effect[0]] ?? effect[0]}`, value: String(effect[1]) };
+        if (detail.melee) tooltip.note = 'Melee';
       }
       return { name, elementIndex, iconSrc, power: detail ? String(detail.power) : '', tooltip, url: this.activeSkillUrl(name) };
     });
@@ -278,10 +287,12 @@ export class PalDetailCardComponent implements OnChanges {
   }
 
   get ivStats(): PalStat[] {
+    // Same colouring as the table: 70+ is high, 100 is perfect.
+    const tone = (value: string): PalStat['tone'] => Number(value) === 100 ? 'perfect' : Number(value) >= 70 ? 'high' : undefined;
     const stats: PalStat[] = [
-      { label: 'HP', value: this.valueFor('iv_hp'), icon: 'hp' },
-      { label: 'Attack', value: this.valueFor('iv_attack'), icon: 'attack' },
-      { label: 'Defense', value: this.valueFor('iv_defense'), icon: 'defense' }
+      { label: 'HP', value: this.valueFor('iv_hp'), icon: 'hp', tone: tone(this.valueFor('iv_hp')) },
+      { label: 'Attack', value: this.valueFor('iv_attack'), icon: 'attack', tone: tone(this.valueFor('iv_attack')) },
+      { label: 'Defense', value: this.valueFor('iv_defense'), icon: 'defense', tone: tone(this.valueFor('iv_defense')) }
     ];
     return stats.filter((stat) => stat.value !== '');
   }
@@ -359,6 +370,14 @@ export class PalDetailCardComponent implements OnChanges {
 
     void this.offlineImages.load('assets/ui/alpha.pog').then((source) => {
       this.alphaImageSrc = source;
+      this.changeDetector.markForCheck();
+    });
+    void this.offlineImages.load('assets/ui/bread.pog').then((source) => {
+      this.breadImageSrc = source;
+      this.changeDetector.markForCheck();
+    });
+    void this.offlineImages.load('assets/ui/trust.pog').then((source) => {
+      this.trustImageSrc = source;
       this.changeDetector.markForCheck();
     });
     const favorite = Number(this.valueFor('favorite_index'));

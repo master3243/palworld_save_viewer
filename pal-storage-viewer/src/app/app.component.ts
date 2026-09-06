@@ -17,6 +17,17 @@ import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSumm
 import { elementIcons, workIcons } from './trait-icons';
 import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
 
+/** Sort weight of a location: party first, then the bases in order, the Pal Box, then dimensional storage. */
+export function locationRank(location: string): number {
+  if (location === 'Party') return 0;
+  const base = /^Base (\d+)/.exec(location);
+  if (base) return 1 + Number(base[1]);
+  if (location === 'Pal Box') return 1000;
+  if (location === 'Dimensional Storage') return 2000;
+  if (!location || location === 'Unknown') return 4000;
+  return 3000;
+}
+
 interface TableColumn {
   key: string;
   label: string;
@@ -389,7 +400,6 @@ export class AppComponent {
   }
 
   private readonly defaultVisibleColumns = new Set([
-    'storage_slot',
     'save_id',
     'location',
     'pal_box_slot_index',
@@ -417,6 +427,7 @@ export class AppComponent {
 
   private readonly preferredColumnOrder = [
     ...this.defaultVisibleColumns,
+    'storage_slot',
     'location_detail',
     'save',
     'owner_name',
@@ -824,9 +835,9 @@ export class AppComponent {
       this.sources = result.sources;
       this.saveSets = result.sets;
       this.locationCounts = this.countLocations(rows);
-      this.originalRows = rows;
-      this.filteredRows = rows;
-      this.rows = [...rows];
+      this.originalRows = this.defaultOrder(rows);
+      this.filteredRows = this.originalRows;
+      this.rows = [...this.originalRows];
       this.columns = this.buildColumns(rows);
       this.palNameWidth = this.measurePalNameWidth(rows);
       this.scheduleMeasure();
@@ -1128,17 +1139,37 @@ export class AppComponent {
 
     const direction = this.sortDirection === 'asc' ? 1 : -1;
     const key = this.sortColumn;
-    this.rows = [...this.filteredRows].sort((left, right) => {
-      const leftValue = this.sortValue(left[key]);
-      const rightValue = this.sortValue(right[key]);
-      if (typeof leftValue === 'number' && typeof rightValue === 'number') {
-        return (leftValue - rightValue) * direction;
-      }
-      return String(leftValue).localeCompare(String(rightValue), undefined, {
-        numeric: true,
-        sensitivity: 'base'
-      }) * direction;
+    // Sort the rows as they are currently shown (Array.sort is stable), so ties keep whatever order
+    // the previous sort left them in: HP asc, then Defense desc, leaves equal-Defense Pals in HP order.
+    const base = this.rows.length === this.filteredRows.length && this.rows.every((row) => this.filteredRows.includes(row))
+      ? this.rows
+      : this.filteredRows;
+    this.rows = [...base].sort((left, right) => {
+      // Empty cells stay at the bottom whichever way the column is sorted.
+      const leftEmpty = this.cellValue(left, key) === '';
+      const rightEmpty = this.cellValue(right, key) === '';
+      if (leftEmpty || rightEmpty) return Number(leftEmpty) - Number(rightEmpty);
+      return this.compareCells(left, right, key) * direction;
     });
+  }
+
+  private compareCells(left: PalStorageRow, right: PalStorageRow, key: string): number {
+    if (key === 'location') return locationRank(this.cellValue(left, key)) - locationRank(this.cellValue(right, key));
+    const leftValue = this.sortValue(left[key]);
+    const rightValue = this.sortValue(right[key]);
+    if (typeof leftValue === 'number' && typeof rightValue === 'number') return leftValue - rightValue;
+    if (typeof leftValue === 'number') return -1;
+    if (typeof rightValue === 'number') return 1;
+    return String(leftValue).localeCompare(String(rightValue), undefined, { numeric: true, sensitivity: 'base' });
+  }
+
+  /** The order the table opens in: where the Pal is (party, bases, box, storage), then save, then slot. */
+  private defaultOrder(rows: PalStorageRow[]): PalStorageRow[] {
+    return [...rows].sort((left, right) =>
+      this.compareCells(left, right, 'location')
+      || this.compareCells(left, right, 'save_id')
+      || this.compareCells(left, right, 'pal_box_slot_index')
+      || this.compareCells(left, right, 'storage_slot'));
   }
 
   private resetTableScroll(): void {
@@ -1160,7 +1191,7 @@ export class AppComponent {
     if (key === 'gender') return 'G';
     if (key === 'is_lucky') return 'L';
     if (key === 'storage_slot') return 'Slot';
-    if (key === 'pal_box_slot_index') return 'Box';
+    if (key === 'pal_box_slot_index') return 'Ind';
     if (key === 'location') return 'Where';
     if (key === 'save_id') return 'Save';
     if (key === 'save') return 'Save name';
@@ -1185,7 +1216,7 @@ export class AppComponent {
     if (key === 'paldeck_no') return 'Paldeck No.';
     if (key === 'elements') return 'Element type(s)';
     if (key === 'work') return 'Work suitability levels (base plus gained ranks)';
-    if (key === 'pal_box_slot_index') return 'Pal Box slot';
+    if (key === 'pal_box_slot_index') return 'Index within its container (party, Pal Box or base slot)';
     if (key === 'location') return 'Location';
     if (key === 'location_detail') return 'Location detail';
     if (key === 'save_id') return 'Save (letter)';
