@@ -150,7 +150,7 @@ export class FilterBarComponent implements OnChanges {
         { label: 'Party', title: 'In the party', tone: 'include', make: () => createRule('where', 'is', ['Party']) },
         { label: 'Box', title: 'In the Pal Box', tone: 'include', make: () => createRule('where', 'is', ['Pal Box']) },
         { label: 'Base', title: 'Working at a base', tone: 'include', make: () => createRule('where', 'starts', ['Base']) },
-        { label: 'DimS', title: 'In dimensional storage', tone: 'include', make: () => createRule('where', 'is', ['Dimensional Storage']) }
+        { label: 'DimsPS', title: 'In the Dimensional Pal Storage', tone: 'include', make: () => createRule('where', 'is', ['DimsPS']) }
       ]
     },
     flagChip('Alpha', 'Alpha pals', 'alpha'),

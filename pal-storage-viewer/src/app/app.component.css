@@ -1011,7 +1011,7 @@ td.work-cell .trait-icons.overflowing {
 }
 
 .lucky-icon img {
-  filter: drop-shadow(0 0 3px rgba(150, 230, 255, 1)) drop-shadow(0 0 7px rgba(110, 210, 255, 0.85));
+  filter: drop-shadow(0 0 2px rgba(130, 220, 255, 0.9));
 }
 
 /* A lone element icon gets the room the column has; two share it. */
@@ -1021,16 +1021,35 @@ td.type-cell .trait-icon:only-child {
   width: 32px;
 }
 
-/* Computed stats: four digits plus an arrow's worth of room. */
+/* Computed stats, centred like the IVs: HP/ATK/DEF fit five digits, SPD three. */
 th.stat-cell,
 td.stat-cell {
   box-sizing: border-box;
-  max-width: 56px;
-  min-width: 56px;
-  padding-left: 4px;
-  padding-right: 4px;
-  text-align: right;
-  width: 56px;
+  max-width: 58px;
+  min-width: 58px;
+  padding-left: 3px;
+  padding-right: 3px;
+  text-align: center;
+  width: 58px;
+}
+
+th.stat-cell.sorted {
+  max-width: 70px;
+  min-width: 70px;
+  width: 70px;
+}
+
+th.stat-cell.speed-cell,
+td.stat-cell.speed-cell {
+  max-width: 46px;
+  min-width: 46px;
+  width: 46px;
+}
+
+th.stat-cell.speed-cell.sorted {
+  max-width: 60px;
+  min-width: 60px;
+  width: 60px;
 }
 
 /* Three equipped active skills as mini chips, like the pal card's. */

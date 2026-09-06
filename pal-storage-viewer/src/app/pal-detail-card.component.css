@@ -190,7 +190,7 @@ dd { color: #eefaff; display: -webkit-box; font-size: .76rem; margin: 0; max-hei
 
 .location-badge[data-location='Party'] { border-color: rgba(255, 210, 120, 0.6); }
 .location-badge[data-location='Pal Box'] { border-color: rgba(120, 220, 160, 0.6); }
-.location-badge[data-location='Dimensional Storage'] { border-color: rgba(196, 150, 255, 0.6); }
+.location-badge[data-location='DimsPS'] { border-color: rgba(196, 150, 255, 0.6); }
 
 .save-badge {
   align-items: center;

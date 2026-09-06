@@ -213,7 +213,7 @@
 
 .location-pill[data-location='Pal Box'] { border: 1px solid rgba(120, 220, 160, 0.5); }
 
-.location-pill[data-location='Dimensional Storage'] { border: 1px solid rgba(196, 150, 255, 0.5); }
+.location-pill[data-location='DimsPS'] { border: 1px solid rgba(196, 150, 255, 0.5); }
 
 .location-pill[data-location^='Base'] { border: 1px solid rgba(144, 226, 255, 0.5); }
 

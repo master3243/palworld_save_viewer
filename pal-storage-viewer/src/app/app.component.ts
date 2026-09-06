@@ -25,7 +25,7 @@ export function locationRank(location: string): number {
   const base = /^Base (\d+)/.exec(location);
   if (base) return 1 + Number(base[1]);
   if (location === 'Pal Box') return 1000;
-  if (location === 'Dimensional Storage') return 2000;
+  if (location === 'DimsPS') return 2000;
   if (!location || location === 'Unknown') return 4000;
   return 3000;
 }
@@ -869,7 +869,7 @@ export class AppComponent {
       const location = this.cellValue(row, 'location') || 'Unknown';
       counts.set(location, (counts.get(location) ?? 0) + 1);
     }
-    const order = ['Party', 'Pal Box', 'Dimensional Storage'];
+    const order = ['Party', 'Pal Box', 'DimsPS'];
     return Array.from(counts, ([location, count]) => ({ location, count })).sort((left, right) => {
       const leftRank = order.indexOf(left.location);
       const rightRank = order.indexOf(right.location);
