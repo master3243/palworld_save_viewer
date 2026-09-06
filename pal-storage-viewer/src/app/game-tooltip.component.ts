@@ -13,7 +13,7 @@ export interface TextSegment { text: string; value: boolean; }
 export interface LevelLine { label: string; segments: TextSegment[]; current: boolean; }
 
 /** One condensing rank of the work grid: filled stars and every suitability's level at that rank. */
-export interface WorkLevelRow { stars: number; current: boolean; items: { src: string; name: string; rank: number; up: boolean; hot: boolean }[]; }
+export interface WorkLevelRow { stars: number; current: boolean; items: { src: string; name: string; rank: number; up: boolean }[]; }
 
 export interface TooltipData {
   title: string;
@@ -31,8 +31,8 @@ export interface TooltipData {
   rows?: [string, string, string?][];
   /** Work suitability at each condensing rank. */
   work?: WorkLevelRow[];
-  /** Left-aligned label + blue figure lines, like the game's passive skill card ("Attack +30.0%"). */
-  inline?: [string, string][];
+  /** Left-aligned lines with every figure marked, like the game's passive skill card ("Attack +30.0%"). */
+  inline?: TextSegment[][];
   lines?: string[];
   /** Text with the level-driven parts marked, shown like an intro line. */
   rich?: TextSegment[];
@@ -56,7 +56,7 @@ export interface TooltipData {
         </span>
         <span class="tip-stat" *ngFor="let stat of data.stats"><i [attr.data-icon]="stat.icon"></i>{{ stat.label }}<b>{{ stat.value }}</b></span>
       </div>
-      <div class="tip-inline" *ngIf="data.inline?.length"><div *ngFor="let row of data.inline"><span>{{ row[0] }}</span><b *ngIf="row[1]">{{ row[1] }}</b></div></div>
+      <div class="tip-inline" *ngIf="data.inline?.length"><div *ngFor="let line of data.inline"><ng-container *ngFor="let seg of line"><em *ngIf="seg.value; else inlinePlain">{{ seg.text }}</em><ng-template #inlinePlain>{{ seg.text }}</ng-template></ng-container></div></div>
       <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
       <div class="tip-rows" *ngIf="data.rows?.length">
         <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'" [class.subtotal]="row[2] === 'subtotal'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
@@ -64,7 +64,7 @@ export interface TooltipData {
       <div class="tip-work" *ngIf="data.work?.length">
         <div class="tip-work-row" *ngFor="let row of data.work" [class.current]="row.current">
           <span class="tip-stars"><i *ngFor="let slot of [0, 1, 2, 3]" [class.on]="slot < row.stars">★</i></span>
-          <span class="tip-work-items"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [class.hot]="item.hot" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
+          <span class="tip-work-items"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
         </div>
       </div>
       <p class="tip-line" *ngFor="let line of data.lines">{{ line }}</p>
@@ -96,7 +96,7 @@ export interface TooltipData {
     .tip-stat i[data-icon="clock"]::after { border-left: 1.5px solid #c9d8df; border-bottom: 1.5px solid #c9d8df; content: ''; height: 3px; left: 4px; position: absolute; top: 1px; width: 2px; }
     .tip-stat i[data-icon="power"] { border: 0; } .tip-stat i[data-icon="power"]::after { content: '✹'; font-size: 12px; font-style: normal; line-height: 10px; position: absolute; left: -1px; top: -1px; }
     .tip-inline { line-height: 1.55; padding: 8px 12px 2px; }
-    .tip-inline span { color: #e6f1f5; } .tip-inline b { color: #5ecbff; font-variant-numeric: tabular-nums; font-weight: 600; margin-left: 6px; }
+    .tip-inline em { color: #5ecbff; font-style: normal; font-variant-numeric: tabular-nums; font-weight: 600; }
     .tip-inline + .tip-line, .tip-inline + .tip-note { margin-top: 4px; }
     .tip-effect { background: rgba(255, 255, 255, .06); display: flex; justify-content: space-between; margin: 4px 0 0; padding: 4px 12px; }
     .tip-effect span { color: #c9d8df; } .tip-effect b { color: #fff; }
@@ -113,7 +113,7 @@ export interface TooltipData {
     .tip-work-items { display: flex; flex-wrap: wrap; gap: 4px 6px; }
     .tip-work-item { align-items: center; background: rgba(255, 255, 255, .05); border: 1px solid transparent; border-radius: 3px; color: #c9d8df; display: inline-flex; gap: 3px; padding: 1px 5px 1px 3px; }
     .tip-work-item img { height: 16px; width: 16px; } .tip-work-item b { font-size: .78rem; font-variant-numeric: tabular-nums; }
-    .tip-work-item.up b { color: #ffe08a; } .tip-work-item.hot { background: rgba(94, 203, 255, .12); border-color: rgba(94, 203, 255, .45); }
+    .tip-work-item.up b { color: #ffe08a; }
     .tip-work-row.current .tip-work-item b { color: #fff; } .tip-work-row.current .tip-work-item.up b { color: #ffe08a; }
     .tip-line { border-top: 1px solid rgba(190, 220, 235, .18); line-height: 1.45; margin: 6px 12px 0; padding: 7px 0 8px; }
     .tip-line + .tip-line { border-top: 0; margin-top: 0; padding-top: 0; }

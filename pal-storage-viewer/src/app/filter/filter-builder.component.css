@@ -153,8 +153,101 @@
   min-width: 0;
 }
 
-.rule.unknown select.field {
+.rule.unknown input.field {
   border-color: rgba(255, 112, 133, 0.6);
+}
+
+.field-wrap {
+  display: inline-flex;
+  position: relative;
+}
+
+input.field {
+  background: rgba(3, 12, 22, 0.78);
+  border: 1px solid rgba(134, 220, 255, 0.28);
+  border-radius: 6px 0 0 6px;
+  border-right: 0;
+  color: #eaf7ff;
+  font-size: 0.78rem;
+  height: 30px;
+  padding: 0 8px;
+  width: 150px;
+}
+
+input.field::placeholder {
+  color: rgba(199, 243, 255, 0.34);
+}
+
+.field-wrap:focus-within input.field {
+  border-color: rgba(149, 243, 255, 0.85);
+}
+
+.field-wrap:focus-within input.field::placeholder {
+  color: rgba(199, 243, 255, 0.55);
+}
+
+input.field:focus-visible {
+  outline: none;
+}
+
+.field-caret {
+  background: rgba(3, 12, 22, 0.78);
+  border: 1px solid rgba(134, 220, 255, 0.28);
+  border-radius: 0 6px 6px 0;
+  color: rgba(199, 243, 255, 0.78);
+  cursor: pointer;
+  font-size: 0.8rem;
+  height: 30px;
+  line-height: 1;
+  padding: 0 7px;
+}
+
+.field-caret:hover,
+.field-wrap.open .field-caret {
+  background: rgba(88, 197, 238, 0.14);
+  color: #f4fdff;
+}
+
+.field-wrap:focus-within .field-caret {
+  border-color: rgba(149, 243, 255, 0.85);
+}
+
+.field-list {
+  max-height: 320px;
+  max-width: 340px;
+  min-width: 260px;
+  width: max-content;
+}
+
+.field-list li[role="option"] {
+  gap: 16px;
+}
+
+.field-list li .suggest-count {
+  flex: 0 0 auto;
+}
+
+.field-list li.section {
+  color: rgba(199, 243, 255, 0.5);
+  cursor: default;
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+  padding: 4px 8px 2px;
+  text-transform: uppercase;
+}
+
+.field-list li.section:hover {
+  background: transparent;
+}
+
+.field-list li.section:first-child {
+  margin-top: 0;
+}
+
+.field-list li.selected .suggest-value {
+  color: #8fe8ff;
 }
 
 select,
@@ -171,10 +264,6 @@ input.value {
 select {
   cursor: pointer;
   max-width: 190px;
-}
-
-select.field {
-  min-width: 150px;
 }
 
 select.op {

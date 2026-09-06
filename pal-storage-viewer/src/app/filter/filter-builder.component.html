@@ -51,12 +51,46 @@
 
           <ng-container *ngIf="child.type === 'rule'; else nestedGroup">
             <div class="rule" [class.unknown]="isUnknownField(child)">
-              <select class="field" [value]="child.field" (change)="onFieldChange(child, $event)" [title]="hint(child)">
-                <option *ngIf="isUnknownField(child)" [value]="child.field" disabled>{{ child.field }} (unknown)</option>
-                <optgroup *ngFor="let fieldGroup of fieldGroups" [label]="fieldGroup.name">
-                  <option *ngFor="let field of fieldGroup.fields" [value]="field.key" [selected]="field.key === child.field">{{ field.label }}</option>
-                </optgroup>
-              </select>
+              <span class="field-wrap" [class.open]="fieldMenu?.ruleId === child.id">
+                <input
+                  #fieldInput
+                  class="field"
+                  type="text"
+                  [value]="fieldText(child)"
+                  [title]="hint(child)"
+                  placeholder="field"
+                  autocomplete="off"
+                  spellcheck="false"
+                  (input)="onFieldInput(child, $event)"
+                  (focus)="onFieldFocus(child, $event)"
+                  (blur)="onFieldBlur(child)"
+                  (keydown)="onFieldKeydown(child, $event, fieldInput)"
+                >
+                <button
+                  class="field-caret"
+                  type="button"
+                  aria-label="Choose a field from the list"
+                  title="Choose a field"
+                  (mousedown)="$event.preventDefault(); toggleFieldMenu(child, fieldInput)"
+                >▾</button>
+                <ul class="suggestions field-list" *ngIf="fieldMenu?.ruleId === child.id" role="listbox">
+                  <ng-container *ngFor="let section of fieldMenu!.sections">
+                    <li class="section" role="presentation">{{ section.name }}</li>
+                    <li
+                      *ngFor="let field of section.fields"
+                      role="option"
+                      [class.active]="field === fieldMenu!.active"
+                      [class.selected]="field.key === child.field"
+                      [attr.aria-selected]="field === fieldMenu!.active"
+                      (mousedown)="$event.preventDefault(); pickField(child, field, fieldInput)"
+                    >
+                      <span class="suggest-value">{{ field.label }}</span>
+                      <span class="suggest-count">{{ field.key }}</span>
+                    </li>
+                  </ng-container>
+                  <li class="section empty" *ngIf="!fieldMenu!.sections.length">No field matches</li>
+                </ul>
+              </span>
 
               <select class="op" [value]="child.op" (change)="onOperatorChange(child, $event)">
                 <option *ngFor="let def of operatorsFor(child)" [value]="def.op" [selected]="def.op === child.op">{{ def.label }}</option>

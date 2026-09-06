@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
-import { TraitIcon, elementIcons, workTable } from './trait-icons';
+import { elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
 import { condenseWorkBonus } from '../backend/stats';
 import { GameDataService } from './game-data.service';
@@ -27,7 +27,6 @@ interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' 
 interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: TooltipData; url: string; }
 interface PartnerSkill { name: string; level: string; segments: TextSegment[]; tooltip: TooltipData; }
 interface FoodEffect { name: string; effects: string; timeLeft: string; }
-interface WorkChip extends TraitIcon { tooltip: TooltipData; }
 interface TrustBar { rank: string; progress: number; title: string; tooltip: TooltipData; }
 
 @Component({
@@ -298,7 +297,7 @@ export class PalDetailCardComponent implements OnChanges {
   emptySlots: number[] = [];
   passiveSkills: PassiveSkill[] = [];
   works: ReturnType<typeof workTable> = [];
-  workChips: WorkChip[] = [];
+  workTooltip: TooltipData | null = null;
   /** Element chart popover, shown while the type chip is hovered. */
   showElementChart = false;
   get elementIndexes(): number[] { return this.elementChips.map((chip) => chip.index); }
@@ -322,7 +321,7 @@ export class PalDetailCardComponent implements OnChanges {
     this.learnedSkillChips = this.computeLearnedSkillChips();
     this.emptySlots = Array.from({ length: Math.max(0, 3 - this.activeSkillChips.length) }, (_, index) => index);
     this.works = workTable(this.row);
-    this.workChips = this.computeWorkChips();
+    this.workTooltip = this.computeWorkTooltip();
     this.elementChips = this.computeElementChips();
     this.rankStars = this.computeRankStars();
     this.foodGauge = this.computeFoodGauge();
@@ -331,31 +330,31 @@ export class PalDetailCardComponent implements OnChanges {
     this.fields = this.computeFields();
   }
 
-  /** Every work chip opens the same grid: the Pal's whole suitability line at each condensing rank
-   * (handbook ranks kept), with the hovered work marked and each level-up in gold. */
-  private computeWorkChips(): WorkChip[] {
+  /** The whole work panel opens one grid: the Pal's suitability line at each condensing rank
+   * (handbook ranks kept), each level-up in gold. */
+  private computeWorkTooltip(): TooltipData | null {
     const species = this.listFor('work_species').map(Number);
     const stars = this.displayRank;
-    const known = species.length === this.works.length && species.every((rank) => Number.isFinite(rank));
-    if (!known) return this.works.map((work) => ({ ...work, tooltip: { title: work.name, titleRight: work.rank ? `Lv.${work.rank}` : '—' } }));
+    if (species.length !== this.works.length || !species.every((rank) => Number.isFinite(rank))) return null;
     const current = condenseWorkBonus(species, stars);
     const handbook = this.works.map((work, index) => work.rank - species[index] - current[index]);
     const able = this.works.map((work, index) => index).filter((index) => species[index] + handbook[index] > 0);
+    if (!able.length) return null;
     const rankAt = (count: number) => { const bonus = condenseWorkBonus(species, count); return able.map((index) => species[index] + handbook[index] + bonus[index]); };
     const perStar = [0, 1, 2, 3, 4].map(rankAt);
+    const rows: WorkLevelRow[] = perStar.map((ranks, count) => ({
+      stars: count,
+      current: count === stars,
+      items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: count > 0 && rank > perStar[count - 1][slot] })),
+    }));
     const extra = handbook.reduce((sum, value) => sum + Math.max(0, value), 0);
-    return this.works.map((work, hovered) => {
-      const rows: WorkLevelRow[] = perStar.map((ranks, count) => ({
-        stars: count,
-        current: count === stars,
-        items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: count > 0 && rank > perStar[count - 1][slot], hot: able[slot] === hovered })),
-      }));
-      const tooltip: TooltipData = { title: 'Work Suitability', titleRight: `${'★'.repeat(stars)}${'☆'.repeat(4 - stars)}` };
-      if (!work.rank) tooltip.intro = [`${work.name}: this Pal is not suited to it.`];
-      if (able.length) { tooltip.intro = [...(tooltip.intro ?? []), 'Levels at each condensing rank:']; tooltip.work = rows; }
-      if (extra > 0) tooltip.note = `Includes +${extra} from handbooks or items.`;
-      return { ...work, tooltip };
-    });
+    return {
+      title: 'Work Suitability',
+      titleRight: `${'★'.repeat(stars)}${'☆'.repeat(4 - stars)}`,
+      intro: ['Levels at each condensing rank:'],
+      work: rows,
+      note: extra > 0 ? `Includes +${extra} from handbooks or items.` : undefined,
+    };
   }
 
   /** Skills the Pal could swap in: mastered plus the species learnset, minus the three equipped slots. */
@@ -507,14 +506,13 @@ export class PalDetailCardComponent implements OnChanges {
     });
   }
 
-  /** The game lists one effect per line with the figure in blue: "Attack +30.0%" / "Defense +5.0%". */
-  private passiveLines(description: string): [string, string][] {
+  /** The game lists one effect per line with every figure in blue ("Max stamina +50.0%" then
+   * "*This effect is only valid for rideable pals."). The data has the effects run together in one
+   * string, so a new line starts after a figure wherever a capitalised word, "*" or "(" follows. */
+  private passiveLines(description: string): TextSegment[][] {
     if (!description) return [];
-    const pieces = description.split(/(?<=[+-]?\d+(?:\.\d+)?%?)\s+(?=[A-Z])/).map((piece) => piece.trim()).filter(Boolean);
-    return pieces.map((piece) => {
-      const match = /^(.*?)\s*([+-]?\d+(?:\.\d+)?%?)$/.exec(piece);
-      return match ? [match[1], match[2]] : [piece, ''];
-    });
+    const lines = description.split(/(?<=\d%?|\d\))\s+(?=[A-Z*(])/).map((line) => line.trim()).filter(Boolean);
+    return lines.map((line) => line.split(/(\d+(?:\.\d+)?)/).filter(Boolean).map((text) => ({ text, value: /^\d/.test(text) })));
   }
 
   activeSkillUrl(move: string): string {

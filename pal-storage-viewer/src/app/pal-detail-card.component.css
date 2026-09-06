@@ -85,7 +85,7 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .bar-row { align-items: center; display: grid; gap: 8px; grid-template-columns: 18px 46px 1fr 92px; }
 .bar-icon { align-items: center; color: #9be0f4; display: inline-flex; font-size: .85rem; justify-content: center; }
 .bar-icon svg { fill: #f0c070; height: 15px; width: 15px; }.bar-icon svg .crust { stroke: #8a5a1e; stroke-width: 1.4; stroke-linecap: round; }
-.bar-row[tabindex], .stat[tabindex], .partner-body[tabindex], .work-chip[tabindex] { outline: none; }
+.bar-row[tabindex], .stat[tabindex], .partner-body[tabindex], .work-grid[tabindex] { outline: none; }
 .food-line { align-items: center; color: #d9edf7; display: grid; font-size: .7rem; gap: 8px; grid-template-columns: 18px 46px 1fr; margin-top: 2px; }
 .food-line b { color: #ffd37a; }.food-line small { color: #8fb4c4; }.bar-label { color: #c8e9f2; font-size: .66rem; font-weight: 800; text-transform: uppercase; }
 .bar { background: rgba(255, 255, 255, .08); border-radius: 3px; display: block; height: 14px; overflow: hidden; }

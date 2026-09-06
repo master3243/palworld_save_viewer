@@ -10,16 +10,23 @@ import { ELEMENT_NAMES } from '../backend/lookups';
 interface ChartNode { index: number; name: string; x: number; y: number; labelAbove: boolean; color: string; }
 
 const COLORS = ['#a08a78', '#d9502c', '#2f80e0', '#e0b41c', '#5fa82a', '#6a3fa0', '#9b3fd0', '#a8642c', '#2fb0d8'];
+// The left five sit on a regular pentagon (Water at the top), as in the game's chart; the right
+// four continue Fire's row and Grass's row.
+const CENTER = { x: 215, y: 196 };
+const RADIUS = 125;
+const onPentagon = (angleDeg: number) => ({ x: Math.round(CENTER.x + RADIUS * Math.cos(angleDeg * Math.PI / 180)), y: Math.round(CENTER.y - RADIUS * Math.sin(angleDeg * Math.PI / 180)) });
+const WATER = onPentagon(90); const FIRE = onPentagon(18); const GRASS = onPentagon(-54); const GROUND = onPentagon(-126); const ELECTRIC = onPentagon(162);
+const STEP = 115;
 const NODES: ChartNode[] = [
-  { index: 3, name: 'Electric', x: 100, y: 180, labelAbove: true, color: COLORS[3] },
-  { index: 2, name: 'Water', x: 215, y: 95, labelAbove: true, color: COLORS[2] },
-  { index: 1, name: 'Fire', x: 330, y: 180, labelAbove: true, color: COLORS[1] },
-  { index: 8, name: 'Ice', x: 445, y: 180, labelAbove: true, color: COLORS[8] },
-  { index: 6, name: 'Dragon', x: 560, y: 180, labelAbove: true, color: COLORS[6] },
-  { index: 5, name: 'Dark', x: 560, y: 300, labelAbove: false, color: COLORS[5] },
-  { index: 0, name: 'Neutral', x: 445, y: 300, labelAbove: false, color: COLORS[0] },
-  { index: 4, name: 'Grass', x: 330, y: 300, labelAbove: false, color: COLORS[4] },
-  { index: 7, name: 'Ground', x: 215, y: 300, labelAbove: false, color: COLORS[7] },
+  { index: 3, name: 'Electric', ...ELECTRIC, labelAbove: true, color: COLORS[3] },
+  { index: 2, name: 'Water', ...WATER, labelAbove: true, color: COLORS[2] },
+  { index: 1, name: 'Fire', ...FIRE, labelAbove: true, color: COLORS[1] },
+  { index: 8, name: 'Ice', x: FIRE.x + STEP, y: FIRE.y, labelAbove: true, color: COLORS[8] },
+  { index: 6, name: 'Dragon', x: FIRE.x + 2 * STEP, y: FIRE.y, labelAbove: true, color: COLORS[6] },
+  { index: 5, name: 'Dark', x: FIRE.x + 2 * STEP, y: GRASS.y, labelAbove: false, color: COLORS[5] },
+  { index: 0, name: 'Neutral', x: FIRE.x + STEP, y: GRASS.y, labelAbove: false, color: COLORS[0] },
+  { index: 4, name: 'Grass', ...GRASS, labelAbove: false, color: COLORS[4] },
+  { index: 7, name: 'Ground', ...GROUND, labelAbove: false, color: COLORS[7] },
 ];
 /** [attacker, defender] pairs. */
 const ARROWS: [number, number][] = [[2, 1], [1, 8], [8, 6], [6, 5], [5, 0], [1, 4], [4, 7], [7, 3], [3, 2]];
@@ -30,7 +37,7 @@ const ARROWS: [number, number][] = [[2, 1], [1, 8], [8, 6], [6, 5], [5, 0], [1, 
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg viewBox="0 0 660 372" class="chart" role="img" aria-label="Element effectiveness chart">
+    <svg viewBox="0 0 640 366" class="chart" role="img" aria-label="Element effectiveness chart">
       <defs>
         <marker id="element-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
           <path d="M0 0L10 5L0 10z" fill="#8ee6ff"/>

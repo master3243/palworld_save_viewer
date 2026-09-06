@@ -200,13 +200,12 @@
 
     <section class="work-panel" *ngIf="hasWorkData">
       <h3>Work Suitability</h3>
-      <div class="work-grid">
+      <div class="work-grid" [appTooltip]="workTooltip" tabindex="-1">
         <span
-          *ngFor="let work of workChips"
+          *ngFor="let work of works"
           class="work-chip"
           [class.none]="work.rank === 0"
-          [appTooltip]="work.tooltip"
-          tabindex="-1"
+          [title]="work.name + ' ' + work.rank"
         >
           <img class="trait-icon" [src]="work.src" [alt]="work.name">
           <b class="work-rank">{{ work.rank }}</b>
