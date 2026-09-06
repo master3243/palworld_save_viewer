@@ -19,7 +19,7 @@ interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defen
 interface PassiveSkill { name: string; rank: string; color: string; rankMarker: string; rankIcon: string; tooltip: TooltipData; }
 interface VitalBar { label: string; icon: string; value: string; percent: number; title: string; tone: string; tooltip: TooltipData | null; }
 interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting'; delta: number; tooltip: TooltipData; }
-interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: TooltipData; url: string; }
+interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: TooltipData; }
 interface PartnerSkill { name: string; level: string; segments: TextSegment[]; tooltip: TooltipData; }
 interface FoodEffect { name: string; effects: string; timeLeft: string; }
 interface TrustBar { rank: string; progress: number; title: string; tooltip: TooltipData; }
@@ -343,7 +343,7 @@ export class PalDetailCardComponent implements OnChanges {
       const iconSrc = elementIndex >= 0 ? `assets/icons/element_${String(elementIndex).padStart(2, '0')}.webp` : '';
       const description = this.gameData.activeDescription(id);
       const tooltip = activeSkillTooltip(name, description, detail);
-      return { name, elementIndex, iconSrc, power: detail ? String(detail.power) : '', tooltip, url: this.activeSkillUrl(name) };
+      return { name, elementIndex, iconSrc, power: detail ? String(detail.power) : '', tooltip };
     });
   }
 
@@ -468,14 +468,6 @@ export class PalDetailCardComponent implements OnChanges {
       const description = this.gameData.passiveDescription(ids[index] ?? '');
       return { name, rank, color, rankMarker, rankIcon, tooltip: passiveSkillTooltip(name, description) };
     });
-  }
-
-  activeSkillUrl(move: string): string {
-    return `https://palworld.wiki.gg/wiki/${encodeURIComponent(move.replace(/\s+/g, '_'))}`;
-  }
-
-  passiveSkillUrl(skill: string): string {
-    return `https://palworld.wiki.gg/wiki/${encodeURIComponent(skill.replace(/\s+/g, '_'))}`;
   }
 
   constructor(

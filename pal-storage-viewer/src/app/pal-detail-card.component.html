@@ -211,6 +211,7 @@
           <img class="trait-icon" [src]="work.src" [alt]="work.name">
           <b class="work-rank" *ngIf="work.rank">{{ work.rank }}</b>
           <i class="work-raise" *ngIf="work.bonus" aria-hidden="true"></i>
+          <small class="work-name">{{ work.name }}</small>
         </span>
       </div>
     </section>
@@ -221,14 +222,12 @@
         <h3>Passive Skills</h3>
         <span class="move-empty" *ngIf="!passiveSkills.length">None</span>
         <div class="skill-chips" *ngIf="passiveSkills.length">
-          <a
+          <button
             *ngFor="let skill of passiveSkills"
             class="skill-chip"
             [attr.data-tone]="skill.color"
-            [href]="passiveSkillUrl(skill.name)"
-            target="_blank"
-            rel="noopener noreferrer"
-            [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
+            type="button"
+            [attr.aria-label]="skill.name + ' details'"
             [appTooltip]="skill.tooltip"
           >
             {{ skill.name }}
@@ -238,7 +237,7 @@
               [src]="rankIconSource"
               [alt]="skill.rankMarker"
             >
-          </a>
+          </button>
         </div>
       </section>
 
@@ -248,38 +247,34 @@
           <div class="move-column">
             <h4>Equipped</h4>
             <div class="move-list">
-              <a
+              <button
                 *ngFor="let skill of activeSkillChips"
                 class="move-chip"
                 [attr.data-element]="skill.elementIndex"
-                [href]="skill.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
+                type="button"
+                [attr.aria-label]="skill.name + ' details'"
                 [appTooltip]="skill.tooltip"
               >
                 <span class="move-name">{{ skill.name }}</span>
                 <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
-              </a>
+              </button>
               <span class="move-empty" *ngFor="let slot of emptySlots">Empty Skill Slot</span>
             </div>
           </div>
           <div class="move-column">
             <h4>Learned, not equipped</h4>
             <div class="move-list">
-              <a
+              <button
                 *ngFor="let skill of learnedSkillChips"
                 class="move-chip learned"
                 [attr.data-element]="skill.elementIndex"
-                [href]="skill.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                [attr.aria-label]="'Open ' + skill.name + ' on Palworld Wiki'"
+                type="button"
+                [attr.aria-label]="skill.name + ' details'"
                 [appTooltip]="skill.tooltip"
               >
                 <span class="move-name">{{ skill.name }}</span>
                 <span class="move-meta" *ngIf="skill.power"><img *ngIf="skill.iconSrc" [src]="skill.iconSrc" alt=""><b>{{ skill.power }}</b></span>
-              </a>
+              </button>
               <span class="move-empty" *ngIf="!learnedSkillChips.length">None</span>
             </div>
           </div>

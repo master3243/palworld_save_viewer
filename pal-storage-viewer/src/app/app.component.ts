@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
 import { CompletionComponent } from './completion/completion.component';
@@ -63,10 +63,29 @@ interface DirectoryEntryLike {
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   @ViewChild('tableScroll') tableScroll?: ElementRef<HTMLElement>;
   @ViewChild('folderInput') folderInput?: ElementRef<HTMLInputElement>;
   @ViewChild('addFilesInput') addFilesInput?: ElementRef<HTMLInputElement>;
+  private detailResizeObserver?: ResizeObserver;
+
+  @ViewChild('detailRow') set detailRow(ref: ElementRef<HTMLElement> | undefined) {
+    this.detailResizeObserver?.disconnect();
+    if (!ref) return;
+    const row = ref.nativeElement;
+    // Reflow, loaded images, and expanded fields all change the virtual row's height.
+    this.detailResizeObserver = new ResizeObserver(() => {
+      const height = row.offsetHeight;
+      if (height === this.detailHeight) return;
+      this.detailHeight = height;
+      this.changeDetector.markForCheck();
+    });
+    this.detailResizeObserver.observe(row);
+  }
+
+  ngOnDestroy(): void {
+    this.detailResizeObserver?.disconnect();
+  }
 
   originalRows: PalStorageRow[] = [];
   /** The save files currently merged into the table, aligned with `sources`. */

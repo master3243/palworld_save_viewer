@@ -17,6 +17,7 @@ export interface WorkLevelRow { stars: number; current: boolean; items: { src: s
 
 export interface TooltipData {
   title: string;
+  wikiUrl?: string;
   /** Figures shown right of the title, e.g. "687 ≫ 550". */
   titleRight?: string;
   /** Text shown first, before any rows. */
@@ -50,8 +51,14 @@ export interface TooltipData {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [class.fitted]="width !== null" [class.ready]="ready">
-      <div class="tip-title"><span>{{ data.title }}</span><b *ngIf="data.titleRight">{{ data.titleRight }}</b></div>
+    <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [class.fitted]="width !== null" [class.ready]="ready" [class.interactive]="!!data.wikiUrl">
+      <div class="tip-title">
+        <span>{{ data.title }}</span><b *ngIf="data.titleRight">{{ data.titleRight }}</b>
+        <a *ngIf="data.wikiUrl" class="tip-wiki" [href]="data.wikiUrl" target="_blank" rel="noopener noreferrer" title="palworld.wiki.gg" [attr.aria-label]="'Open ' + data.title + ' on Palworld Wiki'">
+          <span>GG</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg>
+        </a>
+      </div>
       <p class="tip-intro" *ngFor="let line of data.intro">{{ line }}</p>
       <p class="tip-intro tip-rich" *ngIf="data.rich?.length"><ng-container *ngFor="let seg of data.rich"><em *ngIf="seg.value; else richPlain">{{ seg.text }}</em><ng-template #richPlain>{{ seg.text }}</ng-template></ng-container></p>
       <div class="tip-badges" *ngIf="data.badge || data.stats?.length">
@@ -68,7 +75,7 @@ export interface TooltipData {
       <div class="tip-work" *ngIf="data.work?.length">
         <div class="tip-work-row" *ngFor="let row of data.work" [class.current]="row.current">
           <span class="tip-stars"><i *ngFor="let slot of [0, 1, 2, 3]" [class.on]="slot < row.stars">★</i></span>
-          <span class="tip-work-items" [style.grid-template-columns]="'repeat(' + row.items.length + ', minmax(0, 1fr))'"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [class.none]="item.none" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
+          <span class="tip-work-items" [style.--work-columns]="row.items.length"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [class.none]="item.none" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
         </div>
       </div>
       <p class="tip-line" *ngFor="let line of data.lines">{{ line }}</p>
@@ -82,6 +89,10 @@ export interface TooltipData {
     .tip { background: rgba(14, 24, 32, .96); border: 1px solid rgba(190, 220, 235, .35); box-shadow: 0 10px 30px rgba(0, 0, 0, .55); color: #e6f1f5; font-size: .78rem; left: 0; max-width: 380px; min-width: 220px; opacity: 0; padding-bottom: 9px; pointer-events: none; position: fixed; top: 0; z-index: 1000; }
     .tip.ready { opacity: 1; }
     .tip.fitted { max-width: none; }
+    .tip.interactive { pointer-events: auto; }
+    .tip-wiki { align-items: center; background: rgba(3, 17, 27, .72); border: 1px solid rgba(151, 184, 255, .38); border-radius: 7px; color: #afc7ff; display: inline-flex; flex-shrink: 0; font-size: .74rem; font-weight: 900; gap: 5px; height: 32px; justify-content: center; margin-left: auto; min-width: 49px; padding: 0 8px; text-decoration: none; }
+    .tip-wiki svg { fill: none; height: 16px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; width: 16px; }
+    .tip-wiki:hover, .tip-wiki:focus-visible { background: rgba(61, 174, 217, .2); border-color: #afc7ff; box-shadow: 0 0 6px rgba(132, 165, 245, .28); color: #fff; outline: none; }
     .tip-title { align-items: center; background: linear-gradient(90deg, rgba(110, 125, 135, .55), rgba(60, 75, 85, .55)); color: #fff; display: flex; font-size: .9rem; font-weight: 700; gap: 16px; justify-content: space-between; padding: 6px 12px; }
     .tip-title b { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
     .tip-intro { line-height: 1.45; margin: 8px 12px 0; }
@@ -115,7 +126,7 @@ export interface TooltipData {
     .tip-work-row.current { background: linear-gradient(90deg, rgba(255, 211, 122, .14), transparent); border-left-color: #ffd37a; }
     .tip-stars { display: inline-flex; font-size: .8rem; gap: 1px; letter-spacing: 0; }
     .tip-stars i { color: rgba(190, 220, 235, .25); font-style: normal; } .tip-stars i.on { color: #ffd37a; text-shadow: 0 0 5px rgba(255, 211, 122, .5); }
-    .tip-work-items { display: grid; gap: 3px; }
+    .tip-work-items { display: grid; gap: 3px; grid-template-columns: repeat(var(--work-columns), minmax(0, 1fr)); }
     .tip-work-item { align-items: center; background: rgba(255, 255, 255, .05); border: 1px solid transparent; border-radius: 3px; color: #c9d8df; display: inline-flex; gap: 2px; justify-content: center; min-width: 0; padding: 1px 2px; }
     .tip-work-item img { height: 15px; width: 15px; } .tip-work-item b { font-size: .74rem; font-variant-numeric: tabular-nums; }
     .tip-work-item.none { opacity: .3; }
@@ -134,6 +145,12 @@ export interface TooltipData {
     .tip-level-text em { color: #ffe08a; font-style: normal; font-weight: 700; }
     .tip-levels li.current .tip-level-text em { text-shadow: 0 0 6px rgba(255, 211, 122, .45); }
     .tip-note { color: #ffd37a; font-size: .68rem; margin: 6px 12px 0; }
+    @media (max-width: 600px) {
+      .tip, .tip.fitted { max-width: calc(100vw - 16px); }
+      .tip-work-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+      .tip-work-items { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+      .tip-title { gap: 8px; }
+    }
   `],
 })
 export class GameTooltipComponent {
@@ -149,8 +166,38 @@ export class GameTooltipComponent {
 export class TooltipDirective implements OnInit, OnDestroy {
   @Input('appTooltip') data: TooltipData | null = null;
   private ref: ComponentRef<GameTooltipComponent> | null = null;
-  private readonly show = () => this.open();
+  private static active: TooltipDirective | null = null;
+  private closeTimer: ReturnType<typeof setTimeout> | undefined;
+  private readonly keepOpen = () => { clearTimeout(this.closeTimer); };
+  private readonly show = () => { this.keepOpen(); this.open(); };
   private readonly hide = () => this.close();
+  private readonly leave = () => {
+    this.keepOpen();
+    if (this.data?.wikiUrl) this.closeTimer = setTimeout(this.hide, 200);
+    else this.close();
+  };
+  private readonly blur = (event: FocusEvent) => {
+    if (!this.contains(event.relatedTarget)) this.leave();
+  };
+  private readonly click = (event: MouseEvent) => {
+    if (!this.data?.wikiUrl) return;
+    event.stopPropagation();
+    this.show();
+  };
+  private readonly outside = (event: PointerEvent) => {
+    if (!this.contains(event.target)) this.close();
+  };
+  private readonly keydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') this.close();
+    if (event.key === 'Tab' && !event.shiftKey && document.activeElement === this.host.nativeElement && this.data?.wikiUrl) {
+      event.preventDefault();
+      this.ref?.location.nativeElement.querySelector('.tip-wiki')?.focus();
+    }
+  };
+
+  private contains(target: EventTarget | null): boolean {
+    return target instanceof Node && (this.host.nativeElement.contains(target) || !!this.ref?.location.nativeElement.contains(target));
+  }
 
   constructor(
     private readonly host: ElementRef<HTMLElement>,
@@ -166,14 +213,17 @@ export class TooltipDirective implements OnInit, OnDestroy {
       const el = this.host.nativeElement;
       el.addEventListener('mouseenter', this.show);
       el.addEventListener('focus', this.show);
-      el.addEventListener('mouseleave', this.hide);
-      el.addEventListener('blur', this.hide);
+      el.addEventListener('mouseleave', this.leave);
+      el.addEventListener('blur', this.blur);
+      el.addEventListener('click', this.click);
       window.addEventListener('scroll', this.hide, true);
     });
   }
 
   private open(): void {
     if (!this.data || this.ref) return;
+    TooltipDirective.active?.close();
+    TooltipDirective.active = this;
     const ref = createComponent(GameTooltipComponent, { environmentInjector: this.injector });
     ref.instance.data = this.data;
     const anchor = this.host.nativeElement.getBoundingClientRect();
@@ -183,6 +233,13 @@ export class TooltipDirective implements OnInit, OnDestroy {
     document.body.appendChild(ref.location.nativeElement);
     ref.changeDetectorRef.detectChanges();
     this.ref = ref;
+    const popup = ref.location.nativeElement as HTMLElement;
+    popup.addEventListener('mouseenter', this.keepOpen);
+    popup.addEventListener('mouseleave', this.leave);
+    popup.addEventListener('focusin', this.keepOpen);
+    popup.addEventListener('focusout', this.blur);
+    document.addEventListener('pointerdown', this.outside, true);
+    document.addEventListener('keydown', this.keydown);
     const tip = (ref.location.nativeElement as HTMLElement).querySelector('.tip') as HTMLElement;
     const size = tip.getBoundingClientRect();
     const margin = 8;
@@ -190,23 +247,29 @@ export class TooltipDirective implements OnInit, OnDestroy {
     ref.instance.y = anchor.bottom + margin + size.height > window.innerHeight - margin && anchor.top - size.height - margin > 0
       ? anchor.top - size.height - margin
       : anchor.bottom + margin;
+    ref.instance.y = Math.max(margin, Math.min(ref.instance.y, window.innerHeight - size.height - margin));
     ref.instance.ready = true;
     ref.changeDetectorRef.detectChanges();
   }
 
   private close(): void {
+    this.keepOpen();
     if (!this.ref) return;
+    document.removeEventListener('pointerdown', this.outside, true);
+    document.removeEventListener('keydown', this.keydown);
     this.appRef.detachView(this.ref.hostView);
     this.ref.destroy();
     this.ref = null;
+    if (TooltipDirective.active === this) TooltipDirective.active = null;
   }
 
   ngOnDestroy(): void {
     const el = this.host.nativeElement;
     el.removeEventListener('mouseenter', this.show);
     el.removeEventListener('focus', this.show);
-    el.removeEventListener('mouseleave', this.hide);
-    el.removeEventListener('blur', this.hide);
+    el.removeEventListener('mouseleave', this.leave);
+    el.removeEventListener('blur', this.blur);
+    el.removeEventListener('click', this.click);
     window.removeEventListener('scroll', this.hide, true);
     this.close();
   }

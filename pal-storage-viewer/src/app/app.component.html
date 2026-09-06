@@ -267,7 +267,7 @@
               [passiveIcons]="passiveIconSrcs"
               (toggle)="toggleRow(item.index, $event)"
             ></tr>
-            <tr class="detail-row" *ngIf="isRowOpen(item.index)">
+            <tr #detailRow class="detail-row" *ngIf="isRowOpen(item.index)">
               <td [attr.colspan]="detailColspan">
                 <!-- Sticks to the visible part of a horizontally scrolled table and is as wide as
                      that view, so the card inside can be centred in what the user actually sees. -->

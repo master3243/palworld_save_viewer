@@ -6,6 +6,8 @@ import type { TooltipData, WorkLevelRow } from './game-tooltip.component';
 import type { PalStorageRow } from './save-parser.service';
 import type { TraitIcon } from './trait-icons';
 
+const skillWikiUrl = (name: string) => `https://palworld.wiki.gg/wiki/${encodeURIComponent(name.replace(/\s+/g, '_'))}`;
+
 /** Status ailment names as the game's skill cards show them. */
 const STATUS_NAMES: Record<string, string> = {
   Burn: 'Burn', Wetness: 'Soak', Freeze: 'Freeze', Electrical: 'Electrify', Darkness: 'Blind',
@@ -15,7 +17,7 @@ const STATUS_NAMES: Record<string, string> = {
 export function activeSkillTooltip(name: string, description: string, detail: ActiveSkillDetail | null): TooltipData {
   const elementIndex = detail?.element ?? -1;
   const iconSrc = elementIndex >= 0 ? `assets/icons/element_${String(elementIndex).padStart(2, '0')}.webp` : '';
-  const tooltip: TooltipData = { title: name, lines: description ? [description] : [], width: 360 };
+  const tooltip: TooltipData = { title: name, wikiUrl: skillWikiUrl(name), lines: description ? [description] : [], width: 360 };
   if (detail) {
     tooltip.badge = { text: ELEMENT_NAMES[elementIndex] ?? '', iconSrc, element: elementIndex };
     tooltip.stats = [{ icon: 'clock', label: ':', value: String(detail.cooldown) }, { icon: 'power', label: 'Power:', value: String(detail.power) }];
@@ -31,7 +33,7 @@ export function activeSkillTooltip(name: string, description: string, detail: Ac
 export function passiveSkillTooltip(name: string, description: string): TooltipData {
   const lines = description.split(/(?<=\d%?|\d\))\s+(?=[A-Z*(])/).map((line) => line.trim()).filter(Boolean);
   const inline = lines.map((line) => line.split(/(\d+(?:\.\d+)?)/).filter(Boolean).map((text) => ({ text, value: /^\d/.test(text) })));
-  return { title: name, inline, width: 360, note: description ? undefined : 'No description in the game data.' };
+  return { title: name, wikiUrl: skillWikiUrl(name), inline, width: 360, note: description ? undefined : 'No description in the game data.' };
 }
 
 /** The whole work panel opens one grid: the Pal's suitability line at each condensing rank
