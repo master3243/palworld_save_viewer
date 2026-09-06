@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnChanges, ViewChild } from '@angular/core';
 import { elementIcons, workTable } from './trait-icons';
 import { ELEMENT_NAMES } from '../backend/lookups';
 import { GameDataService } from './game-data.service';
@@ -294,7 +294,25 @@ export class PalDetailCardComponent implements OnChanges {
   works: ReturnType<typeof workTable> = [];
   workTooltip: TooltipData | null = null;
   /** Element chart popover, shown while the type chip is hovered. */
-  showElementChart = false;
+  @ViewChild('elementChartTrigger') elementChartTrigger?: ElementRef<HTMLElement>;
+  elementChartHovered = false;
+  elementChartPinned = false;
+
+  get showElementChart(): boolean {
+    return this.elementChartHovered || this.elementChartPinned;
+  }
+
+  @HostListener('document:pointerdown', ['$event'])
+  @HostListener('document:focusin', ['$event'])
+  onOutsideElementChart(event: Event): void {
+    if (event.target instanceof Node && !this.elementChartTrigger?.nativeElement.contains(event.target)) this.closeElementChart();
+  }
+
+  @HostListener('document:keydown.escape')
+  closeElementChart(): void {
+    this.elementChartHovered = false;
+    this.elementChartPinned = false;
+  }
   get elementIndexes(): number[] { return this.elementChips.map((chip) => chip.index); }
   elementChips: { name: string; src: string; index: number }[] = [];
   rankStars: boolean[] = [];
@@ -483,6 +501,7 @@ export class PalDetailCardComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
+    this.closeElementChart();
     this.refresh();
     this.palImageFailed = false;
     this.palImageSrc = '';

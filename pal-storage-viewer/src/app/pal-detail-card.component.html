@@ -109,12 +109,14 @@
               <i class="exp-bar"><em [style.width.%]="next.percent"></em></i>
               <b>{{ next.text }}</b>
             </div>
-            <span class="trait-line" *ngIf="elementChips.length" (mouseenter)="showElementChart = true" (mouseleave)="showElementChart = false">
-              <span *ngFor="let chip of elementChips" class="element-chip" [attr.data-element]="chip.index"><img [src]="chip.src" [alt]="chip.name">{{ chip.name }}</span>
+            <div #elementChartTrigger class="trait-line" *ngIf="elementChips.length" (pointerenter)="elementChartHovered = $event.pointerType === 'mouse'" (pointerleave)="elementChartHovered = false">
+              <button class="element-trigger" type="button" aria-label="Element effectiveness chart" [attr.aria-expanded]="showElementChart" (click)="elementChartPinned = !elementChartPinned">
+                <span *ngFor="let chip of elementChips" class="element-chip" [attr.data-element]="chip.index"><img [src]="chip.src" [alt]="chip.name">{{ chip.name }}</span>
+              </button>
               <div class="element-popover" *ngIf="showElementChart">
                 <app-element-chart [highlight]="elementIndexes"></app-element-chart>
               </div>
-            </span>
+            </div>
           </div>
         </div>
       </div>

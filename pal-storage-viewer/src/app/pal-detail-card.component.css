@@ -199,6 +199,8 @@ dd { color: #eefaff; display: -webkit-box; font-size: .76rem; margin: 0; max-hei
 }
 
 .trait-line { align-items: center; display: inline-flex; flex-wrap: wrap; gap: 4px; position: relative; }
+.element-trigger { align-items: center; background: transparent; border: 0; color: inherit; cursor: pointer; display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 0; }
+.element-trigger:focus-visible { outline: 2px solid #95f3ff; outline-offset: 3px; }
 .element-popover { background: rgba(14, 40, 52, .97); border: 1px solid rgba(142, 230, 255, .5); box-shadow: 0 14px 36px rgba(0, 0, 0, .6); left: 50%; padding: 10px 8px 2px; position: absolute; top: calc(100% + 6px); transform: translateX(-50%); width: 480px; z-index: 30; }
 .trait-icon { display: block; height: 24px; width: 24px; }
 .work-panel { background: rgba(1, 11, 18, .55); border: 1px solid rgba(135, 220, 255, .18); min-width: 0; padding: 12px; }
