@@ -338,15 +338,15 @@ export class PalDetailCardComponent implements OnChanges {
     if (species.length !== this.works.length || !species.every((rank) => Number.isFinite(rank))) return null;
     const current = condenseWorkBonus(species, stars);
     const handbook = this.works.map((work, index) => work.rank - species[index] - current[index]);
-    const able = this.works.map((work, index) => index).filter((index) => species[index] + handbook[index] > 0);
-    if (!able.length) return null;
+    const able = this.works.map((work, index) => index);
+    if (!this.works.some((work) => work.rank > 0)) return null;
     const rankAt = (count: number) => { const bonus = condenseWorkBonus(species, count); return able.map((index) => species[index] + handbook[index] + bonus[index]); };
     const perStar = [0, 1, 2, 3, 4].map(rankAt);
     const rows: WorkLevelRow[] = perStar.map((ranks, count) => ({
       stars: count,
       current: count === stars,
       // Gold once a level is above the unstarred value, and it stays gold at every higher rank.
-      items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: rank > perStar[0][slot] })),
+      items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: rank > perStar[0][slot], none: rank === 0 })),
     }));
     const extra = handbook.reduce((sum, value) => sum + Math.max(0, value), 0);
     return {
@@ -483,10 +483,12 @@ export class PalDetailCardComponent implements OnChanges {
       { label: 'HP', value: this.valueFor('soul_rank_hp'), icon: 'hp' },
       { label: 'Attack', value: this.valueFor('soul_rank_attack'), icon: 'attack' },
       { label: 'Defense', value: this.valueFor('soul_rank_defense'), icon: 'defense' },
-      // The game's Enhancement screen always lists Work Speed; the save only writes Rank_CraftSpeed once it is above 0.
-      { label: 'Work Speed', value: this.valueFor('soul_rank_craft_speed') || '0', icon: 'crafting' }
+      { label: 'Work Speed', value: this.valueFor('soul_rank_craft_speed'), icon: 'crafting' }
     ];
-    return stats.filter((stat) => stat.value !== '');
+    // The game's Enhancement screen always lists all four; the save only writes a Rank_* property once it
+    // is above 0, so for a Pal (anything with species data) a missing one reads 0. Non-Pal rows show nothing.
+    if (stats.every((stat) => stat.value === '') && !this.hasWorkData) return [];
+    return stats.map((stat) => ({ ...stat, value: stat.value || '0' }));
   }
 
   private computePassiveSkills(): PassiveSkill[] {

@@ -124,7 +124,7 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .potential-panel::before { border-right: 0; border-bottom: 0; left: -1px; top: -1px; }.potential-panel::after { border-left: 0; border-top: 0; bottom: -1px; right: -1px; }
 .potential-panel .stat { grid-template-columns: 22px 1fr auto; }
 .potential-panel .stat-icon { background: #d6eaf2; height: 14px; margin: 0 4px; width: 14px; }
-.potential-panel .stat { background: rgba(0, 0, 0, .25); margin-bottom: 3px; padding: 0 6px 0 0; }.potential-panel .stat small { display: none; }
+.potential-panel .stat { background: rgba(0, 0, 0, .25); margin-bottom: 3px; padding: 0 6px 0 0; }
 .potential-panel .stat strong { color: #7fdcff; font-size: .9rem; }
 .potential-panel .stat strong[data-tone="high"] { color: #63e6a3; }.potential-panel .stat strong[data-tone="perfect"] { color: #ff9a45; }
 .food-gauge { align-items: center; display: flex; gap: 2px; margin-top: 10px; }

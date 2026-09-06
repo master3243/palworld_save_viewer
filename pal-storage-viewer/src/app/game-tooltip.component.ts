@@ -13,7 +13,7 @@ export interface TextSegment { text: string; value: boolean; }
 export interface LevelLine { label: string; segments: TextSegment[]; current: boolean; }
 
 /** One condensing rank of the work grid: filled stars and every suitability's level at that rank. */
-export interface WorkLevelRow { stars: number; current: boolean; items: { src: string; name: string; rank: number; up: boolean }[]; }
+export interface WorkLevelRow { stars: number; current: boolean; items: { src: string; name: string; rank: number; up: boolean; none: boolean }[]; }
 
 export interface TooltipData {
   title: string;
@@ -66,7 +66,7 @@ export interface TooltipData {
       <div class="tip-work" *ngIf="data.work?.length">
         <div class="tip-work-row" *ngFor="let row of data.work" [class.current]="row.current">
           <span class="tip-stars"><i *ngFor="let slot of [0, 1, 2, 3]" [class.on]="slot < row.stars">★</i></span>
-          <span class="tip-work-items"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
+          <span class="tip-work-items" [style.grid-template-columns]="'repeat(' + row.items.length + ', minmax(0, 1fr))'"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [class.none]="item.none" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
         </div>
       </div>
       <p class="tip-line" *ngFor="let line of data.lines">{{ line }}</p>
@@ -113,9 +113,10 @@ export interface TooltipData {
     .tip-work-row.current { background: linear-gradient(90deg, rgba(255, 211, 122, .14), transparent); border-left-color: #ffd37a; }
     .tip-stars { display: inline-flex; font-size: .8rem; gap: 1px; letter-spacing: 0; }
     .tip-stars i { color: rgba(190, 220, 235, .25); font-style: normal; } .tip-stars i.on { color: #ffd37a; text-shadow: 0 0 5px rgba(255, 211, 122, .5); }
-    .tip-work-items { display: flex; flex-wrap: wrap; gap: 4px 6px; }
-    .tip-work-item { align-items: center; background: rgba(255, 255, 255, .05); border: 1px solid transparent; border-radius: 3px; color: #c9d8df; display: inline-flex; gap: 3px; padding: 1px 5px 1px 3px; }
-    .tip-work-item img { height: 16px; width: 16px; } .tip-work-item b { font-size: .78rem; font-variant-numeric: tabular-nums; }
+    .tip-work-items { display: grid; gap: 3px; }
+    .tip-work-item { align-items: center; background: rgba(255, 255, 255, .05); border: 1px solid transparent; border-radius: 3px; color: #c9d8df; display: inline-flex; gap: 2px; justify-content: center; min-width: 0; padding: 1px 2px; }
+    .tip-work-item img { height: 15px; width: 15px; } .tip-work-item b { font-size: .74rem; font-variant-numeric: tabular-nums; }
+    .tip-work-item.none { opacity: .3; }
     .tip-work-item.up b { color: #ffe08a; }
     .tip-work-row.current .tip-work-item b { color: #fff; } .tip-work-row.current .tip-work-item.up b { color: #ffe08a; }
     .tip-line { border-top: 1px solid rgba(190, 220, 235, .18); line-height: 1.45; margin: 6px 12px 0; padding: 7px 0 8px; }
