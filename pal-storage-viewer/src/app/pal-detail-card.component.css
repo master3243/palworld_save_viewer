@@ -50,9 +50,10 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .gender { color: #58cfff; font-size: 1.25rem; font-weight: 900; }.gender.female { color: #ff6c9d; }
 .lucky-badge { align-items: center; background: rgba(255, 224, 111, .12); border: 1px solid rgba(255, 224, 111, .42); border-radius: 20px; color: #ffe06f; display: inline-flex; font-size: .68rem; font-weight: 800; gap: 4px; padding: 2px 8px 2px 4px; text-transform: uppercase; }
 .lucky-badge img { height: 18px; width: 18px; }
+.variant-mark[alt="Lucky"], .lucky-badge img { filter: drop-shadow(0 0 3px rgba(150, 230, 255, 1)) drop-shadow(0 0 8px rgba(110, 210, 255, 0.85)); }
 .gender-image { height: 22px; object-fit: contain; width: 22px; }
-.element-chip { align-items: center; background: #4a5a66; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-size: .78rem; font-weight: 800; gap: 6px; height: 26px; padding: 0 18px 0 8px; }
-.element-chip img { height: 20px; width: 20px; }
+.element-chip { align-items: center; background: #4a5a66; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%); color: #fff; display: inline-flex; font-size: .8rem; font-weight: 800; gap: 7px; height: 30px; padding: 0 20px 0 6px; }
+.element-chip img { height: 26px; width: 26px; }
 .element-chip[data-element="0"] { background: #8f7a68; }.element-chip[data-element="1"] { background: #c04a2c; }.element-chip[data-element="2"] { background: #2f7fd6; }.element-chip[data-element="3"] { background: #b8961c; }.element-chip[data-element="4"] { background: #5f9a2a; }.element-chip[data-element="5"] { background: #5d3c8f; }.element-chip[data-element="6"] { background: #7a3fb0; }.element-chip[data-element="7"] { background: #a0642c; }.element-chip[data-element="8"] { background: #3aa7c9; }
 .spirit { align-items: center; color: #eafaff; display: inline-flex; font-size: .85rem; font-weight: 700; gap: 3px; }.spirit img { height: 24px; width: 20px; }
 .alpha-badge { height: 21px; object-fit: contain; width: 21px; }

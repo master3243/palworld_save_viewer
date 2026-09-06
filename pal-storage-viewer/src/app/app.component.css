@@ -1010,6 +1010,103 @@ td.work-cell .trait-icons.overflowing {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
 }
 
+.lucky-icon img {
+  filter: drop-shadow(0 0 3px rgba(150, 230, 255, 1)) drop-shadow(0 0 7px rgba(110, 210, 255, 0.85));
+}
+
+/* A lone element icon gets the room the column has; two share it. */
+td.type-cell .trait-icon:only-child {
+  height: 32px;
+  margin: -5px 0;
+  width: 32px;
+}
+
+/* Computed stats: four digits plus an arrow's worth of room. */
+th.stat-cell,
+td.stat-cell {
+  box-sizing: border-box;
+  max-width: 56px;
+  min-width: 56px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: right;
+  width: 56px;
+}
+
+/* Three equipped active skills as mini chips, like the pal card's. */
+th.moves-cell,
+td.moves-cell {
+  max-width: 390px;
+  min-width: 390px;
+  overflow: hidden;
+  width: 390px;
+}
+
+.move-chips {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  width: 100%;
+}
+
+.move-mini {
+  align-items: stretch;
+  background: rgba(4, 18, 28, 0.85);
+  border: 1px solid rgba(135, 220, 255, 0.22);
+  border-left: 3px solid #65dcff;
+  color: #eafaff;
+  display: flex;
+  flex: 1 1 0;
+  font-size: 0.72rem;
+  height: 24px;
+  min-width: 0;
+}
+
+.move-mini-name {
+  align-self: center;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.move-mini-meta {
+  align-items: center;
+  background: #4a5a66;
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%);
+  color: #fff;
+  display: grid;
+  flex: 0 0 auto;
+  font-weight: 800;
+  gap: 3px;
+  grid-template-columns: 16px 3ch;
+  padding: 0 5px 0 11px;
+}
+
+.move-mini-meta img {
+  height: 16px;
+  width: 16px;
+}
+
+.move-mini-meta b {
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.move-mini[data-element="0"] .move-mini-meta { background: #8f7a68; }
+.move-mini[data-element="1"] .move-mini-meta { background: #c04a2c; }
+.move-mini[data-element="2"] .move-mini-meta { background: #2f7fd6; }
+.move-mini[data-element="3"] .move-mini-meta { background: #b8961c; }
+.move-mini[data-element="4"] .move-mini-meta { background: #5f9a2a; }
+.move-mini[data-element="5"] .move-mini-meta { background: #5d3c8f; }
+.move-mini[data-element="6"] .move-mini-meta { background: #7a3fb0; }
+.move-mini[data-element="7"] .move-mini-meta { background: #a0642c; }
+.move-mini[data-element="8"] .move-mini-meta { background: #3aa7c9; }
+
 .favorite-icon {
   display: inline-block;
   height: 20px;

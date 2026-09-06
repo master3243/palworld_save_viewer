@@ -244,6 +244,8 @@
                 [class.type-cell]="column.key === 'elements'"
                 [class.work-cell]="column.key === 'work'"
                 [class.skills-cell]="column.key === 'skills'"
+              [class.moves-cell]="column.key === 'combat_moves'"
+              [class.stat-cell]="isStat(column)"
               [class.slot-cell]="isSlotNumber(column)"
               [class.where-cell]="isWhere(column)"
               [class.save-cell]="isSaveLetter(column)"
@@ -296,6 +298,8 @@
                 [class.type-cell]="column.key === 'elements'"
                 [class.work-cell]="column.key === 'work'"
                 [class.skills-cell]="column.key === 'skills'"
+                [class.moves-cell]="column.key === 'combat_moves'"
+                [class.stat-cell]="isStat(column)"
                 [class.slot-cell]="isSlotNumber(column)"
                 [class.where-cell]="isWhere(column)"
                 [class.save-cell]="isSaveLetter(column)"
@@ -364,7 +368,13 @@
                     <span class="passive-chip-name">{{ chip.name }}</span>
                   </span>
                 </span>
-                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank' && column.key !== 'elements' && column.key !== 'work' && column.key !== 'skills'">
+                <span class="move-chips" *ngIf="column.key === 'combat_moves'">
+                  <span *ngFor="let chip of moveChips(item.row)" class="move-mini" [attr.data-element]="chip.element" [title]="chip.title">
+                    <span class="move-mini-name">{{ chip.name }}</span>
+                    <span class="move-mini-meta" *ngIf="chip.power"><img *ngIf="chip.iconSrc" [src]="chip.iconSrc" alt=""><b>{{ chip.power }}</b></span>
+                  </span>
+                </span>
+                <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank' && column.key !== 'elements' && column.key !== 'work' && column.key !== 'skills' && column.key !== 'combat_moves'">
                   {{ cellDisplay(item.row, column) }}
                 </ng-container>
               </td>

@@ -11,10 +11,12 @@ import { GenderIconComponent } from './gender-icon.component';
 import { GithubIconComponent } from './github-icon.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
+import { GameDataService } from './game-data.service';
 import { OfflineImageService } from './offline-image.service';
 import { palImagePath } from './pal-image';
 import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource } from './save-parser.service';
 import { elementIcons, workIcons } from './trait-icons';
+import { ELEMENT_NAMES } from '../backend/lookups';
 import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
 
 /** Sort weight of a location: party first, then the bases in order, the Pal Box, then dimensional storage. */
@@ -413,6 +415,10 @@ export class AppComponent {
     'nickname',
     'level',
     'rank',
+    'max_hp',
+    'attack',
+    'defense',
+    'work_speed',
     'iv_hp',
     'iv_attack',
     'iv_defense',
@@ -421,8 +427,7 @@ export class AppComponent {
     'soul_rank_defense',
     'work',
     'skills',
-    'combat_moves',
-    'learned_moves'
+    'combat_moves'
   ]);
 
   private readonly preferredColumnOrder = [
@@ -438,11 +443,8 @@ export class AppComponent {
     'exp',
     'rank_up_exp',
     'unused_status_points',
+    'learned_moves',
     'hp',
-    'max_hp',
-    'attack',
-    'defense',
-    'work_speed',
     'trust_rank',
     'trust_progress',
     'exp_to_next',
@@ -481,8 +483,10 @@ export class AppComponent {
     private readonly parser: SaveParserService,
     private readonly offlineImages: OfflineImageService,
     private readonly game8Lookup: Game8LookupService,
+    private readonly gameData: GameDataService,
     private readonly changeDetector: ChangeDetectorRef
   ) {
+    void this.gameData.load().then(() => this.changeDetector.markForCheck());
     void this.offlineImages.load('assets/ui/alpha.pog').then((source) => {
       this.alphaImageSrc = source;
       this.changeDetector.markForCheck();
@@ -1049,6 +1053,26 @@ export class AppComponent {
     return column.key.startsWith('iv_');
   }
 
+  isStat(column: TableColumn): boolean {
+    return column.key === 'max_hp' || column.key === 'attack' || column.key === 'defense' || column.key === 'work_speed';
+  }
+
+  /** Equipped active skills as mini chips: name plus the element tab with icon and power. */
+  moveChips(row: PalStorageRow): { name: string; element: number; iconSrc: string; power: string; title: string }[] {
+    const ids = this.cellValue(row, 'active_skill_ids').split(', ').filter(Boolean);
+    const names = this.cellValue(row, 'combat_moves').split(', ').filter(Boolean);
+    return names.map((name, index) => {
+      const detail = this.gameData.activeDetail(ids[index] ?? '');
+      const element = detail?.element ?? -1;
+      return {
+        name, element,
+        iconSrc: element >= 0 ? `assets/icons/element_${String(element).padStart(2, '0')}.webp` : '',
+        power: detail ? String(detail.power) : '',
+        title: detail ? `${name} · ${ELEMENT_NAMES[element] ?? ''} · Power ${detail.power} · Cooldown ${detail.cooldown}s` : name,
+      };
+    });
+  }
+
   isHighIv(row: PalStorageRow, column: TableColumn): boolean {
     if (!this.isIv(column)) return false;
     const value = Number(this.cellValue(row, column.key));
@@ -1212,6 +1236,11 @@ export class AppComponent {
     if (key === 'work') return 'Work';
     if (key === 'favorite_index') return 'F';
     if (key === 'level') return 'LVL';
+    if (key === 'max_hp') return 'HP';
+    if (key === 'attack') return 'ATK';
+    if (key === 'defense') return 'DEF';
+    if (key === 'work_speed') return 'SPD';
+    if (key === 'combat_moves') return 'Active Skills';
     if (key === 'iv_hp') return 'IV H';
     if (key === 'iv_attack') return 'IV A';
     if (key === 'iv_defense') return 'IV D';
@@ -1222,6 +1251,11 @@ export class AppComponent {
   }
 
   private toTitle(key: string): string {
+    if (key === 'max_hp') return 'Max HP (computed like the game)';
+    if (key === 'attack') return 'Attack (computed like the game, passives included)';
+    if (key === 'defense') return 'Defense (computed like the game, passives included)';
+    if (key === 'work_speed') return 'Work speed (computed like the game)';
+    if (key === 'combat_moves') return 'Equipped active skills';
     if (key === 'paldeck_no') return 'Paldeck No.';
     if (key === 'elements') return 'Element type(s)';
     if (key === 'work') return 'Work suitability levels (base plus gained ranks)';
