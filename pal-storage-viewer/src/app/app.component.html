@@ -38,17 +38,22 @@
       <button
         type="button"
         role="tab"
+        aria-label="Pal Table"
         [class.active]="view === 'pals'"
         [attr.aria-selected]="view === 'pals'"
         (click)="setView('pals')"
-      >Pal Table</button>
+      >
+        <span class="view-label">Pal Table</span>
+        <svg class="view-short view-table-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 9v12"/></svg>
+      </button>
       <button
         type="button"
         role="tab"
+        aria-label="100% Tracker"
         [class.active]="view === 'tracker'"
         [attr.aria-selected]="view === 'tracker'"
         (click)="setView('tracker')"
-      >100% Tracker</button>
+      ><span class="view-label">100% Tracker</span><span class="view-short" aria-hidden="true">100%</span></button>
     </div>
   </section>
 

@@ -770,6 +770,34 @@
   padding: 4px 11px;
 }
 
+.view-short { display: none; }
+.view-table-icon {
+  fill: none;
+  height: 16px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 16px;
+}
+
+@media (max-width: 720px) {
+  .page:not(.compact) .toolbar { flex-direction: column; }
+  .view-switch { margin-left: 0; top: 0; }
+
+  .page.compact .logo-crop { --art-height: 26px; }
+  .page.compact .viewer-title { font-size: .9rem; }
+  .page.compact .view-switch { margin-left: 0; top: 0; }
+  .page.compact .view-switch button {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    padding: 6px 9px;
+  }
+  .page.compact .view-label { display: none; }
+  .page.compact .view-short { display: inline-flex; }
+}
+
 .empty-view {
   align-items: center;
   color: rgba(232, 248, 255, 0.85);
