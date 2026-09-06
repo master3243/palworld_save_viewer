@@ -1008,8 +1008,7 @@ export class AppComponent {
     if (column.key === 'gender') return this.genderIcon(value);
     if (column.key === 'is_lucky') return this.isLucky(row) ? '★' : '';
     if (column.key === 'rank') return this.displayRank(value);
-    // Shown 1-based like the game's slot numbers; the save stores it 0-based.
-    if (column.key === 'pal_box_slot_index') return value === '' ? '' : String(Number(value) + 1);
+    if (column.key === 'pal_box_slot_index') return value === '' ? '' : String(Number(value) + 1);  // show 1-based, save stores it 0-based.
     return this.formatSeparators(value);
   }
 
@@ -1192,8 +1191,8 @@ export class AppComponent {
     if (key === 'pal_variant') return 'A';
     if (key === 'gender') return 'G';
     if (key === 'is_lucky') return 'L';
-    if (key === 'storage_slot') return 'Slot';
-    if (key === 'pal_box_slot_index') return 'Ind';
+    if (key === 'storage_slot') return 'File slot';
+    if (key === 'pal_box_slot_index') return 'Slot';
     if (key === 'location') return 'Where';
     if (key === 'save_id') return 'Save';
     if (key === 'save') return 'Save name';
@@ -1218,7 +1217,8 @@ export class AppComponent {
     if (key === 'paldeck_no') return 'Paldeck No.';
     if (key === 'elements') return 'Element type(s)';
     if (key === 'work') return 'Work suitability levels (base plus gained ranks)';
-    if (key === 'pal_box_slot_index') return 'Index within its container (party, Pal Box or base slot)';
+    if (key === 'pal_box_slot_index') return 'Slot # within the Pal Box, dimensional storage, party, or base';
+    if (key === 'storage_slot') return 'Position of the record in the save file';
     if (key === 'location') return 'Location';
     if (key === 'location_detail') return 'Location detail';
     if (key === 'save_id') return 'Save (letter)';

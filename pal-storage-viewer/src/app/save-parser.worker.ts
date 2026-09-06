@@ -168,7 +168,7 @@ async function handleParse(request: ParseRequest): Promise<void> {
   }
 
   progress(READ_SHARE + PARSE_SHARE, 'Resolving locations', '');
-  const data = combineSaves(entries);
+  const data = combineSaves(entries, await getLookups());
 
   // Keep a few recently removed files so re-adding them is instant, but bound memory.
   const live = new Set(entries.map((entry) => entry.key));

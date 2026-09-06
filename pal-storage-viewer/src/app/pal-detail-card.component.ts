@@ -67,7 +67,7 @@ export class PalDetailCardComponent implements OnChanges {
     'passive_hp_pct', 'passive_attack_pct', 'passive_defense_pct', 'passive_work_speed_pct', 'hunger_max',
     'trust_rank', 'trust_progress', 'trust_next', 'exp_to_next', 'exp_progress',
     'partner_skill', 'partner_skill_level', 'partner_skill_text',
-    'food_amount', 'known_skill_ids', 'known_moves',
+    'food_amount', 'known_skill_ids', 'known_moves', 'research_attack_pct', 'research_defense_pct',
     'trust_hp', 'trust_attack', 'trust_defense', 'food_effect', 'food_attack_pct', 'food_defense_pct', 'food_work_speed_pct', 'food_seconds_left',
     'food_status_effect_item', 'food_with_status_effect_timer'
   ]);
@@ -113,6 +113,8 @@ export class PalDetailCardComponent implements OnChanges {
     if (trust || stars || souls) rows.push(['Base', String(base)]);
     if (pct) rows.push(['Passive Skills', `${pct > 0 ? '+' : ''}${pct}%`]);
     if (foodPct) rows.push([`Food: ${this.valueFor('food_effect')}`, `${foodPct > 0 ? '+' : ''}${foodPct}%`]);
+    const researchPct = key === 'attack' ? this.numberFor('research_attack_pct') : key === 'defense' ? this.numberFor('research_defense_pct') : null;
+    if (researchPct) rows.push(['Research Effects', `+${researchPct}%`]);
     rows.push(['Total', String(value)]);
     const intro = { 'Max HP': ["Pal's HP.", 'The Pal is knocked out when it reaches 0.'], Attack: ["Pal's Attack.", 'Damage dealt increases as Attack increases.'], Defense: ["Pal's Defense.", 'Damage taken decreases as defense increases.'] }[label];
     return { title: label, titleRight: base !== value ? `${base} ≫ ${value}` : String(value), intro, rows };
@@ -120,9 +122,9 @@ export class PalDetailCardComponent implements OnChanges {
 
   trust: { rank: string; progress: number; title: string } | null = null;
   private computeTrust(): { rank: string; progress: number; title: string } | null {
-    const points = this.numberFor('friendship_points');
     const rank = this.numberFor('trust_rank');
-    if (points === null || rank === null) return null;
+    if (rank === null) return null;
+    const points = this.numberFor('friendship_points') ?? 0;
     const next = this.numberFor('trust_next');
     const progress = this.numberFor('trust_progress') ?? 0;
     const title = next === null ? `Trust rank ${rank} (max) · ${points.toLocaleString()} points`

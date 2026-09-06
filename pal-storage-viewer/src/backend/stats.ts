@@ -120,10 +120,32 @@ export function trustRank(points: number, lookups: Lookups): { rank: number; pro
 
 const roundHalfUp = (value: number) => Math.floor(value + 0.5);
 
+/** Base value with each percentage applied as its own multiplier, rounded like the game. */
+export function finalStat(base: number, percents: number[]): number {
+  return roundHalfUp(percents.reduce((value, pct) => value * (1 + pct / 100), base));
+}
+
+/** Attack and defense percentages a guild's completed lab research gives its base workers, with the items that count. */
+export function researchBonus(labs: Record<string, number>[], lookups: Lookups): { attack: number; defense: number; items: string[] } {
+  // A world can hold several guilds' labs; the player's is the one with the most work done.
+  const lab = [...labs].sort((a, b) => Object.values(b).reduce((x, y) => x + y, 0) - Object.values(a).reduce((x, y) => x + y, 0))[0] ?? {};
+  const out = { attack: 0, defense: 0, items: [] as string[] };
+  for (const [id, entry] of lookups.research) {
+    if ((lab[id] ?? 0) < entry.work) continue;
+    if (entry.kind === 'A') out.attack += entry.value; else out.defense += entry.value;
+    out.items.push(entry.name);
+  }
+  return out;
+}
+
 export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   const traits = lookups.traitsFor(input.species_id);
   const out: DerivedStats = { ...EMPTY };
-  const level = input.level;
+  // A record without Level/Exp/FriendshipPoint is a fresh level 1 Pal in game; derive from those defaults
+  // (the raw columns stay blank).
+  const level = input.level ?? (traits ? 1 : null);
+  const exp = input.exp ?? 0;
+  const points = input.friendship_points ?? (traits ? 0 : null);
   const stars = Math.max(0, Math.min(4, (input.rank ?? 1) - 1));
   const passives = passivePercents(input.passive_skill_ids, lookups);
   out.passive_hp_pct = passives.hp;
@@ -133,8 +155,8 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
   out.hunger_max = traits?.f ?? null;
 
   let trust = 0;
-  if (input.friendship_points !== null) {
-    const rank = trustRank(input.friendship_points, lookups);
+  if (points !== null) {
+    const rank = trustRank(points, lookups);
     out.trust_rank = rank.rank;
     out.trust_progress = Math.round(rank.progress * 10) / 10;
     out.trust_next = rank.next;
@@ -174,21 +196,21 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
     out.trust_attack = attackBase - base(raw.attack(attackScale), input.soul_ranks.attack);
     out.trust_defense = defenseBase - base(raw.defense(defenseScale), input.soul_ranks.defense);
     out.max_hp = roundHalfUp(hpBase * (1 + passives.hp / 100));
-    out.attack = roundHalfUp(attackBase * (1 + passives.attack / 100) * (1 + out.food_attack_pct / 100));
-    out.defense = roundHalfUp(defenseBase * (1 + passives.defense / 100) * (1 + out.food_defense_pct / 100));
+    out.attack = finalStat(attackBase, [passives.attack, out.food_attack_pct]);
+    out.defense = finalStat(defenseBase, [passives.defense, out.food_defense_pct]);
   }
   if (level !== null && level > 0) {
     // Work speed starts at 70 for every species, +7 per condensing star, then passives (and food) multiply.
     out.work_speed = Math.floor((70 + 7 * stars) * (1 + passives.workSpeed / 100) * (1 + out.food_work_speed_pct / 100));
   }
 
-  if (level !== null && input.exp !== null && lookups.expTotals.length > level) {
+  if (level !== null && lookups.expTotals.length > level) {
     const atMax = lookups.maxLevel > 0 && level >= lookups.maxLevel;
     const current = lookups.expTotals[level - 1] ?? 0;
     const next = lookups.expTotals[level];
     if (!atMax && next > current) {
-      out.exp_to_next = Math.max(0, next - input.exp);
-      out.exp_progress = Math.round(Math.min(100, Math.max(0, (input.exp - current) / (next - current) * 100)) * 10) / 10;
+      out.exp_to_next = Math.max(0, next - exp);
+      out.exp_progress = Math.round(Math.min(100, Math.max(0, (exp - current) / (next - current) * 100)) * 10) / 10;
     } else if (atMax) {
       out.exp_to_next = 0;
       out.exp_progress = 100;

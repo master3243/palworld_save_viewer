@@ -491,10 +491,19 @@ def build_pal_traits(cache: Path) -> None:
             food[item_id] = [(item_names.get(item_id) or {}).get("localized_name") or item_id, effects]
     exp_table = load(cache, "psp/exp.json")
     exp_totals = [exp_table[str(level)]["PalTotalEXP"] for level in range(1, len(exp_table) + 1)]
+    # Guild lab research that raises every base worker's attack or defense once complete.
+    lab_names = load(cache, "psp/l10n/lab_research.json")
+    research = {}
+    for research_id, value in sorted(load(cache, "psp/lab_research.json").items()):
+        kind = {"AttackRateBaseCampWorker": "A", "DefenseRateBaseCampWorker": "D"}.get(value.get("effect_type") or "")
+        if kind:
+            name = (lab_names.get(research_id) or {}).get("localized_name") or research_id
+            research[research_id] = [kind, value.get("effect_value") or 0, value.get("work_amount") or 0, f"{name} ({humanize(value.get('category') or '')})"]
     lines = ["{", f'"elements":{json.dumps(ELEMENTS)},', f'"work":{json.dumps(WORK_KEYS)},',
              f'"maxLevel":{max_pal_level(cache)},', f'"friendship":{json.dumps(friendship, separators=(",", ":"))},',
              f'"exp":{json.dumps(exp_totals, separators=(",", ":"))},',
-             f'"food":{json.dumps(food, separators=(",", ":"), ensure_ascii=False)},', '"pals":{']
+             f'"food":{json.dumps(food, separators=(",", ":"), ensure_ascii=False)},',
+             f'"research":{json.dumps(research, separators=(",", ":"), ensure_ascii=False)},', '"pals":{']
     items = list(traits.items())
     for i, (pal_id, value) in enumerate(items):
         lines.append(f'{json.dumps(pal_id)}:{json.dumps(value, separators=(",", ":"), ensure_ascii=False)}{"," if i < len(items) - 1 else ""}')

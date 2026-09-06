@@ -3,7 +3,8 @@
  */
 import { PlayerCompletion } from './completion';
 import { PropertyValue } from './gvas';
-import { ELEMENT_NAMES, WORK_COLUMN_KEYS, WORK_NAMES } from './lookups';
+import { ELEMENT_NAMES, Lookups, WORK_COLUMN_KEYS, WORK_NAMES } from './lookups';
+import { finalStat, researchBonus } from './stats';
 import { PalRecord } from './record';
 import { BaseCamp, ParsedFile, SaveKind } from './saves';
 
@@ -237,7 +238,7 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
 }
 
 /** Merge the given parsed files; files that share a `set` resolve each other's container ids. */
-export function combineSaves(entries: CombineEntry[]): CombinedSaves {
+export function combineSaves(entries: CombineEntry[], lookups?: Lookups): CombinedSaves {
   const sets = new Map<string, SaveSet>();
   const sources: SaveSource[] = [];
   const recordSource = new Map<PalRecord, SaveSource>();
@@ -295,6 +296,18 @@ export function combineSaves(entries: CombineEntry[]): CombinedSaves {
       record.source_file = source.file;
       record.source_kind = SOURCE_KIND_LABELS[source.kind] ?? source.kind;
       rows.push(flattenRecord(record));
+    }
+    // "Base Pal Enhancement" research raises attack/defense of every Pal working at a base.
+    const research = lookups ? researchBonus(set.labs, lookups) : null;
+    if (research && (research.attack || research.defense)) {
+      for (const row of rows) {
+        if (row['save_id'] !== letter || typeof row['location'] !== 'string' || !row['location'].startsWith('Base')) continue;
+        row['research_attack_pct'] = research.attack;
+        row['research_defense_pct'] = research.defense;
+        row['research_items'] = research.items.join('; ');
+        if (typeof row['attack_base'] === 'number') row['attack'] = finalStat(row['attack_base'], [Number(row['passive_attack_pct']) || 0, Number(row['food_attack_pct']) || 0, research.attack]);
+        if (typeof row['defense_base'] === 'number') row['defense'] = finalStat(row['defense_base'], [Number(row['passive_defense_pct']) || 0, Number(row['food_defense_pct']) || 0, research.defense]);
+      }
     }
     const playerIds = new Set<string>([...set.players, ...set.player_names.keys()]);
     summaries.push({
@@ -411,6 +424,9 @@ export function flattenRecord(item: PalRecord): Row {
     food_defense_pct: item.derived.food_defense_pct,
     food_work_speed_pct: item.derived.food_work_speed_pct,
     food_seconds_left: item.derived.food_seconds_left,
+    research_attack_pct: 0,
+    research_defense_pct: 0,
+    research_items: '',
     passive_hp_pct: item.derived.passive_hp_pct,
     passive_attack_pct: item.derived.passive_attack_pct,
     passive_defense_pct: item.derived.passive_defense_pct,
