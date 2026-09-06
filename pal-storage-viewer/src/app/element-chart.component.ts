@@ -11,12 +11,12 @@ interface ChartNode { index: number; name: string; x: number; y: number; labelAb
 
 const COLORS = ['#a08a78', '#d9502c', '#2f80e0', '#e0b41c', '#5fa82a', '#6a3fa0', '#9b3fd0', '#a8642c', '#2fb0d8'];
 // The left five sit on a regular pentagon (Water at the top), as in the game's chart; the right
-// four continue Fire's row and Grass's row.
+// four continue Fire's row and Grass's row on a square grid, spaced like the game's chart.
 const CENTER = { x: 215, y: 196 };
 const RADIUS = 125;
 const onPentagon = (angleDeg: number) => ({ x: Math.round(CENTER.x + RADIUS * Math.cos(angleDeg * Math.PI / 180)), y: Math.round(CENTER.y - RADIUS * Math.sin(angleDeg * Math.PI / 180)) });
 const WATER = onPentagon(90); const FIRE = onPentagon(18); const GRASS = onPentagon(-54); const GROUND = onPentagon(-126); const ELECTRIC = onPentagon(162);
-const STEP = 115;
+const STEP = 140;
 const NODES: ChartNode[] = [
   { index: 3, name: 'Electric', ...ELECTRIC, labelAbove: true, color: COLORS[3] },
   { index: 2, name: 'Water', ...WATER, labelAbove: true, color: COLORS[2] },
@@ -37,7 +37,7 @@ const ARROWS: [number, number][] = [[2, 1], [1, 8], [8, 6], [6, 5], [5, 0], [1, 
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg viewBox="0 0 640 366" class="chart" role="img" aria-label="Element effectiveness chart">
+    <svg viewBox="0 0 690 366" class="chart" role="img" aria-label="Element effectiveness chart">
       <defs>
         <marker id="element-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
           <path d="M0 0L10 5L0 10z" fill="#8ee6ff"/>
