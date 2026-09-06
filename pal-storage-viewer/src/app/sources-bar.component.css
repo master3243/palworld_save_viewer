@@ -9,11 +9,18 @@
 }
 
 .sources-row {
+  position: relative;
+  min-height: 30px;
+}
+
+.source-controls {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  max-width: 100%;
   min-height: 30px;
+  width: max-content;
 }
 
 .sources-toggle {
@@ -190,9 +197,17 @@
 .location-summary {
   align-items: center;
   display: inline-flex;
-  flex-wrap: wrap;
   gap: 4px;
-  margin-left: auto;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  width: max-content;
+}
+
+.location-summary.hidden {
+  visibility: hidden;
 }
 
 .location-pill {

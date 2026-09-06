@@ -1,18 +1,20 @@
 <div class="sources-bar" [class.open]="open" aria-label="Loaded save files">
-  <div class="sources-row">
-    <button
-      class="sources-toggle"
-      type="button"
-      [attr.aria-expanded]="open"
-      (click)="toggle.emit()"
-    >
-      <span class="sources-caret" aria-hidden="true">{{ open ? '▾' : '▸' }}</span>
-      <span class="sources-label">Sources</span>
-      <span class="sources-summary">{{ summary }}</span>
-    </button>
-    <button class="add-source-button" type="button" (click)="addFiles.emit()">+ Files</button>
-    <button class="add-source-button" type="button" (click)="addFolder.emit($event)">+ Folder</button>
-    <span class="location-summary">
+  <div #sourcesRow class="sources-row">
+    <div #sourceControls class="source-controls">
+      <button
+        class="sources-toggle"
+        type="button"
+        [attr.aria-expanded]="open"
+        (click)="toggle.emit()"
+      >
+        <span class="sources-caret" aria-hidden="true">{{ open ? '▾' : '▸' }}</span>
+        <span class="sources-label">Sources</span>
+        <span class="sources-summary">{{ summary }}</span>
+      </button>
+      <button class="add-source-button" type="button" (click)="addFiles.emit()">+ Files</button>
+      <button class="add-source-button" type="button" (click)="addFolder.emit($event)">+ Folder</button>
+    </div>
+    <span #locationSummary class="location-summary" [class.hidden]="!locationsFit" [attr.aria-hidden]="!locationsFit">
       <span *ngFor="let item of locationCounts" class="location-pill" [attr.data-location]="item.location">
         {{ item.location }} <b>{{ item.count | number }}</b>
       </span>

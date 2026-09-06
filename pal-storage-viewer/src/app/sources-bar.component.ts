@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
 
 import type { SaveSetSummary, SaveSource } from './save-parser.service';
 import { kindBlurb, kindTag, kindTitle, savedAtLabel, shortFileName, sourceTitle } from './save-file-labels';
@@ -25,7 +25,30 @@ export interface LocationCount {
   templateUrl: './sources-bar.component.html',
   styleUrl: './sources-bar.component.css'
 })
-export class SourcesBarComponent {
+export class SourcesBarComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('sourcesRow') sourcesRow!: ElementRef<HTMLElement>;
+  @ViewChild('sourceControls') sourceControls!: ElementRef<HTMLElement>;
+  @ViewChild('locationSummary') locationSummary!: ElementRef<HTMLElement>;
+  locationsFit = false;
+  private resizeObserver?: ResizeObserver;
+
+  constructor(private readonly zone: NgZone) {}
+
+  ngAfterViewInit(): void {
+    const row = this.sourcesRow.nativeElement;
+    const controls = this.sourceControls.nativeElement;
+    const locations = this.locationSummary.nativeElement;
+    this.resizeObserver = new ResizeObserver(() => {
+      const fits = controls.getBoundingClientRect().width + 6 + locations.getBoundingClientRect().width <= row.clientWidth;
+      if (fits !== this.locationsFit) this.zone.run(() => { this.locationsFit = fits; });
+    });
+    for (const element of [row, controls, locations]) this.resizeObserver.observe(element);
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+  }
+
   @Input() groups: SourceGroup[] = [];
   @Input() summary = '';
   @Input() locationCounts: LocationCount[] = [];

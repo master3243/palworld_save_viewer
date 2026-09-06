@@ -92,6 +92,7 @@
   [class.active]="isActive"
   [attr.aria-expanded]="isPanelOpen"
   title="Filter builder"
+  aria-label="Filters"
   (click)="togglePanel()"
 >
   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -101,29 +102,39 @@
   <b *ngIf="activeRuleCount">{{ activeRuleCount }}</b>
 </button>
 
-<div class="quick-chips" role="group" aria-label="Quick filters">
-  <button
-    *ngFor="let chip of allChips"
-    type="button"
-    class="chip"
-    [class.active]="chipState(chip) !== null"
-    [attr.data-tone]="chipState(chip)?.tone || null"
-    [attr.aria-pressed]="chipState(chip) !== null"
-    [title]="chipTitle(chip)"
-    (click)="cycleChip(chip)"
-  >
-    <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'include'" aria-hidden="true">+</span>
-    <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'exclude'" aria-hidden="true">−</span>
-    <ng-container *ngIf="isGenderChip(chip); else textLabel">
-      <span class="chip-genders" [attr.data-state]="chipState(chip)?.tone || 'any'">
-        <app-gender-icon *ngIf="chipState(chip)?.tone !== 'female'" gender="male"></app-gender-icon>
-        <app-gender-icon *ngIf="chipState(chip)?.tone !== 'male'" gender="female"></app-gender-icon>
-      </span>
-    </ng-container>
-    <ng-template #textLabel>
-      <img *ngIf="chipIcon(chip) as icon" class="chip-icon" [src]="icon" alt="">
-      <span>{{ chipLabel(chip) }}</span>
-    </ng-template>
+<div class="quick-filters" [class.can-scroll-left]="canScrollChipsLeft" [class.can-scroll-right]="canScrollChipsRight">
+  <div #chipScroller class="quick-chips" role="group" aria-label="Quick filters" (scroll)="updateChipScroll()">
+    <div #chipTrack class="quick-chip-track">
+      <button
+        *ngFor="let chip of allChips"
+        type="button"
+        class="chip"
+        [class.active]="chipState(chip) !== null"
+        [attr.data-tone]="chipState(chip)?.tone || null"
+        [attr.aria-pressed]="chipState(chip) !== null"
+        [title]="chipTitle(chip)"
+        (click)="cycleChip(chip)"
+      >
+        <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'include'" aria-hidden="true">+</span>
+        <span class="chip-sign" *ngIf="chipState(chip)?.tone === 'exclude'" aria-hidden="true">−</span>
+        <ng-container *ngIf="isGenderChip(chip); else textLabel">
+          <span class="chip-genders" [attr.data-state]="chipState(chip)?.tone || 'any'">
+            <app-gender-icon *ngIf="chipState(chip)?.tone !== 'female'" gender="male"></app-gender-icon>
+            <app-gender-icon *ngIf="chipState(chip)?.tone !== 'male'" gender="female"></app-gender-icon>
+          </span>
+        </ng-container>
+        <ng-template #textLabel>
+          <img *ngIf="chipIcon(chip) as icon" class="chip-icon" [src]="icon" alt="">
+          <span>{{ chipLabel(chip) }}</span>
+        </ng-template>
+      </button>
+    </div>
+  </div>
+  <button class="chip-scroll left" type="button" aria-label="Scroll quick filters left" [hidden]="!canScrollChipsLeft" (click)="scrollChips(-1)">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10 3-5 5 5 5"/></svg>
+  </button>
+  <button class="chip-scroll right" type="button" aria-label="Scroll quick filters right" [hidden]="!canScrollChipsRight" (click)="scrollChips(1)">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg>
   </button>
 </div>
 

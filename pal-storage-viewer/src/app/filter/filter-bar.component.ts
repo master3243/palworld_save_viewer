@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
   HostListener,
   Input,
+  NgZone,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
   ViewChild
@@ -108,11 +111,42 @@ function numberChip(label: string, title: string, field: string, op: FilterRule[
   templateUrl: './filter-bar.component.html',
   styleUrl: './filter-bar.component.css'
 })
-export class FilterBarComponent implements OnChanges {
+export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() rows: PalStorageRow[] = [];
   @Output() filtered = new EventEmitter<PalStorageRow[]>();
 
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('chipScroller') chipScroller!: ElementRef<HTMLElement>;
+  @ViewChild('chipTrack') chipTrack!: ElementRef<HTMLElement>;
+  canScrollChipsLeft = false;
+  canScrollChipsRight = false;
+  private chipResizeObserver?: ResizeObserver;
+
+  ngAfterViewInit(): void {
+    this.chipResizeObserver = new ResizeObserver(() => this.updateChipScroll());
+    this.chipResizeObserver.observe(this.chipScroller.nativeElement);
+    this.chipResizeObserver.observe(this.chipTrack.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.chipResizeObserver?.disconnect();
+  }
+
+  updateChipScroll(): void {
+    const el = this.chipScroller.nativeElement;
+    const left = el.scrollLeft > 1;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+    if (left === this.canScrollChipsLeft && right === this.canScrollChipsRight) return;
+    this.zone.run(() => {
+      this.canScrollChipsLeft = left;
+      this.canScrollChipsRight = right;
+    });
+  }
+
+  scrollChips(direction: number): void {
+    const el = this.chipScroller.nativeElement;
+    el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: 'smooth' });
+  }
 
   root: FilterGroup = createGroup();
   fields: FilterField[] = [];
@@ -210,6 +244,7 @@ export class FilterBarComponent implements OnChanges {
 
   constructor(
     private readonly host: ElementRef<HTMLElement>,
+    private readonly zone: NgZone,
     private readonly offlineImages: OfflineImageService
   ) {
     this.presets = this.loadPresets();

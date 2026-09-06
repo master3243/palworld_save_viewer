@@ -12,18 +12,11 @@
   border: 1px solid rgba(144, 226, 255, 0.32);
   border-radius: 8px;
   display: flex;
-  /* Gives way before the chip row does, so chips stay on one line when they fit. */
-  flex: 1 2 320px;
+  flex: 0 1 440px;
   height: 32px;
   max-width: 440px;
-  min-width: 200px;
+  min-width: 100px;
   position: relative;
-}
-
-/* The full-screen table has room to spare, so let the search box stretch. */
-:host-context(.page.fullscreen) .search {
-  flex-basis: 520px;
-  max-width: 760px;
 }
 
 .search:focus-within {
@@ -331,15 +324,67 @@
   top: -6px;
 }
 
+.quick-filters {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+}
+
 .quick-chips {
-  display: flex;
-  /* Shrinks and wraps within its own box so nothing is clipped and the count
-     and buttons stay on the first line. */
-  flex: 1 1 160px;
-  flex-wrap: wrap;
-  gap: 4px;
-  min-width: 120px;
+  --fade-left: 0px;
+  --fade-right: 0px;
+  mask-image: linear-gradient(to right, transparent, black var(--fade-left), black calc(100% - var(--fade-right)), transparent);
+  overflow-x: auto;
   padding: 2px 0;
+  scrollbar-width: none;
+}
+
+.quick-filters.can-scroll-left .quick-chips { --fade-left: 24px; }
+.quick-filters.can-scroll-right .quick-chips { --fade-right: 24px; }
+
+.quick-chip-track {
+  display: flex;
+  gap: 4px;
+  width: max-content;
+}
+
+.quick-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip-scroll {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #b8ecff;
+  cursor: pointer;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: 18px;
+}
+
+.chip-scroll[hidden] { display: none; }
+.chip-scroll.left { left: 0; }
+.chip-scroll.right { right: 0; }
+.chip-scroll:hover { color: #fff; }
+.chip-scroll svg {
+  fill: none;
+  height: 12px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 12px;
+}
+
+@container (max-width: 1250px) {
+  .search { flex-basis: 140px; max-width: 140px; }
+  .panel-toggle { justify-content: center; padding: 0; width: 32px; }
+  .panel-toggle > span { display: none; }
 }
 
 .chip {
@@ -451,6 +496,23 @@
 .match-count em {
   color: rgba(199, 243, 255, 0.5);
   font-style: normal;
+}
+
+@container (max-width: 600px) {
+  .search {
+    flex: 1 1 0;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .quick-filters {
+    flex-basis: 100%;
+    order: 1;
+  }
+
+  .match-count {
+    min-width: 0;
+  }
 }
 
 .filter-panel {
@@ -580,9 +642,5 @@
 @media (max-width: 900px) {
   .help-columns {
     grid-template-columns: 1fr;
-  }
-
-  .search {
-    max-width: none;
   }
 }
