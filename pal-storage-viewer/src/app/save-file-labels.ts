@@ -20,7 +20,7 @@ export function kindTitle(kind: string): string {
   switch (kind) {
     case 'level': return 'Data for every Pal (minus the dimensional storage)';
     case 'dimensional_storage': return 'Dimensional Pal Storage.';
-    case 'player': return 'Maps containers to the player\'s party or Pal Box, and holds the player\'s progress record (bosses, effigies, journals, quests) for the 100% tracker.';
+    case 'player': return 'A map of containers to the player\'s party or Pal Box, plus the player\'s progress record (bosses, effigies, journals, quests) for the 100% tracker.';
     case 'level_meta': return 'Metadata used to label the save.';
     default: return 'Not a pal save; ignored.';
   }

@@ -1252,7 +1252,7 @@ export class AppComponent {
     if (key === 'storage_slot') return 'File slot';
     if (key === 'pal_box_slot_index') return 'Slot';
     if (key === 'location') return 'Where';
-    if (key === 'save_id') return 'Save';
+    if (key === 'save_id') return 'File';
     if (key === 'save') return 'Save name';
     if (key === 'location_detail') return 'Detail';
     if (key === 'source_file') return 'File';
@@ -1266,7 +1266,7 @@ export class AppComponent {
     if (key === 'attack') return 'ATK';
     if (key === 'defense') return 'DEF';
     if (key === 'work_speed') return 'SPD';
-    if (key === 'combat_moves') return 'Active Skills';
+    if (key === 'combat_moves') return 'Equipped Active Skills';
     if (key === 'iv_hp') return 'IV H';
     if (key === 'iv_attack') return 'IV A';
     if (key === 'iv_defense') return 'IV D';
@@ -1277,11 +1277,12 @@ export class AppComponent {
   }
 
   private toTitle(key: string): string {
-    if (key === 'max_hp') return 'Max HP (computed like the game)';
-    if (key === 'attack') return 'Attack (computed like the game, passives included)';
-    if (key === 'defense') return 'Defense (computed like the game, passives included)';
-    if (key === 'work_speed') return 'Work speed (computed like the game)';
-    if (key === 'combat_moves') return 'Equipped active skills';
+    if (key === 'max_hp') return 'Max HP';
+    if (key === 'attack') return 'Attack';
+    if (key === 'defense') return 'Defense';
+    if (key === 'work_speed') return 'Work speed';
+    if (key === 'skills') return 'Passive Skills';
+    if (key === 'combat_moves') return 'Equipped Active Skills';
     if (key === 'paldeck_no') return 'Paldeck No.';
     if (key === 'elements') return 'Element type(s)';
     if (key === 'work') return 'Work suitability levels (base plus gained ranks)';
@@ -1289,7 +1290,7 @@ export class AppComponent {
     if (key === 'storage_slot') return 'Position of the record in the save file';
     if (key === 'location') return 'Location';
     if (key === 'location_detail') return 'Location detail';
-    if (key === 'save_id') return 'Save (letter)';
+    if (key === 'save_id') return 'File (letter)';
     if (key === 'save') return 'Save name';
     if (key === 'source_file') return 'Source file';
     if (key === 'owner_name') return 'Owner';

@@ -190,7 +190,7 @@
             <span>Visible</span>
             <small>{{ rows.length | number }} rows</small>
           </button>
-          <button type="button" role="menuitem" title="Every pal in the save" (click)="exportCsv('all')">
+          <button type="button" role="menuitem" (click)="exportCsv('all')">
             <span>All</span>
             <small>{{ originalRows.length | number }} rows</small>
           </button>
@@ -234,7 +234,7 @@
         <thead>
           <tr>
             <ng-container *ngFor="let column of displayedColumns; trackBy: trackColumn">
-            <th *ngIf="column.key === 'pal_name'" class="pal-icon-cell" title="Pal portrait"></th>
+            <th *ngIf="column.key === 'pal_name'" class="pal-icon-cell" title="Pal portrait">P</th>
             <th
               [class]="column.cellClass"
               [class.sorted]="sortColumn === column.key"

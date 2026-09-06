@@ -13,7 +13,7 @@
         <img *ngIf="isAlpha && alphaImageSrc" class="variant-mark" [src]="alphaImageSrc" alt="Alpha" title="Alpha Pal">
         <img *ngIf="favoriteImageSrc" class="favorite-badge" [src]="favoriteImageSrc" alt="" aria-label="Favorite" title="Favorite">
         <span class="identity-badges">
-          <span class="save-badge" *ngIf="showSave && valueFor('save_id')" [title]="'Save ' + valueFor('save_id') + ': ' + valueFor('save')">Save {{ valueFor('save_id') }}</span>
+          <span class="save-badge" *ngIf="showSave && valueFor('save_id')" [title]="'File ' + valueFor('save_id') + ': ' + valueFor('save')">File {{ valueFor('save_id') }}</span>
           <span class="location-badge" *ngIf="valueFor('location')" [attr.data-location]="valueFor('location')" title="Where this Pal is">
             {{ valueFor('location') }}<small *ngIf="valueFor('location_detail')"> · {{ valueFor('location_detail') }}</small>
           </span>
@@ -25,7 +25,7 @@
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Open this Pal on Palworld Wiki"
-              title="Palworld Wiki"
+              title="palworld.wiki.gg"
             >
               <span>GG</span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -38,7 +38,7 @@
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Open this Pal on PalDB"
-              title="PalDB"
+              title="paldb.cc"
             >
               <span>CC</span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -51,7 +51,7 @@
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Open this Pal on Palpedia"
-              title="Palpedia"
+              title="palpedia.net"
             >
               <span>P</span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -64,7 +64,7 @@
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Open this Pal on Game8"
-              title="Game8"
+              title="game8.co"
             >
               <span>8</span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -77,7 +77,7 @@
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Open this Pal on Fandom"
-              title="Palworld Fandom"
+              title="palworld.fandom.com"
             >
               <span>F</span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -156,7 +156,7 @@
             <span class="bar"><i [style.width.%]="bar.percent"></i></span>
             <strong>{{ bar.value }}</strong>
           </div>
-          <div class="food-line" *ngIf="foodEffect as food" title="Food status effect stored in the save">
+          <div class="food-line" *ngIf="foodEffect as food" title="Food status effect">
             <span class="bar-icon" aria-hidden="true"><img *ngIf="uiIcons['hunger']" [src]="uiIcons['hunger']" alt=""></span>
             <span class="bar-label">Food</span>
             <span class="food-text"><b>{{ food.name }}</b> · {{ food.effects }}<small *ngIf="food.timeLeft"> · {{ food.timeLeft }}</small></span>
@@ -170,7 +170,7 @@
               <strong>{{ stat.value }}<i class="delta" [class.down]="stat.delta < 0" [class.hidden]="!stat.delta">{{ stat.delta < 0 ? '▼' : '▲' }}</i></strong>
             </div>
           </section>
-          <section class="stat-panel potential-panel" *ngIf="ivStats.length" title="Potential (IV): 0 to 100 per stat">
+          <section class="stat-panel potential-panel" *ngIf="ivStats.length">
             <h3>Potential</h3>
             <div *ngFor="let stat of ivStats" class="stat">
               <span class="stat-icon" [attr.data-icon]="stat.icon" [style.--icon-url]="statIconUrl(stat.icon)" aria-hidden="true"></span><small>{{ stat.label }}</small><strong [attr.data-tone]="stat.tone">{{ stat.value }}</strong>
@@ -237,7 +237,6 @@
               class="passive-rank-icon"
               [src]="rankIconSource"
               [alt]="skill.rankMarker"
-              [title]="'Passive rank ' + skill.rankMarker"
             >
           </a>
         </div>
