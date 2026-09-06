@@ -297,9 +297,17 @@ export class PalDetailCardComponent implements OnChanges {
     return amount === null ? [] : Array.from({ length: 10 }, (_, index) => index < amount);
   }
 
-  /** Icon for a stat row: the game's attack, defense and work speed marks (HP keeps the heart). */
-  statIcon(icon: PalStat['icon'] | CombatStat['icon']): string {
-    return this.uiIcons[{ attack: 'IVA', defense: 'IVD', crafting: 'IVW' }[icon as string] ?? ''] ?? '';
+  /** Mask image for a stat row, so the same mark can be white, cyan or gold: the game's defense and work
+   * speed icons from assets/ui, plus a drawn heart and eight-point burst (the supplied attack icon is opaque). */
+  statIconUrl(icon: PalStat['icon'] | CombatStat['icon']): string {
+    const drawn: Record<string, string> = {
+      hp: "M12 21.5S2.5 15.5 2.5 8.8C2.5 5.6 5 3.5 7.6 3.5c1.9 0 3.4 1 4.4 2.4 1-1.4 2.5-2.4 4.4-2.4 2.6 0 5.1 2.1 5.1 5.3 0 6.7-9.5 12.7-9.5 12.7z",
+      attack: "M12.0 1.0 L14.6 5.7 L19.8 4.2 L18.3 9.4 L23.0 12.0 L18.3 14.6 L19.8 19.8 L14.6 18.3 L12.0 23.0 L9.4 18.3 L4.2 19.8 L5.7 14.6 L1.0 12.0 L5.7 9.4 L4.2 4.2 L9.4 5.7zM9.6 9.6h4.8v4.8H9.6z",
+    };
+    const asset = { defense: 'IVD', crafting: 'IVW' }[icon as string];
+    if (asset) return this.uiIcons[asset] ? `url("${this.uiIcons[asset]}")` : '';
+    const path = drawn[icon];
+    return path ? `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill-rule='evenodd' d='${path}'/></svg>`)}")` : '';
   }
 
   /** Pal Souls spent, the "+N" the game shows next to the stars. */

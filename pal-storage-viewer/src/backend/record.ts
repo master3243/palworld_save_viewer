@@ -241,7 +241,9 @@ export function buildRecord(
     },
     item_container_id: guidOrNull(itemContainer['ID']),
     pal_name: palName,
-    pal_variant: palVariant,
+    // Lucky Pals keep the BOSS_ id (and its stat scaling) but the game shows only the lucky mark,
+    // never the alpha one: the two are mutually exclusive.
+    pal_variant: readBool(buf, prop('IsRarePal')) ? '' : palVariant,
     species_id: characterId,
     species_base_id: lookups.canonicalSpeciesId(characterId),
     unique_npc_id: readName(buf, prop('UniqueNPCID')),

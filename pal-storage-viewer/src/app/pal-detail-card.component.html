@@ -1,36 +1,23 @@
 <article class="card">
   <section class="pal-profile">
     <header class="identity">
-      <div class="level-block">
-        <span>Level</span>
-        <strong>{{ valueFor('level') || '-' }}</strong>
-        <div class="next-exp" *ngIf="expNext as next" [title]="next.title">
-          <div class="next-line"><span>Next</span><b>{{ next.text }}</b></div>
-          <i class="exp-bar"><em [style.width.%]="next.percent"></em></i>
+      <div class="identity-top">
+        <div class="stars" [attr.aria-label]="'Rank ' + displayRank + ' of 4'" [title]="'Condensing: ' + displayRank + ' of 4 stars'">
+          <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
         </div>
-      </div>
-
-      <div class="name-block">
-        <div class="name-line">
-          <h2><span *ngIf="valueFor('paldeck_no')">{{ valueFor('paldeck_no') }}. </span>{{ name }}</h2>
-          <img *ngIf="isAlpha && alphaImageSrc" class="alpha-badge" [src]="alphaImageSrc" alt="Alpha" title="Alpha Pal">
-          <span *ngIf="isLucky" class="lucky-badge" title="Lucky Pal"><img *ngIf="uiIcons['lucky']" [src]="uiIcons['lucky']" alt="">Lucky</span>
-          <img *ngIf="favoriteImageSrc" class="favorite-badge" [src]="favoriteImageSrc" alt="" aria-label="Favorite" title="Favorite">
-          <span *ngIf="gender" class="gender" [class.female]="gender === 'Female'">
-            <ng-container *ngIf="gender === 'Female' || gender === 'Male'; else genderText">
-              <img *ngIf="uiIcons[gender.toLowerCase()]; else genderSvg" class="gender-image" [src]="uiIcons[gender.toLowerCase()]" [alt]="gender" [title]="gender">
-              <ng-template #genderSvg><app-gender-icon [gender]="gender === 'Female' ? 'female' : 'male'"></app-gender-icon></ng-template>
-            </ng-container>
-            <ng-template #genderText>{{ gender }}</ng-template>
-          </span>
-          <span class="trait-line" *ngIf="elementChips.length" title="Element type">
-            <span *ngFor="let chip of elementChips" class="element-chip" [attr.data-element]="chip.index"><img [src]="chip.src" [alt]="chip.name">{{ chip.name }}</span>
-          </span>
+        <div class="spirit" title="Pal Souls spent (sum of the soul ranks)">
+          <img *ngIf="uiIcons['spirit']" [src]="uiIcons['spirit']" alt="Pal Souls"><b>+{{ soulTotal }}</b>
+        </div>
+        <img *ngIf="isLucky && uiIcons['lucky']" class="variant-mark" [src]="uiIcons['lucky']" alt="Lucky" title="Lucky Pal">
+        <img *ngIf="isAlpha && alphaImageSrc" class="variant-mark" [src]="alphaImageSrc" alt="Alpha" title="Alpha Pal">
+        <img *ngIf="favoriteImageSrc" class="favorite-badge" [src]="favoriteImageSrc" alt="" aria-label="Favorite" title="Favorite">
+        <span class="identity-badges">
           <span class="save-badge" *ngIf="showSave && valueFor('save_id')" [title]="'Save ' + valueFor('save_id') + ': ' + valueFor('save')">Save {{ valueFor('save_id') }}</span>
           <span class="location-badge" *ngIf="valueFor('location')" [attr.data-location]="valueFor('location')" title="Where this Pal is">
             {{ valueFor('location') }}<small *ngIf="valueFor('location_detail')"> · {{ valueFor('location_detail') }}</small>
           </span>
-          <span class="wiki-links">
+        </span>
+        <span class="wiki-links">
             <a
               class="wiki-link wikigg-link"
               [href]="wikiGgUrl"
@@ -97,22 +84,39 @@
               </svg>
             </a>
           </span>
+      </div>
+      <div class="identity-main">
+        <div class="level-block">
+          <span>Level</span>
+          <strong>{{ valueFor('level') || '-' }}</strong>
+        </div>
+        <div class="name-block">
+          <div class="name-line">
+            <h2><span *ngIf="valueFor('paldeck_no')">{{ valueFor('paldeck_no') }}. </span>{{ name }}</h2>
+            <span *ngIf="gender" class="gender" [class.female]="gender === 'Female'">
+              <ng-container *ngIf="gender === 'Female' || gender === 'Male'; else genderText">
+                <img *ngIf="uiIcons[gender.toLowerCase()]; else genderSvg" class="gender-image" [src]="uiIcons[gender.toLowerCase()]" [alt]="gender" [title]="gender">
+                <ng-template #genderSvg><app-gender-icon [gender]="gender === 'Female' ? 'female' : 'male'"></app-gender-icon></ng-template>
+              </ng-container>
+              <ng-template #genderText>{{ gender }}</ng-template>
+            </span>
+          </div>
+          <div class="next-row">
+            <div class="next-exp" *ngIf="expNext as next" [title]="next.title">
+              <span>Next</span>
+              <i class="exp-bar"><em [style.width.%]="next.percent"></em></i>
+              <b>{{ next.text }}</b>
+            </div>
+            <span class="trait-line" *ngIf="elementChips.length" title="Element type">
+              <span *ngFor="let chip of elementChips" class="element-chip" [attr.data-element]="chip.index"><img [src]="chip.src" [alt]="chip.name">{{ chip.name }}</span>
+            </span>
+          </div>
         </div>
       </div>
-
     </header>
 
     <div class="profile-body">
       <div class="portrait" aria-hidden="true">
-        <div class="portrait-rank" *ngIf="valueFor('species_id')" [title]="'Condensing: ' + displayRank + ' of 4 stars'">
-          <span>Rank</span>
-          <div class="stars" [attr.aria-label]="'Rank ' + displayRank + ' of 4'">
-            <i *ngFor="let filled of rankStars" [class.filled]="filled">★</i>
-          </div>
-          <div class="spirit" title="Pal Souls spent (sum of the soul ranks)">
-            <img *ngIf="uiIcons['spirit']" [src]="uiIcons['spirit']" alt="Pal Souls"><b>+{{ soulTotal }}</b>
-          </div>
-        </div>
         <div class="portrait-ring">
           <img
             *ngIf="palImageSrc && !palImageFailed; else portraitFallback"
@@ -157,20 +161,20 @@
           <section class="stat-panel combat-panel" *ngIf="combatStats.length">
             <h3>Stats</h3>
             <div *ngFor="let stat of combatStats" class="stat" [appTooltip]="stat.tooltip" tabindex="-1">
-              <span class="stat-icon" [attr.data-icon]="stat.icon" [class.has-image]="statIcon(stat.icon)" aria-hidden="true"><img *ngIf="statIcon(stat.icon) as src" [src]="src" alt=""></span><small>{{ stat.label }}</small>
+              <span class="stat-icon" [attr.data-icon]="stat.icon" [style.--icon-url]="statIconUrl(stat.icon)" aria-hidden="true"></span><small>{{ stat.label }}</small>
               <strong>{{ stat.value }}<i class="delta" [class.down]="stat.delta < 0" [class.hidden]="!stat.delta">{{ stat.delta < 0 ? '▼' : '▲' }}</i></strong>
             </div>
           </section>
           <section class="stat-panel potential-panel" *ngIf="ivStats.length" title="Potential (IV): 0 to 100 per stat">
             <h3>Potential</h3>
             <div *ngFor="let stat of ivStats" class="stat">
-              <span class="stat-icon" [attr.data-icon]="stat.icon" [class.has-image]="statIcon(stat.icon)" aria-hidden="true"><img *ngIf="statIcon(stat.icon) as src" [src]="src" alt=""></span><small>{{ stat.label }}</small><strong [attr.data-tone]="stat.tone">{{ stat.value }}</strong>
+              <span class="stat-icon" [attr.data-icon]="stat.icon" [style.--icon-url]="statIconUrl(stat.icon)" aria-hidden="true"></span><small>{{ stat.label }}</small><strong [attr.data-tone]="stat.tone">{{ stat.value }}</strong>
             </div>
           </section>
           <section class="stat-panel soul-panel" *ngIf="soulStats.length">
             <h3>SR</h3>
             <div *ngFor="let stat of soulStats" class="stat">
-              <span class="stat-icon" [attr.data-icon]="stat.icon" [class.has-image]="statIcon(stat.icon)" aria-hidden="true"><img *ngIf="statIcon(stat.icon) as src" [src]="src" alt=""></span><small>{{ stat.label }}</small><strong>{{ stat.value }}</strong>
+              <span class="stat-icon" [attr.data-icon]="stat.icon" [style.--icon-url]="statIconUrl(stat.icon)" aria-hidden="true"></span><small>{{ stat.label }}</small><strong>{{ stat.value }}</strong>
             </div>
           </section>
         </div>
