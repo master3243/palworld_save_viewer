@@ -345,7 +345,8 @@ export class PalDetailCardComponent implements OnChanges {
     const rows: WorkLevelRow[] = perStar.map((ranks, count) => ({
       stars: count,
       current: count === stars,
-      items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: count > 0 && rank > perStar[count - 1][slot] })),
+      // Gold once a level is above the unstarred value, and it stays gold at every higher rank.
+      items: ranks.map((rank, slot) => ({ src: this.works[able[slot]].src, name: this.works[able[slot]].name, rank, up: rank > perStar[0][slot] })),
     }));
     const extra = handbook.reduce((sum, value) => sum + Math.max(0, value), 0);
     return {
@@ -353,6 +354,7 @@ export class PalDetailCardComponent implements OnChanges {
       titleRight: `${'★'.repeat(stars)}${'☆'.repeat(4 - stars)}`,
       intro: ['Levels at each condensing rank:'],
       work: rows,
+      fit: 'host',
       note: extra > 0 ? `Includes +${extra} from handbooks or items.` : undefined,
     };
   }
@@ -481,7 +483,8 @@ export class PalDetailCardComponent implements OnChanges {
       { label: 'HP', value: this.valueFor('soul_rank_hp'), icon: 'hp' },
       { label: 'Attack', value: this.valueFor('soul_rank_attack'), icon: 'attack' },
       { label: 'Defense', value: this.valueFor('soul_rank_defense'), icon: 'defense' },
-      { label: 'Crafting', value: this.valueFor('soul_rank_craft_speed'), icon: 'crafting' }
+      // The game's Enhancement screen always lists Work Speed; the save only writes Rank_CraftSpeed once it is above 0.
+      { label: 'Work Speed', value: this.valueFor('soul_rank_craft_speed') || '0', icon: 'crafting' }
     ];
     return stats.filter((stat) => stat.value !== '');
   }

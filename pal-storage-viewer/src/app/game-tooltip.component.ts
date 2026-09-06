@@ -31,6 +31,8 @@ export interface TooltipData {
   rows?: [string, string, string?][];
   /** Work suitability at each condensing rank. */
   work?: WorkLevelRow[];
+  /** 'host': the tooltip is as wide as the element it belongs to and lines up with its left edge. */
+  fit?: 'host';
   /** Left-aligned lines with every figure marked, like the game's passive skill card ("Attack +30.0%"). */
   inline?: TextSegment[][];
   lines?: string[];
@@ -46,7 +48,7 @@ export interface TooltipData {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="tip" [style.left.px]="x" [style.top.px]="y" [class.ready]="ready">
+    <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [class.fitted]="width !== null" [class.ready]="ready">
       <div class="tip-title"><span>{{ data.title }}</span><b *ngIf="data.titleRight">{{ data.titleRight }}</b></div>
       <p class="tip-intro" *ngFor="let line of data.intro">{{ line }}</p>
       <p class="tip-intro tip-rich" *ngIf="data.rich?.length"><ng-container *ngFor="let seg of data.rich"><em *ngIf="seg.value; else richPlain">{{ seg.text }}</em><ng-template #richPlain>{{ seg.text }}</ng-template></ng-container></p>
@@ -77,6 +79,7 @@ export interface TooltipData {
   styles: [`
     .tip { background: rgba(14, 24, 32, .96); border: 1px solid rgba(190, 220, 235, .35); box-shadow: 0 10px 30px rgba(0, 0, 0, .55); color: #e6f1f5; font-size: .78rem; left: 0; max-width: 380px; min-width: 220px; opacity: 0; pointer-events: none; position: fixed; top: 0; z-index: 1000; }
     .tip.ready { opacity: 1; }
+    .tip.fitted { max-width: none; }
     .tip-title { align-items: center; background: linear-gradient(90deg, rgba(110, 125, 135, .55), rgba(60, 75, 85, .55)); color: #fff; display: flex; font-size: .9rem; font-weight: 700; gap: 16px; justify-content: space-between; padding: 6px 12px; }
     .tip-title b { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
     .tip-intro { line-height: 1.45; margin: 8px 12px 0; }
@@ -134,6 +137,8 @@ export class GameTooltipComponent {
   @Input({ required: true }) data!: TooltipData;
   x = 0;
   y = 0;
+  /** Fixed width when the tooltip is fitted to its host. */
+  width: number | null = null;
   ready = false;
 }
 
@@ -168,12 +173,13 @@ export class TooltipDirective implements OnInit, OnDestroy {
     if (!this.data || this.ref) return;
     const ref = createComponent(GameTooltipComponent, { environmentInjector: this.injector });
     ref.instance.data = this.data;
+    const anchor = this.host.nativeElement.getBoundingClientRect();
+    if (this.data.fit === 'host') ref.instance.width = Math.round(anchor.width);
     this.appRef.attachView(ref.hostView);
     document.body.appendChild(ref.location.nativeElement);
     ref.changeDetectorRef.detectChanges();
     this.ref = ref;
     const tip = (ref.location.nativeElement as HTMLElement).querySelector('.tip') as HTMLElement;
-    const anchor = this.host.nativeElement.getBoundingClientRect();
     const size = tip.getBoundingClientRect();
     const margin = 8;
     ref.instance.x = Math.max(margin, Math.min(anchor.left, window.innerWidth - size.width - margin));
