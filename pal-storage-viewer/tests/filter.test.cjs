@@ -123,3 +123,18 @@ test('percentage fields and percentages of absolute fields compare their literal
  assert.equal(filter.filter(parseQuery('stomach_pct<11',fields).root).length,0);
  assert.equal(filter.filter(parseQuery('stomach<hunger_max*0.11',fields).root).length,0);
 });
+
+const { hasMultipleOwners, shortOwner } = require('../src/app/pal-owners.ts');
+test('Owner is needed only when a single save has multiple owners', () => {
+  const row = (save, uid, name) => ({save_id:save, owner_player_uid:uid, owner_name:name});
+  assert.equal(hasMultipleOwners([row('A','1','Alex'), row('B','2','Bob')]),false);
+  assert.equal(hasMultipleOwners([row('A','1','Alex'), row('A','2','Alex')]),true);
+  assert.equal(hasMultipleOwners([row('A','1','Alex'), row('A','1','Alex'), row('A',null,'')]),false);
+  assert.equal(hasMultipleOwners([row('A','1','Alex'), row('A','00000000-0000-0000-0000-000000000000','')]),false);
+});
+test('Owner display stays within ten characters and preserves short or Unicode names', () => {
+  assert.equal(shortOwner('NUMBA TWO'),'NUMBA TWO');
+  assert.equal(shortOwner('1234567890'),'1234567890');
+  assert.equal(shortOwner('1234567890extra'),'123456789…');
+  assert.equal(Array.from(shortOwner('😀😀😀😀😀😀😀😀😀😀😀')).length,10);
+});

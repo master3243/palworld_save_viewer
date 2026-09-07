@@ -12,7 +12,10 @@
     </h2>
     <div class="confirm-list">
       <div class="confirm-folder" *ngFor="let folder of folders; trackBy: trackFolder">
-        <div class="confirm-folder-name" [title]="folder.folder">{{ folder.folder || 'Loose files' }}</div>
+        <div class="confirm-folder-heading">
+          <span class="confirm-folder-name" [title]="folder.folder">{{ folder.folder || 'Loose files' }}</span>
+          <button class="source-remove" type="button" [attr.aria-label]="'Leave out save ' + (folder.folder || 'Loose files')" (click)="removeFolder.emit(folder)">&times;</button>
+        </div>
         <ul>
           <li *ngFor="let file of folder.files; trackBy: trackFile">
             <span class="source-kind" [attr.data-kind]="file.kind" [title]="kindTitle(file.kind)">{{ kindTag(file.kind) }}</span>

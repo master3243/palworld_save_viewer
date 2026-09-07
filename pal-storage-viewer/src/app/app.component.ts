@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { hasMultipleOwners, shortOwner } from './pal-owners';
 import { resolveWgsFiles } from '../backend/wgs';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 
@@ -430,6 +431,7 @@ export class AppComponent implements OnDestroy {
 
   private readonly defaultVisibleColumns = new Set([
     'save_id',
+    'owner_name',
     'location',
     'pal_box_slot_index',
     'paldeck_no',
@@ -462,7 +464,6 @@ export class AppComponent implements OnDestroy {
     'storage_slot',
     'location_detail',
     'save',
-    'owner_name',
     'source_file',
     'source_kind',
     'unique_npc_id',
@@ -634,6 +635,13 @@ export class AppComponent implements OnDestroy {
       return;
     }
     this.rebuildPendingFolders();
+  }
+
+  removePendingFolder(folder: PendingFolder): void {
+    if (!this.pendingFiles) return;
+    this.pendingFiles = this.pendingFiles.filter(file => file.folder !== folder.folder);
+    if (!this.pendingFiles.length) this.cancelPending();
+    else this.rebuildPendingFolders();
   }
 
   async confirmPending(): Promise<void> {
@@ -1050,6 +1058,7 @@ export class AppComponent implements OnDestroy {
 
   cellDisplay(row: PalStorageRow, column: TableColumn): string {
     const value = this.cellValue(row, column.key);
+    if (column.key === 'owner_name') return shortOwner(value);
     if (column.key === 'pal_variant') return this.isAlpha(row) ? 'A' : '';
     if (column.key === 'gender') return this.genderIcon(value);
     if (column.key === 'is_lucky') return this.isLucky(row) ? '★' : '';
@@ -1185,11 +1194,12 @@ export class AppComponent implements OnDestroy {
       ...Array.from(keys).sort((left, right) => left.localeCompare(right))
     ];
 
+    const showOwner = hasMultipleOwners(rows);
     return orderedKeys.map((key) => ({
       key,
       label: this.toLabel(key),
       title: this.toTitle(key),
-      visible: this.defaultVisibleColumns.has(key),
+      visible: key === 'owner_name' ? showOwner : this.defaultVisibleColumns.has(key),
       cellClass: this.columnClass(key),
     }));
   }
@@ -1211,6 +1221,7 @@ export class AppComponent implements OnDestroy {
       this.isSaveLetter(column) && 'save-cell',
       key === 'paldeck_no' && 'paldeck-cell',
       key === 'nickname' && 'nickname-cell',
+      key === 'owner_name' && 'owner-cell',
       key === 'level' && 'level-cell',
       key === 'rank' && 'rank-cell',
       this.isIv(column) && 'iv-cell',

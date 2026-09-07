@@ -34,6 +34,7 @@ export class PendingFilesModalComponent {
   @Input() fileCount = 0;
   @Input() palTotal: number | null = null;
   @Input() ignored = 0;
+  @Output() readonly removeFolder = new EventEmitter<PendingFolder>();
   @Output() readonly removeFile = new EventEmitter<PendingFile>();
   @Output() readonly cancel = new EventEmitter<void>();
   @Output() readonly confirm = new EventEmitter<void>();

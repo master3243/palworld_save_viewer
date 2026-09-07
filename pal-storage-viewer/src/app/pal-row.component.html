@@ -4,6 +4,7 @@
   </td>
   <td
     [class]="column.cellClass"
+    [attr.title]="column.key === 'owner_name' ? (row['owner_name'] || null) : null"
     [class.iv-high]="view.cells[column.key]?.iv === 'high'"
     [class.iv-perfect]="view.cells[column.key]?.iv === 'perfect'"
     [class.sorted-column]="sortedColumns.has(column.key)"

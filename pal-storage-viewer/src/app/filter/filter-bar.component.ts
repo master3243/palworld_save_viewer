@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { hasMultipleOwners, shortOwner } from '../pal-owners';
 import {
   AfterViewInit,
   Component,
@@ -178,9 +179,10 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   /** One state per loaded save (A, B, …); only offered when more than one save is loaded. */
   saveChip: QuickChip | null = null;
+  ownerChip: QuickChip | null = null;
 
   get allChips(): QuickChip[] {
-    return this.saveChip ? [this.saveChip, ...this.quickChips] : this.quickChips;
+    return [...(this.saveChip ? [this.saveChip] : []), ...(this.ownerChip ? [this.ownerChip] : []), ...this.quickChips];
   }
 
   readonly quickChips: QuickChip[] = [
@@ -306,6 +308,18 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
         title: `Only save files from ${letter}`,
         tone: 'include' as const,
         make: () => createRule('save', 'is', [letter])
+      }))
+    } : null;
+    const owners = [...new Set(this.rows.map(row => String(row['owner_name'] ?? '')))]
+      .sort((a, b) => a.localeCompare(b));
+    this.ownerChip = hasMultipleOwners(this.rows) && owners.length > 1 ? {
+      label: 'Owner',
+      title: 'Owner: click to cycle through owners, then everyone',
+      states: owners.map(name => ({
+        label: shortOwner(name || 'Empty'),
+        title: name ? `Owner: ${name}` : 'Owner: Empty',
+        tone: 'include' as const,
+        make: () => name ? createRule('owner', 'is', [name]) : createRule('owner', 'empty')
       }))
     } : null;
     this.setupEngine();

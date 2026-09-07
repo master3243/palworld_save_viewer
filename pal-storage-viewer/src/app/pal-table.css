@@ -98,6 +98,7 @@ table.pal-table {
 
 /* Fixed name width keeps the chosen columns within a 1920px viewport. */
 .pal-table th.pal-name-cell { width: 115px; }
+.pal-table th.owner-cell { width: calc(10ch + 12px); }
 
 /* Unsortable portrait column that sits just left of the Pal name. */
 .pal-table th.pal-icon-cell,
@@ -521,6 +522,19 @@ table.pal-table {
   min-width: 350px;
   overflow: hidden;
   width: 350px;
+}
+
+/* Keep the default columns within 1920px when Owner is visible. */
+.pal-table:has(th.owner-cell) .skills-cell {
+  min-width: 180px;
+  max-width: 180px;
+  width: 180px;
+}
+
+.pal-table:has(th.owner-cell) .moves-cell {
+  min-width: 300px;
+  max-width: 300px;
+  width: 300px;
 }
 
 .pal-table .move-chips {

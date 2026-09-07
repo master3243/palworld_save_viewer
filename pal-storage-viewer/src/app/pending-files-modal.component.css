@@ -16,11 +16,24 @@
   text-align: left;
 }
 
+.confirm-folder-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.confirm-folder-heading .source-remove {
+  font-size: 1.75rem;
+  height: 28px;
+}
+
 .confirm-folder-name {
+  flex: 1;
+  min-width: 0;
   color: #9de3ff;
   font-size: 0.85rem;
   font-weight: 600;
-  margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
