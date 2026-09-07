@@ -24,6 +24,7 @@ export function activeSkillTooltip(name: string, description: string, detail: Ac
     const [effect] = detail.effects;
     if (effect) tooltip.effect = { label: `Aggregate: ${STATUS_NAMES[effect[0]] ?? effect[0]}`, value: String(effect[1]) };
     tooltip.attackKind = detail.melee ? 'Melee' : 'Shot';
+    tooltip.range = `${detail.minRange.toLocaleString()}–${detail.maxRange.toLocaleString()}`;
   }
   return tooltip;
 }
