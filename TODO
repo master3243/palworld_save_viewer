@@ -6,12 +6,10 @@ some todos for later cause i'm lazy
     - add logos based on the map icons
 
 - pal table:
-    - some skills wrong color
+    - inline type icon when skill says the name of the type
     - no partner skills has icons
     - icons missing for non base-pals and many stats wrong
     - base x/y positions is weird.
-    - lots of bad tooltips 
-        "in the table, remove all tooltips when the mouse hovers over the table itself (not the columns)."
-    - should be able to put equations of multiple variables (current_hp < max_hp/2)
+    - Movement speeds?
 
 - live map?

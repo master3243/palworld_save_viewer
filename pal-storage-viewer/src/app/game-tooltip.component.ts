@@ -28,6 +28,7 @@ export interface TooltipData {
   stats?: { icon?: 'clock' | 'power'; label: string; value: string }[];
   /** Status effect line under the badge, like the game's "Aggregate: Burn   100". */
   effect?: { label: string; value: string };
+  attackKind?: 'Melee' | 'Shot';
   /** Label/value rows, e.g. a stat breakdown; a third item 'subtotal' draws a divider above the row. */
   rows?: [string, string, string?][];
   /** Work suitability at each condensing rank. */
@@ -68,7 +69,16 @@ export interface TooltipData {
         <span class="tip-stat" *ngFor="let stat of data.stats"><i [attr.data-icon]="stat.icon"></i>{{ stat.label }}<b>{{ stat.value }}</b></span>
       </div>
       <div class="tip-inline" *ngIf="data.inline?.length"><div *ngFor="let line of data.inline"><ng-container *ngFor="let seg of line"><em *ngIf="seg.value; else inlinePlain">{{ seg.text }}</em><ng-template #inlinePlain>{{ seg.text }}</ng-template></ng-container></div></div>
-      <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
+      <div class="tip-details" *ngIf="data.attackKind || data.effect">
+        <span class="tip-attack-kind" *ngIf="data.attackKind" [attr.data-kind]="data.attackKind">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path *ngIf="data.attackKind === 'Melee'" d="m5 19 3-3m-3-4 7 7M9 15 19 5V2h-3L6 12"/>
+            <ng-container *ngIf="data.attackKind === 'Shot'"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></ng-container>
+          </svg>
+          {{ data.attackKind }}
+        </span>
+        <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
+      </div>
       <div class="tip-rows" *ngIf="data.rows?.length">
         <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'" [class.subtotal]="row[2] === 'subtotal'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
       </div>
@@ -114,7 +124,11 @@ export interface TooltipData {
     .tip-inline { line-height: 1.55; padding: 8px 12px 0; }
     .tip-inline em { color: #5ecbff; font-style: normal; font-variant-numeric: tabular-nums; font-weight: 600; }
     .tip-inline + .tip-line, .tip-inline + .tip-note { margin-top: 4px; }
-    .tip-effect { background: rgba(255, 255, 255, .06); display: flex; justify-content: space-between; margin: 4px 0 0; padding: 4px 12px; }
+    .tip-details { align-items: center; background: rgba(255, 255, 255, .04); display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 6px; padding: 5px 12px; }
+    .tip-attack-kind { align-items: center; background: rgba(255, 211, 122, .08); border: 1px solid rgba(255, 211, 122, .3); border-radius: 4px; color: #f0d2a0; display: inline-flex; flex-shrink: 0; font-size: .65rem; font-weight: 700; gap: 5px; letter-spacing: .04em; padding: 3px 6px; white-space: nowrap; }
+    .tip-attack-kind[data-kind="Shot"] { background: rgba(94, 203, 255, .08); border-color: rgba(94, 203, 255, .3); color: #9edfff; }
+    .tip-attack-kind svg { fill: none; height: 13px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; width: 13px; }
+    .tip-effect { align-items: center; display: flex; flex: 1; gap: 8px; justify-content: space-between; }
     .tip-effect span { color: #c9d8df; } .tip-effect b { color: #fff; }
     .tip-rows { border-top: 1px solid rgba(190, 220, 235, .18); margin: 4px 12px 0; padding: 6px 0 0; }
     .tip-row { display: flex; gap: 14px; justify-content: space-between; line-height: 1.5; }

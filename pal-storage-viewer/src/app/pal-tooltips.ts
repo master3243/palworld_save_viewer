@@ -23,7 +23,7 @@ export function activeSkillTooltip(name: string, description: string, detail: Ac
     tooltip.stats = [{ icon: 'clock', label: ':', value: String(detail.cooldown) }, { icon: 'power', label: 'Power:', value: String(detail.power) }];
     const [effect] = detail.effects;
     if (effect) tooltip.effect = { label: `Aggregate: ${STATUS_NAMES[effect[0]] ?? effect[0]}`, value: String(effect[1]) };
-    if (detail.melee) tooltip.note = 'Melee';
+    tooltip.attackKind = detail.melee ? 'Melee' : 'Shot';
   }
   return tooltip;
 }
