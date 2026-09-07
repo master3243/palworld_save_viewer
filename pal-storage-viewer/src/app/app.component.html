@@ -242,9 +242,9 @@
             <th *ngIf="column.key === 'pal_name'" class="pal-icon-cell" title="Pal portrait">P</th>
             <th
               [class]="column.cellClass"
-              [class.sorted]="sortColumn === column.key"
+              [class.sorted]="sortedColumns.has(column.key)"
               [title]="column.title"
-              (click)="toggleSort(column)"
+              (click)="toggleSort(column, $event)"
             >
               <span class="sort-marker" *ngIf="sortMarker(column)">{{ sortMarker(column) }}</span>
               <span class="header-label">{{ column.label }}</span>
@@ -262,7 +262,7 @@
               [row]="item.row"
               [view]="rowView(item.row)"
               [columns]="displayedColumns"
-              [sortColumn]="sortColumn"
+              [sortedColumns]="sortedColumns"
               [open]="isRowOpen(item.index)"
               [index]="item.index"
               [palIcon]="palIconSrc(item.row)"

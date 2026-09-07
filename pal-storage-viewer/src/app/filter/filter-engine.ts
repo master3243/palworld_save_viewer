@@ -5,9 +5,14 @@ import {
   FilterGroup,
   FilterNode,
   FilterRule,
+  SortCriterion,
+  operatorDef,
   isRuleActive,
+  isEmptyTree,
   splitList
 } from './filter-model';
+import { MoveCatalog, MOVE_FIELDS, MOVE_SCOPES } from './move-filters';
+import { numericExpression, type NumericExpression } from './numeric-expression';
 
 type Normalized =
   | { kind: 'text'; value: string; lower: string }
@@ -30,8 +35,10 @@ export class FilterEngine {
   private readonly regexCache = new Map<string, RegExp | null>();
   private readonly suggestionCache = new Map<string, Suggestion[]>();
   private readonly rangeCache = new Map<string, { min: number; max: number } | null>();
+  private readonly expressions = new Map<string, NumericExpression>();
+  readonly moveLookup = new FieldLookup(MOVE_FIELDS);
 
-  constructor(readonly lookup: FieldLookup, private readonly rows: PalStorageRow[]) {}
+  constructor(readonly lookup: FieldLookup, private readonly rows: PalStorageRow[], readonly moves = new MoveCatalog()) {}
 
   filter(root: FilterGroup): PalStorageRow[] {
     return this.rows.filter((row) => this.matchesNode(row, root));
@@ -44,15 +51,34 @@ export class FilterEngine {
   }
 
   matchesNode(row: PalStorageRow, node: FilterNode): boolean {
+    return this.evaluateNode(row, node) ?? true;
+  }
+
+  /** Incomplete rules are absent from AND, OR and NOT alike. */
+  private evaluateNode(row: PalStorageRow, node: FilterNode): boolean | null {
+    if (node.type === 'rule' && (!isRuleActive(node) || this.ruleError(node))) return null;
     if (node.type === 'rule') return this.matchesRule(row, node);
+    if (isEmptyTree(node)) return null;
+    if (node.scope) {
+      const group = { ...node, scope: undefined, negate: false };
+      if (!node.children.length) return null;
+      const results = this.moves.rows(row, node.scope).map(move => this.evaluateNode(move, group));
+      if (results.length && results.every(value => value === null)) return null;
+      const result = node.match === 'none' ? !results.some(value => value === true)
+        : node.match === 'all' ? results.length > 0 && results.every(value => value === true)
+        : results.some(value => value === true);
+      return node.negate ? !result : result;
+    }
+    const children = node.children.map(child => this.evaluateNode(row, child)).filter((value): value is boolean => value !== null);
+    if (!children.length) return null;
     const result = node.combinator === 'and'
-      ? node.children.every((child) => this.matchesNode(row, child))
-      : node.children.length === 0 || node.children.some((child) => this.matchesNode(row, child));
+      ? children.every(Boolean)
+      : children.some(Boolean);
     return node.negate ? !result : result;
   }
 
   matchesRule(row: PalStorageRow, rule: FilterRule): boolean {
-    const field = this.lookup.byKey.get(rule.field);
+    const field = this.field(rule.field);
     // Unknown fields and half-typed rules never hide anything.
     if (!field || !isRuleActive(rule)) return true;
 
@@ -86,17 +112,23 @@ export class FilterEngine {
     if (value.kind === 'number') {
       const actual = value.value;
       if (actual === null) return false;
-      const numbers = values.map((item) => Number(item));
+      const numbers = values.map((item) => this.expression(item, rule).evaluate(row));
+      if (numbers.some(number => number === null)) return false;
       const first = numbers[0];
       switch (rule.op) {
         case 'eq': return numbers.some((expected) => expected === actual);
         case 'neq': return !numbers.some((expected) => expected === actual);
-        case 'gt': return Number.isFinite(first) ? actual > first : true;
-        case 'gte': return Number.isFinite(first) ? actual >= first : true;
-        case 'lt': return Number.isFinite(first) ? actual < first : true;
-        case 'lte': return Number.isFinite(first) ? actual <= first : true;
-        case 'between': return this.between(actual, rule.values);
-        case 'not_between': return !this.between(actual, rule.values);
+        case 'gt': return first !== null && actual > first;
+        case 'gte': return first !== null && actual >= first;
+        case 'lt': return first !== null && actual < first;
+        case 'lte': return first !== null && actual <= first;
+        case 'between': case 'not_between': {
+          const low = rule.values[0]?.trim() ? this.expression(rule.values[0], rule).evaluate(row) : -Infinity;
+          const high = rule.values[1]?.trim() ? this.expression(rule.values[1], rule).evaluate(row) : Infinity;
+          if (low === null || high === null) return false;
+          const inside = actual >= low && actual <= high;
+          return rule.op === 'between' ? inside : !inside;
+        }
         default: return true;
       }
     }
@@ -123,9 +155,13 @@ export class FilterEngine {
     if (!all) {
       const counts = new Map<string, number>();
       for (const row of this.rows) {
-        const value = this.valueOf(row, field);
-        const items = value.kind === 'list' ? value.items : value.kind === 'text' ? [value.value] : [];
-        for (const item of items) {
+        const records = this.moveLookup.byKey.has(field.key)
+          ? MOVE_SCOPES.flatMap(scope => this.moves.rows(row, scope.key)) : [row];
+        const items = records.flatMap(record => {
+          const value = this.valueOf(record, field);
+          return value.kind === 'list' ? value.items : value.kind === 'text' ? [value.value] : [];
+        });
+        for (const item of new Set(items)) {
           if (!item) continue;
           counts.set(item, (counts.get(item) ?? 0) + 1);
         }
@@ -156,6 +192,64 @@ export class FilterEngine {
       this.rangeCache.set(field.key, Number.isFinite(min) ? { min, max } : null);
     }
     return this.rangeCache.get(field.key) ?? null;
+  }
+
+  field(key: string): FilterField | undefined {
+    return this.moveLookup.byKey.get(key) ?? this.lookup.byKey.get(key);
+  }
+
+  private expression(source: string, rule: FilterRule): NumericExpression {
+    const move = this.moveLookup.byKey.has(rule.field);
+    const key = `${move}:${source}`;
+    let expression = this.expressions.get(key);
+    if (!expression) {
+      expression = numericExpression(source, move ? this.moveLookup : this.lookup);
+      this.expressions.set(key, expression);
+    }
+    return expression;
+  }
+
+  ruleError(rule: FilterRule): string | null {
+    const field = this.field(rule.field);
+    if (!field) return `Unknown field "${rule.field}"`;
+    if (!operatorDef(rule.op).kinds.includes(field.kind)) return `Invalid operator for ${field.label}`;
+    if (!isRuleActive(rule)) return null;
+    if (field.kind === 'number') {
+      for (const value of rule.values.filter(value => value.trim())) {
+        const error = this.expression(value, rule).error;
+        if (error) return error;
+      }
+    }
+    if (rule.op === 'regex' || rule.op === 'not_regex') {
+      try { new RegExp(rule.values[0], 'i'); } catch { return 'Invalid regular expression'; }
+    }
+    return null;
+  }
+
+  errors(node: FilterNode): string[] {
+    return node.type === 'rule' ? [this.ruleError(node)].filter((error): error is string => !!error)
+      : node.children.flatMap(child => this.errors(child));
+  }
+
+  sort(rows: PalStorageRow[], criteria: SortCriterion[]): PalStorageRow[] {
+    if (!criteria.length) return rows;
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+    const locationRank = (value: string): number => value === 'Party' ? 0 : /^Base \d+/.test(value) ? 1 + Number(value.match(/\d+/)![0]) : value === 'Pal Box' ? 1000 : value === 'DimsPS' ? 2000 : value && value !== 'Unknown' ? 3000 : 4000;
+    const value = (row: PalStorageRow, field: FilterField): unknown => field.key === 'no' ? row['paldeck_no'] : field.get(row);
+    return [...rows].sort((a, b) => {
+      for (const criterion of criteria) {
+        const field = this.lookup.byKey.get(criterion.field);
+        if (!field) continue;
+        const av = value(a, field), bv = value(b, field);
+        const empty = (value: unknown) => value === null || value === undefined || value === '' || (typeof value === 'number' && !Number.isFinite(value)) || (Array.isArray(value) && !value.length);
+        if (empty(av) || empty(bv)) { const order = Number(empty(av)) - Number(empty(bv)); if (order) return order; continue; }
+        const order = field.key === 'where' ? locationRank(String(av)) - locationRank(String(bv))
+          : typeof av === 'number' && typeof bv === 'number' ? av - bv
+          : collator.compare(String(av), String(bv));
+        if (order) return order * (criterion.direction === 'asc' ? 1 : -1);
+      }
+      return 0;
+    });
   }
 
   private valueOf(row: PalStorageRow, field: FilterField): Normalized {
@@ -198,14 +292,6 @@ export class FilterEngine {
       case 'list': return value.items.length === 0;
       default: return !value.value;
     }
-  }
-
-  private between(actual: number, values: string[]): boolean {
-    const low = Number(values[0]);
-    const high = Number(values[1]);
-    const lowOk = values[0]?.trim() === '' || !Number.isFinite(low) || actual >= low;
-    const highOk = values[1] === undefined || values[1].trim() === '' || !Number.isFinite(high) || actual <= high;
-    return lowOk && highOk;
   }
 
   private regexTest(pattern: string | undefined, text: string): boolean {

@@ -7,6 +7,7 @@ import {
   FilterGroup,
   FilterNode,
   FilterRule,
+  SortCriterion,
   OperatorDef,
   cloneNode,
   createGroup,
@@ -15,6 +16,7 @@ import {
   operatorDef,
   operatorsFor
 } from './filter-model';
+import { MOVE_FIELDS, MOVE_SCOPES, type MoveScope } from './move-filters';
 
 interface FieldGroup {
   name: string;
@@ -50,8 +52,9 @@ export class FilterBuilderComponent {
   @Input({ required: true }) root!: FilterGroup;
   @Input() engine: FilterEngine | null = null;
   @Input() ruleCounts = new Map<string, number>();
+  @Input() sorts: SortCriterion[] = [];
   @Input() set fields(fields: FilterField[]) {
-    this.fieldMap = new Map(fields.map((field) => [field.key, field]));
+    this.fieldMap = new Map([...fields, ...MOVE_FIELDS].map((field) => [field.key, field]));
     const groups = new Map<string, FilterField[]>();
     for (const field of fields) {
       const list = groups.get(field.group) ?? [];
@@ -73,6 +76,66 @@ export class FilterBuilderComponent {
   /** What the user has typed in a field box, kept until they pick or leave. */
   private readonly fieldDraft = new Map<string, string>();
   private fieldBlurTimer: ReturnType<typeof setTimeout> | null = null;
+  readonly moveScopes = MOVE_SCOPES;
+  private comparisonModes = new Map<string, string>();
+
+  numericFields(rule: FilterRule): FilterField[] {
+    return this.availableFields(rule).filter(field => field.kind === 'number');
+  }
+
+  private availableFields(rule: FilterRule): FilterField[] {
+    return MOVE_FIELDS.some(field => field.key === rule.field) ? MOVE_FIELDS : this.fieldGroups.flatMap(group => group.fields);
+  }
+
+  comparisonMode(rule: FilterRule): string {
+    return this.comparisonModes.get(rule.id) ?? (!rule.values.length || rule.values.every(value => !value.trim() || Number.isFinite(Number(value))) ? 'value'
+      : /^[a-z_]\w*(?:\*[\d.]*)?$/i.test(rule.values[0]) ? 'field' : 'formula');
+  }
+
+  setComparisonMode(rule: FilterRule, event: Event): void {
+    const mode = (event.target as HTMLSelectElement).value;
+    this.comparisonModes.set(rule.id, mode);
+    rule.values = mode === 'field' ? [this.numericFields(rule).find(field => field.key === 'max_hp')?.key ?? this.numericFields(rule)[0].key] : [];
+    this.draftText.delete(rule.id);
+    this.emit();
+  }
+
+  referenceField(rule: FilterRule): string { const key = rule.values[0]?.split('*')[0] ?? ''; return this.numericFields(rule).find(field => [field.key, ...field.aliases].includes(key))?.key ?? key; }
+  referencePercent(rule: FilterRule): string { const factor = rule.values[0]?.split('*')[1]; return factor === undefined ? '100' : factor === '' ? '' : String(Number((Number(factor) * 100).toPrecision(12))); }
+  setReference(rule: FilterRule, event: Event): void {
+    const field = (event.target as HTMLSelectElement).value;
+    rule.values = [field + (this.referencePercent(rule) === '100' ? '' : `*${Number(this.referencePercent(rule)) / 100}`)];
+    this.emit();
+  }
+  setPercent(rule: FilterRule, event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    rule.values = [`${this.referenceField(rule)}${value === '100' ? '' : '*' + (value === '' ? '' : Number(value) / 100)}`];
+    this.emit();
+  }
+  hasComparisonMode(rule: FilterRule): boolean { return this.fieldFor(rule)?.kind === 'number' && !['none', 'two'].includes(this.arity(rule)); }
+  errorFor(rule: FilterRule): string | null { return this.engine?.ruleError(rule) ?? null; }
+
+  addMoveGroup(group: FilterGroup): void {
+    const child = createGroup('and', [createRule('move_element', 'has_any')]);
+    child.scope = 'equipped'; child.match = 'any';
+    group.children.push(child);
+    this.emit();
+  }
+  setMoveScope(group: FilterGroup, event: Event): void { group.scope = (event.target as HTMLSelectElement).value as MoveScope; this.emit(); }
+  setMoveMatch(group: FilterGroup, event: Event): void { group.match = (event.target as HTMLSelectElement).value as FilterGroup['match']; this.emit(); }
+
+  get sortFields(): FilterField[] { return this.fieldGroups.flatMap(group => group.fields).filter(field => field.key !== 'any'); }
+  availableSortFields(index: number): FilterField[] { return this.sortFields.filter(field => !this.sorts.some((sort, i) => i !== index && sort.field === field.key)); }
+  addSort(): void {
+    const available = this.availableSortFields(-1);
+    const field = available.find(field => field.key === 'level') ?? available[0];
+    if (field) this.sorts.push({ field: field.key, direction: field.kind === 'number' ? 'desc' : 'asc' });
+    this.emit();
+  }
+  setSortField(index: number, event: Event): void { this.sorts[index].field = (event.target as HTMLSelectElement).value; this.emit(); }
+  setSortDirection(index: number, event: Event): void { this.sorts[index].direction = (event.target as HTMLSelectElement).value as 'asc' | 'desc'; this.emit(); }
+  moveSort(index: number, direction: number): void { const [sort] = this.sorts.splice(index, 1); this.sorts.splice(index + direction, 0, sort); this.emit(); }
+  removeSort(index: number): void { this.sorts.splice(index, 1); this.emit(); }
 
   fieldFor(rule: FilterRule): FilterField | undefined {
     return this.fieldMap.get(rule.field);
@@ -93,13 +156,14 @@ export class FilterBuilderComponent {
 
   inputType(rule: FilterRule): string {
     const field = this.fieldFor(rule);
-    return field?.kind === 'number' && this.arity(rule) !== 'many' ? 'number' : 'text';
+    return field?.kind === 'number' && this.comparisonMode(rule) === 'value' && this.arity(rule) !== 'many' ? 'number' : 'text';
   }
 
   placeholder(rule: FilterRule, slot: 0 | 1 = 0): string {
     const field = this.fieldFor(rule);
     if (!field) return 'value';
     if (field.kind === 'number') {
+      if (this.comparisonMode(rule) === 'formula') return 'e.g. max_hp / 2';
       const range = this.engine?.range(field);
       if (this.arity(rule) === 'two') return slot === 0 ? `min${range ? ` (${range.min})` : ''}` : `max${range ? ` (${range.max})` : ''}`;
       if (this.arity(rule) === 'many') return range ? `e.g. ${range.min}, ${range.max}` : 'value, value';
@@ -133,7 +197,7 @@ export class FilterBuilderComponent {
 
   addRule(group: FilterGroup): void {
     const previous = [...group.children].reverse().find((child): child is FilterRule => child.type === 'rule');
-    const fieldKey = previous ? previous.field : 'skills';
+    const fieldKey = previous ? previous.field : group.scope ? 'move_element' : 'pal';
     const field = this.fieldMap.get(fieldKey);
     group.children.push(createRule(fieldKey, defaultOperator(field?.kind ?? 'list')));
     this.emit();
@@ -271,7 +335,8 @@ export class FilterBuilderComponent {
       || field.key.toLowerCase().includes(query)
       || field.aliases.some((alias) => alias.toLowerCase().includes(query))
       || (field.hint ?? '').toLowerCase().includes(query);
-    const sections = this.fieldGroups.map((group) => ({ name: group.name, fields: group.fields.filter(matches) })).filter((group) => group.fields.length);
+    const groups = MOVE_FIELDS.some(field => field.key === rule.field) ? [{ name: 'Move details', fields: MOVE_FIELDS }] : this.fieldGroups;
+    const sections = groups.map((group) => ({ name: group.name, fields: group.fields.filter(matches) })).filter((group) => group.fields.length);
     const flat = sections.flatMap((section) => section.fields);
     // Prefer a label that starts with the text, then the current field, so Enter does the obvious thing.
     const active = query ? flat.find((field) => field.label.toLowerCase().startsWith(query)) ?? flat[0] ?? null : null;
@@ -286,6 +351,7 @@ export class FilterBuilderComponent {
     if (!next || !previous || next.kind !== previous.kind) {
       rule.op = defaultOperator(next?.kind ?? 'text');
       rule.values = [];
+      this.comparisonModes.delete(rule.id);
       this.draftText.delete(rule.id);
     }
     this.emit();
@@ -306,7 +372,7 @@ export class FilterBuilderComponent {
   onValueInput(rule: FilterRule, event: Event): void {
     const text = (event.target as HTMLInputElement).value;
     this.draftText.set(rule.id, text);
-    rule.values = this.arity(rule) === 'one' ? [text] : this.split(text);
+    rule.values = this.arity(rule) === 'one' || this.comparisonMode(rule) === 'formula' ? [text] : this.split(text);
     this.refreshSuggestions(rule, text);
     this.emit();
   }

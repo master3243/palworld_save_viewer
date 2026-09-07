@@ -22,7 +22,7 @@ export class PalRowComponent {
   @Input({ required: true }) row!: PalStorageRow;
   @Input({ required: true }) view!: RowView;
   @Input({ required: true }) columns!: TableColumn[];
-  @Input() sortColumn: string | null = null;
+  @Input() sortedColumns = new Set<string>();
   @Input() open = false;
   @Input() index = 0;
   @Input() palIcon = '';

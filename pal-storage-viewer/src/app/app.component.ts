@@ -6,7 +6,8 @@ import { CompletionComponent } from './completion/completion.component';
 import { FaqModalComponent } from './faq-modal.component';
 import { PendingFile, PendingFilesModalComponent, PendingFolder } from './pending-files-modal.component';
 import { LocationCount, SourceGroup, SourcesBarComponent } from './sources-bar.component';
-import { FilterBarComponent } from './filter/filter-bar.component';
+import { FilterBarComponent, type FilterResult } from './filter/filter-bar.component';
+import type { SortCriterion } from './filter/filter-model';
 import { GithubIconComponent } from './github-icon.component';
 import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
@@ -36,8 +37,6 @@ interface VirtualRow {
   row: PalStorageRow;
 }
 
-type SortDirection = 'asc' | 'desc' | null;
-
 /** The two things the page can show for a loaded save: the pal table or the 100% tracker. */
 type ViewMode = 'pals' | 'tracker';
 
@@ -64,6 +63,7 @@ interface DirectoryEntryLike {
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnDestroy {
+  @ViewChild(FilterBarComponent) filterBar?: FilterBarComponent;
   @ViewChild('tableScroll') tableScroll?: ElementRef<HTMLElement>;
   @ViewChild('folderInput') folderInput?: ElementRef<HTMLInputElement>;
   @ViewChild('addFilesInput') addFilesInput?: ElementRef<HTMLInputElement>;
@@ -256,8 +256,8 @@ export class AppComponent implements OnDestroy {
   }
   isDropHelpOpen = false;
   openRowIndex: number | null = null;
-  sortColumn: string | null = null;
-  sortDirection: SortDirection = null;
+  sorts: SortCriterion[] = [];
+  sortedColumns = new Set<string>();
   scrollTop = 0;
   viewportHeight = 560;
   /** Visible width of the table scroller; the open card is centred within it. */
@@ -328,12 +328,14 @@ export class AppComponent implements OnDestroy {
     return this.filteredRows.length !== this.originalRows.length;
   }
 
-  onFilterChanged(rows: PalStorageRow[]): void {
-    this.filteredRows = rows;
+  onFilterChanged(result: FilterResult): void {
+    this.filteredRows = result.rows;
+    this.rows = result.rows;
+    this.sorts = result.sorts;
+    this.sortedColumns = result.sortedColumns;
     this.openRowIndex = null;
     this.detailHeight = 0;
     this.resetTableScroll();
-    this.applySort();
     this.scheduleMeasure();
   }
 
@@ -824,8 +826,8 @@ export class AppComponent implements OnDestroy {
     this.error = '';
     this.openRowIndex = null;
     this.detailHeight = 0;
-    this.sortColumn = null;
-    this.sortDirection = null;
+    this.sorts = [];
+    this.sortedColumns = new Set();
     this.scrollTop = 0;
     this.isColumnMenuOpen = false;
     this.isExportMenuOpen = false;
@@ -928,25 +930,15 @@ export class AppComponent implements OnDestroy {
     this.columnsVersion++;
   }
 
-  toggleSort(column: TableColumn): void {
-    if (this.sortColumn !== column.key) {
-      this.sortColumn = column.key;
-      this.sortDirection = 'asc';
-    } else if (this.sortDirection === 'asc') {
-      this.sortDirection = 'desc';
-    } else {
-      this.sortColumn = null;
-      this.sortDirection = null;
-    }
-    this.openRowIndex = null;
-    this.detailHeight = 0;
-    this.resetTableScroll();
-    this.applySort();
+  toggleSort(column: TableColumn, event: MouseEvent): void {
+    this.filterBar?.toggleSort(column.key, event.shiftKey);
   }
 
   sortMarker(column: TableColumn): string {
-    if (this.sortColumn !== column.key || !this.sortDirection) return '';
-    return this.sortDirection === 'asc' ? '▲' : '▼';
+    const field = this.filterBar?.fieldForColumn(column.key);
+    const index = this.sorts.findIndex(sort => sort.field === field?.key);
+    if (index < 0) return '';
+    return (this.sorts[index].direction === 'asc' ? '▲' : '▼') + (this.sorts.length > 1 ? String(index + 1) : '');
   }
 
   toggleRow(index: number, event: MouseEvent): void {
@@ -1212,28 +1204,6 @@ export class AppComponent implements OnDestroy {
       this.isSoulRank(column) && 'soul-rank-cell',
     ];
     return classes.filter(Boolean).join(' ');
-  }
-
-  private applySort(): void {
-    if (!this.sortColumn || !this.sortDirection) {
-      this.rows = [...this.filteredRows];
-      return;
-    }
-
-    const direction = this.sortDirection === 'asc' ? 1 : -1;
-    const key = this.sortColumn;
-    // Sort the rows as they are currently shown (Array.sort is stable), so ties keep whatever order
-    // the previous sort left them in: HP asc, then Defense desc, leaves equal-Defense Pals in HP order.
-    const base = this.rows.length === this.filteredRows.length && this.rows.every((row) => this.filteredRows.includes(row))
-      ? this.rows
-      : this.filteredRows;
-    this.rows = [...base].sort((left, right) => {
-      // Empty cells stay at the bottom whichever way the column is sorted.
-      const leftEmpty = this.cellValue(left, key) === '';
-      const rightEmpty = this.cellValue(right, key) === '';
-      if (leftEmpty || rightEmpty) return Number(leftEmpty) - Number(rightEmpty);
-      return this.compareCells(left, right, key) * direction;
-    });
   }
 
   private compareCells(left: PalStorageRow, right: PalStorageRow, key: string): number {

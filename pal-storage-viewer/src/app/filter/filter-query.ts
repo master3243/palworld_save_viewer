@@ -5,17 +5,21 @@ import {
   FilterNode,
   FilterRule,
   Operator,
+  SortCriterion,
   createGroup,
   createRule,
-  operatorDef
+  operatorDef,
+  isRuleActive
 } from './filter-model';
+import { MOVE_FIELDS, type MoveScope } from './move-filters';
+import { numericExpression } from './numeric-expression';
 
 /**
  * Text syntax, GitHub-search style. Examples:
  *
  *   anubis                     any text contains "anubis"
  *   level>=40 atk>=90          two rules, implicitly AND
- *   skills:Legend,Musclehead   passives has any of
+ *   skills:Legend|Musclehead   passives has any of
  *   skills:Legend&Musclehead   passives has all of
  *   -skills:Brittle            passives has none of
  *   is:alpha -is:lucky         boolean flags
@@ -43,7 +47,7 @@ type Token =
 const OPERATOR_CHARS = ':=!<>~^';
 const VALUE_STOP = ' \t\n\r(),&|"';
 
-export function tokenize(input: string): Token[] {
+export function tokenize(input: string, lookup?: FieldLookup): Token[] {
   const tokens: Token[] = [];
   const n = input.length;
   let i = 0;
@@ -65,7 +69,7 @@ export function tokenize(input: string): Token[] {
     return out;
   };
 
-  const readSegments = (): Segment[] => {
+  const readSegments = (numeric = false): Segment[] => {
     const segments: Segment[] = [];
     let sep: ',' | '&' | '|' | null = null;
     for (;;) {
@@ -75,7 +79,14 @@ export function tokenize(input: string): Token[] {
         text = readQuoted();
         quoted = true;
       } else {
-        while (i < n && !VALUE_STOP.includes(input[i])) {
+        let depth = 0;
+        while (i < n) {
+          if (numeric && input[i] === '(') { depth++; }
+          else if (numeric && input[i] === ')' && depth) { depth--; }
+          else if (numeric && /\s/.test(input[i])) {
+            const rest = input.slice(i).trimStart();
+            if (!depth && !/[+*/-]$/.test(text.trim()) && (!/^[+*/-]/.test(rest) || /^-[a-z_]\w*\s*[:=!<>~^]/i.test(rest))) break;
+          } else if (VALUE_STOP.includes(input[i])) break;
           text += input[i];
           i += 1;
         }
@@ -122,6 +133,8 @@ export function tokenize(input: string): Token[] {
       i += 1;
     }
 
+    const afterHead = i;
+    while (i < n && /\s/.test(input[i])) i++;
     if (i < n && OPERATOR_CHARS.includes(input[i]) && head !== '') {
       let symbol = input[i];
       i += 1;
@@ -130,9 +143,12 @@ export function tokenize(input: string): Token[] {
         i += 1;
       }
       if (symbol === '!') symbol = '!=';
-      tokens.push({ type: 'term', negated, field: head, symbol, segments: readSegments() });
+      while (i < n && /\s/.test(input[i])) i++;
+      const numeric = lookup?.resolve(head)?.kind === 'number' || ['power', 'cooldown', 'ct', 'move_power', 'move_cooldown', 'move_level'].includes(head);
+      tokens.push({ type: 'term', negated, field: head, symbol, segments: readSegments(numeric) });
       continue;
     }
+    i = afterHead;
 
     if (head === '') {
       // Something like ">5" with no field: keep it as plain text.
@@ -156,14 +172,25 @@ export function tokenize(input: string): Token[] {
 export interface ParseResult {
   root: FilterGroup;
   unknownFields: string[];
-  /** Rules that cannot do what they say (unknown field, text where a number is needed…); they are ignored. */
+  /** Invalid input is reported so the UI can retain its last valid results. */
   errors: string[];
+  sorts: SortCriterion[];
 }
 
 export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
-  const tokens = tokenize(input);
+  if (input.length > 8192) return { root: createGroup(), sorts: [], unknownFields: [], errors: ['Query is too long'] };
+  const tokens = tokenize(input, lookup);
+  let nesting = 0;
+  for (const token of tokens) {
+    if (token.type === 'lparen' && ++nesting > 20) return { root: createGroup(), sorts: [], unknownFields: [], errors: ['Too many nested groups'] };
+    if (token.type === 'rparen') nesting--;
+  }
   const unknown = new Set<string>();
   const errors: string[] = [];
+  const sorts: SortCriterion[] = [];
+  const moveLookup = new FieldLookup(MOVE_FIELDS);
+  let currentLookup = lookup;
+  let depth = 0;
   let position = 0;
 
   const peek = (): Token | undefined => tokens[position];
@@ -183,17 +210,29 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
     const star = term.segments.length === 1 && !term.segments[0].quoted && term.segments[0].text === '*';
 
     if (term.field === null) {
-      return [createRule(ANY_FIELD, term.negated ? 'not_contains' : 'contains', values)];
+      return [createRule(currentLookup === moveLookup ? 'move_name' : ANY_FIELD, term.negated ? 'not_contains' : 'contains', values)];
     }
 
     const fieldName = term.field.toLowerCase();
+    if (fieldName === 'sort') {
+      if (term.symbol !== ':') errors.push('Use sort:field or sort:-field');
+      if (depth || term.negated) errors.push('Sort belongs outside filter groups');
+      if (!values.length) errors.push('Sort needs a field');
+      for (const value of values) {
+        const field = lookup.resolve(value.replace(/^[-+]/, ''));
+        if (!field || field.key === ANY_FIELD) errors.push(`Unknown sort field "${value}"`);
+        else if (sorts.some(sort => sort.field === field.key)) errors.push(`"${field.label}" is sorted more than once`);
+        else sorts.push({ field: field.key, direction: value.startsWith('-') ? 'desc' : 'asc' });
+      }
+      return [];
+    }
     if (fieldName === 'is' || fieldName === 'has') {
       return values.map((value) => {
         const lower = value.toLowerCase();
         if (lower === 'male' || lower === 'female') {
           return createRule('gender', term.negated ? 'is_not' : 'is', [lower === 'male' ? 'Male' : 'Female']);
         }
-        const field = lookup.resolve(value);
+        const field = currentLookup.resolve(value);
         if (!field) {
           unknown.add(value);
           errors.push(`Unknown field "${value}"`);
@@ -204,7 +243,7 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
       });
     }
 
-    const field = lookup.resolve(term.field);
+    const field = currentLookup.resolve(term.field);
     if (!field) {
       unknown.add(term.field);
       errors.push(`Unknown field "${term.field}"`);
@@ -223,6 +262,7 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
       ruleValues = [];
     } else if (field.kind === 'boolean') {
       const first = (values[0] ?? '').toLowerCase();
+      if (!['yes', 'true', '1', 'on', 'y', 'no', 'false', '0', 'off', 'n'].includes(first)) errors.push(`"${term.field}" expects yes or no`);
       const falsy = ['no', 'false', '0', 'off', 'n'].includes(first);
       op = falsy ? 'is_false' : 'is_true';
       if (symbol === '!=') op = operatorDef(op).negated;
@@ -234,7 +274,8 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
         ruleValues = [range[1], range[2]];
       } else {
         for (const value of values) {
-          if (!/^-?\d+(\.\d+)?$/.test(value)) errors.push(`"${term.field}" expects a number, not "${value}"`);
+          const error = numericExpression(value, currentLookup).error;
+          if (error) errors.push(`${field.label}: ${error}`);
         }
         if (symbol === '^' || symbol === '~') errors.push(`"${symbol}" does not work on numbers ("${term.field}")`);
         switch (symbol) {
@@ -263,6 +304,7 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
     }
 
     if (term.negated) op = operatorDef(op).negated;
+    if (operatorDef(op).arity === 'one' && ruleValues.length > 1) errors.push(`"${term.field}" expects one value for this comparison`);
     return [createRule(field.key, op, ruleValues)];
   };
 
@@ -274,16 +316,37 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
         const nodes = parseUnary();
         if (nodes.length === 1) return [negateNode(nodes[0])];
         if (nodes.length > 1) return [createGroup('and', nodes, true)];
+        errors.push('Add a condition after NOT');
         return [];
       }
-      return []; // dangling AND / OR
+      errors.push(`Add a condition before ${token.word}`);
+      return [];
     }
     if (token.type === 'lparen') {
+      depth++;
       const inner = parseOr();
-      if (peek()?.type === 'rparen') next();
+      if (peek()?.type === 'rparen') next(); else errors.push('Missing closing parenthesis');
+      depth--;
       return inner ? [inner] : [];
     }
     if (token.type === 'rparen') return [];
+    const scope = /^(equipped|known|unlearned)_moves?$/.exec(token.field ?? '');
+    if (scope && peek()?.type === 'lparen') {
+      if (currentLookup === moveLookup) errors.push('Move groups cannot contain another move group');
+      next(); depth++;
+      const previous = currentLookup;
+      currentLookup = moveLookup;
+      const inner = parseOr();
+      currentLookup = previous;
+      if (peek()?.type === 'rparen') next(); else errors.push('Missing closing parenthesis for moves');
+      depth--;
+      const group = inner?.type === 'group' && !inner.scope && !inner.negate ? inner : createGroup('and', inner ? [inner] : []);
+      group.scope = scope[1] as MoveScope;
+      group.match = token.symbol === '=' ? 'all' : token.symbol === '!=' ? 'none' : 'any';
+      group.negate = token.negated;
+      if (!inner) errors.push('Add a condition inside the move group');
+      return [group];
+    }
     return termToRules(token);
   };
 
@@ -292,7 +355,11 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
     for (;;) {
       const token = peek();
       if (!token || token.type === 'rparen' || (token.type === 'keyword' && token.word === 'OR')) break;
-      if (token.type === 'keyword' && token.word === 'AND') { next(); continue; }
+      if (token.type === 'keyword' && token.word === 'AND') {
+        next();
+        if (!nodes.length || !peek() || peek()?.type === 'rparen' || (peek()?.type === 'keyword' && (peek() as { word: string }).word !== 'NOT')) errors.push('AND needs a condition on each side');
+        continue;
+      }
       nodes.push(...parseUnary());
     }
     if (nodes.length === 0) return null;
@@ -307,6 +374,7 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
     while (peek()?.type === 'keyword' && (peek() as { word: string }).word === 'OR') {
       next();
       const branch = parseAnd();
+      if (!branches.length || !branch) errors.push('OR needs a condition on each side');
       if (branch) branches.push(branch);
     }
     if (branches.length === 0) return null;
@@ -318,44 +386,52 @@ export function parseQuery(input: string, lookup: FieldLookup): ParseResult {
   while (position < tokens.length) {
     const node = parseOr();
     if (node) top.push(node);
-    if (peek()?.type === 'rparen') next(); // unbalanced, ignore
+    if (peek()?.type === 'rparen') { next(); errors.push('Unexpected closing parenthesis'); }
   }
 
   let root: FilterGroup;
-  if (top.length === 1 && top[0].type === 'group' && !top[0].negate) {
+  if (top.length === 1 && top[0].type === 'group' && !top[0].negate && !top[0].scope) {
     root = top[0];
   } else {
     root = createGroup('and', top);
   }
-  return { root, unknownFields: Array.from(unknown), errors: Array.from(new Set(errors)) };
+  let quoted = false;
+  for (let i = 0; i < input.length; i++) { if (input[i] === '\\' && quoted) i++; else if (input[i] === '"') quoted = !quoted; }
+  if (quoted) errors.push('Missing closing quote');
+  const last = tokens[tokens.length - 1];
+  if (last?.type === 'keyword') errors.push(`Add a condition after ${last.word}`);
+  return { root, sorts, unknownFields: Array.from(unknown), errors: Array.from(new Set(errors)) };
 }
 
 const KEYWORDS = /^(and|or|not)$/i;
 
 export function quoteValue(value: string): string {
   const needsQuote = value === ''
-    || /[\s"(),&:=!<>~^]/.test(value)
+    || /[\s"(),&|:=!<>~^]/.test(value)
     || value.startsWith('-')
     || value === '*'
     || KEYWORDS.test(value);
   return needsQuote ? `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : value;
 }
 
-export function serializeQuery(root: FilterGroup, lookup: FieldLookup): string {
-  return serializeGroup(root, lookup, true);
+export function serializeQuery(root: FilterGroup, lookup: FieldLookup, sorts: SortCriterion[] = []): string {
+  return [serializeGroup(root, lookup, true), sorts.length ? `sort:${sorts.map(sort => `${sort.direction === 'desc' ? '-' : ''}${sort.field}`).join(',')}` : ''].filter(Boolean).join(' ');
 }
 
 function serializeGroup(group: FilterGroup, lookup: FieldLookup, isRoot: boolean): string {
+  if (group.scope) lookup = new FieldLookup(MOVE_FIELDS);
   const parts = group.children
     .map((child) => child.type === 'rule' ? serializeRule(child, lookup) : serializeGroup(child, lookup, false))
     .filter((part) => part !== '');
   const joined = group.combinator === 'and' ? parts.join(' ') : parts.join(' OR ');
-  if (isRoot) return joined;
   if (parts.length === 0) return '';
+  if (group.scope) return `${group.negate ? '-' : ''}${group.scope}_move${group.match === 'all' ? '=' : group.match === 'none' ? '!=' : ':'}(${joined})`;
+  if (isRoot && !group.negate) return joined;
   return `${group.negate ? '-' : ''}(${joined})`;
 }
 
 export function serializeRule(rule: FilterRule, lookup: FieldLookup): string {
+  if (!isRuleActive(rule)) return '';
   const field = lookup.byKey.get(rule.field);
   const name = field ? field.key : rule.field;
   const values = rule.values.map((value) => value.trim());
@@ -442,7 +518,7 @@ export function completionContext(input: string, caret: number): CompletionConte
   for (let index = 0; index < valueText.length; index += 1) {
     const char = valueText[index];
     if (char === '"') quotes = !quotes;
-    if (!quotes && (char === ',' || char === '&')) segmentStart = termStart + match[1].length + match[2].length + index + 1;
+    if (!quotes && (char === ',' || char === '&' || char === '|')) segmentStart = termStart + match[1].length + match[2].length + index + 1;
   }
   let prefix = input.slice(segmentStart, caret);
   const quoted = prefix.startsWith('"');

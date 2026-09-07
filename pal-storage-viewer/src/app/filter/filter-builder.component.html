@@ -1,8 +1,38 @@
 <ng-container *ngTemplateOutlet="groupTpl; context: { $implicit: root, parent: null, depth: 0 }"></ng-container>
 
+<section class="sort-section" aria-label="Sort by">
+  <div class="group-head"><strong>Sort by</strong><span class="match-word">First priority at the top</span><button class="ghost" type="button" (click)="addSort()">+ sort</button></div>
+  <p class="empty-group" *ngIf="!sorts.length">Default location, file and slot order.</p>
+  <div class="sort-rule" *ngFor="let sort of sorts; let index = index">
+    <span class="sort-priority">{{ index + 1 }}</span>
+    <select aria-label="Sort field" [value]="sort.field" (change)="setSortField(index, $event)">
+      <option *ngFor="let field of availableSortFields(index)" [value]="field.key" [selected]="field.key === sort.field">{{ field.label }}</option>
+    </select>
+    <select aria-label="Sort direction" [value]="sort.direction" (change)="setSortDirection(index, $event)">
+      <option value="asc" [selected]="sort.direction === 'asc'">Ascending ↑</option>
+      <option value="desc" [selected]="sort.direction === 'desc'">Descending ↓</option>
+    </select>
+    <span class="sort-actions">
+      <button class="icon" type="button" aria-label="Increase sort priority" [disabled]="index === 0" (click)="moveSort(index, -1)">↑</button>
+      <button class="icon" type="button" aria-label="Decrease sort priority" [disabled]="index === sorts.length - 1" (click)="moveSort(index, 1)">↓</button>
+      <button class="icon" type="button" aria-label="Remove sort" (click)="removeSort(index)">×</button>
+    </span>
+  </div>
+</section>
+
 <ng-template #groupTpl let-group let-parent="parent" let-depth="depth">
   <div class="group" [class.root]="depth === 0" [class.negated]="group.negate" [class.any]="group.combinator === 'or'">
     <div class="group-head">
+      <ng-container *ngIf="group.scope">
+        <select aria-label="Matching moves" [value]="group.match || 'any'" (change)="setMoveMatch(group, $event)">
+          <option value="any" [selected]="!group.match || group.match === 'any'">At least one</option>
+          <option value="none" [selected]="group.match === 'none'">No</option>
+          <option value="all" [selected]="group.match === 'all'">Every</option>
+        </select>
+        <select aria-label="Move scope" [value]="group.scope" (change)="setMoveScope(group, $event)">
+          <option *ngFor="let scope of moveScopes" [value]="scope.key" [selected]="scope.key === group.scope">{{ scope.label }}</option>
+        </select>
+      </ng-container>
       <span class="match-word">{{ group.negate ? 'Exclude pals matching' : 'Match' }}</span>
       <span class="combinator" role="group" aria-label="Combine rules with">
         <button
@@ -20,7 +50,8 @@
 
       <span class="group-actions">
         <button class="ghost" type="button" (click)="addRule(group)">+ rule</button>
-        <button class="ghost" type="button" (click)="addGroup(group)">+ group</button>
+        <button class="ghost" type="button" *ngIf="!group.scope" (click)="addGroup(group)">+ group</button>
+        <button class="ghost" type="button" *ngIf="!group.scope" (click)="addMoveGroup(group)">+ move filter</button>
         <button
           *ngIf="depth > 0"
           class="ghost"
@@ -96,6 +127,19 @@
                 <option *ngFor="let def of operatorsFor(child)" [value]="def.op" [selected]="def.op === child.op">{{ def.label }}</option>
               </select>
 
+              <select *ngIf="hasComparisonMode(child)" class="compare-mode" aria-label="Compare with" [value]="comparisonMode(child)" (change)="setComparisonMode(child, $event)">
+                <option value="value" [selected]="comparisonMode(child) === 'value'">Value</option>
+                <option value="field" [selected]="comparisonMode(child) === 'field'">% of field</option>
+                <option value="formula" [selected]="comparisonMode(child) === 'formula'">Formula</option>
+              </select>
+              <span class="reference-value" *ngIf="hasComparisonMode(child) && comparisonMode(child) === 'field'; else literalValue">
+                <input class="value percent" type="number" aria-label="Percentage of field" [value]="referencePercent(child)" (input)="setPercent(child, $event)">
+                <span>% of</span>
+                <select aria-label="Comparison field" [value]="referenceField(child)" (change)="setReference(child, $event)">
+                  <option *ngFor="let field of numericFields(child)" [value]="field.key" [selected]="field.key === referenceField(child)">{{ field.label }}</option>
+                </select>
+              </span>
+              <ng-template #literalValue>
               <ng-container [ngSwitch]="arity(child)">
                 <ng-container *ngSwitchCase="'none'"></ng-container>
 
@@ -146,12 +190,13 @@
                   </ul>
                 </span>
               </ng-container>
+              </ng-template>
 
               <span
                 class="rule-count"
                 *ngIf="countFor(child) !== null"
                 [class.zero]="countFor(child) === 0"
-                [title]="countFor(child) === 0 ? 'No pal matches this rule on its own, so nothing can pass the filter while it is here' : 'Pals matching this rule on its own'"
+                title="Pals matching this rule on its own"
               >{{ countFor(child) }}</span>
 
               <span class="rule-actions">
@@ -163,6 +208,7 @@
                 </button>
                 <button class="icon" type="button" aria-label="Remove rule" title="Remove" (click)="remove(group, child)">×</button>
               </span>
+              <span class="rule-error" *ngIf="errorFor(child) as error" role="status">{{ error }}</span>
             </div>
           </ng-container>
 

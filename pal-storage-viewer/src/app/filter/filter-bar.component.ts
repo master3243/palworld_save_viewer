@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 
 import { OfflineImageService } from '../offline-image.service';
+import { GameDataService } from '../game-data.service';
 import type { PalStorageRow } from '../save-parser.service';
 import { GenderIconComponent } from '../gender-icon.component';
 import { FilterBuilderComponent } from './filter-builder.component';
@@ -25,6 +26,7 @@ import {
   FilterGroup,
   FilterNode,
   FilterRule,
+  SortCriterion,
   buildFieldRegistry,
   countActiveRules,
   createGroup,
@@ -34,6 +36,9 @@ import {
   rulesEqual
 } from './filter-model';
 import { completionContext, parseQuery, quoteValue, serializeQuery } from './filter-query';
+import { MoveCatalog } from './move-filters';
+
+export interface FilterResult { rows: PalStorageRow[]; sorts: SortCriterion[]; sortedColumns: Set<string>; }
 
 interface ChipState {
   /** Label shown while this state is active. */
@@ -113,7 +118,7 @@ function numberChip(label: string, title: string, field: string, op: FilterRule[
 })
 export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() rows: PalStorageRow[] = [];
-  @Output() filtered = new EventEmitter<PalStorageRow[]>();
+  @Output() filtered = new EventEmitter<FilterResult>();
 
   @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
   @ViewChild('chipScroller') chipScroller!: ElementRef<HTMLElement>;
@@ -149,6 +154,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   root: FilterGroup = createGroup();
+  sorts: SortCriterion[] = [];
   fields: FilterField[] = [];
   lookup = new FieldLookup([]);
   engine: FilterEngine | null = null;
@@ -224,6 +230,14 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   ];
 
   readonly helpExamples: HelpExample[] = [
+    { query: 'hp_pct<50', meaning: 'less than half HP; hp refers to IV HP, current_hp to health' },
+    { query: 'current_hp<max_hp', meaning: 'compare two fields on the same Pal' },
+    { query: 'current_hp<max_hp/2', meaning: 'compare with a formula (+, −, *, / and parentheses)' },
+    { query: 'equipped_type:Dark', meaning: 'has an equipped Dark move' },
+    { query: 'known_type:Dark', meaning: 'has a known Dark move, equipped or available to equip' },
+    { query: 'equipped_move:(type:Dark power>=100)', meaning: 'one equipped move must meet both conditions' },
+    { query: 'known_move!=(effect:Burn)', meaning: 'no known move causes Burn' },
+    { query: 'sort:-level,-iv,pal', meaning: 'level descending, then IV total descending, then name' },
     { query: 'anubis', meaning: 'name, nickname, passive or move contains "anubis"' },
     { query: 'level>=40 atk>=90', meaning: 'both conditions (space means AND)' },
     { query: 'hp>=90 OR def>=90', meaning: 'either condition' },
@@ -245,7 +259,8 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   constructor(
     private readonly host: ElementRef<HTMLElement>,
     private readonly zone: NgZone,
-    private readonly offlineImages: OfflineImageService
+    private readonly offlineImages: OfflineImageService,
+    private readonly gameData: GameDataService
   ) {
     this.presets = this.loadPresets();
     for (const chip of this.quickChips) {
@@ -270,6 +285,8 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
     return !isEmptyTree(this.root);
   }
 
+  get hasCriteria(): boolean { return this.isActive || this.sorts.length > 0; }
+
   get activeRuleCount(): number {
     return countActiveRules(this.root);
   }
@@ -290,7 +307,26 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
         make: () => createRule('save', 'is', [letter])
       }))
     } : null;
-    this.fields = buildFieldRegistry(this.rows);
+    this.setupEngine();
+    const rows = this.rows;
+    void this.gameData.load().then(() => {
+      if (this.rows !== rows) return;
+      this.setupEngine();
+      this.recompute();
+    });
+
+    this.suggestions = [];
+    this.queryText = '';
+    this.root = createGroup();
+    this.sorts = [];
+    this.unknownFields = [];
+    this.queryErrors = [];
+    void Promise.resolve().then(() => this.recompute());
+  }
+
+  private setupEngine(): void {
+    const moves = new MoveCatalog(id => this.gameData.activeDetail(id));
+    this.fields = buildFieldRegistry(this.rows, moves);
     this.lookup = new FieldLookup(this.fields);
     const groups = new Map<string, FilterField[]>();
     for (const field of this.fields) {
@@ -299,16 +335,28 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
       groups.set(field.group, list);
     }
     this.fieldGroups = Array.from(groups, ([name, fields]) => ({ name, fields }));
-    this.engine = this.rows.length ? new FilterEngine(this.lookup, this.rows) : null;
-    this.suggestions = [];
+    this.engine = this.rows.length ? new FilterEngine(this.lookup, this.rows, moves) : null;
+  }
 
-    // A new save (or a return to the drop screen) always starts unfiltered.
-    this.queryText = '';
-    this.root = createGroup();
-    this.unknownFields = [];
-    this.queryErrors = [];
-    // The parent is mid change-detection when inputs arrive; emit afterwards.
-    void Promise.resolve().then(() => this.recompute());
+  fieldForColumn(key: string): FilterField | undefined {
+    const mapped: Record<string, string> = { hp: 'current_hp', attack: 'attack_stat', defense: 'defense_stat', save: 'save_name' };
+    return this.lookup.resolve(mapped[key] ?? key);
+  }
+
+  sortForColumn(key: string): SortCriterion | undefined { return this.sorts.find(sort => sort.field === this.fieldForColumn(key)?.key); }
+
+  toggleSort(key: string, additive: boolean): void {
+    const field = this.fieldForColumn(key);
+    if (!field) return;
+    const old = this.sorts.find(sort => sort.field === field.key);
+    const next = !old ? { field: field.key, direction: 'asc' as const } : old.direction === 'asc' ? { field: field.key, direction: 'desc' as const } : null;
+    if (!additive) this.sorts = next ? [next] : [];
+    else {
+      const index = this.sorts.findIndex(sort => sort.field === field.key);
+      if (index >= 0) this.sorts.splice(index, 1, ...(next ? [next] : []));
+      else if (next) this.sorts.push(next);
+    }
+    this.onTreeChanged();
   }
 
   /* ------------------------------------------------------------- search box */
@@ -318,6 +366,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
     this.queryText = input.value;
     const result = parseQuery(this.queryText, this.lookup);
     this.root = result.root;
+    this.sorts = result.sorts;
     this.unknownFields = result.unknownFields;
     this.queryErrors = result.errors;
     this.recompute();
@@ -385,6 +434,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
     target.focus();
     const result = parseQuery(next, this.lookup);
     this.root = result.root;
+    this.sorts = result.sorts;
     this.unknownFields = result.unknownFields;
     this.queryErrors = result.errors;
     this.recompute();
@@ -406,13 +456,16 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
       return;
     }
 
+    const before = this.queryText.slice(0, context.termStart);
+    const inMoveGroup = /(?:equipped|known|unlearned)_moves?(?:!=|:|=)\s*\([^)]*$/i.test(before);
+    const lookup = inMoveGroup ? this.engine.moveLookup : this.lookup;
     if (context.mode === 'field') {
       if (!context.prefix) {
         this.suggestions = [];
         return;
       }
       const isPrefix = 'is'.startsWith(context.prefix.toLowerCase());
-      const fields = this.lookup.complete(context.prefix).slice(0, 8).map((field) => ({
+      const fields = lookup.complete(context.prefix).slice(0, 8).map((field) => ({
         kind: 'field' as const,
         insert: field.kind === 'boolean' ? `is:${field.key}` : field.kind === 'number' ? `${field.key}>=` : `${field.key}:`,
         label: field.key,
@@ -421,10 +474,20 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
       this.suggestions = isPrefix
         ? [{ kind: 'field', insert: 'is:', label: 'is:', detail: 'alpha, lucky, favorite, male, female…' }, ...fields]
         : fields;
+      if (!inMoveGroup) {
+        const groups = ['equipped', 'known', 'unlearned'].filter(scope => `${scope}_move`.startsWith(context.prefix.toLowerCase())).map(scope => ({ kind: 'field' as const, insert: `${scope}_move:(`, label: `${scope}_move:(…)`, detail: 'Match properties of the same move' }));
+        if ('sort'.startsWith(context.prefix.toLowerCase())) groups.push({ kind: 'field', insert: 'sort:', label: 'sort:', detail: 'Ordered sort fields; − means descending' });
+        this.suggestions = [...groups, ...this.suggestions].slice(0, 10);
+      }
       return;
     }
 
     const fieldName = context.field?.toLowerCase() ?? '';
+    if (fieldName === 'sort') {
+      const descending = context.prefix.startsWith('-');
+      this.suggestions = this.lookup.complete(context.prefix.replace(/^[-+]/, '')).filter(field => field.key !== 'any').slice(0, 8).map(field => ({ kind: 'value', insert: `${descending ? '-' : ''}${field.key}`, label: field.label, detail: descending ? 'Descending' : 'Ascending' }));
+      return;
+    }
     if (fieldName === 'is' || fieldName === 'has') {
       const options = [
         ...this.fields.filter((field) => field.kind === 'boolean').map((field) => ({ key: field.key, label: field.label })),
@@ -439,7 +502,12 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
       return;
     }
 
-    const field = this.lookup.resolve(fieldName);
+    const field = lookup.resolve(fieldName);
+    if (field?.kind === 'number') {
+      const prefix = context.prefix.match(/[a-z_]\w*$/i)?.[0];
+      this.suggestions = prefix ? lookup.complete(prefix).filter(field => field.kind === 'number').slice(0, 8).map(field => ({ kind: 'value', insert: context.prefix.slice(0, -prefix.length) + field.key, label: field.label, detail: 'Compare with this field' })) : [];
+      return;
+    }
     if (!field || !field.suggest) {
       this.suggestions = [];
       return;
@@ -501,9 +569,9 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   /* ---------------------------------------------------------------- builder */
 
   onTreeChanged(): void {
-    this.queryText = serializeQuery(this.root, this.lookup);
+    this.queryText = serializeQuery(this.root, this.lookup, this.sorts);
     this.unknownFields = [];
-    this.queryErrors = [];
+    this.queryErrors = this.engine?.errors(this.root) ?? [];
     this.recompute();
   }
 
@@ -522,6 +590,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   clear(): void {
     this.root = createGroup();
+    this.sorts = [];
     this.queryText = '';
     this.unknownFields = [];
     this.queryErrors = [];
@@ -534,6 +603,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
     this.queryText = query;
     const result = parseQuery(query, this.lookup);
     this.root = result.root;
+    this.sorts = result.sorts;
     this.unknownFields = result.unknownFields;
     this.queryErrors = result.errors;
     this.recompute();
@@ -566,7 +636,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   savePreset(): void {
     const name = this.presetName.trim();
     const query = this.queryText.trim();
-    if (!name || !query) return;
+    if (!name || !query || this.queryErrors.length) return;
     this.presets = [...this.presets.filter((preset) => preset.name !== name), { name, query }];
     this.persistPresets();
     this.isSavingPreset = false;
@@ -618,21 +688,26 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
     if (!this.engine) {
       this.matchCount = 0;
       this.ruleCounts = new Map();
-      this.filtered.emit([]);
+      this.filtered.emit({ rows: [], sorts: [], sortedColumns: new Set() });
       return;
     }
+    if (this.queryErrors.length) return;
+    this.queryErrors = this.engine.errors(this.root);
+    if (this.queryErrors.length) return;
     const rows = this.isActive ? this.engine.filter(this.root) : this.rows;
     this.matchCount = rows.length;
     this.ruleCounts = this.computeRuleCounts(this.root);
-    this.filtered.emit(rows);
+    const sortedColumns = new Set<string>();
+    for (const key of Object.keys(this.rows[0] ?? {})) if (this.sortForColumn(key)) sortedColumns.add(key);
+    this.filtered.emit({ rows: this.engine.sort(rows, this.sorts), sorts: this.sorts.map(sort => ({ ...sort })), sortedColumns });
   }
 
-  private computeRuleCounts(node: FilterNode, into = new Map<string, number>()): Map<string, number> {
+  private computeRuleCounts(node: FilterNode, into = new Map<string, number>(), scope?: FilterGroup['scope']): Map<string, number> {
     if (!this.engine) return into;
     if (node.type === 'rule') {
-      into.set(node.id, this.engine.count(node));
+      into.set(node.id, this.engine.count(scope ? { ...createGroup('and', [node]), scope, match: 'any' } : node));
     } else {
-      for (const child of node.children) this.computeRuleCounts(child, into);
+      for (const child of node.children) this.computeRuleCounts(child, into, node.scope ?? scope);
     }
     return into;
   }

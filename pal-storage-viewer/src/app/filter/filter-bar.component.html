@@ -21,8 +21,8 @@
   <button
     class="search-clear"
     type="button"
-    aria-label="Clear filter"
-    title="Clear filter"
+    aria-label="Clear filters and sorting"
+    title="Clear filters and sorting"
     *ngIf="queryText"
     (click)="clear()"
   >×</button>
@@ -50,7 +50,7 @@
   </ul>
 
   <p class="search-warning" *ngIf="queryErrors.length" role="alert">
-    {{ queryErrors.join(' · ') }} (ignored)
+    {{ queryErrors.join(' · ') }}. Showing the last valid results.
   </p>
 
   <div class="help-popover" *ngIf="isHelpOpen" role="dialog" aria-label="Filter syntax help">
@@ -91,7 +91,7 @@
   [class.open]="isPanelOpen"
   [class.active]="isActive"
   [attr.aria-expanded]="isPanelOpen"
-  title="Filter builder"
+  title="Filters and sorting"
   aria-label="Filters"
   (click)="togglePanel()"
 >
@@ -138,8 +138,8 @@
   </button>
 </div>
 
-<span class="match-count" [class.active]="isActive" [title]="isActive ? 'Pals matching the filter' : 'Pals in storage'">
-  <ng-container *ngIf="isActive">{{ matchCount | number }}<em>&nbsp;/&nbsp;</em></ng-container>{{ total | number }}
+<span class="match-count" [class.active]="matchCount !== total" [title]="matchCount !== total ? 'Pals matching the filter' : 'Pals in storage'">
+  <ng-container *ngIf="matchCount !== total">{{ matchCount | number }}<em>&nbsp;/&nbsp;</em></ng-container>{{ total | number }}
 </span>
 
 <div class="filter-panel" *ngIf="isPanelOpen">
@@ -148,6 +148,7 @@
     [fields]="fields"
     [engine]="engine"
     [ruleCounts]="ruleCounts"
+    [sorts]="sorts"
     (changed)="onTreeChanged()"
   ></app-filter-builder>
 
@@ -178,16 +179,16 @@
           (keydown.enter)="savePreset()"
           (keydown.escape)="cancelSavePreset(); $event.stopPropagation()"
         >
-        <button type="button" class="ghost" [disabled]="!presetName.trim() || !isActive" (click)="savePreset()">Save</button>
+        <button type="button" class="ghost" [disabled]="!presetName.trim() || !hasCriteria || queryErrors.length > 0" (click)="savePreset()">Save</button>
         <button type="button" class="ghost" (click)="cancelSavePreset()">Cancel</button>
       </ng-container>
       <ng-template #saveButton>
-        <button type="button" class="ghost" [disabled]="!isActive" title="Save the current filter" (click)="startSavePreset()">+ save current</button>
+        <button type="button" class="ghost" [disabled]="!hasCriteria || queryErrors.length > 0" title="Save the current filter" (click)="startSavePreset()">+ save current</button>
       </ng-template>
     </div>
 
     <div class="footer-actions">
-      <button type="button" class="ghost" [disabled]="!isActive" (click)="clear()">Clear all</button>
+      <button type="button" class="ghost" [disabled]="!hasCriteria && !queryText" (click)="clear()">Clear all</button>
       <button type="button" class="ghost" (click)="togglePanel()">Close</button>
     </div>
   </div>

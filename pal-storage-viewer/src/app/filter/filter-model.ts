@@ -1,4 +1,5 @@
 import type { PalStorageRow } from '../save-parser.service';
+import { MoveCatalog, moveFields, type MoveScope } from './move-filters';
 
 /**
  * Filtering is built on one small model shared by three front ends: quick
@@ -105,7 +106,11 @@ export interface FilterGroup {
   combinator: 'and' | 'or';
   negate: boolean;
   children: FilterNode[];
+  scope?: MoveScope;
+  match?: 'any' | 'all' | 'none';
 }
+
+export interface SortCriterion { field: string; direction: 'asc' | 'desc'; }
 
 export type FilterNode = FilterRule | FilterGroup;
 
@@ -169,6 +174,11 @@ function number(row: PalStorageRow, key: string): number | null {
   if (typeof value === 'number') return value;
   const parsed = Number(text(row, key));
   return text(row, key).trim() !== '' && Number.isFinite(parsed) ? parsed : null;
+}
+
+function percentage(row: PalStorageRow, current: string, maximum: string): number | null {
+  const value = number(row, current), max = number(row, maximum);
+  return value === null || max === null || max <= 0 ? null : 100 * value / max;
 }
 
 function truthy(row: PalStorageRow, key: string): boolean {
@@ -255,7 +265,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   },
   { key: 'level', label: 'Level', group: G.pal, kind: 'number', aliases: ['lvl', 'lv'], get: (row) => number(row, 'level') },
   { key: 'type', label: 'Element', group: G.pal, kind: 'list', aliases: ['element', 'elements', 'types'], suggest: true, hint: 'Fire, Water, Electric, Grass, Dark, Dragon, Ground, Ice, Neutral', get: (row) => text(row, 'elements') },
-  { key: 'work', label: 'Work suitability', group: 'Work', kind: 'list', aliases: ['works', 'suitability', 'suitabilities'], suggest: true, hint: 'work:mining&handiwork = has both, work:mining,handiwork = has either', get: (row) => text(row, 'work').replace(/ \d+/g, '') },
+  { key: 'work', label: 'Work suitability', group: 'Work', kind: 'list', aliases: ['works', 'suitability', 'suitabilities'], suggest: true, hint: 'work:mining,handiwork = has both; work:mining|handiwork = has either', get: (row) => text(row, 'work').replace(/ \d+/g, '') },
   { key: 'type_count', label: 'Element count', group: G.pal, kind: 'number', aliases: ['types_count', 'element_count'], hint: '1 or 2', get: (row) => listCount(row, 'elements') },
   {
     key: 'work_count', label: 'Work count', group: 'Work', kind: 'number', aliases: ['works_count', 'suitability_count'], hint: 'How many work suitabilities the pal has',
@@ -303,7 +313,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   },
   { key: 'sr_craft', label: 'Soul Rank Crafting', group: G.soul, kind: 'number', aliases: ['soul_craft', 'soul_rank_craft_speed'], get: (row) => number(row, 'soul_rank_craft_speed') },
 
-  { key: 'max_hp', label: 'Max HP', group: 'Stats', kind: 'number', aliases: ['maxhp', 'hp_max', 'total_hp'], hint: 'Computed like the game, without Trust and Pal Soul bonuses', get: (row) => number(row, 'max_hp') },
+  { key: 'max_hp', label: 'Max HP', group: 'Stats', kind: 'number', aliases: ['maxhp', 'hp_max', 'total_hp'], get: (row) => number(row, 'max_hp') },
   { key: 'attack_stat', label: 'Attack stat', group: 'Stats', kind: 'number', aliases: ['atk_stat', 'dmg', 'total_attack'], hint: 'Computed attack, passives included', get: (row) => number(row, 'attack') },
   { key: 'defense_stat', label: 'Defense stat', group: 'Stats', kind: 'number', aliases: ['def_stat', 'total_defense'], hint: 'Computed defense, passives included', get: (row) => number(row, 'defense') },
   { key: 'work_speed', label: 'Work speed', group: 'Stats', kind: 'number', aliases: ['ws', 'craft_speed', 'workspeed'], get: (row) => number(row, 'work_speed') },
@@ -319,12 +329,16 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'negative', label: 'Negative passives', group: G.passives, kind: 'number', aliases: ['bad', 'negative_skills'], hint: 'Count of negative passives', get: (row) => colorCount(row, 'negative') },
   { key: 'tiers', label: 'Passive tiers', group: G.passives, kind: 'list', aliases: ['skill_colors', 'colors'], suggest: true, get: (row) => text(row, 'skill_colors') },
 
-  { key: 'moves', label: 'Active skills', group: G.moves, kind: 'list', aliases: ['move', 'active', 'combat_moves', 'equipped'], suggest: true, get: (row) => text(row, 'combat_moves') },
-  { key: 'learned', label: 'Learned skills', group: G.moves, kind: 'list', aliases: ['learned_moves'], suggest: true, get: (row) => text(row, 'learned_moves') },
-  { key: 'move_count', label: 'Active skill count', group: G.moves, kind: 'number', aliases: ['moves_count'], get: (row) => listCount(row, 'combat_moves') },
+  { key: 'moves', label: 'Equipped moves: names', group: G.moves, kind: 'list', aliases: ['move', 'active', 'combat_moves', 'equipped'], suggest: true, get: (row) => text(row, 'combat_moves') },
+  { key: 'learned', label: 'Mastered moves: names', group: G.moves, kind: 'list', aliases: ['learned_moves'], suggest: true, hint: 'Mastered skills explicitly stored in the file; use Known moves for all currently available skills', get: (row) => text(row, 'learned_moves') },
+  { key: 'known', label: 'Any known moves: names', group: G.moves, kind: 'list', aliases: ['known_moves', 'any_move'], suggest: true, hint: 'Equipped, mastered and level-unlocked moves; excludes not yet learnt moves', get: (row) => [...new Set([...splitList(text(row, 'known_moves')), ...splitList(text(row, 'learned_moves')), ...splitList(text(row, 'combat_moves'))])] },
+  { key: 'move_count', label: 'Equipped moves: count', group: G.moves, kind: 'number', aliases: ['moves_count', 'equipped_count'], get: (row) => listCount(row, 'combat_moves') },
   { key: 'learned_count', label: 'Learned skill count', group: G.moves, kind: 'number', aliases: [], get: (row) => listCount(row, 'learned_moves') },
 
   { key: 'current_hp', label: 'Current HP', group: G.condition, kind: 'number', aliases: ['hp_now'], get: (row) => number(row, 'hp') },
+  { key: 'hp_pct', label: 'HP %', group: G.condition, kind: 'number', aliases: ['hp_percent', 'health_pct'], hint: 'Current HP as a percentage of max HP', get: (row) => percentage(row, 'hp', 'max_hp') },
+  { key: 'missing_hp', label: 'Missing HP', group: G.condition, kind: 'number', aliases: ['hp_missing'], get: (row) => { const hp = number(row, 'hp'), max = number(row, 'max_hp'); return hp === null || max === null ? null : Math.max(0, max - hp); } },
+  { key: 'stomach_pct', label: 'Stomach %', group: G.condition, kind: 'number', aliases: ['food_pct', 'hunger_pct'], get: (row) => percentage(row, 'full_stomach', 'hunger_max') },
   { key: 'stomach', label: 'Full stomach', group: G.condition, kind: 'number', aliases: ['full_stomach', 'hunger'], get: (row) => number(row, 'full_stomach') },
   { key: 'sanity', label: 'Sanity', group: G.condition, kind: 'number', aliases: [], get: (row) => number(row, 'sanity') },
   { key: 'health', label: 'Physical health', group: G.condition, kind: 'text', aliases: ['physical_health'], suggest: true, get: (row) => text(row, 'physical_health') },
@@ -337,7 +351,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'slot', label: 'Slot', group: G.storage, kind: 'number', aliases: ['pal_box_slot_index', 'slot_index', 'box_slot', 'ind', 'index'], hint: 'Position within the party, Pal Box page or base, starting at 1', get: (row) => { const value = number(row, 'pal_box_slot_index'); return value === null ? null : value + 1; } },
   { key: 'file_slot', label: 'File slot', group: G.storage, kind: 'number', aliases: ['storage_slot'], hint: 'Position of the record in the save file', get: (row) => number(row, 'storage_slot') },
   { key: 'where', label: 'Location', group: G.storage, kind: 'text', aliases: ['location', 'loc', 'place', 'at'], suggest: true, hint: 'Party, Pal Box, Base 1, DimsPS', get: (row) => text(row, 'location') },
-  { key: 'save', label: 'Save (letter)', group: G.storage, kind: 'text', aliases: ['save_id'], suggest: true, hint: 'A, B, …', get: (row) => text(row, 'save_id') },
+  { key: 'save', label: 'File (letter)', group: G.storage, kind: 'text', aliases: ['save_id'], suggest: true, hint: 'A, B, …', get: (row) => text(row, 'save_id') },
   { key: 'save_name', label: 'Save name', group: G.storage, kind: 'text', aliases: ['world'], suggest: true, get: (row) => text(row, 'save') },
   { key: 'owner', label: 'Owner', group: G.storage, kind: 'text', aliases: ['owner_name', 'player'], suggest: true, get: (row) => text(row, 'owner_name') },
   { key: 'file', label: 'Source file', group: G.storage, kind: 'text', aliases: ['source_file', 'source'], suggest: true, get: (row) => text(row, 'source_file') }
@@ -363,11 +377,12 @@ function toTitle(key: string): string {
  * Every column in the save is filterable, even ones this registry has never
  * heard of: their kind is inferred from the values actually present.
  */
-export function buildFieldRegistry(rows: PalStorageRow[]): FilterField[] {
+export function buildFieldRegistry(rows: PalStorageRow[], catalog = new MoveCatalog()): FilterField[] {
   const keys = new Set<string>();
   for (const row of rows) Object.keys(row).forEach((key) => keys.add(key));
 
-  const known = new Set(KNOWN_FIELDS.flatMap((field) => [field.key, ...field.aliases]));
+  const fields = [...KNOWN_FIELDS, ...moveFields(catalog)];
+  const known = new Set(fields.flatMap((field) => [field.key, ...field.aliases]));
   const extras: FilterField[] = [];
   for (const key of Array.from(keys).sort()) {
     if (CONSUMED_KEYS.has(key) || known.has(key)) continue;
@@ -400,7 +415,7 @@ export function buildFieldRegistry(rows: PalStorageRow[]): FilterField[] {
     });
   }
 
-  return [...KNOWN_FIELDS, ...extras];
+  return [...fields, ...extras];
 }
 
 export class FieldLookup {

@@ -400,3 +400,26 @@ input.value::placeholder {
 .inline-add {
   margin: 0;
 }
+
+.sort-section { border-top: 1px solid rgba(134, 220, 255, .22); margin-top: 14px; padding-top: 12px; }
+.sort-rule, .reference-value, .sort-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; min-width: 0; }
+.sort-rule { margin-top: 6px; }
+.sort-priority { width: 18px; text-align: center; color: #8fe8ff; }
+.reference-value input.percent { width: 68px; }
+.reference-value { flex: 0 1 320px; }
+.reference-value select { flex: 1; min-width: 100px; }
+.rule-error { flex-basis: 100%; color: #ffb3c0; font-size: .74rem; }
+button:disabled { cursor: default; opacity: .35; }
+@media (max-width: 600px) {
+  .joiner { flex-basis: 18px; }
+  .group { padding-left: 6px; }
+  .group-actions { flex-wrap: wrap; margin-left: 0; }
+  .field-wrap, .value-wrap { max-width: 100%; min-width: 0; }
+  .field-wrap { flex: 1 1 140px; }
+  input.field { min-width: 0; width: 100%; }
+  select.op { min-width: 80px; max-width: 130px; }
+  .field-list { min-width: 0; width: min(280px, 65vw); }
+  .suggestions li { white-space: normal; }
+  .suggest-count { overflow-wrap: anywhere; }
+  .sort-rule > select:first-of-type { flex: 1; min-width: 0; }
+}

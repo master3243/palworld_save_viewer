@@ -6,7 +6,7 @@
     [class]="column.cellClass"
     [class.iv-high]="view.cells[column.key]?.iv === 'high'"
     [class.iv-perfect]="view.cells[column.key]?.iv === 'perfect'"
-    [class.sorted-column]="sortColumn === column.key"
+    [class.sorted-column]="sortedColumns.has(column.key)"
     [appTooltip]="column.key === 'work' ? view.workTooltip : null"
   >
     <span

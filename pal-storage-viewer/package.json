@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "ng serve",
+    "test": "node tests/filter.test.cjs",
     "build": "ng build --configuration production"
   },
   "dependencies": {
