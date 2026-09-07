@@ -241,7 +241,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
     { query: 'equipped_move:(type:Dark power>=100)', meaning: 'one equipped move must meet both conditions' },
     { query: 'known_move!=(effect:Burn)', meaning: 'no known move causes Burn' },
     { query: 'sort:-level,-iv,pal', meaning: 'level descending, then IV total descending, then name' },
-    { query: 'anubis', meaning: 'name, nickname, passive or move contains "anubis"' },
+    { query: 'anubis', meaning: 'name, nickname, passive, move, or partner skill name/description contains "anubis"' },
     { query: 'level>=40 atk>=90', meaning: 'both conditions (space means AND)' },
     { query: 'hp>=90 OR def>=90', meaning: 'either condition' },
     { query: 'skills:Legend,Musclehead', meaning: 'has all of these passives' },

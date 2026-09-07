@@ -138,3 +138,26 @@ test('Owner display stays within ten characters and preserves short or Unicode n
   assert.equal(shortOwner('1234567890extra'),'123456789…');
   assert.equal(Array.from(shortOwner('😀😀😀😀😀😀😀😀😀😀😀')).length,10);
 });
+
+test('free text matches partner skill names and descriptions, including partial phrases', () => {
+  const pals = [
+    {pal_name:'Smith', partner_skill:'Cast Iron', partner_skill_text:'Increases productivity while working at a base.'},
+    {pal_name:'Flyer', partner_skill:'Sky Rider', partner_skill_text:'Can be ridden as a flying mount.'},
+    {pal_name:'Other', partner_skill:null, partner_skill_text:null},
+    {pal_name:'Legacy'},
+  ];
+  const fields = new FieldLookup(buildFieldRegistry(pals));
+  const search = new FilterEngine(fields, pals);
+  const matches = query => {
+    const parsed = parseQuery(query, fields);
+    assert.deepEqual(parsed.errors, []);
+    return search.filter(parsed.root).map(row => row.pal_name);
+  };
+  assert.deepEqual(matches('cast iro'), ['Smith']);
+  assert.deepEqual(matches('"cast iro"'), ['Smith']);
+  assert.deepEqual(matches('flying mount'), ['Flyer']);
+  assert.deepEqual(matches('"FLYING MOUNT"'), ['Flyer']);
+  assert.deepEqual(matches('"working at a ba"'), ['Smith']);
+  assert.deepEqual(matches('-"flying mount"'), ['Smith', 'Other', 'Legacy']);
+  assert.deepEqual(matches('cast iro OR "flying mount"'), ['Smith', 'Flyer']);
+});

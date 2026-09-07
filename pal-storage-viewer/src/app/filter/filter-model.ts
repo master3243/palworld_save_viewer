@@ -259,8 +259,8 @@ export const ANY_FIELD = 'any';
 export const KNOWN_FIELDS: FilterField[] = [
   {
     key: ANY_FIELD, label: 'Any text', group: G.pal, kind: 'text', aliases: ['text'],
-    hint: 'Name, nickname, species, passives and moves',
-    get: (row) => ['pal_name', 'nickname', 'species_id', 'skills', 'combat_moves', 'learned_moves']
+    hint: 'Name, nickname, species, passives, moves, partner skill name and description',
+    get: (row) => ['pal_name', 'nickname', 'species_id', 'skills', 'combat_moves', 'learned_moves', 'partner_skill', 'partner_skill_text']
       .map((key) => text(row, key)).filter(Boolean).join(' | ')
   },
   { key: 'pal', label: 'Pal name', group: G.pal, kind: 'text', aliases: ['name', 'pal_name'], suggest: true, get: (row) => text(row, 'pal_name') },
