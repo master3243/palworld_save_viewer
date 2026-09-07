@@ -21,7 +21,7 @@
     <p class="tracker-note error" *ngIf="loadError">{{ loadError }}</p>
 
     <ng-container *ngIf="summary as progress">
-      <header class="overall">
+      <header class="overall" [class.map-overall]="mapOpen">
         <div class="ring-wrap" [attr.aria-label]="progress.percent + '% complete'">
           <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
             <circle class="ring-track" cx="60" cy="60" r="52"></circle>
@@ -52,8 +52,17 @@
             </span>
           </div>
         </div>
+        <div class="tracker-views" role="group" aria-label="Tracker view">
+          <button type="button" [class.active]="!mapOpen" [attr.aria-pressed]="!mapOpen" (click)="mapOpen = false">Overview</button>
+          <button type="button" [class.active]="mapOpen" [attr.aria-pressed]="mapOpen" (click)="showMap()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Zm6-2v16m6-14v16"/></svg> Map
+          </button>
+        </div>
       </header>
 
+      <app-tracker-map *ngIf="mapVisited" [hidden]="!mapOpen" [visible]="mapOpen" [categories]="progress.categories" [playerKey]="selectedPlayer" [focusKey]="mapFocus" (openCategory)="showMapCategory($event)"></app-tracker-map>
+
+      <ng-container *ngIf="!mapOpen">
       <div class="category-grid" role="tablist" aria-label="Categories">
         <button
           *ngFor="let category of progress.categories; trackBy: trackCategory"
@@ -130,7 +139,7 @@
               <td class="name-col">{{ item.name }}</td>
               <td class="detail-col">{{ item.detail }}</td>
               <td class="coords-col" *ngIf="open.hasCoords">
-                <ng-container *ngIf="item.coords">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small></ng-container>
+                <button type="button" class="coordinate-link" *ngIf="item.coords" [attr.aria-label]="'Show ' + item.name + ' on map'" (click)="showMap(item)">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small> ↗</button>
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
@@ -139,6 +148,7 @@
           </tbody>
         </table>
       </section>
+      </ng-container>
     </ng-container>
   </div>
 </div>

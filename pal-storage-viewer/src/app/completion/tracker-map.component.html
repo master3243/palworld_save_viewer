@@ -1,0 +1,132 @@
+<section class="map-shell" [class.expanded]="full" aria-label="Completion map">
+  <div class="map-toolbar">
+    <select aria-label="Objective status" [value]="status" (change)="setStatus($any($event.target).value)">
+      <option value="missing">Missing</option><option value="done">Done</option><option value="all">All</option>
+    </select>
+    <input type="search" class="map-search" [class.no-results]="searchHasNoResults" [attr.aria-invalid]="searchHasNoResults" placeholder="Find an objective…" aria-label="Search map objectives" [value]="search" (input)="setSearch($any($event.target).value)">
+    <button type="button" class="expand-button" [attr.aria-label]="full ? 'Exit expanded map' : 'Expand map'" [attr.aria-pressed]="full" (click)="full = !full">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path *ngIf="!full" d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/><path *ngIf="full" d="M3 9h6V3m6 0v6h6M3 15h6v6m6 0v-6h6"/></svg>
+    </button>
+  </div>
+  <p class="error" *ngIf="loadError">{{ loadError }}</p>
+  <div class="map-layout">
+    <div class="terrain">
+      <canvas #canvas tabindex="0" aria-label="Objective map. Drag to pan, pinch or use plus and minus to zoom. Arrow keys pan. Objectives are also available in the nearby list."
+        (pointerleave)="leaveMap()" (pointerdown)="pointerDown($event)" (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)" (pointercancel)="pointerUp($event)"
+        (wheel)="wheel($event)" (keydown)="keydown($event)" (click)="canvasClick($event)"></canvas>
+      <div class="map-switch" role="group" aria-label="Map">
+        <button type="button" *ngFor="let entry of maps" [class.active]="mapKey === entry.key" [attr.aria-label]="entry.name" [title]="entry.name" [attr.aria-pressed]="mapKey === entry.key" (click)="changeMap(entry.key)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path *ngIf="entry.key === 'palpagos'" d="M3 18c4-4 14-4 18 0M3 21c3 2 5-2 9 0s6-2 9 0M11 15l2-9m0 0C9 2 5 4 4 7c4-2 7-1 9-1Zm0 0c3-5 7-3 8 0-3-1-6-1-8 0Zm0 0c4 0 6 3 5 6-1-3-3-5-5-6Z"/>
+            <path *ngIf="entry.key === 'tree'" d="m12 2-6 7h3l-5 6h4l-4 4h16l-4-4h4l-5-6h3ZM10 19v3h4v-3"/>
+          </svg>
+        </button>
+      </div>
+      <div class="map-tools" role="group" aria-label="Map controls">
+        <button type="button" aria-label="Zoom in" title="Zoom in" (click)="zoomBy(1.5)">+</button>
+        <button type="button" aria-label="Zoom out" title="Zoom out" (click)="zoomBy(1 / 1.5)">−</button>
+      </div>
+      <div class="map-count">{{ filtered.length | number }}</div>
+      <div class="north" aria-hidden="true">↑<b>N</b></div>
+      <p class="terrain-error" *ngIf="imageError">{{ imageError }}</p>
+      <div #popup class="map-popup" *ngIf="popupPoint || popupCluster.length" [class.preview]="!popupPinned">
+        <article class="marker-card" *ngIf="popupPoint as point" [attr.aria-label]="popupPinned ? 'Pinned objective' : 'Objective preview'">
+          <button *ngIf="popupPinned" type="button" class="close" aria-label="Close objective" (click)="clearSelection()">×</button>
+          <span class="eyebrow" [style.color]="colors[point.category]">{{ point.categoryName }} · {{ states[point.item.state] }}</span>
+          <h3>{{ point.item.name }}</h3>
+          <small *ngIf="!popupPinned">{{ point.item.coords }}</small>
+          <ng-container *ngIf="popupPinned">
+            <p *ngIf="point.item.detail">{{ point.item.detail }}</p>
+            <p class="location-note" *ngIf="point.category === 'mainQuests' || point.category === 'sideQuests'">Quest giver</p>
+            <p class="location-note" *ngIf="point.category === 'areas'">Region reference point</p>
+            <div class="marker-actions">
+              <button type="button" [attr.aria-label]="'Copy coordinates ' + point.item.coords" (click)="copyCoordinates(point)">{{ point.item.coords }}</button>
+              <button type="button" [class.active]="routeIndex(point) >= 0" (click)="toggleRoute(point)">{{ routeIndex(point) >= 0 ? '− Stop' : '+ Trip' }}</button>
+              <button type="button" (click)="openCategory.emit(point.category)">List ↗</button>
+            </div>
+            <div class="nearest-travel" *ngIf="travel as station">
+              <span>Nearest fast travel</span>
+              <button type="button" (click)="select(station, true)">{{ station.item.name }} <small>{{ station.item.coords }}</small></button>
+            </div>
+          </ng-container>
+        </article>
+        <article class="marker-card cluster-card" *ngIf="!popupPoint && popupCluster.length" aria-label="Objectives at this marker">
+          <button *ngIf="popupPinned" type="button" class="close" aria-label="Close marker group" (click)="clearSelection()">×</button>
+          <h3>{{ popupCluster.length }} objectives</h3>
+          <ng-container *ngIf="popupPinned; else clusterPreview">
+            <button type="button" class="objective" *ngFor="let point of clusterItems; trackBy: trackPoint" (click)="select(point, true)">
+              <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" alt="">
+              <span><strong>{{ point.item.name }}</strong><small>{{ point.item.coords }} · {{ states[point.item.state] }}</small></span>
+            </button>
+            <button type="button" (click)="zoomToGroup()">Zoom to group</button>
+          </ng-container>
+          <ng-template #clusterPreview><p *ngFor="let point of popupCluster.slice(0, 4)">{{ point.item.name }}</p><small *ngIf="popupCluster.length > 4">+ {{ popupCluster.length - 4 }} more</small></ng-template>
+        </article>
+      </div>
+      <div class="cursor-coordinates" *ngIf="cursorCoords">{{ cursorCoords }}</div>
+    </div>
+
+    <aside class="map-sidebar" aria-label="Map objectives and trip">
+      <details class="layers" open>
+        <summary>Layers <span>{{ enabled.size }} selected</span></summary>
+        <div class="layer-actions"><button type="button" (click)="allLayers(true)">All</button><button type="button" (click)="allLayers(false)">None</button><span class="layer-counts headings"><span>Palpagos</span><span>Tree</span></span></div>
+        <label class="layer" *ngFor="let layer of layers">
+          <input type="checkbox" [checked]="enabled.has(layer.key)" (change)="toggleLayer(layer.key)">
+          <img class="layer-glyph" *ngIf="iconUrls[iconNames[layer.key]]" [src]="iconUrls[iconNames[layer.key]]" alt="">
+          <span class="layer-name">{{ layer.name }}</span><span class="layer-counts"><b [class.current-map]="mapKey === 'palpagos'" [title]="'Palpagos Islands: ' + layer.palpagos">{{ layer.palpagos | number }}</b><b [class.current-map]="mapKey === 'tree'" [title]="'World Tree: ' + layer.tree">{{ layer.tree | number }}</b></span>
+        </label>
+        <select *ngIf="groupOptions.length" aria-label="Objective type" [value]="group" (change)="setGroup($any($event.target).value)">
+          <option value="">All types</option><option *ngFor="let option of groupOptions" [value]="option.key">{{ option.name }}</option>
+        </select>
+      </details>
+
+      <details class="trip-panel" open>
+        <summary>My trip <span>{{ routeHere.length }} stops</span></summary>
+        <p *ngIf="!routeHere.length">Choose a marker, then add it to your trip.</p>
+        <ng-container *ngIf="routeHere.length">
+          <p class="subtle">Straight connections · stops saved per player</p>
+          <ol class="trip-list">
+            <li *ngFor="let stop of routeHere; let index = index; trackBy: trackPoint">
+              <button type="button" class="stop-name" (click)="select(stop, true)"><b>{{ index + 1 }}</b><span>{{ stop.item.name }}<small>{{ stop.item.coords }} · {{ states[stop.item.state] }}</small></span></button>
+              <div class="stop-controls">
+                <button type="button" [attr.aria-label]="'Move ' + stop.item.name + ' earlier'" [disabled]="index === 0" (click)="moveStop(stop, -1)">↑</button>
+                <button type="button" [attr.aria-label]="'Move ' + stop.item.name + ' later'" [disabled]="index === routeHere.length - 1" (click)="moveStop(stop, 1)">↓</button>
+                <button type="button" [attr.aria-label]="'Remove ' + stop.item.name + ' from trip'" (click)="toggleRoute(stop)">×</button>
+              </div>
+            </li>
+          </ol>
+          <div class="trip-actions"><button type="button" (click)="fit(routeHere)">Show trip</button><button type="button" (click)="exportRoute()">CSV ↓</button><button type="button" (click)="clearRoute()">Clear</button></div>
+        </ng-container>
+      </details>
+
+      <details class="coordinate-panel">
+        <summary>Go to coordinates</summary>
+        <form (submit)="$event.preventDefault(); jump()">
+          <label>{{ coordsLabel }}<div class="coordinate-input"><input placeholder="x, y" aria-label="Go to coordinates" [value]="coordinateText" (input)="coordinateText = $any($event.target).value"><button type="submit">Go</button></div></label>
+        </form>
+        <p class="error" *ngIf="coordinateError">{{ coordinateError }}</p>
+      </details>
+
+      <details class="nearby-section" open>
+        <summary>Nearby objectives</summary>
+        <p class="subtle">{{ centerCoords }}</p>
+        <div class="nearby-list">
+          <button type="button" *ngFor="let point of nearby.slice(0, limit); trackBy: trackPoint"
+            class="objective" [class.selected]="point.key === selected?.key" (click)="select(point, true)">
+            <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" alt="">
+            <span><strong>{{ point.item.name }}</strong><small>{{ point.categoryName }} · {{ point.item.coords }}</small></span>
+            <span class="status-dot" [attr.data-state]="point.item.state" [attr.aria-label]="states[point.item.state]" [title]="states[point.item.state]"></span>
+          </button>
+        </div>
+        <button type="button" class="more" *ngIf="nearby.length > limit" (click)="limit = limit + 60">Show more</button>
+        <p *ngIf="!nearby.length">No objectives match these filters.</p>
+      </details>
+      <details class="unmapped" *ngIf="unmapped.length">
+        <summary>Without a fixed location</summary>
+        <p>These lists include unfinished objectives without a known map point. Quest markers show the quest giver, and region markers show a reference point.</p>
+        <button type="button" *ngFor="let category of unmapped" (click)="openCategory.emit(category.key)">{{ category.title }} ↗</button>
+      </details>
+    </aside>
+  </div>
+  <div class="map-footer" *ngIf="message" role="status">{{ message }}</div>
+</section>

@@ -20,6 +20,9 @@
       "url": "https://raw.githubusercontent.com/KrisCris/Palworld-Pal-Editor/3efb2d4b5d1f5710ee672d449b5162fe63745229/src/palworld_pal_editor/assets/data/skin_data.json",
       "sha256": "7dde2c0a1a316c9d0b5eaa160d28b8fc6b544bbe072d767b6dfb791e2be4ca1d"
     },
+    "maps.db": {
+      "sha256": "b02217d121eee83d697ba1d085befe8952ababe76a33e62fa4d0d8711c533e41"
+    },
     "paldb_map_palpagos.js": {
       "url": "https://paldb.cc/js/map_data_en.js?_=1788084268",
       "sha256": "fa066acd32931228e27d270bfd8f71788d2a52ff1228d4b78c934577a9daf9f5"

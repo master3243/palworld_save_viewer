@@ -4,7 +4,7 @@
  */
 import type { PlayerCompletion } from '../../backend';
 
-/** Shape of resources/completion/completion-data.json (built by Paltest/build_completion_data.py). */
+/** Shape of resources/completion/completion-data.json (built by Paltest/db/build_completion_data.py). */
 export interface CompletionData {
   generated: string;
   sources: Record<string, string>;
@@ -61,6 +61,8 @@ export interface TrackedItem {
   group: string;
   /** In-game map coordinates, "x, y", or '' for items without a place. */
   coords: string;
+  /** Precise map position for rendering; coords is the rounded in-game readout. */
+  position?: { x: number; y: number };
   /** Map the coordinates refer to; '' when it is the main one. */
   map: string;
   /** Sort key within the category (paldeck number, level, name). */
@@ -121,7 +123,14 @@ export interface CompletionSummary {
 
 /** Unreal world units -> the coordinates the in-game map shows (checked against paldb.cc markers). */
 export function worldToMap(x: number, y: number): { x: number; y: number } {
-  return { x: Math.round((y - 157935) / 459), y: Math.round((x + 123930) / 459) };
+  const point = worldToMapExact(x, y);
+  return { x: Math.round(point.x), y: Math.round(point.y) };
+}
+
+function worldToMapExact(x: number, y: number): { x: number; y: number } {
+  // The World Tree has its own map readout (PalDB's separate tree map config).
+  if (mapOf(x, y)) return { x: (y + 818197) / 1335.144531 - 127.7, y: (x - 347351.5) / 1335.144531 + 648.7 };
+  return { x: (y - 157935) / 459, y: (x + 123930) / 459 };
 }
 
 const WORLD_TREE = { min: { x: 347351.5, y: -818197 }, max: { x: 689148.5, y: -476400 } };
@@ -132,10 +141,10 @@ export function mapOf(x: number, y: number): string {
   return inside ? 'World Tree' : '';
 }
 
-function place(x: number, y: number): { coords: string; map: string } {
+function place(x: number, y: number): { coords: string; map: string; position?: { x: number; y: number } } {
   if (!x && !y) return { coords: '', map: '' };
   const point = worldToMap(x, y);
-  return { coords: `${point.x}, ${point.y}`, map: mapOf(x, y) };
+  return { coords: `${point.x}, ${point.y}`, map: mapOf(x, y), position: worldToMapExact(x, y) };
 }
 
 /* ------------------------------------------------------------ categories */

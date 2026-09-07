@@ -54,6 +54,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "port": 3881
+          },
           "configurations": {
             "production": {
               "buildTarget": "pal-storage-viewer:build:production"

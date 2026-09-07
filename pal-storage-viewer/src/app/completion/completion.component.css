@@ -559,6 +559,18 @@
   color: rgba(232, 248, 255, 0.5);
 }
 
+.tracker-views { display:flex; flex-shrink:0; gap:5px; }
+.tracker-views button, .coordinate-link { background:#0a202d; border:1px solid #31576a; color:#d9f6ff; cursor:pointer; font:inherit; border-radius:7px; padding:7px 12px; }
+.tracker-views button { display:flex; align-items:center; gap:6px; font-size:13px; }
+.tracker-views button.active { background:#205269; border-color:#79dafa; }
+.tracker-views svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.5; }
+.coordinate-link { padding:2px 6px; font-size:12px; }
+.coordinate-link:hover { border-color:#79dafa; }
+.map-overall .ring-wrap { width:70px; height:70px; }
+.map-overall .ring-text strong { font-size:1.15rem; }
+.map-overall .stats { display:none; }
+.map-overall { padding:10px 14px; }
+
 .empty-row td {
   color: rgba(232, 248, 255, 0.6);
   padding: 18px 8px;
@@ -566,6 +578,9 @@
 }
 
 @media (max-width: 720px) {
+  .tracker-views { width:100%; }
+  .tracker-views button { flex:1; justify-content:center; }
+  .overall.map-overall { flex-direction:row; align-items:center; flex-wrap:wrap; gap:10px; }
   .overall {
     align-items: flex-start;
     flex-direction: column;

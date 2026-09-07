@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angular/core';
 
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
 import { Category, CompletionData, CompletionSummary, TrackedItem, WorldProgress, summarize } from './completion-model';
+import { TrackerMapComponent } from './tracker-map.component';
+import { objectiveKey } from './tracker-map-model';
 
 interface PlayerOption {
   key: string;
@@ -21,7 +23,7 @@ const RING_RADIUS = 52;
 @Component({
   selector: 'app-completion',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TrackerMapComponent],
   templateUrl: './completion.component.html',
   styleUrl: './completion.component.css'
 })
@@ -37,6 +39,10 @@ export class CompletionComponent implements OnChanges {
   selectedCategory = '';
   search = '';
   groupFilter = '';
+  mapOpen = false;
+  mapVisited = false;
+  @ViewChild(TrackerMapComponent) trackerMap?: TrackerMapComponent;
+  mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
 
   private static dataPromise?: Promise<CompletionData>;
@@ -98,6 +104,7 @@ export class CompletionComponent implements OnChanges {
   selectPlayer(key: string): void {
     if (key === this.selectedPlayer) return;
     this.selectedPlayer = key;
+    this.mapFocus = '';
     this.recompute();
   }
 
@@ -105,6 +112,23 @@ export class CompletionComponent implements OnChanges {
     this.selectedCategory = this.selectedCategory === key ? '' : key;
     this.groupFilter = '';
     this.search = '';
+  }
+
+  showMap(item?: TrackedItem): void {
+    if (item) this.mapFocus = objectiveKey(this.selectedCategory, item.id);
+    this.mapVisited = true;
+    this.mapOpen = true;
+    if (item) requestAnimationFrame(() => {
+      this.trackerMap?.focusObjective(this.mapFocus);
+      document.querySelector('app-tracker-map')?.scrollIntoView({ block:'start' });
+    });
+  }
+
+  showMapCategory(key: string): void {
+    this.mapOpen = false;
+    this.selectedCategory = key;
+    this.groupFilter = ''; this.search = '';
+    requestAnimationFrame(() => document.querySelector('.category-detail')?.scrollIntoView({ block: 'nearest' }));
   }
 
   setGroup(key: string): void {

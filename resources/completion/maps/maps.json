@@ -1,0 +1,22 @@
+[
+  {
+    "key": "palpagos",
+    "name": "Palpagos Islands",
+    "image": "resources/completion/maps/palpagos.pog",
+    "detail": "resources/completion/maps/palpagos",
+    "minX": -1922.2984749455338,
+    "maxX": 1234.1285403050108,
+    "minY": -2125.20697167756,
+    "maxY": 1031.2200435729847
+  },
+  {
+    "key": "tree",
+    "name": "World Tree",
+    "image": "resources/completion/maps/tree.pog",
+    "detail": "resources/completion/maps/tree",
+    "minX": -127.7,
+    "maxX": 128.30000004793493,
+    "minY": 648.7,
+    "maxY": 904.700000047935
+  }
+]
