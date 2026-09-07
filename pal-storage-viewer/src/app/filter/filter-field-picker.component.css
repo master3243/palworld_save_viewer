@@ -1,0 +1,16 @@
+:host { display: block; min-width: 0; }
+.field-wrap { display: flex; position: relative; width: 100%; }
+.field, .field-caret { background: rgba(3, 12, 22, .78); border: 1px solid rgba(134, 220, 255, .28); color: #eaf7ff; font-size: .78rem; height: 30px; }
+.field { border-radius: 6px 0 0 6px; border-right: 0; flex: 1; min-width: 0; padding: 0 8px; width: 100%; }
+.field::placeholder { color: rgba(199, 243, 255, .55); }
+.field:focus-visible { outline: none; }
+.field-wrap:focus-within .field, .field-wrap:focus-within .field-caret { border-color: rgba(149, 243, 255, .85); }
+.field-caret { border-radius: 0 6px 6px 0; cursor: pointer; padding: 0 7px; }
+.field-caret:hover, .open .field-caret { background: rgba(88, 197, 238, .14); }
+.field-list { background: #091927; border: 1px solid rgba(137, 221, 255, .34); border-radius: 8px; box-shadow: 0 14px 34px rgba(0, 0, 0, .45); box-sizing: border-box; left: 0; list-style: none; margin: 4px 0 0; overflow: auto; overscroll-behavior: contain; padding: 4px; position: absolute; top: 100%; z-index: 30; }
+.field-list.above { top: auto; bottom: 100%; margin: 0 0 4px; }
+.field-list li { align-items: center; border-radius: 5px; color: #dff6ff; cursor: pointer; display: flex; gap: 12px; justify-content: space-between; padding: 5px 8px; }
+.field-list li:hover, .field-list li.active { background: rgba(88, 197, 238, .16); }
+.field-list li.section { background: transparent; color: rgba(199, 243, 255, .5); cursor: default; font-size: .66rem; font-weight: 750; letter-spacing: .06em; padding: 5px 8px 2px; text-transform: uppercase; }
+.field-list li.selected > span { color: #8fe8ff; }
+.field-list small { color: rgba(199, 243, 255, .5); font-size: .7rem; overflow-wrap: anywhere; }

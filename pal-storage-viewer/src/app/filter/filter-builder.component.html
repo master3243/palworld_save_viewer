@@ -82,46 +82,8 @@
 
           <ng-container *ngIf="child.type === 'rule'; else nestedGroup">
             <div class="rule" [class.unknown]="isUnknownField(child)">
-              <span class="field-wrap" [class.open]="fieldMenu?.ruleId === child.id">
-                <input
-                  #fieldInput
-                  class="field"
-                  type="text"
-                  [value]="fieldText(child)"
-                  [title]="hint(child)"
-                  placeholder="field"
-                  autocomplete="off"
-                  spellcheck="false"
-                  (input)="onFieldInput(child, $event)"
-                  (focus)="onFieldFocus(child, $event)"
-                  (blur)="onFieldBlur(child)"
-                  (keydown)="onFieldKeydown(child, $event, fieldInput)"
-                >
-                <button
-                  class="field-caret"
-                  type="button"
-                  aria-label="Choose a field from the list"
-                  title="Choose a field"
-                  (mousedown)="$event.preventDefault(); toggleFieldMenu(child, fieldInput)"
-                >▾</button>
-                <ul class="suggestions field-list" *ngIf="fieldMenu?.ruleId === child.id" role="listbox">
-                  <ng-container *ngFor="let section of fieldMenu!.sections">
-                    <li class="section" role="presentation">{{ section.name }}</li>
-                    <li
-                      *ngFor="let field of section.fields"
-                      role="option"
-                      [class.active]="field === fieldMenu!.active"
-                      [class.selected]="field.key === child.field"
-                      [attr.aria-selected]="field === fieldMenu!.active"
-                      (mousedown)="$event.preventDefault(); pickField(child, field, fieldInput)"
-                    >
-                      <span class="suggest-value">{{ field.label }}</span>
-                      <span class="suggest-count">{{ field.key }}</span>
-                    </li>
-                  </ng-container>
-                  <li class="section empty" *ngIf="!fieldMenu!.sections.length">No field matches</li>
-                </ul>
-              </span>
+              <app-filter-field-picker class="rule-field" [fields]="availableFields(child)" [value]="child.field"
+                [hint]="hint(child)" label="Filter field" (valueChange)="setField(child, $event)"></app-filter-field-picker>
 
               <select class="op" [value]="child.op" (change)="onOperatorChange(child, $event)">
                 <option *ngFor="let def of operatorsFor(child)" [value]="def.op" [selected]="def.op === child.op">{{ def.label }}</option>
@@ -132,13 +94,17 @@
                 <option value="field" [selected]="comparisonMode(child) === 'field'">% of field</option>
                 <option value="formula" [selected]="comparisonMode(child) === 'formula'">Formula</option>
               </select>
-              <span class="reference-value" *ngIf="hasComparisonMode(child) && comparisonMode(child) === 'field'; else literalValue">
+              <span class="reference-value" *ngIf="hasComparisonMode(child) && comparisonMode(child) === 'field'; else formulaValue">
                 <input class="value percent" type="number" aria-label="Percentage of field" [value]="referencePercent(child)" (input)="setPercent(child, $event)">
                 <span>% of</span>
-                <select aria-label="Comparison field" [value]="referenceField(child)" (change)="setReference(child, $event)">
-                  <option *ngFor="let field of numericFields(child)" [value]="field.key" [selected]="field.key === referenceField(child)">{{ field.label }}</option>
-                </select>
+                <app-filter-field-picker [fields]="numericFields(child)" [value]="referenceField(child)" label="Comparison field"
+                  (valueChange)="setReference(child, $event)"></app-filter-field-picker>
               </span>
+              <ng-template #formulaValue>
+                <app-filter-field-picker *ngIf="hasComparisonMode(child) && comparisonMode(child) === 'formula'; else literalValue"
+                  class="value-wrap" [expression]="true" [fields]="numericFields(child)" [value]="singleValue(child, 0)" label="Formula"
+                  [placeholder]="placeholder(child)" (valueChange)="onFormulaInput(child, $event)"></app-filter-field-picker>
+              </ng-template>
               <ng-template #literalValue>
               <ng-container [ngSwitch]="arity(child)">
                 <ng-container *ngSwitchCase="'none'"></ng-container>

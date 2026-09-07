@@ -525,11 +525,13 @@
   gap: 10px;
   order: 10;
   padding: 10px 12px;
+  min-height: min(400px, 50dvh);
   max-height: min(50dvh, 560px);
   overflow: auto;
 }
 
 .panel-footer {
+  margin-top: auto;
   align-items: center;
   border-top: 1px solid rgba(134, 220, 255, 0.12);
   display: flex;

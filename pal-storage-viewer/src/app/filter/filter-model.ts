@@ -112,6 +112,22 @@ export interface FilterGroup {
 
 export interface SortCriterion { field: string; direction: 'asc' | 'desc'; }
 
+export function cycleSort(sorts: SortCriterion[], field: string, additive = false): SortCriterion[] {
+  const result = sorts.map(sort => ({ ...sort }));
+  const index = result.findIndex(sort => sort.field === field);
+  if (index < 0) {
+    const criterion: SortCriterion = { field, direction: 'asc' };
+    if (additive) result.push(criterion); else result.unshift(criterion);
+  } else if (!additive && index > 0) {
+    result.unshift(...result.splice(index, 1));
+  } else if (result[index].direction === 'asc') {
+    result[index].direction = 'desc';
+  } else {
+    result.splice(index, 1);
+  }
+  return result;
+}
+
 export type FilterNode = FilterRule | FilterGroup;
 
 let nextId = 1;
@@ -339,7 +355,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'hp_pct', label: 'HP %', group: G.condition, kind: 'number', aliases: ['hp_percent', 'health_pct'], hint: 'Current HP as a percentage of max HP', get: (row) => percentage(row, 'hp', 'max_hp') },
   { key: 'missing_hp', label: 'Missing HP', group: G.condition, kind: 'number', aliases: ['hp_missing'], get: (row) => { const hp = number(row, 'hp'), max = number(row, 'max_hp'); return hp === null || max === null ? null : Math.max(0, max - hp); } },
   { key: 'stomach_pct', label: 'Stomach %', group: G.condition, kind: 'number', aliases: ['food_pct', 'hunger_pct'], get: (row) => percentage(row, 'full_stomach', 'hunger_max') },
-  { key: 'stomach', label: 'Full stomach', group: G.condition, kind: 'number', aliases: ['full_stomach', 'hunger'], get: (row) => number(row, 'full_stomach') },
+  { key: 'stomach', label: 'Current hunger', group: G.condition, kind: 'number', aliases: ['full_stomach', 'hunger'], get: (row) => number(row, 'full_stomach') },
   { key: 'sanity', label: 'Sanity', group: G.condition, kind: 'number', aliases: [], get: (row) => number(row, 'sanity') },
   { key: 'health', label: 'Physical health', group: G.condition, kind: 'text', aliases: ['physical_health'], suggest: true, get: (row) => text(row, 'physical_health') },
   { key: 'hunger_type', label: 'Hunger type', group: G.condition, kind: 'text', aliases: [], suggest: true, get: (row) => text(row, 'hunger_type') },

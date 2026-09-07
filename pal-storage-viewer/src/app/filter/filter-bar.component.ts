@@ -27,6 +27,7 @@ import {
   FilterNode,
   FilterRule,
   SortCriterion,
+  cycleSort,
   buildFieldRegistry,
   countActiveRules,
   createGroup,
@@ -348,14 +349,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   toggleSort(key: string, additive: boolean): void {
     const field = this.fieldForColumn(key);
     if (!field) return;
-    const old = this.sorts.find(sort => sort.field === field.key);
-    const next = !old ? { field: field.key, direction: 'asc' as const } : old.direction === 'asc' ? { field: field.key, direction: 'desc' as const } : null;
-    if (!additive) this.sorts = next ? [next] : [];
-    else {
-      const index = this.sorts.findIndex(sort => sort.field === field.key);
-      if (index >= 0) this.sorts.splice(index, 1, ...(next ? [next] : []));
-      else if (next) this.sorts.push(next);
-    }
+    this.sorts = cycleSort(this.sorts, field.key, additive);
     this.onTreeChanged();
   }
 

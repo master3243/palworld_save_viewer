@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { FilterEngine, Suggestion } from './filter-engine';
+import { FilterFieldPickerComponent } from './filter-field-picker.component';
 import {
   FilterField,
   FilterGroup,
@@ -29,13 +30,6 @@ interface SuggestState {
   index: number;
 }
 
-/** The field picker of one rule while it is open: the groups still matching the typed text. */
-interface FieldMenuState {
-  ruleId: string;
-  sections: FieldGroup[];
-  active: FilterField | null;
-}
-
 /**
  * Visual editor for a filter tree: nested "match all / any" groups holding
  * field / operator / value rules. Mutates the tree in place and emits
@@ -44,7 +38,7 @@ interface FieldMenuState {
 @Component({
   selector: 'app-filter-builder',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FilterFieldPickerComponent],
   templateUrl: './filter-builder.component.html',
   styleUrl: './filter-builder.component.css'
 })
@@ -72,10 +66,6 @@ export class FilterBuilderComponent {
   private readonly draftText = new Map<string, string>();
   suggest: SuggestState | null = null;
   private blurTimer: ReturnType<typeof setTimeout> | null = null;
-  fieldMenu: FieldMenuState | null = null;
-  /** What the user has typed in a field box, kept until they pick or leave. */
-  private readonly fieldDraft = new Map<string, string>();
-  private fieldBlurTimer: ReturnType<typeof setTimeout> | null = null;
   readonly moveScopes = MOVE_SCOPES;
   private comparisonModes = new Map<string, string>();
 
@@ -83,7 +73,7 @@ export class FilterBuilderComponent {
     return this.availableFields(rule).filter(field => field.kind === 'number');
   }
 
-  private availableFields(rule: FilterRule): FilterField[] {
+  availableFields(rule: FilterRule): FilterField[] {
     return MOVE_FIELDS.some(field => field.key === rule.field) ? MOVE_FIELDS : this.fieldGroups.flatMap(group => group.fields);
   }
 
@@ -102,8 +92,7 @@ export class FilterBuilderComponent {
 
   referenceField(rule: FilterRule): string { const key = rule.values[0]?.split('*')[0] ?? ''; return this.numericFields(rule).find(field => [field.key, ...field.aliases].includes(key))?.key ?? key; }
   referencePercent(rule: FilterRule): string { const factor = rule.values[0]?.split('*')[1]; return factor === undefined ? '100' : factor === '' ? '' : String(Number((Number(factor) * 100).toPrecision(12))); }
-  setReference(rule: FilterRule, event: Event): void {
-    const field = (event.target as HTMLSelectElement).value;
+  setReference(rule: FilterRule, field: string): void {
     rule.values = [field + (this.referencePercent(rule) === '100' ? '' : `*${Number(this.referencePercent(rule)) / 100}`)];
     this.emit();
   }
@@ -240,110 +229,7 @@ export class FilterBuilderComponent {
 
   /* -------------------------------------------------------------- field box */
 
-  fieldText(rule: FilterRule): string {
-    return this.fieldDraft.get(rule.id) ?? (this.fieldFor(rule)?.label ?? rule.field);
-  }
-
-  onFieldFocus(rule: FilterRule, event: FocusEvent): void {
-    if (this.fieldBlurTimer) clearTimeout(this.fieldBlurTimer);
-    const input = event.target as HTMLInputElement;
-    // Start from an empty box so the first keystroke searches, but keep the current label visible as placeholder.
-    this.fieldDraft.set(rule.id, '');
-    input.value = '';
-    input.placeholder = this.fieldFor(rule)?.label ?? rule.field;
-    this.openFieldMenu(rule, '');
-    this.revealActive(input);
-  }
-
-  onFieldInput(rule: FilterRule, event: Event): void {
-    const text = (event.target as HTMLInputElement).value;
-    this.fieldDraft.set(rule.id, text);
-    this.openFieldMenu(rule, text);
-  }
-
-  onFieldBlur(rule: FilterRule): void {
-    this.fieldBlurTimer = setTimeout(() => {
-      this.fieldDraft.delete(rule.id);
-      if (this.fieldMenu?.ruleId === rule.id) this.fieldMenu = null;
-      this.fieldBlurTimer = null;
-    }, 150);
-  }
-
-  onFieldKeydown(rule: FilterRule, event: KeyboardEvent, input: HTMLInputElement): void {
-    const menu = this.fieldMenu?.ruleId === rule.id ? this.fieldMenu : null;
-    if (!menu) {
-      if (event.key === 'ArrowDown') { this.openFieldMenu(rule, this.fieldDraft.get(rule.id) ?? ''); event.preventDefault(); }
-      return;
-    }
-    const flat = menu.sections.flatMap((section) => section.fields);
-    const position = menu.active ? flat.indexOf(menu.active) : -1;
-    if (event.key === 'ArrowDown') {
-      menu.active = flat[(position + 1) % flat.length] ?? null;
-      this.revealActive(input);
-      event.preventDefault();
-    } else if (event.key === 'ArrowUp') {
-      menu.active = flat[(position - 1 + flat.length) % flat.length] ?? null;
-      this.revealActive(input);
-      event.preventDefault();
-    } else if (event.key === 'Enter' || event.key === 'Tab') {
-      const choice = menu.active ?? (flat.length === 1 ? flat[0] : null);
-      if (choice) {
-        this.pickField(rule, choice, input);
-        event.preventDefault();
-      }
-    } else if (event.key === 'Escape') {
-      this.fieldMenu = null;
-      input.blur();
-      event.stopPropagation();
-    }
-  }
-
-  toggleFieldMenu(rule: FilterRule, input: HTMLInputElement): void {
-    if (this.fieldMenu?.ruleId === rule.id && (this.fieldDraft.get(rule.id) ?? '') === '') {
-      this.fieldMenu = null;
-      input.blur();
-      return;
-    }
-    if (document.activeElement !== input) input.focus();
-    this.fieldDraft.set(rule.id, '');
-    input.value = '';
-    this.openFieldMenu(rule, '');
-    this.revealActive(input);
-  }
-
-  /** Scroll the list so the highlighted (or current) field is visible; runs after the list renders. */
-  private revealActive(input: HTMLInputElement): void {
-    setTimeout(() => input.parentElement?.querySelector('li.active, li.selected')?.scrollIntoView({ block: 'nearest' }));
-  }
-
-  pickField(rule: FilterRule, field: FilterField, input: HTMLInputElement | null): void {
-    if (this.fieldBlurTimer) clearTimeout(this.fieldBlurTimer);
-    this.fieldMenu = null;
-    this.fieldDraft.delete(rule.id);
-    if (input) {
-      input.value = field.label;
-      input.blur();
-    }
-    this.applyField(rule, field.key);
-  }
-
-  /** Groups whose fields match the typed text on label, key, alias or hint (all when empty). */
-  private openFieldMenu(rule: FilterRule, text: string): void {
-    const query = text.trim().toLowerCase();
-    const matches = (field: FilterField) => !query
-      || field.label.toLowerCase().includes(query)
-      || field.key.toLowerCase().includes(query)
-      || field.aliases.some((alias) => alias.toLowerCase().includes(query))
-      || (field.hint ?? '').toLowerCase().includes(query);
-    const groups = MOVE_FIELDS.some(field => field.key === rule.field) ? [{ name: 'Move details', fields: MOVE_FIELDS }] : this.fieldGroups;
-    const sections = groups.map((group) => ({ name: group.name, fields: group.fields.filter(matches) })).filter((group) => group.fields.length);
-    const flat = sections.flatMap((section) => section.fields);
-    // Prefer a label that starts with the text, then the current field, so Enter does the obvious thing.
-    const active = query ? flat.find((field) => field.label.toLowerCase().startsWith(query)) ?? flat[0] ?? null : null;
-    this.fieldMenu = { ruleId: rule.id, sections, active };
-  }
-
-  private applyField(rule: FilterRule, key: string): void {
+  setField(rule: FilterRule, key: string): void {
     const previous = this.fieldFor(rule);
     const next = this.fieldMap.get(key);
     if (rule.field === key) return;
@@ -366,6 +252,12 @@ export class FilterBuilderComponent {
       default: break;
     }
     this.draftText.delete(rule.id);
+    this.emit();
+  }
+
+  onFormulaInput(rule: FilterRule, value: string): void {
+    this.comparisonModes.set(rule.id, 'formula');
+    rule.values = [value];
     this.emit();
   }
 

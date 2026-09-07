@@ -98,3 +98,28 @@ test('move suggestions count each Pal once across equipped and known moves', () 
  const dark = engine.suggestions(engine.moveLookup.resolve('type')).find(item => item.value === 'Dark');
  assert.equal(dark.count, 2);
 });
+
+test('header clicks promote sorts without losing secondary priorities', () => {
+ const { cycleSort } = require('../src/app/filter/filter-model.ts');
+ const original = [{field:'level',direction:'asc'},{field:'iv',direction:'desc'},{field:'pal',direction:'asc'}];
+ const promoted = cycleSort(original,'iv');
+ assert.deepEqual(promoted,[original[1],original[0],original[2]]);
+ assert.deepEqual(cycleSort(promoted,'iv'),[original[0],original[2]]);
+ assert.deepEqual(cycleSort(original,'hp_pct'),[{field:'hp_pct',direction:'asc'},...original]);
+ assert.equal(original[0].direction,'asc');
+ assert.deepEqual(cycleSort(cycleSort(original,'level'),'level'),original.slice(1));
+});
+test('Shift-click cycles a secondary sort in place', () => {
+ const { cycleSort } = require('../src/app/filter/filter-model.ts');
+ const original=[{field:'level',direction:'asc'},{field:'iv',direction:'asc'}];
+ assert.deepEqual(cycleSort(original,'iv',true),[original[0],{field:'iv',direction:'desc'}]);
+ assert.deepEqual(cycleSort(original,'pal',true),[...original,{field:'pal',direction:'asc'}]);
+});
+test('percentage fields and percentages of absolute fields compare their literal values', () => {
+ const sample={full_stomach:244,hunger_max:480};
+ const fields=new FieldLookup(buildFieldRegistry([sample]));
+ const filter=new FilterEngine(fields,[sample]);
+ assert.equal(filter.filter(parseQuery('stomach_pct<hunger_max*0.11',fields).root).length,1);
+ assert.equal(filter.filter(parseQuery('stomach_pct<11',fields).root).length,0);
+ assert.equal(filter.filter(parseQuery('stomach<hunger_max*0.11',fields).root).length,0);
+});

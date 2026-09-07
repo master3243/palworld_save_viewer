@@ -1,0 +1,20 @@
+<div class="field-wrap" [class.open]="open">
+  <input #input class="field" type="text" role="combobox" [attr.aria-label]="label" [attr.aria-expanded]="open" aria-autocomplete="list"
+    [attr.aria-controls]="open ? menuId : null" [attr.aria-activedescendant]="open && active ? menuId + '-' + active.key : null"
+    [value]="display" [title]="hint" [placeholder]="!expression && draft !== null ? selectedLabel : placeholder"
+    autocomplete="off" spellcheck="false" (input)="onInput()" (focus)="onFocus()" (blur)="onBlur()"
+    (keydown)="onKeydown($event)" (click)="onCaret()" (keyup.arrowleft)="onCaret()" (keyup.arrowright)="onCaret()">
+  <button class="field-caret" type="button" [attr.aria-label]="'Choose ' + label.toLowerCase()" [attr.aria-expanded]="open"
+    (mousedown)="$event.preventDefault()" (click)="toggle()">▾</button>
+  <ul #menu *ngIf="open" [id]="menuId" class="field-list" [class.above]="above" role="listbox" [attr.aria-label]="label + ' suggestions'"
+    [style.max-height.px]="menuHeight" [style.width.px]="menuWidth">
+    <ng-container *ngFor="let section of sections">
+      <li class="section" role="presentation">{{ section.name }}</li>
+      <li *ngFor="let field of section.fields" [id]="menuId + '-' + field.key" role="option" [class.active]="field === active" [class.selected]="field.key === value"
+        [attr.aria-selected]="field === active" (mousedown)="$event.preventDefault()" (click)="pick(field)">
+        <span>{{ field.label }}</span><small>{{ field.key }}</small>
+      </li>
+    </ng-container>
+    <li class="section" *ngIf="!sections.length">No field matches</li>
+  </ul>
+</div>
