@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { resolveWgsFiles } from '../backend/wgs';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
@@ -573,6 +574,18 @@ export class AppComponent implements OnDestroy {
    * first. Files dropped while that list is open are added to it.
    */
   private async offerInputs(inputs: SaveInput[], append: boolean): Promise<void> {
+    this.error = '';
+    this.isParsing = true;
+    this.progress = { fraction: null, label: 'Reading folder…', detail: '' };
+    try {
+      inputs = await resolveWgsFiles(inputs);
+    } catch (error) {
+      this.error = error instanceof Error ? error.message : 'Could not read this folder.';
+      return;
+    } finally {
+      this.isParsing = false;
+      this.progress = null;
+    }
     const candidates = inputs.filter((input) => this.parser.isCandidate(input));
     if (candidates.length <= 1 && !this.pendingFiles) {
       await this.parseInputs(inputs, append);
@@ -837,7 +850,7 @@ export class AppComponent implements OnDestroy {
   private async parseInputs(inputs: SaveInput[], append: boolean): Promise<void> {
     const candidates = inputs.filter((input) => this.parser.isCandidate(input));
     if (!candidates.length) {
-      this.error = 'No Palworld save files found. Drop Level.sav, a Players folder, or a _dps.sav file.';
+      this.error = 'No Palworld save files found. Drop a world save folder, an Xbox wgs folder, or Level.sav / Player .sav files.';
       return;
     }
     const previous = this.loadedInputs;

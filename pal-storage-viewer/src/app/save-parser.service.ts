@@ -2,12 +2,8 @@ import { Injectable } from '@angular/core';
 
 export type PalStorageRow = Record<string, unknown>;
 
-/** One save file chosen by the user, with the folder path it was picked from (if any). */
-export interface SaveInput {
-  file: File;
-  /** Relative path inside a dropped/picked folder, e.g. "MyWorld/Players/x_dps.sav". */
-  path: string;
-}
+export type { SaveInput } from '../backend/wgs';
+import type { SaveInput } from '../backend/wgs';
 
 export type { CombinedSaves, PlayerCompletion, SaveSetSummary, SaveSource } from '../backend';
 import type { CombinedSaves } from '../backend';
@@ -86,7 +82,7 @@ export class SaveParserService {
   ): Promise<CombinedSaves> {
     const usable = inputs.filter((input) => this.isCandidate(input));
     if (!usable.length) {
-      throw new Error('No Palworld save files found. Drop Level.sav, a Players folder, or a _dps.sav file.');
+      throw new Error('No Palworld save files found. Drop a world save folder, an Xbox wgs folder, or Level.sav / Player .sav files.');
     }
     const files = usable.map((input) => {
       const set = this.setLabel(input);

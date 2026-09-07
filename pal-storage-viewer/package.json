@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "ng serve",
-    "test": "node tests/filter.test.cjs",
+    "test": "node --test tests/*.test.cjs",
     "build": "ng build --configuration production"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "@angular/platform-browser": "18.2.13",
     "@angular/platform-browser-dynamic": "18.2.13",
     "@angular/router": "18.2.13",
+    "fflate": "0.8.2",
     "rxjs": "7.8.1",
     "tslib": "2.6.3",
     "zone.js": "0.14.10"

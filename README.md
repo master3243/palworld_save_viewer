@@ -34,6 +34,14 @@ Where `IDprofile` and `IDworld` are long random numbers. Inside it, `Level.sav` 
 
 For best results, drop these three items: the "Level.sav" file, "LevelMeta.sav" file, and the "Players" folder (contains 2 files).
 
+For PC Xbox Game Pass, drop the whole `wgs` folder:
+
+```
+%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs
+```
+
+It can contain multiple worlds and account folders. The viewer recovers each world and lets you pick which you want load (or possibly load all).
+
 <img src="resources/paste.png" alt="Example of files to drop" width="500" />
 
 ## Can you fix X bug or implement Y feature?
@@ -73,6 +81,11 @@ It also literally took less time to make the first version of this tool than it 
 ## Resources Used
 
 Resources used while building the save decoder
+
+- [XGP-save-extractor](https://github.com/Z1ni/XGP-save-extractor/tree/3e1bf319a9760a476968239c563e76f1c741c467)
+  - Reference for WGS indexes, container GUIDs and Palworld file names; adapted under its MIT license.
+- [palworld-save-tools](https://github.com/cheahjs/palworld-save-tools/blob/main/palworld_save_tools/palsav.py)
+  - Reference for single/double zlib saves and the Xbox CNK wrapper.
 
 - [palworld-plm-tools](https://github.com/DYSCreations/palworld-plm-tools)
   - Used as a reference for the Palworld `PlM1` save wrapper and Oodle-compressed `GVAS` payload shape.
