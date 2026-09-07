@@ -354,12 +354,12 @@ function towerCategory(record: PlayerCompletion, data: CompletionData): Category
     };
   });
   return finish({
-    key: 'towers', title: 'Main bosses', items, groups: [],
+    key: 'towers', title: 'Bosses', items, groups: [],
     unknown: unknownIds(record.tower_bosses, new Set(Object.keys(data.towers))),
   });
 }
 
-/** Main bosses beaten on Hard: the eight towers and the final World Tree boss. */
+/** Bosses beaten on Hard: the eight towers and the final World Tree boss. */
 function towerHardCategory(record: PlayerCompletion, data: CompletionData): Category {
   const items: TrackedItem[] = Object.entries(data.towers)
     .filter(([id]) => !NO_HARD_MODE.has(id))
@@ -367,7 +367,7 @@ function towerHardCategory(record: PlayerCompletion, data: CompletionData): Cate
       const count = record.tower_boss_counts[id.replace('BOSS_BATTLE_NAME_', '') + '_Hard'] ?? 0;
       return { id: `${id}_Hard`, name, detail: count ? `defeated ${count}×` : '', state: count > 0 ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null };
     });
-  return finish({ key: 'towersHard', title: 'Main bosses (Hard)', items, groups: [], unknown: [] });
+  return finish({ key: 'towersHard', title: 'Bosses (Hard)', items, groups: [], unknown: [] });
 }
 
 function raidCategory(record: PlayerCompletion, data: CompletionData): Category {
