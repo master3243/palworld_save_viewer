@@ -6,7 +6,7 @@ require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileMo
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText, filename);
 const { worldToMap, mapOf } = require('../src/app/completion/completion-model.ts');
-const { mapObjectives, project, unproject, clusterMarkers, nearestTravel, parseCoordinates } = require('../src/app/completion/tracker-map-model.ts');
+const { mapObjectives, project, unproject, clusterMarkers, layoutMapMarkers, visibleMarkerClusters, nearestTravel, parseCoordinates } = require('../src/app/completion/tracker-map-model.ts');
 const maps = require('../../resources/completion/maps/maps.json');
 const item = (id, coords, extra={}) => ({id, name:id, coords, map:'', state:'todo', detail:'', group:'', order:0, no:null, ...extra});
 const category = (key, items, extra={}) => ({key, title:key, items, ...extra});
@@ -82,4 +82,45 @@ test('rendering keeps precise positions even when coordinate readouts are identi
   assert.equal(points[0].x,.4);
   assert.equal(points[1].x,-.4);
   assert.equal(clusterMarkers(points,p=>({x:p.x*40,y:p.y*40})).length,2);
+});
+
+const layoutMap = { minX: 0, maxX: 1000, minY: 0, maxY: 1000 };
+const members = clusters => clusters.map(c => c.items.map(p => p.key));
+
+test('panning across grid boundaries moves bubbles without changing anchors or membership', () => {
+  const points = mapObjectives([category('notes', [
+    item('a', '120, 900'), item('b', '150, 900'), item('c', '135, 900'),
+    item('d', '120, 870'), item('e', '150, 870'), item('f', '135, 885'),
+  ])]);
+  const layout = layoutMapMarkers(points, layoutMap, 1000, new Set());
+  assert(layout.some(c => c.items.length > 1));
+  for (const offset of [{x:0,y:0}, {x:13,y:17}, {x:-45,y:-35}, {x:100.25,y:80.5}, {x:0,y:0}]) {
+    const visible = visibleMarkerClusters(layout, offset, 1000, 1000);
+    assert.deepEqual(members(visible), members(layout));
+    visible.forEach((cluster, i) => {
+      assert.equal(cluster.x, layout[i].x + offset.x);
+      assert.equal(cluster.y, layout[i].y + offset.y);
+      assert.strictEqual(cluster.items, layout[i].items);
+    });
+  }
+});
+
+test('viewport clipping hides whole bubbles without regrouping their offscreen members', () => {
+  const points = mapObjectives([category('notes', [item('a', '30, 900'), item('b', '50, 900'), item('c', '70, 900')])]);
+  const layout = layoutMapMarkers(points, layoutMap, 1000, new Set());
+  assert.deepEqual(members(layout), [['notes:a', 'notes:b'], ['notes:c']]);
+  assert.deepEqual(members(visibleMarkerClusters(layout, {x:-50,y:0}, 100, 200)), members(layout));
+  assert.deepEqual(members(visibleMarkerClusters(layout, {x:-60,y:0}, 100, 200)), [['notes:c']]);
+  assert.deepEqual(members(visibleMarkerClusters(layout, {x:100,y:0}, 100, 200)), []);
+  assert.deepEqual(members(visibleMarkerClusters(layout, {x:0,y:0}, 100, 200)), members(layout));
+});
+
+test('map layouts still respond to zoom, filters and individually numbered trip stops', () => {
+  const points = mapObjectives([category('notes', [item('a', '30, 900'), item('b', '50, 900'), item('c', '70, 900')])]);
+  const layout = (points, size = 1000, stops = new Set()) => layoutMapMarkers(points, layoutMap, size, stops);
+  assert.deepEqual(members(layout(points, 2000)), [['notes:a'], ['notes:b'], ['notes:c']]);
+  assert.deepEqual(members(layout(points.slice(1))), [['notes:b', 'notes:c']]);
+  assert.deepEqual(members(layout(points, 1000, new Set(['notes:b']))), [['notes:a'], ['notes:c'], ['notes:b']]);
+  assert.deepEqual(members(layout(points)), [['notes:a', 'notes:b'], ['notes:c']]);
+  assert.deepEqual(layout([]), []);
 });

@@ -75,3 +75,18 @@ export function clusterMarkers(points: MapObjective[], screen: (p: MapObjective)
   }
   return clusters;
 }
+
+export function layoutMapMarkers(points: MapObjective[], map: MapDefinition, size: number, stops: ReadonlySet<string>): MarkerCluster[] {
+  const position = (p: MapObjective) => {
+    const n = project(p, map);
+    return { x: n.x * size, y: n.y * size };
+  };
+  const clusters = clusterMarkers(points.filter(p => !stops.has(p.key)), position);
+  clusters.push(...points.filter(p => stops.has(p.key)).map(p => ({ ...position(p), items: [p] })));
+  return clusters;
+}
+
+export function visibleMarkerClusters(layout: MarkerCluster[], offset: MapPoint, width: number, height: number): MarkerCluster[] {
+  return layout.map(c => ({ x: c.x + offset.x, y: c.y + offset.y, items: c.items }))
+    .filter(c => c.x > -25 && c.x < width + 25 && c.y > -25 && c.y < height + 25);
+}

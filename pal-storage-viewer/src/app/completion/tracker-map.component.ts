@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, Output, ViewChild } from '@angular/core';
 import type { Category } from './completion-model';
 import { CATEGORY_COLORS, CATEGORY_ICONS, STATE_LABELS, MapDefinition, MapObjective, MapPoint, MarkerCluster,
-  clusterMarkers, distanceSquared, mapObjectives, nearestTravel, parseCoordinates, project, unproject } from './tracker-map-model';
+  distanceSquared, layoutMapMarkers, mapObjectives, nearestTravel, parseCoordinates, project, unproject, visibleMarkerClusters } from './tracker-map-model';
 
 @Component({
   selector: 'app-tracker-map', standalone: true, imports: [CommonModule],
@@ -59,6 +59,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   private zoom = 1;
   private center = { x: .5, y: .5 };
   private clusters: MarkerCluster[] = [];
+  private markerLayout?: { points: MapObjective[]; map: MapDefinition; size: number; stops: string; clusters: MarkerCluster[] };
   private frame = 0;
   private initialized = false;
   private destroyed = false;
@@ -463,11 +464,14 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       const a=this.screen(route[i-1]),b=this.screen(route[i]); ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
     }
     ctx.strokeStyle='#fff0b0';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
-    const onScreen = this.filtered.filter(p => { const s=this.screen(p);return s.x>-25&&s.x<this.width+25&&s.y>-25&&s.y<this.height+25; });
     const stops = new Map(route.map((p,i) => [p.key,i+1]));
-    // Trip stops stay individually numbered even when surrounding objectives cluster.
-    this.clusters = clusterMarkers(onScreen.filter(p => !stops.has(p.key)),p=>this.screen(p));
-    this.clusters.push(...onScreen.filter(p => stops.has(p.key)).map(p => ({...this.screen(p),items:[p]})));
+    const stopKeys = JSON.stringify([...stops.keys()]);
+    if (!this.markerLayout || this.markerLayout.points !== this.filtered || this.markerLayout.map !== map
+      || this.markerLayout.size !== this.size || this.markerLayout.stops !== stopKeys) {
+      this.markerLayout = { points: this.filtered, map, size: this.size, stops: stopKeys,
+        clusters: layoutMapMarkers(this.filtered, map, this.size, new Set(stops.keys())) };
+    }
+    this.clusters = visibleMarkerClusters(this.markerLayout.clusters, { x: left, y: top }, this.width, this.height);
     for (const cluster of this.clusters) {
       if (cluster.items.length > 1) {
         ctx.beginPath();ctx.arc(cluster.x,cluster.y,10,0,Math.PI*2);ctx.fillStyle='#102632';ctx.fill();
