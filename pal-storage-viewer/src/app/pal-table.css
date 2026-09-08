@@ -545,6 +545,13 @@ table.pal-table {
   width: 100%;
 }
 
+.pal-table th.owned-time-cell,
+.pal-table td.owned-time-cell {
+  width: 168px;
+  min-width: 168px;
+  max-width: 168px;
+}
+
 .pal-table .move-mini {
   align-items: stretch;
   background: rgba(4, 18, 28, 0.85);
@@ -556,6 +563,10 @@ table.pal-table {
   font-size: 0.72rem;
   height: 24px;
   min-width: 0;
+}
+
+.pal-table .move-mini:only-child {
+  max-width: calc((100% - 4px) / 2);
 }
 
 .pal-table .move-mini-name {

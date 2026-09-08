@@ -22,6 +22,7 @@ import { activeSkillTooltip, passiveSkillTooltip, workSuitabilityTooltip } from 
 import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
 import { PalRowComponent } from './pal-row.component';
 import { CellView, RowView, TableColumn } from './table-model';
+import { formatOwnedTime } from './owned-time';
 
 /** Sort weight of a location: party first, then the bases in order, the Pal Box, then dimensional storage. */
 export function locationRank(location: string): number {
@@ -204,6 +205,7 @@ export class AppComponent implements OnDestroy {
   isParsing = false;
   isDragging = false;
   isColumnMenuOpen = false;
+  columnSearch = '';
   isExportMenuOpen = false;
   isFullscreen = false;
   /** User-chosen table width in px (null = the stylesheet default). Resets on reload. */
@@ -943,7 +945,18 @@ export class AppComponent implements OnDestroy {
 
   toggleColumnMenu(): void {
     this.isColumnMenuOpen = !this.isColumnMenuOpen;
-    if (this.isColumnMenuOpen) this.isExportMenuOpen = false;
+    if (this.isColumnMenuOpen) {
+      this.isExportMenuOpen = false;
+      this.columnSearch = '';
+    }
+  }
+
+  get matchingColumns(): TableColumn[] {
+    const terms = this.columnSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    return terms.length ? this.columns.filter(column => {
+      const text = `${column.title} ${column.label} ${column.key}`.toLowerCase();
+      return terms.every(term => text.includes(term));
+    }) : this.columns;
   }
 
   toggleColumn(column: TableColumn): void {
@@ -1058,6 +1071,7 @@ export class AppComponent implements OnDestroy {
 
   cellDisplay(row: PalStorageRow, column: TableColumn): string {
     const value = this.cellValue(row, column.key);
+    if (column.key === 'owned_time') return formatOwnedTime(value);
     if (column.key === 'owner_name') return shortOwner(value);
     if (column.key === 'pal_variant') return this.isAlpha(row) ? 'A' : '';
     if (column.key === 'gender') return this.genderIcon(value);
@@ -1222,6 +1236,7 @@ export class AppComponent implements OnDestroy {
       key === 'paldeck_no' && 'paldeck-cell',
       key === 'nickname' && 'nickname-cell',
       key === 'owner_name' && 'owner-cell',
+      key === 'owned_time' && 'owned-time-cell',
       key === 'level' && 'level-cell',
       key === 'rank' && 'rank-cell',
       this.isIv(column) && 'iv-cell',

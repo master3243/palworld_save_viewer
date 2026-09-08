@@ -228,10 +228,14 @@
       </button>
 
       <div class="column-menu" *ngIf="isColumnMenuOpen">
-        <label *ngFor="let column of columns; trackBy: trackColumn">
-          <input type="checkbox" [checked]="column.visible" (change)="toggleColumn(column)">
-          <span>{{ column.title }}</span>
-        </label>
+        <input class="column-search" type="search" aria-label="Search columns" placeholder="Search columns…" [value]="columnSearch" (input)="columnSearch = $any($event.target).value">
+        <div class="column-options">
+          <label *ngFor="let column of matchingColumns; trackBy: trackColumn">
+            <input type="checkbox" [checked]="column.visible" (change)="toggleColumn(column)">
+            <span>{{ column.title }}</span>
+          </label>
+          <p class="column-empty" *ngIf="!matchingColumns.length" role="status">No matching columns.</p>
+        </div>
       </div>
     </div>
 

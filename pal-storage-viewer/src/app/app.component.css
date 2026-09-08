@@ -453,16 +453,35 @@
   border: 1px solid rgba(137, 221, 255, 0.34);
   border-radius: 8px;
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.44);
-  display: grid;
-  gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   max-height: min(58vh, 520px);
-  overflow: auto;
+  overflow: hidden;
   padding: 8px;
   position: absolute;
   right: 8px;
   top: calc(100% + 6px);
   width: 260px;
 }
+
+.column-search {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 30px;
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid rgba(137, 221, 255, 0.34);
+  border-radius: 5px;
+  background: #06141e;
+  color: #dff6ff;
+  font: inherit;
+  font-size: .8rem;
+}
+
+.column-search:focus { outline: 1px solid #42c8f5; }
+.column-options { min-height: 0; overflow: auto; }
+.column-empty { margin: 8px; color: #9bbdce; font-size: .8rem; }
 
 .column-menu label {
   align-items: center;

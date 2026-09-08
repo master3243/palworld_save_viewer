@@ -12,6 +12,7 @@ import { GenderIconComponent } from './gender-icon.component';
 import { OfflineImageService } from './offline-image.service';
 import { palImagePath } from './pal-image';
 import { PalStorageRow } from './save-parser.service';
+import { formatOwnedTime } from './owned-time';
 
 interface DetailField { key: string; label: string; value: string; rawValue?: string; }
 interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense' | 'crafting'; tone?: 'high' | 'perfect'; }
@@ -576,7 +577,7 @@ export class PalDetailCardComponent implements OnChanges {
         return {
           key,
           label: this.toLabel(key),
-          value: key === 'owned_time' ? this.formatDate(rawValue) : rawValue,
+          value: key === 'owned_time' ? formatOwnedTime(rawValue) : rawValue,
           rawValue: key === 'owned_time' ? rawValue : undefined
         };
       });
@@ -602,16 +603,6 @@ export class PalDetailCardComponent implements OnChanges {
     if (value && typeof value === 'object') return JSON.stringify(value);
     if (value === null || value === undefined) return '';
     return String(value).replace(/\s*;\s*/g, ', ');
-  }
-
-  private formatDate(value: string): string {
-    // Unreal DateTime values are 100-nanosecond ticks since 0001-01-01.
-    const numericValue = Number(value);
-    const date = /^-?\d+$/.test(value)
-      ? new Date(numericValue / 10_000 - 62_135_596_800_000)
-      : new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
   }
 
   private get wikiName(): string {
