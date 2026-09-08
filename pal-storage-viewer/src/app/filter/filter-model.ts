@@ -333,6 +333,7 @@ export const KNOWN_FIELDS: FilterField[] = [
   { key: 'attack_stat', label: 'Attack stat', group: 'Stats', kind: 'number', aliases: ['atk_stat', 'dmg', 'total_attack'], hint: 'Computed attack, passives included', get: (row) => number(row, 'attack') },
   { key: 'defense_stat', label: 'Defense stat', group: 'Stats', kind: 'number', aliases: ['def_stat', 'total_defense'], hint: 'Computed defense, passives included', get: (row) => number(row, 'defense') },
   { key: 'work_speed', label: 'Work speed', group: 'Stats', kind: 'number', aliases: ['ws', 'craft_speed', 'workspeed'], get: (row) => number(row, 'work_speed') },
+  { key: 'firepower', label: 'Expedition firepower', group: 'Stats', kind: 'number', aliases: ['expedition_firepower', 'expedition_power'], hint: '(floor(base HP / 5) + base attack + base defense) × (stars + 1)²', get: (row) => number(row, 'firepower') },
   { key: 'trust_rank', label: 'Trust rank', group: 'Stats', kind: 'number', aliases: ['trust_level', 'friendship_rank'], hint: '0 to 10', get: (row) => number(row, 'trust_rank') },
   { key: 'trust_pct', label: 'Trust progress %', group: 'Stats', kind: 'number', aliases: ['trust_progress'], hint: 'Progress through the current trust rank', get: (row) => number(row, 'trust_progress') },
   { key: 'exp_next', label: 'Exp to next level', group: 'Stats', kind: 'number', aliases: ['exp_to_next', 'next_exp'], hint: '0 at max level', get: (row) => number(row, 'exp_to_next') },

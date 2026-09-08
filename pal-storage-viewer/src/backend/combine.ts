@@ -414,6 +414,7 @@ export function flattenRecord(item: PalRecord): Row {
     attack: item.derived.attack,
     defense: item.derived.defense,
     work_speed: item.derived.work_speed,
+    firepower: item.derived.firepower,
     max_hp_base: item.derived.max_hp_base,
     attack_base: item.derived.attack_base,
     defense_base: item.derived.defense_base,

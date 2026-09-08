@@ -463,6 +463,7 @@ export class AppComponent implements OnDestroy {
 
   private readonly preferredColumnOrder = [
     ...this.defaultVisibleColumns,
+    'firepower',
     'storage_slot',
     'location_detail',
     'save',
@@ -1107,7 +1108,7 @@ export class AppComponent implements OnDestroy {
   }
 
   isStat(column: TableColumn): boolean {
-    return column.key === 'max_hp' || column.key === 'attack' || column.key === 'defense' || column.key === 'work_speed';
+    return column.key === 'max_hp' || column.key === 'attack' || column.key === 'defense' || column.key === 'work_speed' || column.key === 'firepower';
   }
 
   /** Equipped active skills as mini chips: name plus the element tab with icon and power. */
@@ -1230,6 +1231,7 @@ export class AppComponent implements OnDestroy {
       key === 'combat_moves' && 'moves-cell',
       this.isStat(column) && 'stat-cell',
       key === 'work_speed' && 'speed-cell',
+      key === 'firepower' && 'firepower-cell',
       this.isSlotNumber(column) && 'slot-cell',
       this.isWhere(column) && 'where-cell',
       this.isSaveLetter(column) && 'save-cell',
@@ -1299,6 +1301,7 @@ export class AppComponent implements OnDestroy {
     if (key === 'attack') return 'ATK';
     if (key === 'defense') return 'DEF';
     if (key === 'work_speed') return 'SPD';
+    if (key === 'firepower') return 'Firepower';
     if (key === 'combat_moves') return 'Equipped Active Skills';
     if (key === 'iv_hp') return 'IV H';
     if (key === 'iv_attack') return 'IV A';
@@ -1314,6 +1317,7 @@ export class AppComponent implements OnDestroy {
     if (key === 'attack') return 'Attack';
     if (key === 'defense') return 'Defense';
     if (key === 'work_speed') return 'Work speed';
+    if (key === 'firepower') return 'Expedition firepower';
     if (key === 'skills') return 'Passive Skills';
     if (key === 'combat_moves') return 'Equipped Active Skills';
     if (key === 'paldeck_no') return 'Paldeck No.';

@@ -508,6 +508,13 @@ table.pal-table {
   width: 58px;
 }
 
+.pal-table th.stat-cell.firepower-cell,
+.pal-table td.stat-cell.firepower-cell {
+  max-width: 82px;
+  min-width: 82px;
+  width: 82px;
+}
+
 .pal-table th.stat-cell.speed-cell,
 .pal-table td.stat-cell.speed-cell {
   max-width: 46px;

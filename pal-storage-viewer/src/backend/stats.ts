@@ -33,6 +33,7 @@ export interface DerivedStats {
   attack: number | null;
   defense: number | null;
   work_speed: number | null;
+  firepower: number | null;
   /** After trust, condensing and souls, before passives and food: what the game shows left of the arrow. */
   max_hp_base: number | null;
   attack_base: number | null;
@@ -78,7 +79,7 @@ export interface DerivedStats {
 }
 
 const EMPTY: DerivedStats = {
-  max_hp: null, attack: null, defense: null, work_speed: null,
+  max_hp: null, attack: null, defense: null, work_speed: null, firepower: null,
   max_hp_base: null, attack_base: null, defense_base: null,
   trust_hp: null, trust_attack: null, trust_defense: null,
   passive_hp_pct: 0, passive_attack_pct: 0, passive_defense_pct: 0, passive_work_speed_pct: 0,
@@ -211,6 +212,8 @@ export function deriveStats(input: StatInputs, lookups: Lookups): DerivedStats {
     out.max_hp_base = hpBase;
     out.attack_base = attackBase;
     out.defense_base = defenseBase;
+    // https://paldb.cc/en/Firepower - floor HP/5 before applying the squared rank.
+    out.firepower = (Math.floor(hpBase / 5) + attackBase + defenseBase) * (stars + 1) ** 2;
     // Raw pieces of each stat: flat amount, species × level, what the IV adds, and what trust adds.
     const parts = (flat: number, scale: number, rate: number, factor: number, value: number | null, rawStat: (scale: number) => number) => {
       const species = Math.floor(scale * factor * level);

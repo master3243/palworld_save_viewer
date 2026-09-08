@@ -19,7 +19,7 @@ interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defen
 
 interface PassiveSkill { name: string; rank: string; color: string; rankMarker: string; rankIcon: string; tooltip: TooltipData; }
 interface VitalBar { label: string; icon: string; value: string; percent: number; title: string; tone: string; tooltip: TooltipData | null; }
-interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting'; delta: number; tooltip: TooltipData; }
+interface CombatStat { label: string; value: string; icon: 'attack' | 'defense' | 'crafting' | 'firepower'; delta: number; tooltip: TooltipData; }
 interface ActiveSkillChip { name: string; elementIndex: number; iconSrc: string; power: string; tooltip: TooltipData; }
 interface PartnerSkill { name: string; level: string; segments: TextSegment[]; tooltip: TooltipData; }
 interface FoodEffect { name: string; effects: string; timeLeft: string; }
@@ -61,7 +61,7 @@ export class PalDetailCardComponent implements OnChanges {
     'soul_rank_defense', 'soul_rank_craft_speed', 'skills', 'skill_ranks', 'skill_colors',
     'passive_skill_ids', 'combat_moves', 'active_skill_ids', 'location', 'location_detail', 'save_id',
     'full_stomach', 'sanity', 'friendship_points', 'exp',
-    'max_hp', 'attack', 'defense', 'work_speed', 'max_hp_base', 'attack_base', 'defense_base',
+    'max_hp', 'attack', 'defense', 'work_speed', 'firepower', 'max_hp_base', 'attack_base', 'defense_base',
     'passive_hp_pct', 'passive_attack_pct', 'passive_defense_pct', 'passive_work_speed_pct', 'hunger_max',
     'trust_rank', 'trust_progress', 'trust_next', 'exp_to_next', 'exp_progress',
     'partner_skill', 'partner_skill_level', 'partner_skill_text', 'partner_skill_levels', 'stat_parts', 'work_species',
@@ -213,6 +213,24 @@ export class PalDetailCardComponent implements OnChanges {
       stats.push({ label: 'Work Speed', value: String(workSpeed), icon: 'crafting', delta: Math.sign(pct + foodPct), tooltip: {
         title: 'Work Speed', titleRight: base !== workSpeed ? `${base} ≫ ${workSpeed}` : String(workSpeed),
         intro: ["Pal's Work Speed.", 'Affects the efficiency of working on various tasks at base.'], rows,
+      } });
+    }
+    const firepower = this.numberFor('firepower');
+    const hp = this.numberFor('max_hp_base');
+    const attack = this.numberFor('attack_base');
+    const defense = this.numberFor('defense_base');
+    if (firepower !== null && hp !== null && attack !== null && defense !== null) {
+      stats.push({ label: 'Firepower', value: String(firepower), icon: 'firepower', delta: 0, tooltip: {
+        title: 'Expedition Firepower', titleRight: String(firepower),
+        intro: ['Strength contributed when dispatched on an expedition.'],
+        rows: [
+          [`Base HP ${hp} ÷ 5 (rounded down)`, String(Math.floor(hp / 5))],
+          ['Base Attack', String(attack)],
+          ['Base Defense', String(defense)],
+          [`Condensing (${this.displayRank} stars + 1)²`, `×${(this.displayRank + 1) ** 2}`],
+          ['Total', String(firepower)],
+        ],
+        wikiUrl: 'https://paldb.cc/en/Firepower',
       } });
     }
     return stats;
@@ -439,6 +457,7 @@ export class PalDetailCardComponent implements OnChanges {
   statIconUrl(icon: PalStat['icon'] | CombatStat['icon']): string {
     const drawn: Record<string, string> = {
       hp: "M12 21.5S2.5 15.5 2.5 8.8C2.5 5.6 5 3.5 7.6 3.5c1.9 0 3.4 1 4.4 2.4 1-1.4 2.5-2.4 4.4-2.4 2.6 0 5.1 2.1 5.1 5.3 0 6.7-9.5 12.7-9.5 12.7z",
+      firepower: "M3 2h4l11 13 2-2 2 2-3 3 3 3-1 1-3-3-3 3-2-2 2-2L3 6zM21 2v4l-7 6-2-2 5-8zM10 14l2 2-3 2 2 2-2 2-3-3-3 3-1-1 3-3-3-3 2-2 2 2z",
       attack: "M12.0 1.0 L14.6 5.7 L19.8 4.2 L18.3 9.4 L23.0 12.0 L18.3 14.6 L19.8 19.8 L14.6 18.3 L12.0 23.0 L9.4 18.3 L4.2 19.8 L5.7 14.6 L1.0 12.0 L5.7 9.4 L4.2 4.2 L9.4 5.7zM9.6 9.6h4.8v4.8H9.6z",
     };
     const asset = { defense: 'IVD', crafting: 'IVW' }[icon as string];
