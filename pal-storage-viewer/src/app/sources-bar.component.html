@@ -43,12 +43,14 @@
           class="source-chip"
           [attr.data-kind]="item.source.kind"
           [class.muted]="!item.source.pals && item.source.kind !== 'player' && item.source.kind !== 'level_meta'"
-          [title]="item.source.file + ' · ' + sourceTitle(item.source)"
+          [title]="item.source.file + ' · ' + sourceTitle(item.source, group.set)"
         >
           <span class="source-kind" [attr.data-kind]="item.source.kind" [title]="kindTitle(item.source.kind)">{{ sourceKindTag(item.source) }}</span>
           <span class="source-name">{{ shortFileName(item.source.file) }}</span>
-          <span class="source-blurb">{{ kindBlurb(item.source.kind) }}</span>
-          <span class="source-count" *ngIf="item.source.pals">{{ item.source.pals | number }}</span>
+          <span
+            [class.source-count]="item.source.kind === 'level' || item.source.kind === 'dimensional_storage'"
+            [class.source-blurb]="item.source.kind !== 'level' && item.source.kind !== 'dimensional_storage'"
+          >{{ sourceBlurb(item.source, group.set) }}</span>
           <button
             class="source-remove"
             type="button"

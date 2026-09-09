@@ -2,7 +2,7 @@
  * Labels for save files and their kinds, shared by the sources bar, the load
  * confirmation and the page.
  */
-import type { SaveSource } from './save-parser.service';
+import type { SaveSetSummary, SaveSource } from './save-parser.service';
 
 /** Short tag for a file kind, used on every chip. */
 export function kindTag(kind: string): string {
@@ -56,13 +56,41 @@ export function savedAtLabel(value: string | undefined): string {
   return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
+export function sourcePlayer(source: SaveSource, set: SaveSetSummary | null) {
+  return set?.players.find(player => player.uid === source.player_uid);
+}
+
+export function sourcePlayerName(source: SaveSource, set: SaveSetSummary | null): string {
+  return sourcePlayer(source, set)?.name || (source.player_uid
+    ? `Player …${source.player_uid.replace(/-/g, '').slice(-4)}`
+    : 'Unknown player');
+}
+
+/** Details from this loaded file, rather than a generic description of its kind. */
+export function sourceBlurb(source: SaveSource, set: SaveSetSummary | null): string {
+  switch (source.kind) {
+    case 'level_meta': return [source.world_name || 'Unknown world',
+      source.in_game_day != null ? `day ${source.in_game_day}` : ''].filter(Boolean).join(' - ');
+    case 'player': return sourcePlayerName(source, set);
+    case 'level':
+    case 'dimensional_storage': return `${source.pals.toLocaleString()} Pals`;
+    default: return kindBlurb(source.kind);
+  }
+}
+
 /** Tooltip for a loaded file: what it is and what it contributed. */
-export function sourceTitle(source: SaveSource): string {
-  const parts = [source.kind_label];
+export function sourceTitle(source: SaveSource, set: SaveSetSummary | null = null, progress: number | null = null): string {
+  const parts = [source.kind === 'level' ? 'World' : source.kind_label];
   if (source.set) parts.push(`folder: ${source.set}`);
   if (source.world_name) parts.push(`world: ${source.world_name}`);
-  if (source.players) parts.push(`${source.players} player${source.players === 1 ? '' : 's'}`);
-  if (source.bases) parts.push(`${source.bases} base${source.bases === 1 ? '' : 's'}`);
+  if (source.kind === 'level_meta' && source.in_game_day != null) parts.push(`day ${source.in_game_day}`);
+  if (source.kind === 'player') {
+    parts.push(`player: ${sourcePlayerName(source, set)}`);
+    parts.push(progress !== null ? `${progress}% progress` : 'progress unavailable');
+  }
+  if (source.kind === 'level' || source.kind === 'dimensional_storage') parts.push(`${source.pals.toLocaleString()} pals`);
+  if (source.players != null) parts.push(`${source.players} player${source.players === 1 ? '' : 's'}`);
+  if (source.bases != null) parts.push(`${source.bases} base${source.bases === 1 ? '' : 's'}`);
   if (source.skipped?.wild_or_npc) parts.push(`${source.skipped.wild_or_npc} wild/NPC skipped`);
   if (source.note) parts.push(source.note);
   return parts.join(' · ');

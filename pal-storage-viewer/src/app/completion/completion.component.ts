@@ -5,6 +5,7 @@ import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
 import { Category, CompletionData, CompletionSummary, TrackedItem, WorldProgress, summarize } from './completion-model';
 import { TrackerMapComponent } from './tracker-map.component';
 import { objectiveKey } from './tracker-map-model';
+import { loadCompletionData } from './completion-data';
 
 interface PlayerOption {
   key: string;
@@ -44,8 +45,6 @@ export class CompletionComponent implements OnChanges {
   @ViewChild(TrackerMapComponent) trackerMap?: TrackerMapComponent;
   mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
-
-  private static dataPromise?: Promise<CompletionData>;
 
   constructor(private readonly changeDetector: ChangeDetectorRef) {
     void this.loadData();
@@ -176,15 +175,9 @@ export class CompletionComponent implements OnChanges {
   }
 
   private async loadData(): Promise<void> {
-    CompletionComponent.dataPromise ??= (async () => {
-      const response = await fetch(new URL('resources/completion/completion-data.json', document.baseURI));
-      if (!response.ok) throw new Error(`Could not load the completion data (${response.status}).`);
-      return await response.json() as CompletionData;
-    })();
     try {
-      this.data = await CompletionComponent.dataPromise;
+      this.data = await loadCompletionData();
     } catch (error) {
-      CompletionComponent.dataPromise = undefined;
       this.loadError = error instanceof Error ? error.message : 'Could not load the completion data.';
     }
     this.recompute();
