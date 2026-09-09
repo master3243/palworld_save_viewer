@@ -74,6 +74,34 @@
   margin: 12px 0;
 }
 
+.faq-platform {
+  align-items: center;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 34px minmax(0, 1fr);
+}
+
+.faq-platform-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.platform-icon {
+  background: rgba(55, 154, 235, 0.16);
+  border: 1px solid rgba(138, 203, 255, 0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(92, 180, 255, 0.2), inset 0 0 8px rgba(92, 180, 255, 0.08);
+  color: #b3e1ff;
+  fill: none;
+  height: 34px;
+  padding: 3px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+  width: 34px;
+}
+
 .faq-body ul {
   margin: 0 0 6px;
   padding-left: 18px;
