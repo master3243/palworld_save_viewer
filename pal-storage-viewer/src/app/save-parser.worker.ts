@@ -6,8 +6,9 @@
  * removing one file does not re-parse the others.
  */
 import {
-  CombineEntry, CombinedSaves, Lookups, ParsedFile, combineSaves, decodeSave, palCount, parseSaveFile
+  CombineEntry, CombinedSaves, Lookups, ParsedFile, combineSaves, decodeSave, parseSaveFile
 } from '../backend';
+import { previewSave, type SavePreview } from '../backend/save-preview';
 
 export interface WorkerFile {
   file: File;
@@ -60,8 +61,7 @@ export interface CountMessage {
   type: 'count';
   id: number;
   index: number;
-  kind: string;
-  pals: number | null;
+  preview: SavePreview;
 }
 
 export interface CountDoneMessage {
@@ -187,8 +187,7 @@ async function handleCount(request: CountRequest): Promise<void> {
       type: 'count',
       id: request.id,
       index,
-      kind: 'error' in parsed ? 'unknown' : parsed.kind,
-      pals: 'error' in parsed ? null : palCount(parsed),
+      preview: previewSave(parsed),
     });
   }
   post({ type: 'count-done', id: request.id });
@@ -219,4 +218,3 @@ async function loadText(relativeUrl: string): Promise<string> {
   if (!response.ok) throw new Error(`Could not load ${relativeUrl} (${response.status}).`);
   return response.text();
 }
-

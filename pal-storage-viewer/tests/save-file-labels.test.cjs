@@ -22,10 +22,11 @@ test('player names resolve within their own world even when UIDs are shared', ()
   const second = { players: [{ uid: file.player_uid, name: 'Diavolo' }] };
   assert.equal(sourceBlurb(file, first), 'Church');
   assert.equal(sourceBlurb(file, second), 'Diavolo');
-  assert.equal(sourceBlurb(file, null), 'Player …0001');
+  assert.equal(sourceBlurb(file, null), '');
   assert.match(sourceTitle(file, first, 42.7), /player: Church · 42.7% progress/);
   assert.match(sourceTitle(file, second, 0), /player: Diavolo · 0% progress/);
   assert.match(sourceTitle(file, null), /progress unavailable/);
+  assert.doesNotMatch(sourceTitle(file, null), /player:|Unknown player|Player …/);
 });
 
 test('world and DPS chips show Pal counts, including empty files, without redundant world filenames', () => {

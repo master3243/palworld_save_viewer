@@ -48,9 +48,10 @@
           <span class="source-kind" [attr.data-kind]="item.source.kind" [title]="kindTitle(item.source.kind)">{{ sourceKindTag(item.source) }}</span>
           <span class="source-name">{{ shortFileName(item.source.file) }}</span>
           <span
+            *ngIf="sourceBlurb(item.source, group.set) as blurb"
             [class.source-count]="item.source.kind === 'level' || item.source.kind === 'dimensional_storage'"
             [class.source-blurb]="item.source.kind !== 'level' && item.source.kind !== 'dimensional_storage'"
-          >{{ sourceBlurb(item.source, group.set) }}</span>
+          >{{ blurb }}</span>
           <button
             class="source-remove"
             type="button"

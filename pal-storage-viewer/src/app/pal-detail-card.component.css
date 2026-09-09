@@ -79,6 +79,8 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .profile-body { display: grid; gap: 24px; grid-template-columns: 150px 1fr; padding: 24px 8px 18px; }
 .portrait { align-items: center; border-right: 1px solid rgba(145, 227, 255, .18); display: flex; flex-direction: column; justify-content: center; padding-right: 24px; }
 .portrait-ring { align-items: center; background: radial-gradient(circle at 35% 28%, #8eeeff, #267b9c 55%, #102a42 57%); border: 3px solid #b4f2ff; border-radius: 50%; box-shadow: 0 0 0 5px rgba(65, 196, 230, .16), 0 8px 26px rgba(0,0,0,.5); display: flex; height: 92px; justify-content: center; overflow: hidden; width: 92px; }
+/* Explicitly clip the filtered image in Safari; keep the ring's glow outside the clip. */
+.portrait-clip { align-items: center; border-radius: 50%; clip-path: circle(50%); display: flex; flex: 0 0 100%; height: 100%; justify-content: center; overflow: hidden; width: 100%; }
 .portrait-ring img { filter: drop-shadow(0 5px 5px rgba(0,0,0,.35)); height: 112%; object-fit: contain; width: 112%; }
 .portrait-ring span { color: white; font-size: 2rem; font-weight: 900; text-shadow: 0 2px 8px #06364c; }
 .portrait small { color: #76bed2; font-size: .6rem; margin-top: 12px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

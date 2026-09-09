@@ -61,9 +61,7 @@ export function sourcePlayer(source: SaveSource, set: SaveSetSummary | null) {
 }
 
 export function sourcePlayerName(source: SaveSource, set: SaveSetSummary | null): string {
-  return sourcePlayer(source, set)?.name || (source.player_uid
-    ? `Player …${source.player_uid.replace(/-/g, '').slice(-4)}`
-    : 'Unknown player');
+  return sourcePlayer(source, set)?.name || '';
 }
 
 /** Details from this loaded file, rather than a generic description of its kind. */
@@ -85,7 +83,8 @@ export function sourceTitle(source: SaveSource, set: SaveSetSummary | null = nul
   if (source.world_name) parts.push(`world: ${source.world_name}`);
   if (source.kind === 'level_meta' && source.in_game_day != null) parts.push(`day ${source.in_game_day}`);
   if (source.kind === 'player') {
-    parts.push(`player: ${sourcePlayerName(source, set)}`);
+    const name = sourcePlayerName(source, set);
+    if (name) parts.push(`player: ${name}`);
     parts.push(progress !== null ? `${progress}% progress` : 'progress unavailable');
   }
   if (source.kind === 'level' || source.kind === 'dimensional_storage') parts.push(`${source.pals.toLocaleString()} pals`);

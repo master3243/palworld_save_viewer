@@ -631,12 +631,14 @@ export class AppComponent implements OnDestroy {
     this.rebuildPendingFolders();
     this.pendingAppend = this.pendingFiles && this.pendingAppend ? true : append;
     this.pendingIgnored += inputs.length - candidates.length;
-    // Preview counts arrive one file at a time while the user reads the list.
-    void this.parser.countPals(added.map((file) => file.input), (index, kind, pals) => {
+    // Preview details arrive one file at a time while the user reads the list.
+    void this.parser.previewFiles(added.map((file) => file.input), (index, preview) => {
       const file = added[index];
-      if (!file) return;
-      file.pals = pals;
-      if (kind !== 'unknown') file.kind = kind;
+      if (!file || !this.pendingFiles?.includes(file)) return;
+      file.preview = preview;
+      file.pals = preview.pals;
+      if (preview.kind !== 'unknown') file.kind = preview.kind;
+      this.rebuildPendingFolders();
       this.changeDetector.markForCheck();
     });
   }

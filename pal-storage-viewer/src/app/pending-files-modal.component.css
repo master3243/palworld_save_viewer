@@ -52,9 +52,36 @@
   padding: 3px 0;
 }
 
-.confirm-file-name {
+.confirm-file-info {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.confirm-file-name {
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.confirm-file-detail {
+  color: rgba(200, 236, 255, 0.7);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.confirm-file-detail.failed {
+  color: #ffb3ba;
+}
+
+.confirm-file-owner {
+  font-size: 0.8rem;
+  max-width: 35%;
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -63,6 +90,7 @@
   color: rgba(200, 236, 255, 0.7);
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .confirm-note {
@@ -76,8 +104,9 @@
   color: #9df0c0;
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
-  min-width: 64px;
+  flex-shrink: 0;
   text-align: right;
+  white-space: nowrap;
 }
 
 .confirm-file-pals.pending {

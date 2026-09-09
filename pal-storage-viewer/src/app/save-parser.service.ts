@@ -7,6 +7,7 @@ import type { SaveInput } from '../backend/wgs';
 
 export type { CombinedSaves, PlayerCompletion, SaveSetSummary, SaveSource } from '../backend';
 import type { CombinedSaves } from '../backend';
+import type { SavePreview } from '../backend/save-preview';
 
 /** Files in a save folder that never contain pals; skipped before decoding. */
 const IGNORED_FILE_NAMES = new Set(['localdata.sav', 'worldoption.sav']);
@@ -22,7 +23,7 @@ type WorkerResponse =
   | { type: 'progress'; id: number; fraction: number | null; label: string; detail: string }
   | { type: 'result'; id: number; data: CombinedSaves }
   | { type: 'error'; id: number; message: string }
-  | { type: 'count'; id: number; index: number; kind: string; pals: number | null }
+  | { type: 'count'; id: number; index: number; preview: SavePreview }
   | { type: 'count-done'; id: number };
 
 @Injectable({ providedIn: 'root' })
@@ -35,15 +36,15 @@ export class SaveParserService {
     onProgress?: (progress: ParseProgress) => void;
   }>();
   private readonly pendingCounts = new Map<number, {
-    onEach: (index: number, kind: string, pals: number | null) => void;
+    onEach: (index: number, preview: SavePreview) => void;
     resolve: () => void;
   }>();
 
   /**
-   * Preview how many pals each file holds. Runs in the worker (decompress + byte
-   * scan, about a tenth of the full parse) and reports per file as it goes.
+   * Parse and cache files in the worker, reporting basic details as each finishes.
+   * Loading the confirmed selection reuses these parsed files.
    */
-  countPals(inputs: SaveInput[], onEach: (index: number, kind: string, pals: number | null) => void): Promise<void> {
+  previewFiles(inputs: SaveInput[], onEach: (index: number, preview: SavePreview) => void): Promise<void> {
     if (!inputs.length) return Promise.resolve();
     const worker = this.getWorker();
     const id = this.nextRequestId++;
@@ -133,7 +134,7 @@ export class SaveParserService {
         const counting = this.pendingCounts.get(message.id);
         if (!counting) return;
         if (message.type === 'count') {
-          counting.onEach(message.index, message.kind, message.pals);
+          counting.onEach(message.index, message.preview);
         } else {
           this.pendingCounts.delete(message.id);
           counting.resolve();

@@ -125,13 +125,15 @@
     <div class="profile-body">
       <div class="portrait" aria-hidden="true">
         <div class="portrait-ring">
-          <img
-            *ngIf="palImageSrc && !palImageFailed; else portraitFallback"
-            [src]="palImageSrc"
-            [alt]="name"
-            (error)="palImageFailed = true"
-          >
-          <ng-template #portraitFallback><span>{{ initials }}</span></ng-template>
+          <div class="portrait-clip">
+            <img
+              *ngIf="palImageSrc && !palImageFailed; else portraitFallback"
+              [src]="palImageSrc"
+              [alt]="name"
+              (error)="palImageFailed = true"
+            >
+            <ng-template #portraitFallback><span>{{ initials }}</span></ng-template>
+          </div>
         </div>
         <small>{{ valueFor('species_id') }}</small>
         <div class="food-gauge" *ngIf="foodGauge.length" [title]="'Appetite: eats ' + valueFor('food_amount') + ' of 10'">
