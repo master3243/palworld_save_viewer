@@ -12,7 +12,6 @@
         <span class="sources-summary">{{ summary }}</span>
       </button>
       <button class="add-source-button" type="button" (click)="addFiles.emit()">+ Files</button>
-      <button class="add-source-button" type="button" (click)="addFolder.emit($event)">+ Folder</button>
     </div>
     <span #locationSummary class="location-summary" [class.hidden]="!locationsFit" [attr.aria-hidden]="!locationsFit">
       <span *ngFor="let item of locationCounts" class="location-pill" [attr.data-location]="item.location">

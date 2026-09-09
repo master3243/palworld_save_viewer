@@ -29,6 +29,11 @@
                 "input": "../resources",
                 "ignore": ["*.png"],
                 "output": "/resources"
+              },
+              {
+                "glob": "upload_*.png",
+                "input": "../resources",
+                "output": "/resources"
               }
             ],
             "styles": ["src/styles.css", "src/app/pal-table.css"]

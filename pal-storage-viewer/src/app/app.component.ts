@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { hasMultipleOwners, shortOwner } from './pal-owners';
 import { resolveWgsFiles } from '../backend/wgs';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnDestroy, ViewChild } from '@angular/core';
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
 import { CompletionComponent } from './completion/completion.component';
@@ -45,6 +45,12 @@ type ViewMode = 'pals' | 'tracker';
 
 const TRACKER_HASH = '#tracker';
 
+declare global {
+  interface Window {
+    SCREENSHOT_MODE?: boolean;
+  }
+}
+
 /** Share of the progress bar covered by decoding and parsing in the worker. */
 const PARSE_SHARE = 0.95;
 
@@ -68,9 +74,10 @@ interface DirectoryEntryLike {
 export class AppComponent implements OnDestroy {
   @ViewChild(FilterBarComponent) filterBar?: FilterBarComponent;
   @ViewChild('tableScroll') tableScroll?: ElementRef<HTMLElement>;
-  @ViewChild('folderInput') folderInput?: ElementRef<HTMLInputElement>;
   @ViewChild('addFilesInput') addFilesInput?: ElementRef<HTMLInputElement>;
   private detailResizeObserver?: ResizeObserver;
+  screenshotMode = Boolean(window.SCREENSHOT_MODE);
+  private screenshotModeTimer: number;
 
   @ViewChild('detailRow') set detailRow(ref: ElementRef<HTMLElement> | undefined) {
     this.detailResizeObserver?.disconnect();
@@ -88,6 +95,7 @@ export class AppComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.detailResizeObserver?.disconnect();
+    window.clearInterval(this.screenshotModeTimer);
   }
 
   originalRows: PalStorageRow[] = [];
@@ -175,10 +183,6 @@ export class AppComponent implements OnDestroy {
 
   toggleSources(): void {
     this.isSourcesOpen = !this.isSourcesOpen;
-  }
-
-  onDropzoneClick(event: Event): void {
-    if (this.isParsing) event.preventDefault();
   }
 
   /** Drop every file of one save at once. */
@@ -518,8 +522,21 @@ export class AppComponent implements OnDestroy {
     private readonly offlineImages: OfflineImageService,
     private readonly game8Lookup: Game8LookupService,
     private readonly gameData: GameDataService,
-    private readonly changeDetector: ChangeDetectorRef
+    private readonly changeDetector: ChangeDetectorRef,
+    private readonly zone: NgZone
   ) {
+    // Console assignments do not trigger Angular change detection. Poll outside
+    // Angular and re-enter only when the flag changes, so no reload is needed.
+    this.screenshotModeTimer = this.zone.runOutsideAngular(() => window.setInterval(() => {
+      const enabled = Boolean(window.SCREENSHOT_MODE);
+      if (enabled !== this.screenshotMode) {
+        this.zone.run(() => {
+          this.screenshotMode = enabled;
+          this.changeDetector.markForCheck();
+        });
+      }
+    }, 250));
+
     void this.gameData.load().then(() => {
       // Move chips need the skill table; rebuild the cached row views once it is here.
       this.rowViews = new WeakMap();
@@ -677,12 +694,6 @@ export class AppComponent implements OnDestroy {
     return 'unknown';
   }
 
-  openFolderPicker(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.folderInput?.nativeElement.click();
-  }
-
   openAddFilesPicker(): void {
     this.addFilesInput?.nativeElement.click();
   }
@@ -746,9 +757,6 @@ export class AppComponent implements OnDestroy {
   }
 
   startDemo(event: Event): void {
-    // The dropzone is a <label> wrapping the file input, so a bare click here
-    // would also pop the OS file picker. The file confirmation that follows
-    // offers Cancel, so no separate prompt is needed.
     event.preventDefault();
     event.stopPropagation();
     void this.loadDemoSave();

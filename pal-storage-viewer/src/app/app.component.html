@@ -1,5 +1,6 @@
 <main
   class="page"
+  [class.screenshot-mode]="screenshotMode"
   [class.compact]="hasData"
   [class.fullscreen]="hasData && isFullscreen"
   [class.dragging-over]="hasData && isDragging"
@@ -7,14 +8,6 @@
   (dragover)="onDragOver($event)"
   (dragleave)="onDragLeave($event)"
 >
-  <input
-    #folderInput
-    class="hidden-input"
-    type="file"
-    webkitdirectory
-    multiple
-    (change)="onFileInput($event)"
-  >
   <input
     #addFilesInput
     class="hidden-input"
@@ -57,20 +50,17 @@
     </div>
   </section>
 
-  <label
+  <section
     *ngIf="!hasData"
     class="dropzone"
     [class.dragging]="isDragging"
     [class.busy]="isParsing"
-    (click)="onDropzoneClick($event)"
+    aria-label="Drag and drop save files or folders"
     (drop)="onDrop($event)"
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
   >
-    <input type="file" accept=".sav,.gvas" multiple [disabled]="isParsing" (change)="onFileInput($event)">
-    <span class="drop-title" *ngIf="!isParsing">Drop save file/folder</span>
-    <span class="drop-subtitle" *ngIf="!isParsing && view === 'pals'">Level.sav / LevelMeta.sav / Player .sav / Player _dps.sav / Xbox wgs folder</span>
-    <span class="drop-subtitle" *ngIf="!isParsing && view === 'tracker'">100% Tracker: Players\xxx.sav file or Xbox wgs folder</span>
+    <span class="drop-title" *ngIf="!isParsing">Drag and drop save here</span>
 
     <span
       class="progress-block"
@@ -93,14 +83,6 @@
 
     <span class="drop-actions" *ngIf="!isParsing">
       <button
-        class="demo-button folder-button"
-        type="button"
-        (click)="openFolderPicker($event)"
-      >
-        <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2a1.5 1.5 0 0 1 1.06.44L11 6.7h8.5A1.5 1.5 0 0 1 21 8.2v9.3a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/></svg>
-        <span>Folder</span>
-      </button>
-      <button
         class="demo-button"
         type="button"
         (click)="startDemo($event)"
@@ -116,7 +98,37 @@
         (click)="toggleDropHelp($event)"
       >?</button>
     </span>
-  </label>
+  </section>
+
+  <section class="upload-guides" *ngIf="!hasData && !screenshotMode" aria-label="How to upload your save">
+    <figure class="upload-guide">
+      <figcaption>
+        <h2>Steam Players</h2>
+        <p><code>%LOCALAPPDATA%\Pal\Saved\SaveGames\</code> <code>IDprofile\IDworld\</code></p>
+        <p class="upload-drop-instruction">
+          <span>Drag:</span>
+          <code><svg class="upload-item-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9H3z"/></svg>Players</code>
+          <span>+</span>
+          <code><svg class="upload-item-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H5v18h14V8zM14 3v5h5M8 13h8M8 17h8"/></svg>Level.sav</code>
+          <span>+</span>
+          <code><svg class="upload-item-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H5v18h14V8zM14 3v5h5M8 13h8M8 17h8"/></svg>LevelMeta.sav</code>
+        </p>
+      </figcaption>
+      <img src="resources/upload_steam.png" width="1718" height="856" draggable="false" alt="Steam save folder with Players, Level.sav, and LevelMeta.sav selected and dragged into the upload area.">
+    </figure>
+    <figure class="upload-guide">
+      <figcaption>
+        <h2>Gamepass Players</h2>
+        <p><code>%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData</code></p>
+        <p class="upload-drop-instruction">
+          <span>Drag:</span>
+          <code><svg class="upload-item-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9H3z"/></svg>wgs</code>
+          <span>folder</span>
+        </p>
+      </figcaption>
+      <img src="resources/upload_gamepass.png" width="1720" height="801" draggable="false" alt="Gamepass SystemAppData folder with the wgs folder dragged into the upload area.">
+    </figure>
+  </section>
 
   <app-faq-modal *ngIf="isDropHelpOpen" (closed)="closeDropHelp()"></app-faq-modal>
 
@@ -163,7 +175,6 @@
       [open]="isSourcesOpen"
       (toggle)="toggleSources()"
       (addFiles)="openAddFilesPicker()"
-      (addFolder)="openFolderPicker($event)"
       (removeSource)="removeSource($event)"
       (removeGroup)="removeSaveGroup($event)"
     ></app-sources-bar>

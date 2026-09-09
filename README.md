@@ -22,27 +22,37 @@ Example of searching my save for Male Bellanoir with perfect IVs and Serenity (f
 
 Simply open the link, click the "demo" then "Load" buttons to load my personal save file. Now you'll see all the Pals I have with detailed stats and support for arbitrarily complex search filters (even across multiple save files).
 
-If you want to actually use it (not just a demo), drop your save file/folder to see all the Pals with their stats.
+To load your own save, drag and drop the items below into the upload area.
 
-For Steam users, the save folder is located at:
+---
+
+The save folder (for Steam users) is:
 
 ```
 %LOCALAPPDATA%\Pal\Saved\SaveGames\IDprofile\IDworld\
 ```
 
-Where `IDprofile` and `IDworld` are long random numbers. Inside it, `Level.sav` holds all Pal info (other than the dimensional storage), `Players\xxx_dps.sav` is the dimensional storage Pals, and `Players\xxx.sav` tiny metadata mapping container to either the player's party or Pal Box (mostly can be inferred and not needed).
+Where `IDprofile` and `IDworld` are long random numbers.
 
-For best results, drop these three items: the "Level.sav" file, "LevelMeta.sav" file, and the "Players" folder (contains 2 files).
+Inside it, drag and drop these three: `Players` + `Level.sav` + `LevelMeta.sav`
 
-For PC Xbox Game Pass, drop the whole `wgs` folder:
+<img src="resources/upload_steam.png" alt="Steam: drag the Players folder, Level.sav, and LevelMeta.sav into the upload area" width="500" />
+
+---
+
+The save folder (for Gamepass users) is:
 
 ```
-%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs
+%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData
 ```
 
-It can contain multiple worlds and account folders. The viewer recovers each world and lets you pick which you want load (or possibly load all).
+Inside it, drag and drop: `wgs`
 
-<img src="resources/paste.png" alt="Example of files to drop" width="500" />
+<img src="resources/upload_gamepass.png" alt="Gamepass: drag the wgs folder into the upload area" width="500" />
+
+---
+
+You can also upload multiple worlds and the viewer will properly combine them while separating the pals and progress by player name.
 
 ## Can you fix X bug or implement Y feature?
 

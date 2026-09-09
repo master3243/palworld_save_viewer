@@ -55,7 +55,6 @@ export class SourcesBarComponent implements AfterViewInit, OnDestroy {
   @Input() open = false;
   @Output() readonly toggle = new EventEmitter<void>();
   @Output() readonly addFiles = new EventEmitter<void>();
-  @Output() readonly addFolder = new EventEmitter<Event>();
   @Output() readonly removeSource = new EventEmitter<number>();
   @Output() readonly removeGroup = new EventEmitter<SourceGroup>();
 

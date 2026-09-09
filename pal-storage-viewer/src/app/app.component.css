@@ -11,6 +11,23 @@
   position: relative;
 }
 
+.page:not(.compact) {
+  height: auto;
+  overflow: visible;
+}
+
+.page.screenshot-mode {
+  background: #350e14;
+}
+
+.screenshot-mode .dropzone {
+  background: #48151e;
+}
+
+.screenshot-mode .dropzone.dragging {
+  background: #63212c;
+}
+
 /* Narrow screens: give the table the width instead of the page margins. */
 @media (max-width: 1280px) {
   .page {
@@ -200,7 +217,7 @@
   border: 1px dashed rgba(123, 214, 255, 0.72);
   border-radius: 8px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 16px 36px rgba(0, 0, 0, 0.24);
-  cursor: pointer;
+  cursor: default;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -224,10 +241,94 @@
   padding-bottom: 24px;
 }
 
-.dropzone input {
-  inline-size: 1px;
-  opacity: 0;
-  position: absolute;
+.upload-guides {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 8px auto 24px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.upload-guide {
+  background: rgba(7, 17, 29, 0.72);
+  border: 1px solid rgba(123, 214, 255, 0.25);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  overflow: hidden;
+}
+
+.upload-guide figcaption {
+  flex: 1;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.upload-guide h2 {
+  color: #f7fcff;
+  font-size: 1.1rem;
+  margin: 0 0 6px;
+}
+
+.upload-guide p {
+  color: rgba(200, 236, 255, 0.82);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  gap: 8px;
+  justify-content: center;
+  line-height: 1.5;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.upload-guide .upload-drop-instruction {
+  align-items: center;
+  margin-top: 10px;
+}
+
+.upload-guide .upload-drop-instruction code {
+  align-items: center;
+  display: inline-flex;
+  gap: 5px;
+}
+
+.upload-item-icon {
+  fill: none;
+  flex: 0 0 13px;
+  height: 13px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  width: 13px;
+}
+
+.upload-guide img {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.upload-guide code {
+  background: rgba(55, 154, 235, 0.14);
+  border: 1px solid rgba(100, 185, 255, 0.28);
+  border-radius: 4px;
+  color: #8acbff;
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  max-width: 100%;
+  padding: 3px 6px;
+  vertical-align: middle;
+}
+
+@media (max-width: 900px) {
+  .upload-guides {
+    grid-template-columns: 1fr;
+    max-width: 592px;
+  }
 }
 
 .drop-title {
@@ -625,12 +726,6 @@
   pointer-events: none;
   position: absolute;
   z-index: 20;
-}
-
-.drop-subtitle {
-  color: rgba(200, 236, 255, 0.72);
-  font-size: 0.9rem;
-  margin-top: -6px;
 }
 
 /* Loading progress ---------------------------------------------------- */
