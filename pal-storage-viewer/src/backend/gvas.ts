@@ -36,8 +36,11 @@ export class SaveBuffer {
 
   /** Byte offset of `needle` (ASCII) at or after `start`, fully before `end`, else -1. */
   find(needle: string, start = 0, end = this.bytes.length): number {
-    const pos = this.text.indexOf(needle, start);
-    return pos === -1 || pos + needle.length > end ? -1 : pos;
+    start = Math.max(0, start);
+    end = Math.min(end, this.bytes.length);
+    if (start + needle.length > end) return -1;
+    const pos = this.text.slice(start, end).indexOf(needle);
+    return pos === -1 ? -1 : start + pos;
   }
 
   /** Count non-overlapping occurrences of an ASCII pattern. */
