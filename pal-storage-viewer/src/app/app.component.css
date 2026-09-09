@@ -258,6 +258,8 @@
   flex-direction: column;
   margin: 0;
   overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .upload-guide figcaption {
@@ -267,9 +269,30 @@
 }
 
 .upload-guide h2 {
+  align-items: center;
   color: #f7fcff;
+  display: flex;
   font-size: 1.1rem;
+  gap: 10px;
+  justify-content: center;
   margin: 0 0 6px;
+}
+
+.platform-icon {
+  background: rgba(55, 154, 235, 0.16);
+  border: 1px solid rgba(138, 203, 255, 0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(92, 180, 255, 0.2), inset 0 0 8px rgba(92, 180, 255, 0.08);
+  color: #b3e1ff;
+  fill: none;
+  flex: 0 0 34px;
+  height: 34px;
+  padding: 3px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+  width: 34px;
 }
 
 .upload-guide p {
@@ -282,6 +305,85 @@
   line-height: 1.5;
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.upload-guide .save-location {
+  align-items: center;
+  flex-wrap: nowrap;
+  font-size: 0.7rem;
+}
+
+.save-location-label {
+  flex-shrink: 0;
+}
+
+.save-location-paths {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.save-location-paths > code {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.save-path-placeholder {
+  cursor: help;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.save-path-hint {
+  max-width: 100%;
+  position: relative;
+}
+
+.save-path-placeholder:focus-visible {
+  outline: 2px solid #8acbff;
+  outline-offset: 2px;
+}
+
+.save-path-tooltip {
+  opacity: 0;
+  padding-top: 8px;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  top: 100%;
+  transition: opacity 120ms ease;
+  visibility: hidden;
+  width: 230px;
+  max-width: calc(100vw - 64px);
+  z-index: 10;
+}
+
+.save-path-tooltip-content {
+  background: #10283c;
+  border: 1px solid rgba(138, 203, 255, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  color: #d1e7f7;
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+
+.save-path-tooltip strong {
+  color: #8acbff;
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+}
+
+.save-path-hint:hover .save-path-tooltip,
+.save-path-hint:focus-within .save-path-tooltip {
+  opacity: 1;
+  visibility: visible;
 }
 
 .upload-guide .upload-drop-instruction {
