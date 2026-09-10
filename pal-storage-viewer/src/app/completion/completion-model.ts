@@ -3,6 +3,7 @@
  * progress. Pure functions, no Angular, so they can be checked under Node.
  */
 import type { PlayerCompletion } from '../../backend';
+import { QUEST_REWARDS, UNTRACKED_MAIN_QUESTS } from './mission-rules';
 
 /** Shape of resources/completion/completion-data.json (built by Paltest/db/build_completion_data.py). */
 export interface CompletionData {
@@ -225,15 +226,15 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
 }
 
 function technologyCategory(record: PlayerCompletion, data: CompletionData): Category {
-  const unlocked = new Set(record.technologies);
+  const unlocked = new Set(record.technologies.map(id => id.toLowerCase()));
   const items: TrackedItem[] = data.technologies.map(([id, name, level, ancient]) => ({
-    id, name, detail: '', state: unlocked.has(id) ? 'done' : 'todo', group: ancient ? 'ancient' : 'regular', coords: '', map: '', order: level, no: level,
+    id, name, detail: '', state: unlocked.has(id.toLowerCase()) ? 'done' : 'todo', group: ancient ? 'ancient' : 'regular', coords: '', map: '', order: level, no: level,
   }));
   const names = new Map([['regular', 'Technology'], ['ancient', 'Ancient technology']]);
-  const known = new Set(data.technologies.map(([id]) => id));
+  const known = new Set(data.technologies.map(([id]) => id.toLowerCase()));
   return finish({
     key: 'technologies', title: 'Technologies', items, groups: groupsOf(items, names),
-    unknown: record.technologies.filter((id) => !known.has(id)).sort(),
+    unknown: record.technologies.filter((id) => !known.has(id.toLowerCase())).sort(),
   }, 'Level');
 }
 
@@ -311,17 +312,23 @@ function noteCategory(record: PlayerCompletion, data: CompletionData): Category 
 }
 
 function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Main' | 'Sub'): Category {
-  const completed = new Set(record.quests_completed);
-  const active = new Map(record.quests_active.map((quest) => [quest.id, quest]));
+  const completed = new Set(record.quests_completed.map(id => id.toLowerCase()));
+  const active = new Map(record.quests_active.map((quest) => [quest.id.toLowerCase(), quest]));
+  const claimed = {
+    npc_achievements: new Set(record.npc_achievements.map(id => id.toLowerCase())),
+    pal_display: new Set(record.pal_display.map(id => id.toLowerCase())),
+  };
+  const quests = Object.entries(data.quests).filter(([id, [type, , disabled]]) =>
+    type === kind && !disabled && (kind !== 'Main' || !UNTRACKED_MAIN_QUESTS.has(id.toLowerCase())));
   const items: TrackedItem[] = [];
   // Several quests share a display name (the nine Pal Critic requests); add the part of
   // the id that tells them apart.
   const nameCounts = new Map<string, number>();
-  for (const [, [type, name, disabled]] of Object.entries(data.quests)) {
-    if (type === kind && !disabled) nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1);
+  for (const [, [, name]] of quests) {
+    nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1);
   }
-  for (const [id, [type, baseName, disabled, x, y]] of Object.entries(data.quests)) {
-    if (type !== kind || disabled) continue;
+  for (const [id, [, baseName, , x, y]] of quests) {
+    const key = id.toLowerCase();
     const areaMatch = /_([A-Z])_\d+$/.exec(id);
     const suffix = areaMatch ? `area ${areaMatch[1]}` : id.replace(/^(Main|Sub|Hidden)_/, '').replace(/_/g, ' ');
     const name = (nameCounts.get(baseName) ?? 0) > 1 ? `${baseName} (${suffix})` : baseName;
@@ -329,22 +336,30 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
     const critics = id.includes('PalDisplay') && data.palCritics.length ? `critics at ${data.palCritics.map(([cx, cy]) => `${cx}, ${cy}`).join(' · ')}` : '';
     let state: ItemState = 'todo';
     let detail = '';
-    if (completed.has(id)) {
+    if (completed.has(key)) {
       state = 'done';
-    } else if (active.has(id)) {
+    } else if (active.has(key)) {
       state = 'active';
-      const quest = active.get(id)!;
+      const quest = active.get(key)!;
       const counters = Object.entries(quest.counters).filter(([key]) => !key.startsWith('CanCompleteFlag'));
       const progress = counters.map(([key, value]) => `${key.replace(/^QuestBlock_DeliveryItem_/, '').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()} ${value}`);
       detail = ['in progress', quest.block > 0 ? `step ${quest.block + 1}` : '', ...progress].filter(Boolean).join(' · ');
     }
+    const rewards = QUEST_REWARDS.get(key);
+    if (rewards) {
+      const done = rewards.ids.filter(flag => claimed[rewards.field].has(flag)).length;
+      // A completed introductory/request quest does not prove all rewards were
+      // claimed. Count each finite series from its persistent stage flags.
+      state = done === rewards.ids.length ? 'done' : done > 0 || state !== 'todo' ? 'active' : 'todo';
+      detail = `${done} / ${rewards.ids.length} rewards claimed`;
+    }
     if (critics) detail = [detail, critics].filter(Boolean).join(' · ');
     items.push({ id, name, detail, state, group: '', ...place(x, y), order: 0, no: null });
   }
-  const known = new Set(Object.keys(data.quests));
+  const known = new Set(Object.keys(data.quests).map(id => id.toLowerCase()));
   const key = kind === 'Main' ? 'mainQuests' : 'sideQuests';
   return finish({
-    key, title: kind === 'Main' ? 'Main missions' : 'Side missions', items, groups: [], unknown: kind === 'Main' ? unknownIds(record.quests_completed, known) : [],
+    key, title: kind === 'Main' ? 'Main missions' : 'Side missions', items, groups: [], unknown: kind === 'Main' ? record.quests_completed.filter(id => !known.has(id.toLowerCase())).sort() : [],
   });
 }
 
