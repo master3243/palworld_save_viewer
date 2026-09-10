@@ -19,7 +19,7 @@ RAW = ROOT / "completion_sources" / "raw"
 OUT = ROOT / "resources" / "completion" / "maps"
 CUSTOM_ICONS = (
     "Paldeck", "Capture Bonus", "Raid Boss", "Statue of Power", "Technology",
-    "Ancient Technology", "Lab Research", "Main Mission", "Sub Mission", "Lifmunk Effigy",
+    "Ancient Technology", "Lab Research", "Main Mission", "Sub Mission", "Lifmunk Effigy", "Skins",
 )
 
 
