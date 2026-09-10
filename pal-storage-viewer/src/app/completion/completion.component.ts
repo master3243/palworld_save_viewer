@@ -107,7 +107,7 @@ export class CompletionComponent implements OnChanges {
       }
     }
     this.players = players;
-    if (!players.some((player) => player.key === this.selectedPlayer)) this.selectedPlayer = players[0]?.key ?? '';
+    if (!players.some((player) => player.key === this.selectedPlayer)) this.selectedPlayer = '';
     this.recompute();
   }
 
@@ -206,10 +206,15 @@ export class CompletionComponent implements OnChanges {
   }
 
   private recompute(): void {
-    const player = this.player;
     if (this.data) {
       for (const option of this.players) option.percent = summarize(option.completion, this.data, option.world).percent;
+      if (!this.player) {
+        const best = this.players.reduce<PlayerOption | null>((best, option) =>
+          !best || option.percent! > best.percent! ? option : best, null);
+        this.selectedPlayer = best?.key ?? '';
+      }
     }
+    const player = this.player;
     this.summary = player && this.data ? summarize(player.completion, this.data, player.world) : null;
     if (this.summary && !this.summary.categories.some((category) => category.key === this.selectedCategory)) this.selectedCategory = '';
   }
