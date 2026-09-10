@@ -107,7 +107,7 @@
             >
           </div>
         </div>
-        <div class="group-chips" [class.progress-groups]="open.key === 'research' || open.key === 'relics'" *ngIf="open.groups.length" role="group" aria-label="Type">
+        <div class="group-chips" [class.progress-groups]="open.key === 'research' || open.key === 'relics' || open.key === 'technologies' || open.key === 'fastTravel'" *ngIf="open.groups.length" role="group" aria-label="Type">
           <button
             *ngFor="let group of open.groups"
             type="button"
@@ -141,7 +141,10 @@
           <tbody>
             <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state" [class.uncounted]="item.counted === false">
               <td class="state-col" *ngIf="!isPalList"><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</td>
-              <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">{{ item.no }}<ng-container *ngIf="item.noMax !== undefined"> / {{ item.noMax }}</ng-container></td>
+              <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">
+                <span class="card-count" *ngIf="item.noMax !== undefined; else plainNumber">{{ item.no }}<span>/{{ item.noMax }}</span></span>
+                <ng-template #plainNumber>{{ item.no }}</ng-template>
+              </td>
               <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><span>{{ item.name }}</span></td>
