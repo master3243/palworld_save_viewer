@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
+require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText, filename);
 
 // Exercise the worker's actual message stream without downloading the decoder.
 function workerHarness() {
@@ -36,6 +39,7 @@ function workerHarness() {
     require: name => {
       if (name === '../backend') return backend;
       if (name === '../backend/save-preview') return {};
+      if (name === './save-file-labels') return require('../src/app/save-file-labels.ts');
       throw new Error(`Unexpected import: ${name}`);
     },
     self: {
@@ -77,7 +81,8 @@ test('batch progress stays monotonic while individual file stages and counts upd
   const worker = workerHarness();
   const files = [
     file('Level.sav', 800, 0), file('LevelMeta.sav', 10, 1),
-    file('0001.sav', 20, 2), file('0001_dps.sav', 170, 3),
+    file('00000000000000000000000000000001.sav', 20, 2),
+    file('00000000000000000000000000000001_dps.sav', 170, 3),
   ];
   await worker.run({ id: 1, files });
   const updates = assertMonotonic(worker.messages);
@@ -87,10 +92,10 @@ test('batch progress stays monotonic while individual file stages and counts upd
   }
   assert.ok(details.every(detail => !detail.startsWith('File ')));
   assert.ok(details.includes('Level.sav: Decompressing'));
-  assert.ok(details.includes('Level.sav: Reading Pals: 50 / 100 entries, 40 pals'));
+  assert.ok(details.includes('Level.sav: Reading Pals: 50 / 100'));
   assert.ok(details.includes('LevelMeta.sav: Reading world metadata'));
-  assert.ok(details.includes('0001.sav: Reading player progress'));
-  assert.ok(details.includes('0001_dps.sav: Reading Pals: 50 / 100'));
+  assert.ok(details.includes('00000000000…00000001.sav: Reading player progress'));
+  assert.ok(details.includes('00000000000…0001_dps.sav: Reading Pals: 50 / 100'));
   assert.ok(details.every(detail => !detail.includes('—')));
   const firstDone = updates.find(update => update.detail === 'Level.sav: Ready');
   assert.ok(Math.abs(firstDone.fraction - 0.8 * 0.95) < 1e-10);
@@ -99,10 +104,11 @@ test('batch progress stays monotonic while individual file stages and counts upd
 
   // A repeat batch can mix cached data with new files without resetting progress.
   worker.messages.length = 0;
-  await worker.run({ id: 2, files: [...files, file('other.sav', 100, 0)] });
+  await worker.run({ id: 2, files: [...files, file('My very long renamed world backup.sav', 100, 0)] });
   assertMonotonic(worker.messages);
   assert.equal(worker.parses(), 5);
   assert.ok(worker.messages.some(message => message.detail === 'Level.sav: Using cached data'));
+  assert.ok(worker.messages.some(message => message.detail === 'My very lon…d backup.sav: Reading Pals: 50 / 100'));
 });
 
 test('empty, unreadable and zero-size files finish their shares without invalid progress', async () => {

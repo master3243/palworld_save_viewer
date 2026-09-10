@@ -5,8 +5,21 @@ const ts = require('typescript');
 require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText, filename);
-const { sourceBlurb, sourceTitle } = require('../src/app/save-file-labels.ts');
+const { shortFileName, sourceBlurb, sourceTitle } = require('../src/app/save-file-labels.ts');
 const source = (kind, extra = {}) => ({ file: 'test.sav', set: 'world-a', kind, kind_label: kind, pals: 0, note: '', ...extra });
+
+test('all long filenames are shortened, including nonstandard IDs and renamed saves', () => {
+  for (const name of ['Level.sav', 'LevelMeta.sav', 'a'.repeat(20) + '.sav']) {
+    assert.equal(shortFileName(name), name);
+  }
+  for (const name of ['0'.repeat(31) + '1.sav', '0'.repeat(31) + '1_dps.sav', '0'.repeat(60) + '.sav', 'My very long renamed world backup.gvas', '0'.repeat(32) + '.gvas', 'a'.repeat(21) + '.sav']) {
+    const short = shortFileName(name);
+    assert.equal(short.length, 24);
+    assert.ok(short.includes('…'));
+    assert.ok(short.startsWith(name.slice(0, 11)));
+    assert.ok(short.endsWith(name.slice(-12)));
+  }
+});
 
 test('metadata labels use the day and world from that file, including day zero', () => {
   const meta = source('level_meta', { world_name: 'All Blue', in_game_day: 0 });

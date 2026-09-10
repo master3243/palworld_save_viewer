@@ -37,10 +37,9 @@ export function kindBlurb(kind: string): string {
   }
 }
 
-/** Long player-id file names read as "…0001_dps.sav"; the full name stays in the tooltip. */
+/** Cap filenames at 24 characters, preserving the beginning and ending. */
 export function shortFileName(name: string): string {
-  const match = /^([0-9a-f]{32})(_dps)?\.sav$/i.exec(name);
-  return match ? `…${match[1].slice(-4)}${match[2] ?? ''}.sav` : name;
+  return name.length > 24 ? `${name.slice(0, 11)}…${name.slice(-12)}` : name;
 }
 
 export function formatSize(bytes: number): string {

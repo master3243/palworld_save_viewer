@@ -9,6 +9,7 @@ import {
   CombineEntry, CombinedSaves, Lookups, ParsedFile, SaveKind, combineSaves, decodeSave, parseSaveFile
 } from '../backend';
 import { previewSave, type SavePreview } from '../backend/save-preview';
+import { shortFileName } from './save-file-labels';
 
 export interface WorkerFile {
   file: File;
@@ -153,17 +154,15 @@ async function handleParse(request: ParseRequest): Promise<void> {
   const entries: CombineEntry[] = [];
   for (const [index, entry] of files.entries()) {
     const key = fileKey(entry.set, entry.file);
+    const displayName = shortFileName(entry.name);
     const reportFile = (fraction: number, stage: string, counts = '') => {
       fileFractions[index] = Math.max(fileFractions[index], fraction);
-      report(`Loading saves · File ${index + 1} of ${files.length}`, `${entry.name}: ${stage}${counts ? `: ${counts}` : ''}`);
+      report(`Loading saves · File ${index + 1} of ${files.length}`, `${displayName}: ${stage}${counts ? `: ${counts}` : ''}`);
     };
     reportFile(0, parsedCache.has(key) ? 'Using cached data' : 'Decompressing');
-    const parsed = await parseInto(key, entry.file, (done, total, found, unit) => {
+    const parsed = await parseInto(key, entry.file, (done, total) => {
       const fraction = total > 0 ? Math.min(1, Math.max(0, done / total)) : 0;
-      const pals = `${found.toLocaleString()} pal${found === 1 ? '' : 's'}`;
-      const counts = unit === 'entries'
-        ? `${done.toLocaleString()} / ${total.toLocaleString()} entries, ${pals}`
-        : `${done.toLocaleString()} / ${total.toLocaleString()}`;
+      const counts = `${done.toLocaleString()} / ${total.toLocaleString()}`;
       reportFile(READ_SHARE + fraction * PARSE_SHARE, 'Reading Pals', counts);
     }, (kind) => {
       const stage = kind === 'level_meta' ? 'Reading world metadata'
