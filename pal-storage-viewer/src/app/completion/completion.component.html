@@ -128,7 +128,7 @@
         <table class="item-table" [class.pal-list]="isPalList" *ngIf="!open.needsFile">
           <thead>
             <tr>
-              <th class="state-col" *ngIf="!isPalList">Status</th>
+              <th class="state-col">Status</th>
               <th class="no-col" *ngIf="open.hasNumbers">{{ open.numberLabel }}</th>
               <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
@@ -139,11 +139,20 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state" [class.uncounted]="item.counted === false">
-              <td class="state-col" *ngIf="!isPalList"><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</td>
+            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : null">
+              <td class="state-col">
+                <span class="paldeck-status" *ngIf="isPalList; else standardStatus" [attr.data-state]="item.state"><span class="state-dot" [attr.data-state]="item.state" aria-hidden="true"></span>{{ item.state === 'done' ? 'Complete' : item.state === 'active' ? 'In progress' : 'Incomplete' }}</span>
+                <ng-template #standardStatus><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</ng-template>
+              </td>
               <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">
-                <span class="card-count" *ngIf="item.noMax !== undefined; else plainNumber">{{ item.no }}<span>/{{ item.noMax }}</span></span>
-                <ng-template #plainNumber>{{ item.no }}</ng-template>
+                <span class="paldeck-number" *ngIf="isPalList; else standardNumber">
+                  <span class="paldeck-number-label">No.</span>
+                  <span class="paldeck-number-digits"><span class="paldeck-number-zeroes">{{ item.no !== null && item.no < 10 ? '00' : item.no !== null && item.no < 100 ? '0' : '' }}</span>{{ item.no }}<small *ngIf="palNumberSuffix(item) | async as suffix">{{ suffix }}</small></span>
+                </span>
+                <ng-template #standardNumber>
+                  <span class="card-count" *ngIf="item.noMax !== undefined; else plainNumber">{{ item.no }}<span>/{{ item.noMax }}</span></span>
+                  <ng-template #plainNumber>{{ item.no }}</ng-template>
+                </ng-template>
               </td>
               <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
@@ -155,7 +164,7 @@
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="(isPalList ? 2 : 3) + (open.key === 'captureBonus' ? 1 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="3 + (open.key === 'captureBonus' ? 1 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
             </tr>
           </tbody>
         </table>

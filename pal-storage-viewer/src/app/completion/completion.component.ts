@@ -9,6 +9,7 @@ import { loadCompletionData } from './completion-data';
 import { TabDiscovery } from '../tab-discovery';
 import { workIcon } from '../trait-icons';
 import { OfflineImageService } from '../offline-image.service';
+import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
 
 interface PlayerOption {
@@ -49,12 +50,25 @@ export class CompletionComponent implements OnChanges {
   categoryIcons: Record<string, string> = {};
   private mapIcons: Record<string, string> = {};
   private readonly tabDiscovery = new TabDiscovery();
+  private readonly palNumberSuffixes = new Map<string, Promise<string>>();
   get isPalList(): boolean {
     return this.selectedCategory === 'paldeck' || this.selectedCategory === 'captureBonus';
   }
 
   palIcon(item: TrackedItem): Promise<string> {
     return this.images.load(palImagePath(item.id, item.id));
+  }
+
+  palNumberSuffix(item: TrackedItem): Promise<string> {
+    let suffix = this.palNumberSuffixes.get(item.id);
+    if (!suffix) {
+      suffix = this.palLookup.numberFor(item.name).then(number => {
+        const match = /^(\d+)([A-Za-z]*)$/.exec(number);
+        return match && Number(match[1]) === item.no ? match[2].toUpperCase() : '';
+      });
+      this.palNumberSuffixes.set(item.id, suffix);
+    }
+    return suffix;
   }
 
   get showMapPing(): boolean {
@@ -64,7 +78,7 @@ export class CompletionComponent implements OnChanges {
   mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
 
-  constructor(private readonly changeDetector: ChangeDetectorRef, private readonly images: OfflineImageService) {
+  constructor(private readonly changeDetector: ChangeDetectorRef, private readonly images: OfflineImageService, private readonly palLookup: Game8LookupService) {
     void this.loadData();
     void this.loadCategoryIcons();
   }
