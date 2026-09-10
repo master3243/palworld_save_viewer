@@ -258,6 +258,7 @@
   flex-direction: column;
   margin: 0;
   overflow: hidden;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
   -webkit-user-select: none;
   user-select: none;
 }
@@ -327,8 +328,29 @@
 }
 
 .save-location-paths > code {
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, text-shadow 180ms ease;
   -webkit-user-select: text;
   user-select: text;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .upload-guide:hover {
+    border-color: rgba(138, 220, 255, 0.55);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3), 0 0 22px rgba(92, 180, 255, 0.14);
+    transform: translateY(-5px) scale(1.01);
+  }
+
+  .upload-guide:hover .save-location-paths > code {
+    background-color: rgba(55, 154, 235, 0.22);
+    border-color: rgba(138, 220, 255, 0.65);
+    box-shadow: 0 0 12px rgba(92, 180, 255, 0.25);
+    text-shadow: 0 0 8px rgba(138, 203, 255, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upload-guide, .save-location-paths > code { transition: none; }
+  .upload-guide:hover { transform: none; }
 }
 
 .save-path-placeholder {
