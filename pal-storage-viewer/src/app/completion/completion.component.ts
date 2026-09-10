@@ -77,6 +77,9 @@ export class CompletionComponent implements OnChanges {
   }
 
   groupIcon(category: string, group: TrackedGroup): string | undefined {
+    if (category === 'technologies') {
+      return this.mapIcons[group.key === 'ancient' ? 'Ancient Technology' : 'Technology'];
+    }
     if (category === 'relics') return this.mapIcons[group.name];
     if (category === 'fastTravel') {
       return this.mapIcons[group.key === 'statue' ? 'Fast Travel' : 'Watchtower'];

@@ -16,6 +16,8 @@ export const CATEGORY_COLORS: Record<string, string> = {
   sideQuests: '#a7a6ff', areas: '#a8d3e8', ruins: '#dfc599',
 };
 export const CATEGORY_ICONS: Record<string, string> = {
+  paldeck: 'Paldeck', captureBonus: 'Capture Bonus', raids: 'Raid Boss', statue: 'Statue of Power',
+  technologies: 'Technology', research: 'Lab Research',
   relics: 'Lifmunk Effigy', notes: 'Journals', fastTravel: 'Fast Travel', towers: 'Tower',
   towersHard: 'Tower', alphas: 'Alpha Pal', bounties: 'Bounty', mainQuests: 'Main Mission',
   sideQuests: 'Sub Mission', areas: 'Region', ruins: 'Ancient Ruin',

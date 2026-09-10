@@ -17,6 +17,10 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "completion_sources" / "raw"
 OUT = ROOT / "resources" / "completion" / "maps"
+CUSTOM_ICONS = (
+    "Paldeck", "Capture Bonus", "Raid Boss", "Statue of Power", "Technology",
+    "Ancient Technology", "Lab Research", "Main Mission", "Sub Mission",
+)
 
 
 def write_pog(path, payload, mime):
@@ -27,6 +31,15 @@ def save_image(image, path, **options):
     payload = io.BytesIO()
     image.save(payload, format="WEBP", **options)
     write_pog(path, payload.getvalue(), "image/webp")
+
+
+def register_custom_icons(icons):
+    icon_dir = OUT / "icons"
+    for label in CUSTOM_ICONS:
+        filename = label.lower().replace(" ", "-") + ".pog"
+        if not (icon_dir / filename).is_file():
+            raise FileNotFoundError(f"Missing supplied tracker icon: {icon_dir / filename}")
+        icons[label] = f"resources/completion/maps/icons/{filename}"
 
 
 def build():
@@ -82,14 +95,13 @@ def build():
             icons[label] = f"resources/completion/maps/icons/{filename}"
         # Simple map conventions for categories without an available game texture.
         symbols = {
-            "Main Mission": '<path fill="#ffd779" d="M12 1 23 12 12 23 1 12Z"/><path stroke="#18202b" stroke-width="2.5" d="M12 6v8m0 2v2"/>',
-            "Sub Mission": '<path fill="#b4c2ff" d="M12 1 23 12 12 23 1 12Z"/><path stroke="#18202b" stroke-width="2.5" d="M12 6v8m0 2v2"/>',
             "Region": '<path fill="#cce8ec" stroke="#122c3b" stroke-width="1" d="m1 20 8-15 5 8 3-5 6 12Zm5-4h6l-3-5Zm10 0h4l-2-4Z"/>',
         }
         for label, shape in symbols.items():
             filename = label.lower().replace(" ", "-") + ".pog"
             write_pog(icon_dir / filename, f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">{shape}</svg>\n'.encode(), "image/svg+xml")
             icons[label] = f"resources/completion/maps/icons/{filename}"
+        register_custom_icons(icons)
         (OUT / "icons.json").write_text(json.dumps(icons, indent=2) + "\n")
     (OUT / "maps.json").write_text(json.dumps(maps, indent=2) + "\n")
     # Remove superseded generated images; original source files stay in maps.db.

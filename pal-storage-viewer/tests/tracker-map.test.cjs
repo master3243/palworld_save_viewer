@@ -6,10 +6,20 @@ require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileMo
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText, filename);
 const { worldToMap, mapOf } = require('../src/app/completion/completion-model.ts');
-const { mapObjectives, project, unproject, clusterMarkers, layoutMapMarkers, visibleMarkerClusters, nearestTravel, parseCoordinates } = require('../src/app/completion/tracker-map-model.ts');
+const { CATEGORY_ICONS, mapObjectives, project, unproject, clusterMarkers, layoutMapMarkers, visibleMarkerClusters, nearestTravel, parseCoordinates } = require('../src/app/completion/tracker-map-model.ts');
 const maps = require('../../resources/completion/maps/maps.json');
 const item = (id, coords, extra={}) => ({id, name:id, coords, map:'', state:'todo', detail:'', group:'', order:0, no:null, ...extra});
 const category = (key, items, extra={}) => ({key, title:key, items, ...extra});
+
+test('tracker card and map icons resolve to bundled image data', () => {
+  const paths = require('../../resources/completion/maps/icons.json');
+  for (const name of new Set([...Object.values(CATEGORY_ICONS), 'Ancient Technology', 'Watchtower'])) {
+    assert.ok(paths[name], `Missing icon manifest entry: ${name}`);
+    const packed = fs.readFileSync(require('node:path').resolve(__dirname, '../..', paths[name]), 'utf8').trim();
+    assert.match(packed, /^data:image\/(?:webp|png|svg\+xml);base64,[A-Za-z0-9+/]+=*$/);
+    assert.ok(Buffer.from(packed.split(',')[1], 'base64').length > 0);
+  }
+});
 
 test('map includes only located, counted objectives from available files, with category-scoped identities', () => {
   const points = mapObjectives([

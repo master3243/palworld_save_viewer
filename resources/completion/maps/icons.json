@@ -21,5 +21,12 @@
   "Yakumo Effigy": "resources/completion/maps/icons/yakumo-effigy.pog",
   "Main Mission": "resources/completion/maps/icons/main-mission.pog",
   "Sub Mission": "resources/completion/maps/icons/sub-mission.pog",
-  "Region": "resources/completion/maps/icons/region.pog"
+  "Region": "resources/completion/maps/icons/region.pog",
+  "Paldeck": "resources/completion/maps/icons/paldeck.pog",
+  "Capture Bonus": "resources/completion/maps/icons/capture-bonus.pog",
+  "Raid Boss": "resources/completion/maps/icons/raid-boss.pog",
+  "Statue of Power": "resources/completion/maps/icons/statue-of-power.pog",
+  "Technology": "resources/completion/maps/icons/technology.pog",
+  "Ancient Technology": "resources/completion/maps/icons/ancient-technology.pog",
+  "Lab Research": "resources/completion/maps/icons/lab-research.pog"
 }
