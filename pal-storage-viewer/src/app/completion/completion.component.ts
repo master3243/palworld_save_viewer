@@ -4,7 +4,7 @@ import { ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angu
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
 import { Category, CompletionData, CompletionSummary, TrackedItem, WorldProgress, summarize } from './completion-model';
 import { TrackerMapComponent } from './tracker-map.component';
-import { objectiveKey } from './tracker-map-model';
+import { CATEGORY_ICONS, objectiveKey } from './tracker-map-model';
 import { loadCompletionData } from './completion-data';
 import { TabDiscovery } from '../tab-discovery';
 
@@ -43,6 +43,7 @@ export class CompletionComponent implements OnChanges {
   groupFilter = '';
   mapOpen = false;
   mapVisited = false;
+  categoryIcons: Record<string, string> = {};
   private readonly tabDiscovery = new TabDiscovery();
 
   get showMapPing(): boolean {
@@ -54,6 +55,24 @@ export class CompletionComponent implements OnChanges {
 
   constructor(private readonly changeDetector: ChangeDetectorRef) {
     void this.loadData();
+    void this.loadCategoryIcons();
+  }
+
+  private async loadCategoryIcons(): Promise<void> {
+    try {
+      const response = await fetch(new URL('resources/completion/maps/icons.json', document.baseURI));
+      if (!response.ok) return;
+      const paths: Record<string, string> = await response.json();
+      const sources = new Map<string, string>();
+      await Promise.allSettled([...new Set(Object.values(CATEGORY_ICONS))].map(async name => {
+        if (!paths[name]) return;
+        const image = await fetch(new URL(paths[name], document.baseURI));
+        if (image.ok) sources.set(name, (await image.text()).trim());
+      }));
+      this.categoryIcons = Object.fromEntries(Object.entries(CATEGORY_ICONS)
+        .filter(([, name]) => sources.has(name)).map(([category, name]) => [category, sources.get(name)!]));
+      this.changeDetector.markForCheck();
+    } catch { /* Decorative icons must not prevent the tracker from loading. */ }
   }
 
   ngOnChanges(): void {

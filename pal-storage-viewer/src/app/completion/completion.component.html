@@ -77,7 +77,10 @@
           (click)="selectCategory(category.key)"
         >
           <span class="card-head">
-            <span class="card-title">{{ category.title }}</span>
+            <span class="card-title">
+              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" alt="" decoding="async">
+              <span>{{ category.title }}</span>
+            </span>
             <span class="card-count">{{ category.done | number }} <i>/</i> {{ category.total | number }}</span>
           </span>
           <span class="bar" aria-hidden="true">

@@ -287,9 +287,20 @@
 }
 
 .card-title {
+  align-items: center;
   color: #f1fbff;
+  display: flex;
   font-size: 0.95rem;
   font-weight: 700;
+  gap: 7px;
+  min-width: 0;
+}
+
+.card-map-icon {
+  flex: 0 0 22px;
+  height: 22px;
+  object-fit: contain;
+  width: 22px;
 }
 
 .card-count {
