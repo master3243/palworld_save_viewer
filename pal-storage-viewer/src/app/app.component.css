@@ -964,8 +964,14 @@
   letter-spacing: 0.01em;
   line-height: 1;
   padding: 6px 13px;
+  position: relative;
   white-space: nowrap;
 }
+
+.tab-ping { background: #ffd65a; border-radius: 50%; box-shadow: 0 0 6px #ffd65a88; height: 6px; pointer-events: none; position: absolute; right: 5px; top: 2px; width: 6px; }
+.tab-ping::after { animation: tab-ping 2s ease-out infinite; border: 1px solid #ffd65a; border-radius: 50%; content: ''; inset: -1px; position: absolute; }
+@keyframes tab-ping { 0% { opacity: .9; transform: scale(1); } 80%, 100% { opacity: 0; transform: scale(2.8); } }
+@media (prefers-reduced-motion: reduce) { .tab-ping::after { animation: none; } }
 
 .view-switch button:hover {
   color: #f1fbff;

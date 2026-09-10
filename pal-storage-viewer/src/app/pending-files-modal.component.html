@@ -6,6 +6,9 @@
     aria-labelledby="confirmLoadTitle"
     (click)="$event.stopPropagation()"
   >
+    <button class="confirm-close" type="button" aria-label="Cancel loading and close dialog" title="Close" (click)="cancel.emit()">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg>
+    </button>
     <h2 class="modal-title" id="confirmLoadTitle">
       {{ append ? 'Add' : 'Load' }} {{ fileCount }} files from {{ folders.length }} {{ folders.length === 1 ? 'folder' : 'folders' }}?
       <small class="modal-subtitle" *ngIf="palTotal !== null">{{ palTotal | number }} pals</small>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 import { FilterEngine, Suggestion } from './filter-engine';
 import { FilterFieldPickerComponent } from './filter-field-picker.component';
@@ -68,6 +68,7 @@ export class FilterBuilderComponent {
   private blurTimer: ReturnType<typeof setTimeout> | null = null;
   readonly moveScopes = MOVE_SCOPES;
   private comparisonModes = new Map<string, string>();
+  sortDrag: { pointerId: number; from: number; to: number; startY: number; offset: number; active: boolean; row: HTMLElement; centers: number[] } | null = null;
 
   numericFields(rule: FilterRule): FilterField[] {
     return this.availableFields(rule).filter(field => field.kind === 'number');
@@ -123,8 +124,52 @@ export class FilterBuilderComponent {
   }
   setSortField(index: number, event: Event): void { this.sorts[index].field = (event.target as HTMLSelectElement).value; this.emit(); }
   setSortDirection(index: number, event: Event): void { this.sorts[index].direction = (event.target as HTMLSelectElement).value as 'asc' | 'desc'; this.emit(); }
-  moveSort(index: number, direction: number): void { const [sort] = this.sorts.splice(index, 1); this.sorts.splice(index + direction, 0, sort); this.emit(); }
+  moveSort(index: number, direction: number): void {
+    const target = index + direction;
+    if (index < 0 || index >= this.sorts.length || target < 0 || target >= this.sorts.length || target === index) return;
+    const [sort] = this.sorts.splice(index, 1);
+    this.sorts.splice(target, 0, sort);
+    this.emit();
+  }
   removeSort(index: number): void { this.sorts.splice(index, 1); this.emit(); }
+
+  startSortDrag(event: PointerEvent, index: number): void {
+    if (event.button !== 0 || !event.isPrimary || this.sorts.length < 2) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('select, input, button') && !target.closest('.sort-priority')) return;
+    const row = event.currentTarget as HTMLElement;
+    const centers = Array.from(row.parentElement!.querySelectorAll<HTMLElement>('.sort-rule'), element => {
+      const rect = element.getBoundingClientRect();
+      return rect.top + rect.height / 2;
+    });
+    this.sortDrag = { pointerId: event.pointerId, from: index, to: index, startY: event.clientY, offset: 0, active: false, row, centers };
+    row.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  }
+
+  moveSortDrag(event: PointerEvent): void {
+    const drag = this.sortDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    drag.offset = event.clientY - drag.startY;
+    drag.active ||= Math.abs(drag.offset) >= 4;
+    if (!drag.active) return;
+    drag.to = drag.centers.filter((center, index) => index !== drag.from && event.clientY > center).length;
+    event.preventDefault();
+  }
+
+  endSortDrag(event: PointerEvent, commit = true): void {
+    const drag = this.sortDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    this.cancelSortDrag();
+    if (commit && drag.active) this.moveSort(drag.from, drag.to - drag.from);
+  }
+
+  @HostListener('document:keydown.escape')
+  cancelSortDrag(): void {
+    const drag = this.sortDrag;
+    this.sortDrag = null;
+    if (drag?.row.hasPointerCapture(drag.pointerId)) drag.row.releasePointerCapture(drag.pointerId);
+  }
 
   fieldFor(rule: FilterRule): FilterField | undefined {
     return this.fieldMap.get(rule.field);

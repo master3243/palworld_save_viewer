@@ -308,8 +308,15 @@ input.value::placeholder {
 
 .sort-section { border-top: 1px solid rgba(134, 220, 255, .22); margin-top: 14px; padding-top: 12px; }
 .sort-rule, .reference-value, .sort-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; min-width: 0; }
-.sort-rule { margin-top: 6px; }
-.sort-priority { width: 18px; text-align: center; color: #8fe8ff; }
+.sort-rule { margin-top: 6px; position: relative; }
+.sort-priority { align-items: center; background: transparent; border: 0; display: inline-flex; gap: 4px; padding: 5px 0; min-width: 28px; justify-content: center; color: #8fe8ff; cursor: grab; touch-action: none; user-select: none; }
+.sort-priority svg { width: 8px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; opacity: .65; }
+.sort-priority:focus-visible { outline: 1px solid #8fe8ff; outline-offset: 2px; }
+.sort-dragging { background: #102b3c; border-radius: 6px; box-shadow: 0 5px 18px #0008; opacity: .9; z-index: 2; user-select: none; }
+.sort-dragging .sort-priority { cursor: grabbing; }
+.sort-drop-before::before, .sort-drop-after::after { content: ''; position: absolute; left: 0; right: 0; height: 2px; background: #8fe8ff; pointer-events: none; }
+.sort-drop-before::before { top: -4px; }
+.sort-drop-after::after { bottom: -4px; }
 .reference-value input.percent { width: 68px; }
 .reference-value { flex: 0 1 320px; }
 .reference-value app-filter-field-picker { flex: 1; min-width: 100px; }

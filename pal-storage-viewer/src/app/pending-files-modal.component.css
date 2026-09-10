@@ -1,8 +1,15 @@
 /* Multi-file confirmation ------------------------------------------- */
 .confirm-modal {
   max-width: 560px;
+  position: relative;
   width: min(92vw, 560px);
 }
+
+.confirm-modal .modal-title { padding: 0 22px; }
+.confirm-close { align-items: center; background: transparent; border: 0; border-radius: 6px; color: #91a7b4; cursor: pointer; display: flex; height: 28px; justify-content: center; padding: 4px; position: absolute; right: 10px; top: 10px; width: 28px; }
+.confirm-close svg { fill: none; height: 20px; stroke: currentColor; stroke-linecap: round; stroke-width: 1.8; width: 20px; }
+.confirm-close:hover, .confirm-close:focus-visible { background: #244656; color: #eafaff; }
+.confirm-close:focus-visible { outline: 1px solid #95f3ff; outline-offset: 2px; }
 
 .confirm-list {
   display: flex;

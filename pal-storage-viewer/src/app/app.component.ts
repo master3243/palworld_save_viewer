@@ -23,6 +23,7 @@ import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
 import { PalRowComponent } from './pal-row.component';
 import { CellView, RowView, TableColumn } from './table-model';
 import { formatOwnedTime } from './owned-time';
+import { TabDiscovery, type ViewMode } from './tab-discovery';
 
 /** Sort weight of a location: party first, then the bases in order, the Pal Box, then dimensional storage. */
 export function locationRank(location: string): number {
@@ -39,9 +40,6 @@ interface VirtualRow {
   index: number;
   row: PalStorageRow;
 }
-
-/** The two things the page can show for a loaded save: the pal table or the 100% tracker. */
-type ViewMode = 'pals' | 'tracker';
 
 const TRACKER_HASH = '#tracker';
 
@@ -306,8 +304,14 @@ export class AppComponent implements OnDestroy {
 
   /** Which view is open; kept in the URL hash so the tracker can be linked to. */
   view: ViewMode = typeof location !== 'undefined' && location.hash === TRACKER_HASH ? 'tracker' : 'pals';
+  private readonly tabDiscovery = new TabDiscovery();
+
+  shouldPingTab(view: ViewMode): boolean {
+    return this.tabDiscovery.shouldPing(view, this.view, this.hasData && !this.isParsing);
+  }
 
   setView(view: ViewMode): void {
+    this.tabDiscovery.visit(view, this.hasData && !this.isParsing);
     if (this.view === view) return;
     this.view = view;
     const url = `${location.pathname}${location.search}${view === 'tracker' ? TRACKER_HASH : ''}`;
@@ -317,6 +321,7 @@ export class AppComponent implements OnDestroy {
   @HostListener('window:hashchange')
   onHashChange(): void {
     this.view = location.hash === TRACKER_HASH ? 'tracker' : 'pals';
+    this.tabDiscovery.visit(this.view, this.hasData && !this.isParsing);
   }
 
   /** Something is loaded: pals for the table, or a player record for the tracker. */
@@ -916,6 +921,7 @@ export class AppComponent implements OnDestroy {
       this.filteredRows = this.originalRows;
       this.rows = [...this.originalRows];
       this.columns = this.buildColumns(rows);
+      this.tabDiscovery.visit(this.view, this.hasData);
       this.scheduleMeasure();
     } catch (error) {
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';

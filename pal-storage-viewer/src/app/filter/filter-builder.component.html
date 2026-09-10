@@ -3,8 +3,18 @@
 <section class="sort-section" aria-label="Sort by">
   <div class="group-head"><strong>Sort by</strong><span class="match-word">First priority at the top</span><button class="ghost" type="button" (click)="addSort()">+ sort</button></div>
   <p class="empty-group" *ngIf="!sorts.length">Default location, file and slot order.</p>
-  <div class="sort-rule" *ngFor="let sort of sorts; let index = index">
-    <span class="sort-priority">{{ index + 1 }}</span>
+  <div class="sort-rule" *ngFor="let sort of sorts; let index = index"
+    [class.sort-dragging]="sortDrag?.active && sortDrag?.from === index"
+    [class.sort-drop-before]="sortDrag?.active && sortDrag?.to === index && sortDrag!.to < sortDrag!.from"
+    [class.sort-drop-after]="sortDrag?.active && sortDrag?.to === index && sortDrag!.to > sortDrag!.from"
+    [style.transform]="sortDrag?.active && sortDrag?.from === index ? 'translateY(' + sortDrag!.offset + 'px)' : null"
+    (pointerdown)="startSortDrag($event, index)" (pointermove)="moveSortDrag($event)"
+    (pointerup)="endSortDrag($event)" (pointercancel)="endSortDrag($event, false)" (lostpointercapture)="endSortDrag($event, false)">
+    <button type="button" class="sort-priority" [attr.aria-label]="'Reorder sort priority ' + (index + 1)"
+      title="Drag to reorder. Use arrow keys to move."
+      (keydown.arrowup)="moveSort(index, -1); $event.preventDefault()" (keydown.arrowdown)="moveSort(index, 1); $event.preventDefault()">
+      <svg viewBox="0 0 8 12" aria-hidden="true"><path d="M2 2h0M6 2h0M2 6h0M6 6h0M2 10h0M6 10h0"/></svg>{{ index + 1 }}
+    </button>
     <select aria-label="Sort field" [value]="sort.field" (change)="setSortField(index, $event)">
       <option *ngFor="let field of availableSortFields(index)" [value]="field.key" [selected]="field.key === sort.field">{{ field.label }}</option>
     </select>
