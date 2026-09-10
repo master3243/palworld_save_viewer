@@ -452,6 +452,59 @@
   vertical-align: middle;
 }
 
+.steam-upload-guide figcaption {
+  container-type: inline-size;
+}
+
+.steam-location-paths,
+.gamepass-location-path {
+  container-type: inline-size;
+  flex: 1;
+}
+
+.steam-location-paths {
+  flex-wrap: nowrap;
+}
+
+.steam-location-paths > code,
+.steam-location-paths .save-path-placeholder {
+  box-sizing: border-box;
+  /* Fit both path chunks while preserving the gap and their separate highlights. */
+  font-size: min(0.7rem, calc((100cqw - 36px) / 33));
+  white-space: nowrap;
+}
+
+.steam-location-paths > code,
+.steam-location-paths .save-path-hint {
+  flex-shrink: 0;
+}
+
+.steam-upload-guide .upload-drop-instruction {
+  flex-wrap: nowrap;
+  font-size: min(0.8rem, calc((100cqw - 97px) / 25));
+  white-space: nowrap;
+}
+
+.steam-upload-guide .upload-drop-instruction > * {
+  flex-shrink: 0;
+}
+
+.steam-upload-guide .upload-item-icon {
+  flex-basis: 1em;
+  height: 1em;
+  width: 1em;
+}
+
+.upload-guide .gamepass-save-path {
+  box-sizing: border-box;
+  /* Allow about 46em for this 74-character monospace path, plus its padding and border. */
+  font-size: min(0.7rem, calc((100cqw - 14px) / 46));
+  overflow-wrap: normal;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
+}
+
 @media (max-width: 900px) {
   .upload-guides {
     grid-template-columns: 1fr;

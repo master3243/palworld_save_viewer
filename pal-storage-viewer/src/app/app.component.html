@@ -102,7 +102,7 @@
   </section>
 
   <section class="upload-guides" *ngIf="!hasData && !screenshotMode" aria-label="How to upload your save">
-    <figure class="upload-guide">
+    <figure class="upload-guide steam-upload-guide">
       <figcaption>
         <h2>
           <svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -114,7 +114,7 @@
         </h2>
         <p class="save-location">
           <span class="save-location-label">Save Location:</span>
-          <span class="save-location-paths">
+          <span class="save-location-paths steam-location-paths">
             <code>%LOCALAPPDATA%\Pal\Saved\SaveGames\</code>
             <span class="save-path-hint">
               <code class="save-path-placeholder" tabindex="0" aria-describedby="save-path-tooltip">IDprofile\IDworld\</code>
@@ -149,7 +149,7 @@
         </h2>
         <p class="save-location">
           <span class="save-location-label">Save Location:</span>
-          <span class="save-location-paths"><code>%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData</code></span>
+          <span class="save-location-paths gamepass-location-path"><code class="gamepass-save-path">%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData</code></span>
         </p>
         <p class="upload-drop-instruction">
           <span>Drag:</span>
