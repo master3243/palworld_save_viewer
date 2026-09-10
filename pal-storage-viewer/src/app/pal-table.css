@@ -165,27 +165,27 @@ table.pal-table {
   white-space: nowrap;
 }
 
-/* Four digits plus the compact horizontal padding. */
+/* Compact slot columns share the same width and padding. */
 .pal-table th.slot-cell,
 .pal-table td.slot-cell {
   box-sizing: border-box;
-  max-width: 42px;
-  min-width: 42px;
+  max-width: 34px;
+  min-width: 34px;
   padding-left: 4px;
   padding-right: 4px;
   text-align: center;
-  width: 42px;
+  width: 34px;
 }
 
 .pal-table th.paldeck-cell,
 .pal-table td.paldeck-cell {
   box-sizing: border-box;
-  max-width: 48px;
-  min-width: 48px;
+  max-width: 38px;
+  min-width: 38px;
   padding-left: 4px;
   padding-right: 4px;
   text-align: center;
-  width: 48px;
+  width: 38px;
 }
 
 .pal-table th.nickname-cell,
@@ -201,23 +201,23 @@ table.pal-table {
 .pal-table th.rank-cell,
 .pal-table td.rank-cell {
   box-sizing: border-box;
-  max-width: 45px;
-  min-width: 45px;
+  max-width: 38px;
+  min-width: 38px;
   padding-left: 3px;
   padding-right: 3px;
   text-align: center;
-  width: 45px;
+  width: 38px;
 }
 
 .pal-table th.level-cell,
 .pal-table td.level-cell {
   box-sizing: border-box;
-  max-width: 44px;
-  min-width: 44px;
-  padding-left: 4px;
-  padding-right: 4px;
+  max-width: 26px;
+  min-width: 26px;
+  padding-left: 1px;
+  padding-right: 1px;
   text-align: center;
-  width: 44px;
+  width: 26px;
 }
 
 .pal-table .table-rank-stars {
@@ -245,15 +245,15 @@ table.pal-table {
 .pal-table th.soul-rank-cell,
 .pal-table td.soul-rank-cell {
   box-sizing: border-box;
-  max-width: 38px;
-  min-width: 38px;
+  max-width: 34px;
+  min-width: 34px;
   padding-left: 2px;
   padding-right: 2px;
   text-align: center;
-  width: 38px;
+  width: 34px;
 }
 
-/* "SR H" is a touch wider than "IV H"; keep it on one line at 38px. */
+/* "SR H" is a touch wider than "IV H"; keep its header compact. */
 .pal-table th.soul-rank-cell .header-label {
   font-size: 0.78rem;
   letter-spacing: -0.02em;
@@ -365,12 +365,12 @@ table.pal-table {
 .pal-table th.type-cell,
 .pal-table td.type-cell {
   box-sizing: border-box;
-  max-width: 56px;
-  min-width: 56px;
+  max-width: 40px;
+  min-width: 40px;
   padding-left: 3px;
   padding-right: 3px;
   text-align: center;
-  width: 56px;
+  width: 40px;
 }
 
 .pal-table td.type-cell .trait-icons {
@@ -525,16 +525,16 @@ table.pal-table {
   top: 0;
 }
 
-/* Computed stats, centred like the IVs: HP/ATK/DEF fit five digits, SPD three. */
+/* Compact computed stats, with separate widths for SPD and Firepower below. */
 .pal-table th.stat-cell,
 .pal-table td.stat-cell {
   box-sizing: border-box;
-  max-width: 58px;
-  min-width: 58px;
-  padding-left: 3px;
-  padding-right: 3px;
+  max-width: 42px;
+  min-width: 42px;
+  padding-left: 2px;
+  padding-right: 2px;
   text-align: center;
-  width: 58px;
+  width: 42px;
 }
 
 .pal-table th.stat-cell.firepower-cell,
@@ -546,9 +546,9 @@ table.pal-table {
 
 .pal-table th.stat-cell.speed-cell,
 .pal-table td.stat-cell.speed-cell {
-  max-width: 46px;
-  min-width: 46px;
-  width: 46px;
+  max-width: 38px;
+  min-width: 38px;
+  width: 38px;
 }
 
 /* Three equipped active skills as mini chips, like the pal card's. */
@@ -697,12 +697,12 @@ table.pal-table {
 .pal-table th.save-cell,
 .pal-table td.save-cell {
   box-sizing: border-box;
-  max-width: 40px;
-  min-width: 40px;
+  max-width: 28px;
+  min-width: 28px;
   padding-left: 4px;
   padding-right: 4px;
   text-align: center;
-  width: 40px;
+  width: 28px;
 }
 
 /* "Save" and "Where" in the header font are a hair wider than their columns. */
@@ -726,12 +726,12 @@ table.pal-table {
 .pal-table th.where-cell,
 .pal-table td.where-cell {
   box-sizing: border-box;
-  max-width: 52px;
-  min-width: 52px;
+  max-width: 50px;
+  min-width: 50px;
   overflow: hidden;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding-left: 2px;
+  padding-right: 2px;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 52px;
+  width: 50px;
 }
