@@ -37,6 +37,7 @@
           <small *ngIf="!popupPinned">{{ point.item.coords }}</small>
           <ng-container *ngIf="popupPinned">
             <p *ngIf="point.item.detail">{{ point.item.detail }}</p>
+            <p *ngIf="point.item.no !== null && (point.category === 'alphas' || point.category === 'bounties')">Lv. {{ point.item.no }}</p>
             <p class="location-note" *ngIf="point.category === 'mainQuests' || point.category === 'sideQuests'">Quest giver</p>
             <p class="location-note" *ngIf="point.category === 'areas'">Region reference point</p>
             <div class="marker-actions">

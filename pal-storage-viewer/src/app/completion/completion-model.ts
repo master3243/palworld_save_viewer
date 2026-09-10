@@ -70,6 +70,10 @@ export interface TrackedItem {
   order: number;
   /** Number shown in its own column (Paldeck number, technology tier), or null. */
   no: number | null;
+  /** Maximum shown alongside the number for rank progress. */
+  noMax?: number;
+  /** Lifetime catches shown against the capture bonus target, without capping. */
+  captureProgress?: { done: number; total: number };
   /** False for rows shown for information only (paid DLC); they do not count. */
   counted?: boolean;
   /** Short label shown as a chip in its own column (Normal / Ultra). */
@@ -220,7 +224,8 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
     let state: ItemState = 'todo';
     if (bonus >= CAPTURE_BONUS_MAX) state = 'done';
     else if (bonus > 0) state = 'active';
-    return { id: tribe, name, detail: `caught ${caught} / ${CAPTURE_BONUS_MAX}`, state, group: '', coords: '', map: '', order: index, no: index };
+    return { id: tribe, name, detail: '', state, group: '', coords: '', map: '', order: index, no: index,
+      captureProgress: { done: caught, total: CAPTURE_BONUS_MAX } };
   });
   return finish({ key: 'captureBonus', title: 'Capture bonus', items, groups: [], unknown: [] });
 }
@@ -276,12 +281,12 @@ function statueCategory(record: PlayerCompletion, data: CompletionData): Categor
     }
     const max = perRank.length;
     const toNext = rank < max ? cumulative + perRank[rank] - spent : 0;
-    const parts = [`rank ${rank} / ${max}`];
+    const parts: string[] = [];
     if (held) parts.push(`${held} held`);
     if (toNext) parts.push(`${toNext} more for next rank`);
     items.push({
       id: type.enum, name: type.name, detail: parts.join(' · '), state: rank >= max ? 'done' : rank > 0 ? 'active' : 'todo',
-      group: '', coords: '', map: '', order: 0, no: rank,
+      group: '', coords: '', map: '', order: 0, no: rank, noMax: max,
     });
   }
   return finish({ key: 'statue', title: 'Statue of Power', items, groups: [], unknown: [] }, 'Rank');
@@ -417,14 +422,14 @@ function bossCategory(record: PlayerCompletion, data: CompletionData, kinds: str
     if (!kinds.includes(kind) || seen.has(lower)) continue;
     seen.add(lower);
     items.push({
-      id: spawner, name, detail: level ? `Lv. ${level}` : '', state: beaten.has(lower) ? 'done' : 'todo',
-      group: kind, ...place(x, y), order: level, no: null,
+      id: spawner, name, detail: '', state: beaten.has(lower) ? 'done' : 'todo',
+      group: kind, ...place(x, y), order: level, no: level || null,
     });
   }
   const allKnown = new Set(data.bosses.map(([spawner]) => spawner.toLowerCase()));
   // Only report ids that no boss list knows, and only once (on the alpha category).
   const unknown = key === 'alphas' ? record.bosses.filter((spawner) => !allKnown.has(spawner.toLowerCase())).sort() : [];
-  return finish({ key, title, items, groups: [], unknown });
+  return finish({ key, title, items, groups: [], unknown }, 'LVL');
 }
 
 function areaCategory(record: PlayerCompletion, data: CompletionData): Category {

@@ -40,7 +40,7 @@
         </div>
         <div class="overall-text">
           <h2>{{ player?.label }}</h2>
-          <p>{{ progress.done | number }} / {{ progress.total | number }}</p>
+          <p>{{ progress.done | number }}<span>/{{ progress.total | number }}</span></p>
           <div class="stats" aria-label="Counters">
             <span class="stat level-stat" *ngIf="player?.level !== null && player?.level !== undefined" [class.max]="isMaxLevel" title="Player level">
               <b>Lv. {{ player?.level }}</b>
@@ -81,7 +81,7 @@
               <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'bounties' || category.key === 'fastTravel' ? 'scale(1.2)' : null" alt="" decoding="async">
               <span>{{ category.title }}</span>
             </span>
-            <span class="card-count">{{ category.done | number }} <i>/</i> {{ category.total | number }}</span>
+            <span class="card-count">{{ category.done | number }}<span>/{{ category.total | number }}</span></span>
           </span>
           <span class="bar" aria-hidden="true">
             <span class="bar-fill" [style.width.%]="category.percent"></span>
@@ -107,7 +107,7 @@
             >
           </div>
         </div>
-        <div class="group-chips" [class.research-groups]="open.key === 'research'" *ngIf="open.groups.length" role="group" aria-label="Type">
+        <div class="group-chips" [class.progress-groups]="open.key === 'research' || open.key === 'relics'" *ngIf="open.groups.length" role="group" aria-label="Type">
           <button
             *ngFor="let group of open.groups"
             type="button"
@@ -125,30 +125,34 @@
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
-        <table class="item-table" *ngIf="!open.needsFile">
+        <table class="item-table" [class.pal-list]="isPalList" *ngIf="!open.needsFile">
           <thead>
             <tr>
-              <th class="state-col">Status</th>
+              <th class="state-col" *ngIf="!isPalList">Status</th>
               <th class="no-col" *ngIf="open.hasNumbers">{{ open.numberLabel }}</th>
+              <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
-              <th>Details</th>
+              <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
+              <th *ngIf="!isPalList">Details</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state" [class.uncounted]="item.counted === false">
-              <td class="state-col"><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</td>
-              <td class="no-col" *ngIf="open.hasNumbers">{{ item.no }}</td>
+              <td class="state-col" *ngIf="!isPalList"><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</td>
+              <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">{{ item.no }}<ng-container *ngIf="item.noMax !== undefined"> / {{ item.noMax }}</ng-container></td>
+              <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
-              <td class="name-col">{{ item.name }}</td>
-              <td class="detail-col">{{ item.detail }}</td>
+              <td class="name-col" [attr.title]="isPalList ? item.name : null"><span>{{ item.name }}</span></td>
+              <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
+              <td class="detail-col" *ngIf="!isPalList"><span>{{ item.detail }}</span></td>
               <td class="coords-col" *ngIf="open.hasCoords">
                 <button type="button" class="coordinate-link" *ngIf="item.coords" [attr.aria-label]="'Show ' + item.name + ' on map'" (click)="showMap(item)">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small> ↗</button>
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="3 + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="(isPalList ? 2 : 3) + (open.key === 'captureBonus' ? 1 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
             </tr>
           </tbody>
         </table>

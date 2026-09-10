@@ -8,6 +8,8 @@ import { CATEGORY_ICONS, objectiveKey } from './tracker-map-model';
 import { loadCompletionData } from './completion-data';
 import { TabDiscovery } from '../tab-discovery';
 import { workIcon } from '../trait-icons';
+import { OfflineImageService } from '../offline-image.service';
+import { palImagePath } from '../pal-image';
 
 interface PlayerOption {
   key: string;
@@ -47,6 +49,13 @@ export class CompletionComponent implements OnChanges {
   categoryIcons: Record<string, string> = {};
   private mapIcons: Record<string, string> = {};
   private readonly tabDiscovery = new TabDiscovery();
+  get isPalList(): boolean {
+    return this.selectedCategory === 'paldeck' || this.selectedCategory === 'captureBonus';
+  }
+
+  palIcon(item: TrackedItem): Promise<string> {
+    return this.images.load(palImagePath(item.id, item.id));
+  }
 
   get showMapPing(): boolean {
     return this.tabDiscovery.shouldPing('map', this.mapOpen ? 'map' : null, this.summary !== null);
@@ -55,7 +64,7 @@ export class CompletionComponent implements OnChanges {
   mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
 
-  constructor(private readonly changeDetector: ChangeDetectorRef) {
+  constructor(private readonly changeDetector: ChangeDetectorRef, private readonly images: OfflineImageService) {
     void this.loadData();
     void this.loadCategoryIcons();
   }

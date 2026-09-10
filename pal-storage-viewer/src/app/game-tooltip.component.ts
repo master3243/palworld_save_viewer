@@ -4,8 +4,9 @@
  */
 import { CommonModule } from '@angular/common';
 import {
-  ApplicationRef, Component, ComponentRef, Directive, ElementRef, EnvironmentInjector, Input, NgZone, OnDestroy, OnInit, createComponent,
+  ApplicationRef, ChangeDetectorRef, Component, ComponentRef, Directive, ElementRef, EnvironmentInjector, Input, NgZone, OnDestroy, OnInit, createComponent,
 } from '@angular/core';
+import { OfflineImageService } from './offline-image.service';
 
 /** A run of tooltip text; `value` marks the part that changes with the skill level. */
 export interface TextSegment { text: string; value: boolean; }
@@ -17,6 +18,8 @@ export interface WorkLevelRow { stars: number; current: boolean; items: { src: s
 
 export interface TooltipData {
   title: string;
+  /** Local .pog portrait loaded only while the tooltip is open. */
+  portrait?: { path: string; alt: string };
   wikiUrl?: string;
   /** Figures shown right of the title, e.g. "687 ≫ 550". */
   titleRight?: string;
@@ -62,6 +65,9 @@ export interface TooltipData {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg>
         </a>
       </div>
+      <div class="tip-portrait" *ngIf="data.portrait">
+        <img *ngIf="portraitSrc" [src]="portraitSrc" [alt]="data.portrait.alt" draggable="false">
+      </div>
       <p class="tip-intro" *ngFor="let line of data.intro">{{ line }}</p>
       <p class="tip-intro tip-rich" *ngIf="data.rich?.length"><ng-container *ngFor="let seg of data.rich"><em *ngIf="seg.value; else richPlain">{{ seg.text }}</em><ng-template #richPlain>{{ seg.text }}</ng-template></ng-container></p>
       <div class="tip-badges" *ngIf="data.badge || data.stats?.length">
@@ -103,6 +109,8 @@ export interface TooltipData {
     .tip.ready { opacity: 1; }
     .tip.fitted { max-width: none; }
     .tip.interactive { pointer-events: auto; }
+    .tip-portrait { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 160px; height: 160px; margin: 12px auto; border: 2px solid rgba(180, 242, 255, .55); border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 35% 28%, rgba(142, 238, 255, .55), rgba(38, 123, 156, .75) 55%, rgba(16, 42, 66, .95) 60%); box-shadow: 0 0 0 4px rgba(65, 196, 230, .14); }
+    .tip-portrait img { display: block; width: 150px; height: 150px; object-fit: contain; clip-path: circle(50%); }
     .tip-wiki { align-items: center; background: rgba(3, 17, 27, .72); border: 1px solid rgba(151, 184, 255, .38); border-radius: 7px; color: #afc7ff; display: inline-flex; flex-shrink: 0; font-size: .74rem; font-weight: 900; gap: 5px; height: 32px; justify-content: center; margin-left: auto; min-width: 49px; padding: 0 8px; text-decoration: none; }
     .tip-wiki svg { fill: none; height: 16px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; width: 16px; }
     .tip-wiki:hover, .tip-wiki:focus-visible { background: rgba(61, 174, 217, .2); border-color: #afc7ff; box-shadow: 0 0 6px rgba(132, 165, 245, .28); color: #fff; outline: none; }
@@ -172,7 +180,7 @@ export interface TooltipData {
     }
   `],
 })
-export class GameTooltipComponent {
+export class GameTooltipComponent implements OnInit, OnDestroy {
   @Input({ required: true }) data!: TooltipData;
   interactive = false;
   x = 0;
@@ -180,6 +188,21 @@ export class GameTooltipComponent {
   /** Fixed width when the tooltip is fitted to its host. */
   width: number | null = null;
   ready = false;
+  portraitSrc = '';
+  private destroyed = false;
+
+  constructor(private readonly images: OfflineImageService, private readonly changeDetector: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    if (!this.data.portrait) return;
+    void this.images.load(this.data.portrait.path).then(src => {
+      if (this.destroyed) return;
+      this.portraitSrc = src;
+      this.changeDetector.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void { this.destroyed = true; }
 }
 
 @Directive({ selector: '[appTooltip]', standalone: true })
@@ -188,6 +211,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
   private ref: ComponentRef<GameTooltipComponent> | null = null;
   private static active: TooltipDirective | null = null;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
+  private touchPortrait = false;
   private get interactive(): boolean {
     return !!this.data?.wikiUrl && window.matchMedia('(max-width: 720px)').matches;
   }
@@ -196,13 +220,25 @@ export class TooltipDirective implements OnInit, OnDestroy {
   private readonly hide = () => this.close();
   private readonly leave = () => {
     this.keepOpen();
+    // Touch browsers can synthesize a mouse leave immediately after a tap.
+    if (this.touchPortrait) return;
     if (this.interactive) this.closeTimer = setTimeout(this.hide, 200);
     else this.close();
   };
   private readonly blur = (event: FocusEvent) => {
-    if (!this.contains(event.relatedTarget)) this.leave();
+    if (!this.contains(event.relatedTarget)) {
+      if (this.touchPortrait) this.close();
+      else this.leave();
+    }
+  };
+  private readonly pointerdown = (event: PointerEvent) => {
+    this.touchPortrait = !!this.data?.portrait && event.pointerType !== 'mouse';
   };
   private readonly click = (event: MouseEvent) => {
+    if (this.data?.portrait) {
+      this.show();
+      return;
+    }
     if (!this.interactive) return;
     event.preventDefault();
     event.stopPropagation();
@@ -240,6 +276,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
       el.addEventListener('mouseleave', this.leave);
       el.addEventListener('blur', this.blur);
       el.addEventListener('click', this.click);
+      el.addEventListener('pointerdown', this.pointerdown);
       window.addEventListener('scroll', this.hide, true);
     });
   }
@@ -280,6 +317,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
 
   private close(): void {
     this.keepOpen();
+    this.touchPortrait = false;
     if (!this.ref) return;
     document.removeEventListener('pointerdown', this.outside, true);
     document.removeEventListener('keydown', this.keydown);
@@ -297,6 +335,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
     el.removeEventListener('mouseleave', this.leave);
     el.removeEventListener('blur', this.blur);
     el.removeEventListener('click', this.click);
+    el.removeEventListener('pointerdown', this.pointerdown);
     window.removeEventListener('scroll', this.hide, true);
     this.close();
   }

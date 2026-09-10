@@ -1,7 +1,9 @@
 /** Path of the offline portrait for a Pal; the backend's canonical id wins over the raw save id. */
 export function palImagePath(speciesBaseId: string, speciesId: string): string {
   const id = speciesBaseId || imageSpeciesId(speciesId);
-  return id ? `assets/pals/${encodeURIComponent(id)}.pog` : '';
+  // The completion catalog uses different casing for this one portrait filename.
+  const filename = id === 'Blueplatypus' ? 'BluePlatypus' : id;
+  return filename ? `assets/pals/${encodeURIComponent(filename)}.pog` : '';
 }
 
 /** Strip the boss/quest/summon prefixes and suffixes a save can wrap around a species id. */

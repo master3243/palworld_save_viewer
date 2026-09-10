@@ -46,7 +46,7 @@
       </div>
     </div>
     <p class="confirm-note" *ngIf="ignored">{{ ignored }} {{ ignored === 1 ? 'file' : 'files' }} ignored (not Pal saves)</p>
-    <p class="confirm-note">Drop more files to add them to this list</p>
+    <p class="confirm-note">Drop more files to add</p>
     <div class="modal-actions">
       <button class="modal-ghost" type="button" (click)="cancel.emit()">Cancel</button>
       <button class="modal-primary" type="button" (click)="confirm.emit()">{{ append ? 'Add' : 'Load' }}</button>
