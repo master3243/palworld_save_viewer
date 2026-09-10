@@ -64,16 +64,16 @@
       <app-tracker-map *ngIf="mapVisited" [hidden]="!mapOpen" [visible]="mapOpen" [categories]="progress.categories" [playerKey]="selectedPlayer" [focusKey]="mapFocus" (openCategory)="showMapCategory($event)"></app-tracker-map>
 
       <ng-container *ngIf="!mapOpen">
-      <div class="category-grid" role="tablist" aria-label="Categories">
+      <div class="category-grid" role="group" aria-label="Categories">
+        <ng-container *ngFor="let category of progress.categories; trackBy: trackCategory">
         <button
-          *ngFor="let category of progress.categories; trackBy: trackCategory"
           type="button"
-          role="tab"
           class="category-card"
           [class.active]="category.key === selectedCategory"
           [class.complete]="category.total > 0 && category.done === category.total && !category.needsFile"
           [class.needs-file]="!!category.needsFile"
-          [attr.aria-selected]="category.key === selectedCategory"
+          [attr.aria-expanded]="category.key === selectedCategory"
+          [attr.aria-controls]="category.key === selectedCategory ? 'category-detail-' + category.key : null"
           (click)="selectCategory(category.key)"
         >
           <span class="card-head">
@@ -91,9 +91,9 @@
             <span class="card-pct" *ngIf="!category.needsFile">{{ category.percent }}%</span>
           </span>
         </button>
-      </div>
 
-      <section class="category-detail" *ngIf="category as open">
+      <ng-container *ngIf="category.key === selectedCategory">
+      <section class="category-detail" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
         <div class="detail-head">
           <h3>{{ open.title }} <span class="detail-count">{{ open.done | number }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
@@ -153,6 +153,9 @@
           </tbody>
         </table>
       </section>
+      </ng-container>
+        </ng-container>
+      </div>
       </ng-container>
     </ng-container>
   </div>

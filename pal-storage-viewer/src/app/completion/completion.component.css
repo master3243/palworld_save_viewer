@@ -241,6 +241,7 @@
 
 .category-grid {
   display: grid;
+  grid-auto-flow: row dense;
   gap: 10px;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 }
@@ -398,6 +399,9 @@
 /* ------------------------------------------------------------ detail */
 
 .category-detail {
+  grid-column: 1 / -1;
+  min-width: 0;
+  overflow-x: auto;
   background: rgba(5, 15, 25, 0.55);
   border: 1px solid rgba(134, 220, 255, 0.14);
   border-radius: 10px;
@@ -625,6 +629,10 @@
 }
 
 @media (max-width: 720px) {
+  .category-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .tracker-views { width:100%; }
   .tracker-views button { flex:1; justify-content:center; }
   .overall.map-overall { flex-direction:row; align-items:center; flex-wrap:wrap; gap:10px; }
