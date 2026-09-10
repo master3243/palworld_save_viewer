@@ -6,6 +6,7 @@ import { Category, CompletionData, CompletionSummary, TrackedItem, WorldProgress
 import { TrackerMapComponent } from './tracker-map.component';
 import { objectiveKey } from './tracker-map-model';
 import { loadCompletionData } from './completion-data';
+import { TabDiscovery } from '../tab-discovery';
 
 interface PlayerOption {
   key: string;
@@ -42,6 +43,11 @@ export class CompletionComponent implements OnChanges {
   groupFilter = '';
   mapOpen = false;
   mapVisited = false;
+  private readonly tabDiscovery = new TabDiscovery();
+
+  get showMapPing(): boolean {
+    return this.tabDiscovery.shouldPing('map', this.mapOpen ? 'map' : null, this.summary !== null);
+  }
   @ViewChild(TrackerMapComponent) trackerMap?: TrackerMapComponent;
   mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
@@ -114,6 +120,7 @@ export class CompletionComponent implements OnChanges {
   }
 
   showMap(item?: TrackedItem): void {
+    this.tabDiscovery.visit('map', this.summary !== null);
     if (item) this.mapFocus = objectiveKey(this.selectedCategory, item.id);
     this.mapVisited = true;
     this.mapOpen = true;

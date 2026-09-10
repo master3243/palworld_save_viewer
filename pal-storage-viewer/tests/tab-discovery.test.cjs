@@ -50,3 +50,21 @@ test('switching tabs before loading does not count, even with old stored flags',
   tabs.visit('pals', true);
   assert.equal(tabs.shouldPing('pals', 'tracker', true), false);
 });
+
+test('Map discovery is independent and survives later visits to the main tabs', () => {
+  let saved = '["pals","tracker"]';
+  const storage = { getItem: () => saved, setItem: (_, value) => { saved = value; }, removeItem() {} };
+  const mainTabs = new TabDiscovery(storage);
+  const trackerTabs = new TabDiscovery(storage);
+  assert.equal(trackerTabs.shouldPing('map', null, false), false);
+  trackerTabs.visit('map', false);
+  assert.equal(trackerTabs.shouldPing('map', null, true), true);
+  assert.equal(trackerTabs.shouldPing('map', 'map', true), false);
+  trackerTabs.visit('map', true);
+  assert.equal(trackerTabs.shouldPing('map', null, true), false);
+  mainTabs.visit('pals', true);
+  const reloaded = new TabDiscovery(storage);
+  assert.equal(reloaded.shouldPing('map', null, true), false);
+  assert.equal(reloaded.shouldPing('tracker', 'pals', true), false);
+  assert.deepEqual(new Set(JSON.parse(saved)), new Set(['pals', 'tracker', 'map']));
+});

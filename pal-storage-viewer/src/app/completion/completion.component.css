@@ -561,7 +561,7 @@
 
 .tracker-views { display:flex; flex-shrink:0; gap:5px; }
 .tracker-views button, .coordinate-link { background:#0a202d; border:1px solid #31576a; color:#d9f6ff; cursor:pointer; font:inherit; border-radius:7px; padding:7px 12px; }
-.tracker-views button { display:flex; align-items:center; gap:6px; font-size:13px; }
+.tracker-views button { display:flex; align-items:center; gap:6px; font-size:13px; position:relative; }
 .tracker-views button.active { background:#205269; border-color:#79dafa; }
 .tracker-views svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.5; }
 .coordinate-link { padding:2px 6px; font-size:12px; }
