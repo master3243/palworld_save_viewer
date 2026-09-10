@@ -842,16 +842,20 @@
 .progress-head {
   align-items: baseline;
   display: flex;
+  gap: 8px;
   justify-content: space-between;
 }
 
 .progress-label {
   color: #e8f8ff;
   font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
 }
 
 .progress-percent {
   color: rgba(232, 248, 255, 0.8);
+  flex-shrink: 0;
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
 }
@@ -886,6 +890,7 @@
   font-variant-numeric: tabular-nums;
   min-height: 1.2em;
   overflow: hidden;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

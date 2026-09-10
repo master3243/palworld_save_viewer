@@ -6,7 +6,7 @@
  * removing one file does not re-parse the others.
  */
 import {
-  CombineEntry, CombinedSaves, Lookups, ParsedFile, combineSaves, decodeSave, parseSaveFile
+  CombineEntry, CombinedSaves, Lookups, ParsedFile, SaveKind, combineSaves, decodeSave, parseSaveFile
 } from '../backend';
 import { previewSave, type SavePreview } from '../backend/save-preview';
 
@@ -76,7 +76,7 @@ type OozModule = { decompress(data: Uint8Array, rawSize: number): Uint8Array };
 /** The worker chunk is emitted next to index.html, so this is the app base URL. */
 const APP_BASE = new URL('./', self.location.href);
 
-/** Share of the bar given to each stage. */
+/** Each file contributes these stage shares, weighted by its size across the batch. */
 const READ_SHARE = 0.1;
 const PARSE_SHARE = 0.85;
 
@@ -117,7 +117,8 @@ function fileKey(set: string, file: File): string {
 async function parseInto(
   key: string,
   file: File,
-  progress?: (done: number, total: number, found: number, unit: string) => void
+  progress?: (done: number, total: number, found: number, unit: string) => void,
+  onKind?: (kind: SaveKind) => void
 ): Promise<ParsedFile | { error: string }> {
   const cached = parsedCache.get(key);
   if (cached) return cached;
@@ -125,7 +126,7 @@ async function parseInto(
   let parsed: ParsedFile | { error: string };
   try {
     const decoded = decodeSave(new Uint8Array(await file.arrayBuffer()), ooz);
-    parsed = parseSaveFile(decoded, lookups, progress);
+    parsed = parseSaveFile(decoded, lookups, progress, onKind);
   } catch (error) {
     parsed = { error: error instanceof Error ? error.message : String(error) };
   }
@@ -146,24 +147,32 @@ async function handleParse(request: ParseRequest): Promise<void> {
   const fileFractions = files.map(() => 0);
   const report = (label: string, detail: string) => {
     const weighted = fileFractions.reduce((sum, fraction, i) => sum + fraction * weights[i], 0) / totalWeight;
-    progress(READ_SHARE + weighted * PARSE_SHARE, label, detail);
+    progress(Math.min(READ_SHARE + PARSE_SHARE, weighted), label, detail);
   };
 
   const entries: CombineEntry[] = [];
   for (const [index, entry] of files.entries()) {
     const key = fileKey(entry.set, entry.file);
-    if (!parsedCache.has(key)) {
-      progress(READ_SHARE * (index / files.length), 'Decompressing', `${entry.name} (${index + 1} of ${files.length})`);
-    }
+    const reportFile = (fraction: number, stage: string, counts = '') => {
+      fileFractions[index] = Math.max(fileFractions[index], fraction);
+      report(`Loading saves · File ${index + 1} of ${files.length}`, `${entry.name}: ${stage}${counts ? `: ${counts}` : ''}`);
+    };
+    reportFile(0, parsedCache.has(key) ? 'Using cached data' : 'Decompressing');
     const parsed = await parseInto(key, entry.file, (done, total, found, unit) => {
-      fileFractions[index] = total > 0 ? done / total : 0;
+      const fraction = total > 0 ? Math.min(1, Math.max(0, done / total)) : 0;
       const pals = `${found.toLocaleString()} pal${found === 1 ? '' : 's'}`;
-      const detail = unit === 'entries'
-        ? `${entry.name}: ${done.toLocaleString()} of ${total.toLocaleString()} entries, ${pals}`
-        : `${entry.name}: ${done.toLocaleString()} of ${total.toLocaleString()} pals`;
-      report('Reading pals', detail);
+      const counts = unit === 'entries'
+        ? `${done.toLocaleString()} / ${total.toLocaleString()} entries, ${pals}`
+        : `${done.toLocaleString()} / ${total.toLocaleString()}`;
+      reportFile(READ_SHARE + fraction * PARSE_SHARE, 'Reading Pals', counts);
+    }, (kind) => {
+      const stage = kind === 'level_meta' ? 'Reading world metadata'
+        : kind === 'player' ? 'Reading player progress'
+        : kind === 'level' || kind === 'dimensional_storage' ? 'Reading Pals'
+        : 'Reading save data';
+      reportFile(READ_SHARE, stage);
     });
-    fileFractions[index] = 1;
+    reportFile(READ_SHARE + PARSE_SHARE, 'error' in parsed ? 'Could not read file' : 'Ready');
     entries.push({ key, name: entry.name, set: entry.set, letter: entry.letter, parsed });
   }
 

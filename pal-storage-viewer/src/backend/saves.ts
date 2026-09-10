@@ -263,9 +263,15 @@ export type ParsedFile =
   | { kind: 'world_option' | 'local_data' | 'unknown'; class_name: string; saved_at: string; payload: null };
 
 /** Decode one save file (already decompressed GVAS bytes) into its parsed payload. */
-export function parseSaveFile(decoded: Uint8Array, lookups: Lookups, progress?: ParseProgress): ParsedFile {
+export function parseSaveFile(
+  decoded: Uint8Array,
+  lookups: Lookups,
+  progress?: ParseProgress,
+  onKind?: (kind: SaveKind) => void
+): ParsedFile {
   const buf = new SaveBuffer(decoded);
   const [kind, className] = detectSaveKind(buf);
+  onKind?.(kind);
   const savedAt = readSaveTimestamp(buf);
   switch (kind) {
     case 'dimensional_storage':
