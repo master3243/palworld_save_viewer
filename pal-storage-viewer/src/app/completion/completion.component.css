@@ -458,7 +458,7 @@
 }
 
 .group-chip {
-  align-items: baseline;
+  align-items: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(134, 220, 255, 0.2);
   border-radius: 999px;
@@ -468,6 +468,13 @@
   font-size: 0.74rem;
   gap: 6px;
   padding: 3px 9px;
+}
+
+.group-icon {
+  flex: 0 0 20px;
+  height: 20px;
+  object-fit: contain;
+  width: 20px;
 }
 
 .group-chip b {

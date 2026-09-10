@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angular/core';
 
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
-import { Category, CompletionData, CompletionSummary, TrackedItem, WorldProgress, summarize } from './completion-model';
+import { Category, CompletionData, CompletionSummary, TrackedGroup, TrackedItem, WorldProgress, summarize } from './completion-model';
 import { TrackerMapComponent } from './tracker-map.component';
 import { CATEGORY_ICONS, objectiveKey } from './tracker-map-model';
 import { loadCompletionData } from './completion-data';
@@ -44,6 +44,7 @@ export class CompletionComponent implements OnChanges {
   mapOpen = false;
   mapVisited = false;
   categoryIcons: Record<string, string> = {};
+  private mapIcons: Record<string, string> = {};
   private readonly tabDiscovery = new TabDiscovery();
 
   get showMapPing(): boolean {
@@ -64,15 +65,23 @@ export class CompletionComponent implements OnChanges {
       if (!response.ok) return;
       const paths: Record<string, string> = await response.json();
       const sources = new Map<string, string>();
-      await Promise.allSettled([...new Set(Object.values(CATEGORY_ICONS))].map(async name => {
-        if (!paths[name]) return;
-        const image = await fetch(new URL(paths[name], document.baseURI));
+      await Promise.allSettled(Object.entries(paths).map(async ([name, path]) => {
+        const image = await fetch(new URL(path, document.baseURI));
         if (image.ok) sources.set(name, (await image.text()).trim());
       }));
+      this.mapIcons = Object.fromEntries(sources);
       this.categoryIcons = Object.fromEntries(Object.entries(CATEGORY_ICONS)
         .filter(([, name]) => sources.has(name)).map(([category, name]) => [category, sources.get(name)!]));
       this.changeDetector.markForCheck();
     } catch { /* Decorative icons must not prevent the tracker from loading. */ }
+  }
+
+  groupIcon(category: string, group: TrackedGroup): string | undefined {
+    if (category === 'relics') return this.mapIcons[group.name];
+    if (category === 'fastTravel') {
+      return this.mapIcons[group.key === 'statue' ? 'Fast Travel' : 'Watchtower'];
+    }
+    return undefined;
   }
 
   ngOnChanges(): void {

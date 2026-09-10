@@ -116,6 +116,7 @@
             [class.complete]="group.done === group.total"
             (click)="setGroup(group.key)"
           >
+            <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" alt="" decoding="async">
             <span>{{ group.name }}</span>
             <b>{{ group.done }}/{{ group.total }}</b>
           </button>
