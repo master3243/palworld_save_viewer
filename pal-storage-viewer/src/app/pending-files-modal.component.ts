@@ -77,7 +77,7 @@ export class PendingFilesModalComponent implements OnChanges {
   }
 
   palLabel(file: PendingFile): string {
-    if (file.pals === undefined) return '…';
+    if (file.pals === undefined) return '...';
     if (file.pals === null) return '';
     return `${file.pals.toLocaleString()} pal${file.pals === 1 ? '' : 's'}`;
   }

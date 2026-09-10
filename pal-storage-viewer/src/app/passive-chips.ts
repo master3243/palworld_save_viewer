@@ -9,7 +9,7 @@ export interface PassiveChip {
   tone: string;
   /** Signed rank; 0 when the skill has none. */
   rank: number;
-  /** Key of the rank arrow image (passive_plus_2 …), or '' for no arrow. */
+  /** Key of the rank arrow image (passive_plus_2 ...), or '' for no arrow. */
   iconKey: string;
 }
 

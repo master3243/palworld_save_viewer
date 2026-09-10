@@ -270,7 +270,7 @@
       </button>
 
       <div class="column-menu" *ngIf="isColumnMenuOpen">
-        <input class="column-search" type="search" aria-label="Search columns" placeholder="Search columns…" [value]="columnSearch" (input)="columnSearch = $any($event.target).value">
+        <input class="column-search" type="search" aria-label="Search columns" placeholder="Search columns..." [value]="columnSearch" (input)="columnSearch = $any($event.target).value">
         <div class="column-options">
           <label *ngFor="let column of matchingColumns; trackBy: trackColumn">
             <input type="checkbox" [checked]="column.visible" (change)="toggleColumn(column)">

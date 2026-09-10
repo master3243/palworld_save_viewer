@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { hasMultipleOwners, shortOwner } from '../pal-owners';
+import { hasMultipleOwners } from '../pal-owners';
 import {
   AfterViewInit,
   Component,
@@ -177,7 +177,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
   suggestionIndex = -1;
   private suggestionsVisible = false;
 
-  /** One state per loaded save (A, B, …); only offered when more than one save is loaded. */
+  /** One state per loaded save (A, B, ...); only offered when more than one save is loaded. */
   saveChip: QuickChip | null = null;
   ownerChip: QuickChip | null = null;
 
@@ -316,7 +316,7 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
       label: 'Owner',
       title: 'Owner: click to cycle through owners, then everyone',
       states: owners.map(name => ({
-        label: shortOwner(name || 'Empty'),
+        label: name || 'Empty',
         title: name ? `Owner: ${name}` : 'Owner: Empty',
         tone: 'include' as const,
         make: () => name ? createRule('owner', 'is', [name]) : createRule('owner', 'empty')
@@ -480,10 +480,10 @@ export class FilterBarComponent implements OnChanges, AfterViewInit, OnDestroy {
         detail: field.label + (field.kind === 'number' ? ' (number)' : field.kind === 'boolean' ? ' (yes/no)' : '')
       }));
       this.suggestions = isPrefix
-        ? [{ kind: 'field', insert: 'is:', label: 'is:', detail: 'alpha, lucky, favorite, male, female…' }, ...fields]
+        ? [{ kind: 'field', insert: 'is:', label: 'is:', detail: 'alpha, lucky, favorite, male, female...' }, ...fields]
         : fields;
       if (!inMoveGroup) {
-        const groups = ['equipped', 'known', 'unlearned'].filter(scope => `${scope}_move`.startsWith(context.prefix.toLowerCase())).map(scope => ({ kind: 'field' as const, insert: `${scope}_move:(`, label: `${scope}_move:(…)`, detail: 'Match properties of the same move' }));
+        const groups = ['equipped', 'known', 'unlearned'].filter(scope => `${scope}_move`.startsWith(context.prefix.toLowerCase())).map(scope => ({ kind: 'field' as const, insert: `${scope}_move:(`, label: `${scope}_move:(...)`, detail: 'Match properties of the same move' }));
         if ('sort'.startsWith(context.prefix.toLowerCase())) groups.push({ kind: 'field', insert: 'sort:', label: 'sort:', detail: 'Ordered sort fields; − means descending' });
         this.suggestions = [...groups, ...this.suggestions].slice(0, 10);
       }

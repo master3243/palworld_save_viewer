@@ -42,7 +42,7 @@ export function pendingFileDetails(
           return { text: name, stat: `${summarize(preview.completion, data, { labs }).percent}%`, statTitle: 'Tracker progress' };
         }
         const pending = Boolean(preview.completion && catalogPending);
-        return { text: name, stat: pending ? '…' : '—', statTitle: pending ? 'Loading progress…' : 'Progress unavailable', pending };
+        return { text: name, stat: pending ? '...' : '-', statTitle: pending ? 'Loading progress...' : 'Progress unavailable', pending };
       }
       default: return { text: '' };
     }

@@ -140,7 +140,7 @@ async function handleParse(request: ParseRequest): Promise<void> {
   const progress = (fraction: number | null, label: string, detail = '') =>
     post({ type: 'progress', id, fraction, label, detail });
 
-  if (!(oozPromise && lookupsPromise)) progress(null, 'Initializing…', '');
+  if (!(oozPromise && lookupsPromise)) progress(null, 'Initializing...', '');
   await Promise.all([getOoz(), getLookups()]);
 
   const weights = files.map((entry) => entry.file.size || 1);

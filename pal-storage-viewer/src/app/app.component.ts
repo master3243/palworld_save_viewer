@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { hasMultipleOwners, shortOwner } from './pal-owners';
+import { hasMultipleOwners } from './pal-owners';
 import { resolveWgsFiles } from '../backend/wgs';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnDestroy, ViewChild } from '@angular/core';
 
@@ -597,7 +597,7 @@ export class AppComponent implements OnDestroy {
   private async offerInputs(inputs: SaveInput[], append: boolean): Promise<void> {
     this.error = '';
     this.isParsing = true;
-    this.progress = { fraction: null, label: 'Reading folder…', detail: '' };
+    this.progress = { fraction: null, label: 'Reading folder...', detail: '' };
     try {
       inputs = await resolveWgsFiles(inputs);
     } catch (error) {
@@ -884,7 +884,7 @@ export class AppComponent implements OnDestroy {
 
     this.resetData();
     this.isParsing = true;
-    this.progress = { fraction: null, label: 'Initializing\u2026', detail: '' };
+    this.progress = { fraction: null, label: 'Initializing...', detail: '' };
     this.assignSaveLetters(merged);
     try {
       // The worker owns 0..95% of the bar; the table build takes the rest.
@@ -1083,7 +1083,7 @@ export class AppComponent implements OnDestroy {
   cellDisplay(row: PalStorageRow, column: TableColumn): string {
     const value = this.cellValue(row, column.key);
     if (column.key === 'owned_time') return formatOwnedTime(value);
-    if (column.key === 'owner_name') return shortOwner(value);
+    if (column.key === 'owner_name') return value;
     if (column.key === 'pal_variant') return this.isAlpha(row) ? 'A' : '';
     if (column.key === 'gender') return this.genderIcon(value);
     if (column.key === 'is_lucky') return this.isLucky(row) ? '★' : '';

@@ -17,7 +17,7 @@
       </button>
     </div>
 
-    <p class="tracker-note" *ngIf="!data && !loadError">Loading game data…</p>
+    <p class="tracker-note" *ngIf="!data && !loadError">Loading game data...</p>
     <p class="tracker-note error" *ngIf="loadError">{{ loadError }}</p>
 
     <ng-container *ngIf="summary as progress">

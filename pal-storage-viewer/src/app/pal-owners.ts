@@ -15,9 +15,3 @@ export function hasMultipleOwners(rows: PalStorageRow[]): boolean {
   }
   return false;
 }
-
-/** Ten displayed characters, including the ellipsis, without splitting Unicode code points. */
-export function shortOwner(name: string): string {
-  const chars = Array.from(name);
-  return chars.length > 10 ? chars.slice(0, 9).join('') + '…' : name;
-}

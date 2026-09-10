@@ -100,6 +100,35 @@ table.pal-table {
 .pal-table th.pal-name-cell { width: 115px; }
 .pal-table th.owner-cell { width: calc(10ch + 12px); }
 
+.pal-table .owner-cell,
+.owner-name {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-variant-ligatures: none;
+  text-overflow: clip;
+}
+
+/* Keep the full name in the DOM. Short names hide the suffix outside their own width. */
+.owner-name {
+  display: inline-block;
+  max-width: 10ch;
+  overflow: hidden;
+  position: relative;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.owner-name-text {
+  clip-path: polygon(0 0, 9ch 0, 9ch 100%, 0 100%);
+  display: block;
+  width: max-content;
+}
+
+.owner-name-suffix {
+  left: 9ch;
+  position: absolute;
+  top: 0;
+}
+
 /* Unsortable portrait column that sits just left of the Pal name. */
 .pal-table th.pal-icon-cell,
 .pal-table td.pal-icon-cell {

@@ -70,7 +70,11 @@
         <span class="move-mini-meta" *ngIf="chip.power"><img *ngIf="chip.iconSrc" [src]="chip.iconSrc" alt=""><b>{{ chip.power }}</b></span>
       </span>
     </span>
-    <ng-container *ngIf="column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank' && column.key !== 'elements' && column.key !== 'work' && column.key !== 'skills' && column.key !== 'combat_moves'">
+    <span class="owner-name" *ngIf="column.key === 'owner_name'">
+      <span class="owner-name-text">{{ view.cells[column.key]?.text }}</span>
+      <span class="owner-name-suffix" aria-hidden="true">-</span>
+    </span>
+    <ng-container *ngIf="column.key !== 'owner_name' && column.key !== 'pal_variant' && column.key !== 'gender' && column.key !== 'is_lucky' && column.key !== 'favorite_index' && column.key !== 'rank' && column.key !== 'elements' && column.key !== 'work' && column.key !== 'skills' && column.key !== 'combat_moves'">
       {{ view.cells[column.key]?.text }}
     </ng-container>
   </td>

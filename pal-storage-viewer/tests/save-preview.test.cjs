@@ -47,10 +47,10 @@ test('progress uses tracker category weighting and the matching world research',
   assert.deepEqual(pendingFileDetails([player, level('Church')], catalog)[0], { text: 'Church', stat: '50%', statTitle: 'Tracker progress' });
   // Without research data that category is excluded, giving (50 + 0) / 2.
   assert.equal(pendingFileDetails([player], catalog)[0].stat, '25%');
-  assert.equal(pendingFileDetails([player], null, undefined, true)[0].stat, '…');
+  assert.equal(pendingFileDetails([player], null, undefined, true)[0].stat, '...');
   const noRecord = { ...player, completion: null };
   assert.equal(pendingFileDetails([noRecord], catalog)[0].text, '');
-  assert.equal(pendingFileDetails([noRecord], catalog)[0].stat, '—');
+  assert.equal(pendingFileDetails([noRecord], catalog)[0].stat, '-');
   assert.equal(pendingFileDetails([noRecord], catalog)[0].statTitle, 'Progress unavailable');
 });
 

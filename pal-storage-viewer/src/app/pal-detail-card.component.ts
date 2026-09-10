@@ -270,7 +270,7 @@ export class PalDetailCardComponent implements OnChanges {
         if (segments.length) segments.push({ text: ' · ', value: false });
         segments.push(seg);
       }
-      if (!segments.length) segments.push({ text: '—', value: false });
+      if (!segments.length) segments.push({ text: '-', value: false });
       return { ...line, segments };
     });
     return { name, level, segments: current.segments, tooltip: { title, rich: current.segments, levels, note: 'Partner skill level = condensing stars + 1' } };

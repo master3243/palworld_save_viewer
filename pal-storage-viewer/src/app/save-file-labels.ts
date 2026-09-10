@@ -39,7 +39,7 @@ export function kindBlurb(kind: string): string {
 
 /** Cap filenames at 24 characters, preserving the beginning and ending. */
 export function shortFileName(name: string): string {
-  return name.length > 24 ? `${name.slice(0, 11)}…${name.slice(-12)}` : name;
+  return name.length > 24 ? `${name.slice(0, 9)}...${name.slice(-12)}` : name;
 }
 
 export function formatSize(bytes: number): string {

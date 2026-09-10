@@ -3,7 +3,7 @@
     <select aria-label="Objective status" [value]="status" (change)="setStatus($any($event.target).value)">
       <option value="missing">Missing</option><option value="done">Done</option><option value="all">All</option>
     </select>
-    <input type="search" class="map-search" [class.no-results]="searchHasNoResults" [attr.aria-invalid]="searchHasNoResults" placeholder="Find an objective…" aria-label="Search map objectives" [value]="search" (input)="setSearch($any($event.target).value)">
+    <input type="search" class="map-search" [class.no-results]="searchHasNoResults" [attr.aria-invalid]="searchHasNoResults" placeholder="Find an objective..." aria-label="Search map objectives" [value]="search" (input)="setSearch($any($event.target).value)">
     <button type="button" class="expand-button" [attr.aria-label]="full ? 'Exit expanded map' : 'Expand map'" [attr.aria-pressed]="full" (click)="full = !full">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path *ngIf="!full" d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/><path *ngIf="full" d="M3 9h6V3m6 0v6h6M3 15h6v6m6 0v-6h6"/></svg>
     </button>

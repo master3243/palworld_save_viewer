@@ -159,7 +159,7 @@ export class FilterBuilderComponent {
       return range ? `${range.min} – ${range.max}` : 'number';
     }
     if (rule.op === 'regex' || rule.op === 'not_regex') return 'pattern';
-    return field.kind === 'list' ? 'skill, skill…' : 'value, value…';
+    return field.kind === 'list' ? 'skill, skill...' : 'value, value...';
   }
 
   valueText(rule: FilterRule): string {

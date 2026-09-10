@@ -35,7 +35,7 @@ export interface SaveSource {
   bases?: number;
   skipped?: { players: number; wild_or_npc: number; unreadable: number };
   player_uid?: string | null;
-  /** A player save that carries the completion record (bosses, effigies, journals…). */
+  /** A player save that carries the completion record (bosses, effigies, journals...). */
   has_completion?: boolean;
   world_name?: string;
   host_player_name?: string;

@@ -125,7 +125,11 @@
         </ng-container>
         <ng-template #textLabel>
           <img *ngIf="chipIcon(chip) as icon" class="chip-icon" [src]="icon" alt="">
-          <span>{{ chipLabel(chip) }}</span>
+          <span *ngIf="chip === ownerChip && chipState(chip); else plainChipLabel" class="owner-name">
+            <span class="owner-name-text">{{ chipLabel(chip) }}</span>
+            <span class="owner-name-suffix" aria-hidden="true">-</span>
+          </span>
+          <ng-template #plainChipLabel><span>{{ chipLabel(chip) }}</span></ng-template>
         </ng-template>
       </button>
     </div>

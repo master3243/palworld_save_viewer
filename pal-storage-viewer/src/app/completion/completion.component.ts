@@ -57,7 +57,7 @@ export class CompletionComponent implements OnChanges {
         if (!player.completion) continue;
         players.push({
           key: `${set.folder}|${player.uid}`,
-          label: player.name || `Player …${player.uid.replace(/-/g, '').slice(-4)}`,
+          label: player.name || `Player ...${player.uid.replace(/-/g, '').slice(-4)}`,
           letter: set.letter,
           save: set.label,
           completion: player.completion,

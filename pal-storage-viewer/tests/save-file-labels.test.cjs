@@ -15,8 +15,8 @@ test('all long filenames are shortened, including nonstandard IDs and renamed sa
   for (const name of ['0'.repeat(31) + '1.sav', '0'.repeat(31) + '1_dps.sav', '0'.repeat(60) + '.sav', 'My very long renamed world backup.gvas', '0'.repeat(32) + '.gvas', 'a'.repeat(21) + '.sav']) {
     const short = shortFileName(name);
     assert.equal(short.length, 24);
-    assert.ok(short.includes('…'));
-    assert.ok(short.startsWith(name.slice(0, 11)));
+    assert.ok(short.includes('...'));
+    assert.ok(short.startsWith(name.slice(0, 9)));
     assert.ok(short.endsWith(name.slice(-12)));
   }
 });
@@ -39,7 +39,7 @@ test('player names resolve within their own world even when UIDs are shared', ()
   assert.match(sourceTitle(file, first, 42.7), /player: Church · 42.7% progress/);
   assert.match(sourceTitle(file, second, 0), /player: Diavolo · 0% progress/);
   assert.match(sourceTitle(file, null), /progress unavailable/);
-  assert.doesNotMatch(sourceTitle(file, null), /player:|Unknown player|Player …/);
+  assert.doesNotMatch(sourceTitle(file, null), /player:|Unknown player|Player .../);
 });
 
 test('world and DPS chips show Pal counts, including empty files, without redundant world filenames', () => {

@@ -94,9 +94,8 @@ test('batch progress stays monotonic while individual file stages and counts upd
   assert.ok(details.includes('Level.sav: Decompressing'));
   assert.ok(details.includes('Level.sav: Reading Pals: 50 / 100'));
   assert.ok(details.includes('LevelMeta.sav: Reading world metadata'));
-  assert.ok(details.includes('00000000000…00000001.sav: Reading player progress'));
-  assert.ok(details.includes('00000000000…0001_dps.sav: Reading Pals: 50 / 100'));
-  assert.ok(details.every(detail => !detail.includes('—')));
+  assert.ok(details.includes('000000000...00000001.sav: Reading player progress'));
+  assert.ok(details.includes('000000000...0001_dps.sav: Reading Pals: 50 / 100'));
   const firstDone = updates.find(update => update.detail === 'Level.sav: Ready');
   assert.ok(Math.abs(firstDone.fraction - 0.8 * 0.95) < 1e-10);
   const nextStart = updates.find(update => update.detail === 'LevelMeta.sav: Decompressing');
@@ -108,7 +107,7 @@ test('batch progress stays monotonic while individual file stages and counts upd
   assertMonotonic(worker.messages);
   assert.equal(worker.parses(), 5);
   assert.ok(worker.messages.some(message => message.detail === 'Level.sav: Using cached data'));
-  assert.ok(worker.messages.some(message => message.detail === 'My very lon…d backup.sav: Reading Pals: 50 / 100'));
+  assert.ok(worker.messages.some(message => message.detail === 'My very l...d backup.sav: Reading Pals: 50 / 100'));
 });
 
 test('empty, unreadable and zero-size files finish their shares without invalid progress', async () => {

@@ -54,7 +54,7 @@ export type ItemState = 'done' | 'active' | 'todo';
 export interface TrackedItem {
   id: string;
   name: string;
-  /** Secondary text: level, step, capture count… */
+  /** Secondary text: level, step, capture count... */
   detail: string;
   state: ItemState;
   /** Sub-list the item belongs to (effigy type, boss kind), if the category has groups. */
@@ -441,7 +441,7 @@ function ruinCategory(record: PlayerCompletion, data: CompletionData): Category 
  * several guilds the most advanced one is shown.
  *
  * TODO: once the app ships work-suitability / element icons, show the research category
- * (Cool, EmitFlame, Watering…) as its icon instead of text, in the chips and the rows.
+ * (Cool, EmitFlame, Watering...) as its icon instead of text, in the chips and the rows.
  */
 function researchCategory(world: WorldProgress | undefined, data: CompletionData): Category {
   const labs = world?.labs ?? [];
