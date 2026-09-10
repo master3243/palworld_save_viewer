@@ -1,5 +1,5 @@
 export type ViewMode = 'pals' | 'tracker';
-type VisitStorage = Pick<Storage, 'getItem' | 'setItem'>;
+type VisitStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 // Ignore older flags, which also counted visits made before loading a save.
 const STORAGE_KEY = 'pal-viewer.visited-loaded-tabs';
 
@@ -12,6 +12,7 @@ export class TabDiscovery {
   private readonly visited = new Set<ViewMode>();
 
   constructor(private readonly storage = browserStorage()) {
+    try { storage?.removeItem('pal-viewer.visited-tabs'); } catch { /* Storage may be read-only. */ }
     try {
       const saved: unknown = JSON.parse(storage?.getItem(STORAGE_KEY) ?? '[]');
       if (Array.isArray(saved)) {

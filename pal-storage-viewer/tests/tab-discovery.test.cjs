@@ -23,20 +23,21 @@ test('only an unvisited inactive tab pings while a save is loaded', () => {
 
 test('visited tabs remain dismissed after reloading and broken storage is tolerated', () => {
   let saved = 'invalid JSON';
-  const storage = { getItem: () => saved, setItem: (_, value) => { saved = value; } };
+  const storage = { getItem: () => saved, setItem: (_, value) => { saved = value; }, removeItem() {} };
   const tabs = new TabDiscovery(storage);
   assert.equal(tabs.shouldPing('tracker', 'pals', true), true);
   tabs.visit('tracker', true);
   assert.equal(new TabDiscovery(storage).shouldPing('tracker', 'pals', true), false);
-  const blocked = new TabDiscovery({ getItem() { throw Error(); }, setItem() { throw Error(); } });
+  const blocked = new TabDiscovery({ getItem() { throw Error(); }, setItem() { throw Error(); }, removeItem() { throw Error(); } });
   blocked.visit('tracker', true);
   assert.equal(blocked.shouldPing('tracker', 'pals', true), false);
 });
 
 test('switching tabs before loading does not count, even with old stored flags', () => {
   const saved = new Map([['pal-viewer.visited-tabs', '["pals","tracker"]']]);
-  const storage = { getItem: key => saved.get(key) ?? null, setItem: (key, value) => saved.set(key, value) };
+  const storage = { getItem: key => saved.get(key) ?? null, setItem: (key, value) => saved.set(key, value), removeItem: key => saved.delete(key) };
   const tabs = new TabDiscovery(storage);
+  assert.equal(saved.has('pal-viewer.visited-tabs'), false);
   tabs.visit('pals', false);
   tabs.visit('tracker', false);
   assert.equal(saved.has('pal-viewer.visited-loaded-tabs'), false);
