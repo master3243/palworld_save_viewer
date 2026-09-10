@@ -2,7 +2,7 @@
  * Element and work suitability icons for a table row, shared by the table and the pal card.
  * Icon files live in assets/icons (element_NN.webp, palwork_NN.webp).
  */
-import { ELEMENT_NAMES, WORK_COLUMN_KEYS, WORK_NAMES } from '../backend/lookups';
+import { ELEMENT_NAMES, WORK_COLUMN_KEYS, WORK_KEYS, WORK_NAMES } from '../backend/lookups';
 import type { PalStorageRow } from './save-parser.service';
 
 /** Icon file number for each work suitability, in WORK_KEYS order (09 was the dropped Oil Extraction). */
@@ -17,6 +17,12 @@ export interface TraitIcon {
 }
 
 const pad = (index: number) => String(index).padStart(2, '0');
+
+/** Existing work suitability artwork, shared by Pal traits and lab research. */
+export function workIcon(key: string): string {
+  const index = WORK_KEYS.indexOf(key);
+  return index === -1 ? '' : `assets/icons/palwork_${pad(WORK_ICON_INDEX[index])}.webp`;
+}
 
 /** Element icons of a row, from its "elements" text (e.g. "Fire, Dark"). */
 export function elementIcons(row: PalStorageRow): TraitIcon[] {
@@ -36,7 +42,7 @@ export function workTable(row: PalStorageRow): TraitIcon[] {
     if (match) bonuses.set(match[1], Number(match[2]));
   }
   return WORK_COLUMN_KEYS.map((key, index) => ({
-    src: `assets/icons/palwork_${pad(WORK_ICON_INDEX[index])}.webp`,
+    src: workIcon(WORK_KEYS[index]),
     name: WORK_NAMES[index],
     rank: Number(row[key] ?? 0),
     bonus: bonuses.get(WORK_NAMES[index]) ?? 0,

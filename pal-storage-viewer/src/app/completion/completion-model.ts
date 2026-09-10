@@ -451,7 +451,17 @@ function researchCategory(world: WorldProgress | undefined, data: CompletionData
       unknown: [], hasCoords: false, hasNumbers: false, numberLabel: '', hasTags: false, needsFile: 'Level.sav',
     };
   }
-  const names = new Map<string, string>();
+  const names = new Map<string, string>([
+    ['Handcraft', 'Handiwork'],
+    ['EmitFlame', 'Kindling'],
+    ['Watering', 'Watering'],
+    ['Seeding', 'Planting'],
+    ['GenerateElectricity', 'Generating Electricity'],
+    ['Deforest', 'Lumbering'],
+    ['Mining', 'Mining'],
+    ['Cool', 'Cooling'],
+    ['ProductMedicine', 'Medicine Production'],
+  ]);
   for (const [, , category] of data.research) if (category && !names.has(category)) names.set(category, category.replace(/([a-z])([A-Z])/g, '$1 $2'));
   const build = (lab: Record<string, number>): Category => {
     const items: TrackedItem[] = data.research.map(([id, name, category, work]) => {

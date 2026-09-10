@@ -19,7 +19,7 @@ RAW = ROOT / "completion_sources" / "raw"
 OUT = ROOT / "resources" / "completion" / "maps"
 CUSTOM_ICONS = (
     "Paldeck", "Capture Bonus", "Raid Boss", "Statue of Power", "Technology",
-    "Ancient Technology", "Lab Research", "Main Mission", "Sub Mission",
+    "Ancient Technology", "Lab Research", "Main Mission", "Sub Mission", "Lifmunk Effigy",
 )
 
 
@@ -85,6 +85,8 @@ def build():
             if not name.startswith("icons/"):
                 continue
             label = Path(name).stem
+            if label in CUSTOM_ICONS:
+                continue
             filename = label.lower().replace(" ", "-") + ".pog"
             icon = Image.open(io.BytesIO(archive.read(name))).convert("RGBA")
             bounds = icon.getchannel("A").point(lambda alpha: 255 if alpha > 16 else 0).getbbox()

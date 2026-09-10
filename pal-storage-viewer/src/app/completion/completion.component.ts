@@ -7,6 +7,7 @@ import { TrackerMapComponent } from './tracker-map.component';
 import { CATEGORY_ICONS, objectiveKey } from './tracker-map-model';
 import { loadCompletionData } from './completion-data';
 import { TabDiscovery } from '../tab-discovery';
+import { workIcon } from '../trait-icons';
 
 interface PlayerOption {
   key: string;
@@ -77,6 +78,7 @@ export class CompletionComponent implements OnChanges {
   }
 
   groupIcon(category: string, group: TrackedGroup): string | undefined {
+    if (category === 'research') return workIcon(group.key);
     if (category === 'technologies') {
       return this.mapIcons[group.key === 'ancient' ? 'Ancient Technology' : 'Technology'];
     }

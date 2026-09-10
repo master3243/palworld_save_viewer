@@ -78,7 +78,7 @@
         >
           <span class="card-head">
             <span class="card-title">
-              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" alt="" decoding="async">
+              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'bounties' || category.key === 'fastTravel' ? 'scale(1.2)' : null" alt="" decoding="async">
               <span>{{ category.title }}</span>
             </span>
             <span class="card-count">{{ category.done | number }} <i>/</i> {{ category.total | number }}</span>
@@ -107,7 +107,7 @@
             >
           </div>
         </div>
-        <div class="group-chips" *ngIf="open.groups.length" role="group" aria-label="Type">
+        <div class="group-chips" [class.research-groups]="open.key === 'research'" *ngIf="open.groups.length" role="group" aria-label="Type">
           <button
             *ngFor="let group of open.groups"
             type="button"
@@ -116,9 +116,9 @@
             [class.complete]="group.done === group.total"
             (click)="setGroup(group.key)"
           >
-            <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" alt="" decoding="async">
+            <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" [style.transform]="open.key === 'fastTravel' && group.key === 'statue' ? 'scale(1.2)' : null" alt="" decoding="async">
             <span>{{ group.name }}</span>
-            <b>{{ group.done }}/{{ group.total }}</b>
+            <b>{{ group.done }}<span>/{{ group.total }}</span></b>
           </button>
         </div>
         <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" or "+ Folder" above.</p>

@@ -482,14 +482,43 @@
   font-variant-numeric: tabular-nums;
 }
 
-.group-chip.complete b {
-  color: #8ef0c2;
+.research-groups .group-chip b {
+  align-items: baseline;
+  color: #fff36a;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 600;
+  gap: 2px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.research-groups .group-chip b span {
+  color: #a99a40;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .group-chip.active {
   background: rgba(116, 230, 255, 0.16);
   border-color: rgba(142, 229, 255, 0.7);
   color: #f1fbff;
+}
+
+.group-chip.complete {
+  background: rgba(83, 219, 151, 0.12);
+  border-color: rgba(142, 240, 194, 0.45);
+  color: #8ef0c2;
+}
+
+.group-chip.complete.active {
+  background: rgba(83, 219, 151, 0.24);
+  border-color: #8ef0c2;
+}
+
+.group-chips .group-chip.complete b,
+.group-chips .group-chip.complete b span {
+  color: #8ef0c2;
 }
 
 .item-table {
