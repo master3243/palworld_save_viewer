@@ -156,7 +156,7 @@
               </td>
               <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
-              <td class="name-col" [attr.title]="isPalList ? item.name : null"><span>{{ item.name }}</span></td>
+              <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="effigyIcon(open.key, item) as icon" [src]="icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
               <td class="detail-col" *ngIf="!isPalList"><span>{{ item.detail }}</span></td>
               <td class="coords-col" *ngIf="open.hasCoords">

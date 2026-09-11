@@ -112,6 +112,12 @@ export class CompletionComponent implements OnChanges {
     return undefined;
   }
 
+  effigyIcon(category: string, item: TrackedItem): string | undefined {
+    const name = category === 'relics' ? item.name
+      : category === 'statue' ? this.data?.relicTypes.find(type => type.enum === item.id)?.item : undefined;
+    return name ? this.mapIcons[name] : undefined;
+  }
+
   ngOnChanges(): void {
     const players: PlayerOption[] = [];
     for (const set of this.sets) {

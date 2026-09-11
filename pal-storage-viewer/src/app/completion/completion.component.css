@@ -639,6 +639,14 @@
   font-weight: 600;
 }
 
+.name-col img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
 .detail-col {
   color: rgba(232, 248, 255, 0.7);
 }
