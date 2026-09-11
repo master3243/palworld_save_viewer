@@ -58,7 +58,7 @@ export function nearestTravel(target: MapObjective, objectives: MapObjective[]):
     .sort((a,b) => distanceSquared(a,target)-distanceSquared(b,target))[0] ?? null;
 }
 
-/** Cluster in screen space, keeping hit targets usable at every zoom. */
+/** Screen-space bubbles require at least four markers. */
 export function clusterMarkers(points: MapObjective[], screen: (p: MapObjective) => MapPoint, cell = 28): MarkerCluster[] {
   const buckets = new Map<string, MarkerCluster[]>();
   const clusters: MarkerCluster[] = [];
@@ -75,20 +75,76 @@ export function clusterMarkers(points: MapObjective[], screen: (p: MapObjective)
       const bucket = buckets.get(key) ?? []; bucket.push(next); buckets.set(key,bucket);
     }
   }
-  return clusters;
+  return clusters.flatMap(cluster => cluster.items.length >= 4
+    ? [cluster]
+    : cluster.items.map(point => ({ ...screen(point), items: [point] })));
 }
 
-export function layoutMapMarkers(points: MapObjective[], map: MapDefinition, size: number, stops: ReadonlySet<string>): MarkerCluster[] {
-  const position = (p: MapObjective) => {
-    const n = project(p, map);
-    return { x: n.x * size, y: n.y * size };
-  };
-  const clusters = clusterMarkers(points.filter(p => !stops.has(p.key)), position);
-  clusters.push(...points.filter(p => stops.has(p.key)).map(p => ({ ...position(p), items: [p] })));
-  return clusters;
+export const MARKER_ZOOM_STEP = 1.25;
+
+interface MarkerNode extends MarkerCluster {
+  diameter: number;
+  children: MarkerNode[];
 }
 
-export function visibleMarkerClusters(layout: MarkerCluster[], offset: MapPoint, width: number, height: number): MarkerCluster[] {
-  return layout.map(c => ({ x: c.x + offset.x, y: c.y + offset.y, items: c.items }))
+/** Spatial groups shared across zoom levels. */
+export class MarkerHierarchy {
+  private readonly root?: MarkerNode;
+  private readonly stops: MarkerCluster[];
+
+  constructor(points: MapObjective[], map: MapDefinition, stops: ReadonlySet<string>) {
+    const markers = points.map(point => ({ ...project(point, map), items: [point] }));
+    this.stops = markers.filter(marker => stops.has(marker.items[0].key));
+    const grouped = markers.filter(marker => !stops.has(marker.items[0].key));
+    if (grouped.length) this.root = this.build(grouped);
+  }
+
+  private build(markers: MarkerCluster[]): MarkerNode {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, x = 0, y = 0;
+    for (const marker of markers) {
+      minX = Math.min(minX, marker.x); maxX = Math.max(maxX, marker.x);
+      minY = Math.min(minY, marker.y); maxY = Math.max(maxY, marker.y);
+      x += marker.x; y += marker.y;
+    }
+    const node: MarkerNode = { x: x / markers.length, y: y / markers.length,
+      items: markers.flatMap(marker => marker.items), diameter: Math.hypot(maxX - minX, maxY - minY), children: [] };
+    if (markers.length > 1) {
+      // Balanced splits keep dense groups together.
+      const axis = maxX - minX >= maxY - minY ? 'x' : 'y';
+      markers.sort((a, b) => a[axis] - b[axis] || a.items[0].key.localeCompare(b.items[0].key));
+      let middle = Math.floor(markers.length / 2), largestGap = 0;
+      for (let i = 1; i < markers.length; i++) {
+        const gap = markers[i][axis] - markers[i - 1][axis];
+        if (gap > largestGap) { largestGap = gap; }
+      }
+      // Separate outliers before splitting dense groups.
+      if (largestGap > (markers[markers.length - 1][axis] - markers[0][axis]) / 4) {
+        middle = markers.findIndex((marker, i) => i > 0 && marker[axis] - markers[i - 1][axis] === largestGap);
+      }
+      node.children = [this.build(markers.slice(0, middle)), this.build(markers.slice(middle))];
+    }
+    return node;
+  }
+
+  layout(size: number): MarkerCluster[] {
+    const clusters: MarkerCluster[] = [];
+    const visit = (node: MarkerNode) => {
+      // 56px spans two icons. Keep smaller groups in the tree.
+      if (node.items.length === 1 || (node.items.length >= 4 && node.diameter * size <= 56)) clusters.push(node);
+      else node.children.forEach(visit);
+    };
+    if (this.root) visit(this.root);
+    return [...clusters, ...this.stops].map(cluster => ({
+      x: cluster.x * size, y: cluster.y * size, items: cluster.items,
+    }));
+  }
+}
+
+export function layoutMapMarkers(points: MapObjective[], map: MapDefinition, size: number, stops: ReadonlySet<string>, hierarchy?: MarkerHierarchy): MarkerCluster[] {
+  return (hierarchy ?? new MarkerHierarchy(points, map, stops)).layout(size);
+}
+
+export function visibleMarkerClusters(layout: MarkerCluster[], offset: MapPoint, width: number, height: number, scale = 1): MarkerCluster[] {
+  return layout.map(c => ({ x: c.x * scale + offset.x, y: c.y * scale + offset.y, items: c.items }))
     .filter(c => c.x > -25 && c.x < width + 25 && c.y > -25 && c.y < height + 25);
 }
