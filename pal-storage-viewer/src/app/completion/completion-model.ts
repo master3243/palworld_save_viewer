@@ -48,6 +48,7 @@ export interface CompletionData {
 export interface CraftingRecipe {
   id: string;
   quantity: number;
+  workAmount: number;
   sources: string[];
   ingredients: [string, string, number][];
 }
@@ -58,6 +59,11 @@ export interface CraftingItem {
   rarity: number;
   group: string;
   icon: string;
+  weight: number;
+  baseValue: number;
+  stackLimit: number;
+  technologyLevels: number[];
+  stats: [string, number][];
   recipes: CraftingRecipe[];
 }
 
@@ -92,7 +98,7 @@ export interface TrackedItem {
   /** Lifetime catches shown against the capture bonus target, without capping. */
   captureProgress?: { done: number; total: number };
   fishing?: { common: number; whopper: number; lunker: number };
-  crafting?: CraftingItem & { count: number | null; sources: string[] };
+  crafting?: CraftingItem & { count: number | null; sources: string[]; sourceLabel: string };
   /** False for rows shown for information only (paid DLC); they do not count. */
   counted?: boolean;
   /** Short label shown as a chip in its own column (Normal / Ultra). */
@@ -296,6 +302,21 @@ function technologyCategory(record: PlayerCompletion, data: CompletionData): Cat
   }, 'Level');
 }
 
+function craftingSourceLabel(name: string, source: string): string {
+  for (const [prefix, label] of [['Technology: ', 'Tech'], ['Ancient technology: ', 'Ancient tech']]) {
+    if (source.startsWith(prefix)) {
+      const technology = source.slice(prefix.length);
+      return technology === name ? label : `${label}: ${technology}`;
+    }
+  }
+  const prefix = `${name} `;
+  if (source.startsWith(prefix)) {
+    const suffix = source.slice(prefix.length);
+    if (/^Schematic(?: \d+)?$/.test(suffix)) return suffix;
+  }
+  return source;
+}
+
 function craftingCategory(record: PlayerCompletion, data: CompletionData): Category {
   const counts = new Map<string, number>();
   for (const [id, count] of Object.entries(record.crafted_item_counts ?? {})) {
@@ -313,7 +334,7 @@ function craftingCategory(record: PlayerCompletion, data: CompletionData): Categ
       id: item.id, name: item.name, group: item.group, no: null, coords: '', map: '', order: 0,
       state: count !== null && count > 0 ? 'done' : 'todo',
       detail: [...sources, ...item.recipes.flatMap(recipe => recipe.ingredients.map(([, name]) => name))].join(' · '),
-      crafting: { ...item, count, sources },
+      crafting: { ...item, count, sources, sourceLabel: sources.map(source => craftingSourceLabel(item.name, source)).join(' · ') },
     };
   });
   const groups = new Map([...new Set(catalog.map(item => item.group))].sort().map(name => [name, name]));

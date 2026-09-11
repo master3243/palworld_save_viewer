@@ -147,10 +147,15 @@
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
               <ng-container *ngIf="open.key === 'crafting'">
+                <th>Category</th>
                 <th>Rarity</th>
+                <th class="craft-number">Weight</th>
+                <th class="craft-number" title="Stored item value">Base value</th>
+                <th class="craft-number">Tech level</th>
                 <th>Unlock source</th>
                 <th class="crafted-col">Crafted</th>
                 <th>Ingredients</th>
+                <th>Item stats</th>
               </ng-container>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
               <ng-container *ngIf="columns.fishing">
@@ -183,20 +188,26 @@
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <ng-container *ngIf="item.crafting as craft">
+                <td>{{ craft.group }}</td>
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
-                <td class="craft-source"><span>{{ craft.sources.length ? craft.sources.join(' · ') : '-' }}</span></td>
+                <td class="craft-number craft-weight">{{ craft.weight | number }}</td>
+                <td class="craft-number craft-value">{{ craft.baseValue | number }}</td>
+                <td class="craft-number craft-tech-level">{{ craft.technologyLevels.length ? craft.technologyLevels.join(', ') : '-' }}</td>
+                <td class="craft-source"><span [attr.title]="craft.sources.length ? craft.sources.join(' · ') : null">{{ craft.sourceLabel || '-' }}</span></td>
                 <td class="crafted-col"><span class="card-count">{{ craft.count === null ? '-' : (craft.count | number) }}</span></td>
                 <td class="craft-ingredients">
                   <details #recipeDetails (toggle)="onRecipeToggle()">
                     <summary [attr.aria-label]="'Ingredients for ' + item.name">{{ craft.recipes.length === 1 ? 'Recipe' : craft.recipes.length + ' recipes' }}</summary>
                     <ng-container *ngIf="recipeDetails.open">
                       <div class="craft-recipe" *ngFor="let recipe of craft.recipes">
-                        <b>Makes {{ recipe.quantity | number }}</b>
+                        <b>Makes {{ recipe.quantity | number }}, {{ recipe.workAmount | number }} work required</b>
                         <span *ngFor="let ingredient of recipe.ingredients">{{ ingredient[2] | number }} × {{ ingredient[1] }}</span>
                       </div>
+                      <div class="craft-stack">Stack limit: {{ craft.stackLimit | number }}</div>
                     </ng-container>
                   </details>
                 </td>
+                <td class="craft-stats"><div *ngIf="craft.stats.length; else noCraftStats"><span *ngFor="let stat of craft.stats">{{ stat[0] }}: {{ stat[1] | number }}</span></div><ng-template #noCraftStats>-</ng-template></td>
               </ng-container>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
               <ng-container *ngIf="columns.fishing">
@@ -221,7 +232,7 @@
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="3 + (open.key === 'crafting' ? 3 : 0) + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (columns.fishing ? 3 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="3 + (open.key === 'crafting' ? 8 : 0) + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (columns.fishing ? 3 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
             </tr>
           </tbody>
         </table>

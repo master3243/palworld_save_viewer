@@ -77,6 +77,31 @@ test('missing crafting history stays unknown and does not lower overall completi
   }
 });
 
+test('crafting metadata preserves item variants, direct technology levels, and food stats', () => {
+  const items = category('crafting', { crafted_item_counts: {} }).items;
+  const craft = id => items.find(item => item.id === id).crafting;
+  const rifle = craft('AssaultRifle_Default1');
+  assert.equal(rifle.group, 'Weapons');
+  assert.equal(rifle.weight, 15);
+  assert.equal(rifle.baseValue, 57600);
+  assert.equal(rifle.stackLimit, 1);
+  assert.deepEqual(rifle.technologyLevels, [45]);
+  assert.deepEqual(rifle.stats, [['Attack', 320], ['Durability', 3000], ['Magazine', 20]]);
+  assert.equal(rifle.recipes[0].workAmount, 100000);
+  const legendary = craft('AssaultRifle_Default5');
+  assert.deepEqual(legendary.technologyLevels, []);
+  assert.equal(legendary.baseValue, 120000);
+  assert.deepEqual(legendary.stats, [['Attack', 560], ['Durability', 6000], ['Magazine', 30]]);
+  assert.equal(legendary.recipes[0].workAmount, 3200000);
+  const milk = craft('HotMilk');
+  assert.equal(milk.weight, 1.5);
+  assert.equal(milk.stackLimit, 9999);
+  assert.deepEqual(milk.stats, [['Nutrition', 16], ['SAN', 1]]);
+  assert.deepEqual(craft('Pal_crystal_S').stats, []);
+  assert.ok(craft('Pal_crystal_S').recipes.every(recipe => recipe.workAmount === 1000));
+  assert.ok(new Set(craft('Pal_crystal_S').recipes.map(recipe => recipe.quantity)).size > 1);
+});
+
 test('capture bonus shows fishing tiers for matching species without changing capture progress', () => {
   const progress = {
     capture_counts: { Penguin: 21, Penguin_Electric: 8 },

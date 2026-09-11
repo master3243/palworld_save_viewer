@@ -15,8 +15,10 @@ def build(cache: Path) -> list[dict]:
     names = {key.lower(): value['localized_name'] for key, value in read('psp/l10n/items.json').items()}
     tech_names = read('psp/l10n/technologies.json')
     technologies = {}
+    technology_levels = {}
     for key, value in read('psp/technologies.json').items():
         for recipe in value['unlock_item_recipes']:
+            technology_levels.setdefault(recipe.lower(), []).append(value['level_cap'])
             technologies.setdefault(recipe.lower(), []).append(
                 ('Ancient technology: ' if value['is_boss_technology'] else 'Technology: ')
                 + tech_names.get(key, {}).get('localized_name', key))
@@ -27,6 +29,11 @@ def build(cache: Path) -> list[dict]:
         'Ammo': 'Ammunition', 'Food': 'Food', 'Essential': 'Key items',
         'Blueprint': 'Schematics',
     }
+    stat_fields = [
+        ('PhysicalAttackValue', 'Attack'), ('PhysicalDefenseValue', 'Defense'),
+        ('HPValue', 'HP'), ('ShieldValue', 'Shield'), ('Durability', 'Durability'),
+        ('MagazineSize', 'Magazine'), ('RestoreSatiety', 'Nutrition'), ('RestoreSanity', 'SAN'),
+    ]
     outputs = {}
     for recipe_id, recipe in recipes.items():
         item_id, item = items[recipe['Product_Id'].lower()]
@@ -36,10 +43,14 @@ def build(cache: Path) -> list[dict]:
         entry = outputs.setdefault(item_id, {
             'id': item_id, 'name': names[item_id.lower()], 'rarity': item['Rarity'],
             'group': groups.get(item['TypeA'], 'Other'),
+            'weight': item['Weight'], 'baseValue': item['Price'], 'stackLimit': item['MaxStackCount'],
+            'technologyLevels': [],
+            'stats': [[label, item[field]] for field, label in stat_fields if item[field] != 0],
             'icon': f'resources/completion/crafting-icons/{icon_key}.pog' if icon_key in icons else '',
             'recipes': [],
         })
         sources = list(technologies.get(recipe_id.lower(), []))
+        entry['technologyLevels'] = sorted(set(entry['technologyLevels'] + technology_levels.get(recipe_id.lower(), [])))
         if recipe['UnlockItemID']:
             sources.append(names.get(recipe['UnlockItemID'].lower(), 'Schematic'))
         ingredients = []
@@ -48,6 +59,7 @@ def build(cache: Path) -> list[dict]:
             if material and count > 0:
                 ingredients.append([items[material.lower()][0], names[material.lower()], count])
         entry['recipes'].append({'id': recipe_id, 'quantity': recipe['Product_Count'],
+                                 'workAmount': recipe['WorkAmount'],
                                  'sources': sources, 'ingredients': ingredients})
     return sorted(outputs.values(), key=lambda entry: (entry['name'].lower(), entry['rarity'], entry['id']))
 
