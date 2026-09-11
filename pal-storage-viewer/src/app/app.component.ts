@@ -76,6 +76,62 @@ export class AppComponent implements OnDestroy {
   private detailResizeObserver?: ResizeObserver;
   screenshotMode = Boolean(window.SCREENSHOT_MODE);
   private screenshotModeTimer: number;
+  readonly steamSaveLocation = '%LOCALAPPDATA%\\Pal\\Saved\\SaveGames\\';
+  readonly gamepassSaveLocation = '%LOCALAPPDATA%\\Packages\\PocketpairInc.Palworld_ad4psfrxyesvt\\SystemAppData';
+  copiedSaveLocation = '';
+  saveLocationCopyStatus = '';
+  private copyStatusTimer?: number;
+
+  async copySaveLocation(path: string): Promise<void> {
+    window.clearTimeout(this.copyStatusTimer);
+    this.copiedSaveLocation = '';
+    this.saveLocationCopyStatus = '';
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(path);
+      copied = true;
+    } catch {
+      copied = this.copySaveLocationFallback(path);
+    }
+    if (copied) {
+      this.copiedSaveLocation = path;
+      this.saveLocationCopyStatus = 'Save location copied.';
+    } else {
+      this.saveLocationCopyStatus = 'Your browser blocked copying. Please copy this path manually: ' + path;
+    }
+    if (copied) {
+      this.copyStatusTimer = window.setTimeout(() => {
+        this.copiedSaveLocation = '';
+        this.saveLocationCopyStatus = '';
+      }, 3000);
+    }
+  }
+
+  private copySaveLocationFallback(path: string): boolean {
+    const focused = document.activeElement;
+    const selection = window.getSelection();
+    const ranges = selection
+      ? Array.from({ length: selection.rangeCount }, (_, index) => selection.getRangeAt(index).cloneRange())
+      : [];
+    const input = document.createElement('textarea');
+    input.value = path;
+    input.readOnly = true;
+    input.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;user-select:text;-webkit-user-select:text;';
+    document.body.appendChild(input);
+    try {
+      input.focus({ preventScroll: true });
+      input.select();
+      input.setSelectionRange(0, path.length);
+      return document.execCommand('copy');
+    } catch {
+      return false;
+    } finally {
+      input.remove();
+      if (focused instanceof HTMLElement) focused.focus({ preventScroll: true });
+      selection?.removeAllRanges();
+      ranges.forEach(range => selection?.addRange(range));
+    }
+  }
 
   @ViewChild('detailRow') set detailRow(ref: ElementRef<HTMLElement> | undefined) {
     this.detailResizeObserver?.disconnect();
@@ -94,6 +150,7 @@ export class AppComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.detailResizeObserver?.disconnect();
     window.clearInterval(this.screenshotModeTimer);
+    window.clearTimeout(this.copyStatusTimer);
   }
 
   originalRows: PalStorageRow[] = [];

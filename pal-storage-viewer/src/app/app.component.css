@@ -329,10 +329,43 @@
   min-width: 0;
 }
 
-.upload-guide .save-location-paths > code {
+.save-location-copy {
+  align-items: center;
+  background: rgba(55, 154, 235, 0.14);
+  border: 1px solid rgba(100, 185, 255, 0.28);
+  border-radius: 4px;
+  color: #8acbff;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 5px;
+  padding: 3px 6px;
   transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, text-shadow 180ms ease;
-  -webkit-user-select: text;
-  user-select: text;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.save-location-copy:focus-visible {
+  outline: 2px solid #8acbff;
+  outline-offset: 3px;
+}
+
+.save-location-copy svg {
+  fill: none;
+  flex: 0 0 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  width: 14px;
+}
+
+.save-location-copy-status {
+  color: #c7edff;
+  font-size: 0.8rem;
+  min-height: 1.5em;
+  text-align: center;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -344,7 +377,7 @@
 
   .upload-guide:hover .save-location-label { color: #d4edff; }
 
-  .upload-guide:hover .save-location-paths > code {
+  .upload-guide:hover .save-location-copy {
     background-color: rgba(55, 154, 235, 0.32);
     border-color: rgba(164, 230, 255, 0.9);
     box-shadow: 0 0 18px rgba(92, 180, 255, 0.4);
@@ -354,7 +387,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .upload-guide, .save-location-label, .upload-guide .save-location-paths > code { transition: none; }
+  .upload-guide, .save-location-label, .save-location-copy { transition: none; }
   .upload-guide:hover { transform: none; }
 }
 
@@ -457,20 +490,30 @@
   flex: 0 1 auto;
 }
 
+.upload-guide .save-location-copy code {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: inherit;
+  padding: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .steam-location-paths {
   flex: 0 1 auto;
   flex-wrap: nowrap;
 }
 
-.steam-location-paths > code,
+.steam-location-paths > .save-location-copy,
 .steam-location-paths .save-path-placeholder {
   box-sizing: border-box;
   /* Reserve space for the label, padding, and gaps. */
-  font-size: min(0.7rem, calc((100cqw - 5rem - 36px) / 33));
+  font-size: min(0.7rem, calc((100cqw - 5rem - 55px) / 33));
   white-space: nowrap;
 }
 
-.steam-location-paths > code,
+.steam-location-paths > .save-location-copy,
 .steam-location-paths .save-path-hint {
   flex-shrink: 0;
 }
@@ -494,7 +537,7 @@
 .upload-guide .gamepass-save-path {
   box-sizing: border-box;
   /* Reserve space for the label, gap, and path padding. */
-  font-size: min(0.7rem, calc((100cqw - 5rem - 22px) / 46));
+  font-size: min(0.7rem, calc((100cqw - 5rem - 41px) / 46));
   overflow-wrap: normal;
   text-align: center;
   white-space: nowrap;

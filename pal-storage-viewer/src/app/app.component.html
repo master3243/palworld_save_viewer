@@ -115,7 +115,10 @@
         <p class="save-location">
           <span class="save-location-label">Save Location:</span>
           <span class="save-location-paths steam-location-paths">
-            <code>%LOCALAPPDATA%\Pal\Saved\SaveGames\</code>
+            <button type="button" class="save-location-copy" aria-label="Copy Steam save location" [title]="copiedSaveLocation === steamSaveLocation ? 'Copied!' : 'Copy save location'" (click)="copySaveLocation(steamSaveLocation)">
+              <code>{{ steamSaveLocation }}</code>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="copiedSaveLocation === steamSaveLocation ? 'M5 12l4 4L19 6' : 'M9 5H5v16h14V5h-4M9 3h6v4H9z'"/></svg>
+            </button>
             <span class="save-path-hint">
               <code class="save-path-placeholder" tabindex="0" aria-describedby="save-path-tooltip">IDprofile\IDworld\</code>
               <span class="save-path-tooltip" id="save-path-tooltip" role="tooltip">
@@ -149,7 +152,12 @@
         </h2>
         <p class="save-location">
           <span class="save-location-label">Save Location:</span>
-          <span class="save-location-paths gamepass-location-path"><code class="gamepass-save-path">%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData</code></span>
+          <span class="save-location-paths gamepass-location-path">
+            <button type="button" class="save-location-copy gamepass-save-path" aria-label="Copy Gamepass save location" [title]="copiedSaveLocation === gamepassSaveLocation ? 'Copied!' : 'Copy save location'" (click)="copySaveLocation(gamepassSaveLocation)">
+              <code>{{ gamepassSaveLocation }}</code>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="copiedSaveLocation === gamepassSaveLocation ? 'M5 12l4 4L19 6' : 'M9 5H5v16h14V5h-4M9 3h6v4H9z'"/></svg>
+            </button>
+          </span>
         </p>
         <p class="upload-drop-instruction">
           <span>Drag:</span>
@@ -160,6 +168,8 @@
       <img src="resources/upload_gamepass.png" width="1720" height="801" draggable="false" alt="Gamepass SystemAppData folder with the wgs folder dragged into the upload area.">
     </figure>
   </section>
+
+  <p class="save-location-copy-status" role="status" *ngIf="!hasData && !screenshotMode">{{ saveLocationCopyStatus }}</p>
 
   <app-faq-modal *ngIf="isDropHelpOpen" (closed)="closeDropHelp()"></app-faq-modal>
 
