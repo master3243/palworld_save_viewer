@@ -80,10 +80,10 @@ test('each Pal Critic uses its own six stages and the correct save field', () =>
   for (const area of ['A', 'I']) {
     const item = mission(`Sub_PalDisplay_${area}_01`, extra);
     assert.equal(item.state, 'done');
-    assert.match(item.detail, /^6 \/ 6 rewards claimed/);
+    assert.equal(item.detail, '6 / 6 rewards claimed');
   }
   assert.equal(mission('Sub_PalDisplay_B_01', extra).state, 'active');
-  assert.match(mission('Sub_PalDisplay_B_01', extra).detail, /^1 \/ 6 rewards claimed/);
+  assert.equal(mission('Sub_PalDisplay_B_01', extra).detail, '1 / 6 rewards claimed');
   assert.equal(mission('Sub_PalDisplay_C_01', extra).state, 'todo');
 });
 

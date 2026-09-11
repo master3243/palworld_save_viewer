@@ -63,17 +63,6 @@ h2 { color: white; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: 1.1; ma
 .alpha-badge { height: 21px; object-fit: contain; width: 21px; }
 .favorite-badge { height: 24px; object-fit: contain; width: 24px; }
 .wiki-links { display: inline-flex; gap: 7px; margin-left: auto; }
-.wiki-link { align-items: center; background: rgba(3, 17, 27, .72); border: 1px solid rgba(126, 221, 248, .34); border-radius: 7px; color: #8de2f8; display: inline-flex; font-size: .74rem; font-weight: 900; gap: 5px; height: 32px; justify-content: center; min-width: 49px; padding: 0 8px; text-decoration: none; }
-.wiki-link svg { fill: none; height: 16px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; width: 16px; }
-.wiki-link:hover, .wiki-link:focus-visible { background: rgba(61, 174, 217, .2); border-color: #8de2f8; box-shadow: 0 0 6px rgba(99, 214, 246, .28); color: #fff; outline: none; }
-.wikigg-link { border-color: rgba(151, 184, 255, .38); color: #afc7ff; }
-.wikigg-link:hover, .wikigg-link:focus-visible { border-color: #afc7ff; box-shadow: 0 0 6px rgba(132, 165, 245, .28); }
-.fandom-link { border-color: rgba(255, 166, 203, .38); color: #ffacd0; }
-.fandom-link:hover, .fandom-link:focus-visible { border-color: #ffacd0; box-shadow: 0 0 6px rgba(255, 139, 190, .25); }
-.paldb-link { border-color: rgba(153, 231, 170, .38); color: #9de7ad; }
-.paldb-link:hover, .paldb-link:focus-visible { border-color: #9de7ad; box-shadow: 0 0 6px rgba(126, 224, 149, .24); }
-.game8-link { border-color: rgba(255, 185, 104, .4); color: #ffc078; }
-.game8-link:hover, .game8-link:focus-visible { border-color: #ffc078; box-shadow: 0 0 6px rgba(255, 171, 75, .26); }
 .stars { display: flex; gap: 2px; }.stars i { color: transparent; font-size: 1.7rem; font-style: normal; line-height: 1; -webkit-text-stroke: 1.3px rgba(200, 215, 225, .5); }.stars i.filled { color: #ffd400; -webkit-text-stroke: 0; text-shadow: 0 0 8px rgba(255, 212, 0, .65), 0 0 2px rgba(255, 240, 150, .9); }
 
 .profile-body { display: grid; gap: 24px; grid-template-columns: 150px 1fr; padding: 24px 8px 18px; }

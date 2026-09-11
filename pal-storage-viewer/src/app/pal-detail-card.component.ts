@@ -13,6 +13,7 @@ import { OfflineImageService } from './offline-image.service';
 import { palImagePath } from './pal-image';
 import { PalStorageRow } from './save-parser.service';
 import { formatOwnedTime } from './owned-time';
+import { palWikiLinks, PalWikiLink } from './pal-wiki-links';
 
 interface DetailField { key: string; label: string; value: string; rawValue?: string; }
 interface PalStat { label: string; value: string; icon: 'hp' | 'attack' | 'defense' | 'crafting'; tone?: 'high' | 'perfect'; }
@@ -30,7 +31,7 @@ interface TrustBar { rank: string; progress: number; title: string; tooltip: Too
   standalone: true,
   imports: [CommonModule, GenderIconComponent, TooltipDirective, ElementChartComponent],
   templateUrl: './pal-detail-card.component.html',
-  styleUrl: './pal-detail-card.component.css'
+  styleUrls: ['./pal-wiki-links.css', './pal-detail-card.component.css']
 })
 export class PalDetailCardComponent implements OnChanges {
   @Input({ required: true }) row!: PalStorageRow;
@@ -412,21 +413,11 @@ export class PalDetailCardComponent implements OnChanges {
     return this.valueFor('nickname') || this.valueFor('pal_name') || this.valueFor('species_id') || 'Pal';
   }
 
-  get palpediaUrl(): string {
-    return `https://www.palpedia.net/pals/${encodeURIComponent(this.wikiName)}`;
+  get wikiLinks(): PalWikiLink[] {
+    return palWikiLinks(this.wikiName, this.game8Url);
   }
 
-  get wikiGgUrl(): string {
-    return `https://palworld.wiki.gg/wiki/${encodeURIComponent(this.wikiName.replace(/\s+/g, '_'))}`;
-  }
-
-  get fandomUrl(): string {
-    return `https://palworld.fandom.com/wiki/${encodeURIComponent(this.wikiName.replace(/\s+/g, '_'))}`;
-  }
-
-  get palDbUrl(): string {
-    return `https://paldb.cc/en/${encodeURIComponent(this.wikiName.replace(/\s+/g, '_'))}`;
-  }
+  trackWikiLink(_index: number, link: PalWikiLink): string { return link.site; }
 
   get initials(): string {
     return this.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();

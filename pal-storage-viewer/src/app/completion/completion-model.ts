@@ -164,8 +164,8 @@ function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoor
   const counted = category.items.filter((item) => item.counted !== false);
   const done = counted.filter((item) => item.state === 'done').length;
   const total = counted.length;
-  // In progress first, then missing, then done; within a state by the category's own order.
-  category.items.sort((a, b) => STATE_RANK[a.state] - STATE_RANK[b.state] || a.order - b.order || a.name.localeCompare(b.name));
+  const stateRank = category.key === 'captureBonus' ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
+  category.items.sort((a, b) => stateRank[a.state] - stateRank[b.state] || a.order - b.order || a.name.localeCompare(b.name));
   return {
     ...category, done, total, percent: percentOf(done, total),
     hasCoords: category.items.some((item) => item.coords !== ''),
@@ -337,8 +337,6 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
     const areaMatch = /_([A-Z])_\d+$/.exec(id);
     const suffix = areaMatch ? `area ${areaMatch[1]}` : id.replace(/^(Main|Sub|Hidden)_/, '').replace(/_/g, ' ');
     const name = (nameCounts.get(baseName) ?? 0) > 1 ? `${baseName} (${suffix})` : baseName;
-    // The Pal Critic requests have no marker of their own; list where the critics stand.
-    const critics = id.includes('PalDisplay') && data.palCritics.length ? `critics at ${data.palCritics.map(([cx, cy]) => `${cx}, ${cy}`).join(' · ')}` : '';
     let state: ItemState = 'todo';
     let detail = '';
     if (completed.has(key)) {
@@ -358,7 +356,6 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
       state = done === rewards.ids.length ? 'done' : done > 0 || state !== 'todo' ? 'active' : 'todo';
       detail = `${done} / ${rewards.ids.length} rewards claimed`;
     }
-    if (critics) detail = [detail, critics].filter(Boolean).join(' · ');
     items.push({ id, name, detail, state, group: '', ...place(x, y), order: 0, no: null });
   }
   const known = new Set(Object.keys(data.quests).map(id => id.toLowerCase()));

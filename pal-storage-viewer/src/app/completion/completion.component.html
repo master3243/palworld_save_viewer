@@ -134,6 +134,7 @@
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
+              <th *ngIf="isPalList" aria-label="Pal links"></th>
               <th *ngIf="!isPalList">Details</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
             </tr>
@@ -158,13 +159,22 @@
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="effigyIcon(open.key, item) as icon" [src]="icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
+              <td *ngIf="isPalList" class="pal-links-col">
+                <span class="wiki-links" role="group" [attr.aria-label]="item.name + ' links'">
+                  <a *ngFor="let link of wikiLinks(item); trackBy: trackWikiLink" class="wiki-link" [ngClass]="link.className" [href]="link.url"
+                    target="_blank" rel="noopener noreferrer" [attr.aria-label]="'Open ' + item.name + ' on ' + link.site" [title]="link.domain">
+                    <span>{{ link.label }}</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg>
+                  </a>
+                </span>
+              </td>
               <td class="detail-col" *ngIf="!isPalList"><span>{{ item.detail }}</span></td>
               <td class="coords-col" *ngIf="open.hasCoords">
                 <button type="button" class="coordinate-link" *ngIf="item.coords" [attr.aria-label]="'Show ' + item.name + ' on map'" (click)="showMap(item)">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small> ↗</button>
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="3 + (open.key === 'captureBonus' ? 1 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="3 + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
             </tr>
           </tbody>
         </table>

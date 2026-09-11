@@ -556,6 +556,10 @@
 .item-table.pal-list tr[data-state="done"] td { color: #dfe8ec; }
 .pal-list .name-col { font-size: .95rem; white-space: nowrap; }
 .pal-list .name-col span { display: block; max-width: 30ch; overflow: hidden; text-overflow: ellipsis; }
+.pal-links-col .wiki-links { display: inline-flex; gap: 5px; opacity: 0; pointer-events: none; vertical-align: middle; }
+.pal-links-col .wiki-link { box-sizing: border-box; height: 30px; min-width: 49px; padding: 0 6px; }
+.pal-list tbody tr:hover .wiki-links,
+.pal-list tbody tr:focus-within .wiki-links { opacity: 1; pointer-events: auto; }
 .paldeck-number { align-items: baseline; color: #f0f5f7; display: inline-flex; gap: 2px; white-space: nowrap; }
 .paldeck-status { color: #ffa3a3; font-size: .78rem; font-weight: 600; }
 .paldeck-status[data-state="done"] { color: #8ef0c2; }

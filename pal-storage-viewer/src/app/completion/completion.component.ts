@@ -11,6 +11,7 @@ import { workIcon } from '../trait-icons';
 import { OfflineImageService } from '../offline-image.service';
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
+import { palWikiLinks, PalWikiLink } from '../pal-wiki-links';
 
 interface PlayerOption {
   key: string;
@@ -31,7 +32,7 @@ const RING_RADIUS = 52;
   standalone: true,
   imports: [CommonModule, TrackerMapComponent],
   templateUrl: './completion.component.html',
-  styleUrl: './completion.component.css'
+  styleUrls: ['../pal-wiki-links.css', './completion.component.css']
 })
 export class CompletionComponent implements OnChanges {
   @Input() sets: SaveSetSummary[] = [];
@@ -51,6 +52,7 @@ export class CompletionComponent implements OnChanges {
   private mapIcons: Record<string, string> = {};
   private readonly tabDiscovery = new TabDiscovery();
   private readonly palNumberSuffixes = new Map<string, Promise<string>>();
+  private readonly palLinks = new Map<string, PalWikiLink[]>();
   get isPalList(): boolean {
     return this.selectedCategory === 'paldeck' || this.selectedCategory === 'captureBonus';
   }
@@ -58,6 +60,22 @@ export class CompletionComponent implements OnChanges {
   palIcon(item: TrackedItem): Promise<string> {
     return this.images.load(palImagePath(item.id, item.id));
   }
+
+  wikiLinks(item: TrackedItem): PalWikiLink[] {
+    const key = `${item.id}:${item.name}`;
+    let links = this.palLinks.get(key);
+    if (!links) {
+      links = palWikiLinks(item.name);
+      this.palLinks.set(key, links);
+      void this.palLookup.urlFor(item.name).then(url => {
+        if (url) this.palLinks.set(key, palWikiLinks(item.name, url));
+        this.changeDetector.markForCheck();
+      });
+    }
+    return links;
+  }
+
+  trackWikiLink(_index: number, link: PalWikiLink): string { return link.site; }
 
   palNumberSuffix(item: TrackedItem): Promise<string> {
     let suffix = this.palNumberSuffixes.get(item.id);
