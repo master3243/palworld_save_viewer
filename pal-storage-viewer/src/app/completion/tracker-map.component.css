@@ -41,8 +41,10 @@ canvas:active { cursor:grabbing; }
 .marker-card p { margin:6px 0; font-size:12px; color:#b7d1df; }
 .marker-card small { font-size:11px; color:#a5bdc9; }
 .marker-card .location-note { color:#e5c78e; }
-.marker-actions { display:flex; flex-wrap:wrap; gap:4px; margin:7px 0 3px; font-size:11px; }
-.marker-actions button, .nearest-travel button { min-height:28px; padding:4px 6px; }
+.marker-card .marker-coordinates { color:#95b4c5; font-size:11px; font-variant-numeric:tabular-nums; }
+.marker-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin:10px 0 3px; font-size:12px; }
+.marker-actions button { min-height:32px; padding:6px 10px; }
+.nearest-travel button { min-height:28px; padding:4px 6px; }
 .nearest-travel { border-top:1px solid #294859; margin-top:10px; padding-top:8px; display:grid; gap:5px; }
 .nearest-travel > span { font-size:11px; color:#95b4c5; }
 .nearest-travel button { text-align:left; font-size:12px; color:#82dff9; }

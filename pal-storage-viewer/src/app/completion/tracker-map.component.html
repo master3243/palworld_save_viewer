@@ -34,12 +34,12 @@
           <button type="button" class="close" aria-label="Close objective" (click)="clearSelection()">×</button>
           <span class="eyebrow" [style.color]="colors[point.category]">{{ point.categoryName }} · {{ states[point.item.state] }}</span>
           <h3>{{ point.item.name }}</h3>
+          <p class="marker-coordinates">X: {{ point.x | number:'1.0-0' }} Y: {{ point.y | number:'1.0-0' }}</p>
           <p *ngIf="point.item.detail">{{ point.item.detail }}</p>
           <p *ngIf="point.item.no !== null && (point.category === 'alphas' || point.category === 'bounties')">Lv. {{ point.item.no }}</p>
           <p class="location-note" *ngIf="point.category === 'mainQuests' || point.category === 'sideQuests'">{{ point.category === 'sideQuests' ? 'Quest start' : 'Quest giver' }}</p>
           <p class="location-note" *ngIf="point.category === 'areas'">Region reference point</p>
           <div class="marker-actions">
-            <button type="button" [attr.aria-label]="'Copy coordinates ' + point.item.coords" (click)="copyCoordinates(point)">{{ point.item.coords }}</button>
             <button type="button" [class.active]="routeIndex(point) >= 0" (click)="toggleRoute(point)">{{ routeIndex(point) >= 0 ? '− Stop' : '+ Trip' }}</button>
             <button type="button" (click)="openCategory.emit(point.category)">List ↗</button>
           </div>
@@ -62,7 +62,7 @@
         <article class="marker-card" *ngIf="hovered as point" aria-label="Objective preview">
           <span class="eyebrow" [style.color]="colors[point.category]">{{ point.categoryName }} · {{ states[point.item.state] }}</span>
           <h3>{{ point.item.name }}</h3>
-          <small>{{ point.item.coords }}</small>
+          <small>X: {{ point.x | number:'1.0-0' }} Y: {{ point.y | number:'1.0-0' }}</small>
         </article>
         <article class="marker-card cluster-card" *ngIf="hoverCluster as cluster" aria-label="Marker group preview">
           <h3>{{ cluster.items.length }} objectives</h3>

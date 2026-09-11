@@ -264,12 +264,6 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     catch { this.message = 'Trip kept for this session; browser storage is unavailable.'; }
   }
 
-  async copyCoordinates(point: MapPoint): Promise<void> {
-    try { await navigator.clipboard.writeText(`${Math.round(point.x)}, ${Math.round(point.y)}`); this.message = 'Coordinates copied.'; }
-    catch { this.message = `Coordinates: ${Math.round(point.x)}, ${Math.round(point.y)}`; }
-    this.cd.markForCheck();
-  }
-
   exportRoute(): void {
     const rows = [['Stop', 'Objective', 'Category', 'Map', 'X', 'Y', 'Status'], ...this.routeHere.map((p,i) => [i+1, p.item.name, p.categoryName, this.map?.name ?? '', Math.round(p.x), Math.round(p.y), this.states[p.item.state]])];
     const csv = rows.map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
