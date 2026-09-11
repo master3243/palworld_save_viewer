@@ -118,7 +118,7 @@ export class CompletionComponent implements OnChanges {
     } catch { /* Decorative icons must not prevent the tracker from loading. */ }
   }
 
-  groupIcon(category: string, group: TrackedGroup): string | undefined {
+  groupIcon(category: string, group: Pick<TrackedGroup, 'key' | 'name'>): string | undefined {
     if (category === 'research') return workIcon(group.key);
     if (category === 'technologies') {
       return this.mapIcons[group.key === 'ancient' ? 'Ancient Technology' : 'Technology'];
@@ -130,7 +130,10 @@ export class CompletionComponent implements OnChanges {
     return undefined;
   }
 
-  effigyIcon(category: string, item: TrackedItem): string | undefined {
+  itemIcon(category: string, item: TrackedItem): string | undefined {
+    if (category === 'technologies') {
+      return this.mapIcons[item.group === 'ancient' ? 'Ancient Technology' : 'Technology'];
+    }
     const name = category === 'relics' ? item.name
       : category === 'statue' ? this.data?.relicTypes.find(type => type.enum === item.id)?.item : undefined;
     return name ? this.mapIcons[name] : undefined;

@@ -451,6 +451,18 @@
   gap: 6px;
 }
 
+.technology-points { display: flex; flex-wrap: wrap; gap: 10px; }
+.group-chip.point-summary { box-sizing: border-box; flex: 0 0 200px; width: 200px; padding: 10px 12px; border-radius: 8px; flex-direction: column; align-items: stretch; gap: 8px; text-align: left; }
+.group-chip-head { display: inline-flex; align-items: center; gap: 6px; }
+.point-summary .group-chip-head b { margin-left: auto; }
+.point-values { display: grid; gap: 5px; font-size: .78rem; }
+.point-row { display: flex; justify-content: space-between; gap: 12px; color: rgba(232, 248, 255, .7); }
+.point-value { color: #e8f8ff; font-variant-numeric: tabular-nums; }
+.point-summary .points-needed { border-top: 1px solid rgba(134, 220, 255, .14); padding-top: 5px; }
+.points-needed .point-value { color: #fff36a; font-weight: 600; }
+.point-summary:hover { border-color: rgba(142, 229, 255, .7); }
+.point-summary:focus-visible { outline: 2px solid #95f3ff; outline-offset: 2px; }
+
 .group-chip {
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
@@ -649,6 +661,12 @@
   object-fit: contain;
   margin-right: 8px;
   vertical-align: middle;
+}
+
+.name-col img.technology-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
 }
 
 .detail-col {

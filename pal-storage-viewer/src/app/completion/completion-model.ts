@@ -28,8 +28,8 @@ export interface CompletionData {
   ruinPickups: Record<string, [number, number, number, string, string]>;
   /** [tribe id, paldeck number, name] */
   paldeck: [string, number, string][];
-  /** [technology id, name, required level, ancient (boss) technology?] */
-  technologies: [string, string, number, number][];
+  /** [technology id, name, required level, ancient (boss) technology?, point cost] */
+  technologies: [string, string, number, number, number][];
   /** [summoning slab item id, boss name, ultra?] */
   raids: [string, string, number][];
   /** EPalRelicType short name -> effigies needed for each successive Statue of Power rank */
@@ -107,6 +107,8 @@ export interface Category {
   hasTags: boolean;
   /** Set when the category cannot be computed because this save file was not loaded. */
   needsFile?: string;
+  /** Costs of all remaining technologies, independent of the visible list filters. */
+  technologyPoints?: { key: string; name: string; remaining: number; available: number | null; needed: number | null }[];
 }
 
 export interface StatEntry {
@@ -232,13 +234,23 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
 
 function technologyCategory(record: PlayerCompletion, data: CompletionData): Category {
   const unlocked = new Set(record.technologies.map(id => id.toLowerCase()));
-  const items: TrackedItem[] = data.technologies.map(([id, name, level, ancient]) => ({
-    id, name, detail: '', state: unlocked.has(id.toLowerCase()) ? 'done' : 'todo', group: ancient ? 'ancient' : 'regular', coords: '', map: '', order: level, no: level,
+  const items: TrackedItem[] = data.technologies.map(([id, name, level, ancient, cost]) => ({
+    id, name, detail: `${cost} ${ancient ? 'ancient technology' : 'technology'} ${cost === 1 ? 'point' : 'points'}`, state: unlocked.has(id.toLowerCase()) ? 'done' : 'todo', group: ancient ? 'ancient' : 'regular', coords: '', map: '', order: level, no: level,
   }));
+  const technologyPoints = [0, 1].map(ancient => {
+    const remaining = data.technologies.reduce((sum, [id, , , type, cost]) =>
+      sum + (type === ancient && !unlocked.has(id.toLowerCase()) ? cost : 0), 0);
+    const available = (ancient ? record.counters.boss_technology_points : record.counters.technology_points) ?? null;
+    return {
+      key: ancient ? 'ancient' : 'regular',
+      name: ancient ? 'Ancient technology points' : 'Technology points', remaining, available,
+      needed: remaining === 0 ? 0 : available === null ? null : Math.max(0, remaining - available),
+    };
+  });
   const names = new Map([['regular', 'Technology'], ['ancient', 'Ancient technology']]);
   const known = new Set(data.technologies.map(([id]) => id.toLowerCase()));
   return finish({
-    key: 'technologies', title: 'Technologies', items, groups: groupsOf(items, names),
+    key: 'technologies', title: 'Technologies', items, groups: groupsOf(items, names), technologyPoints,
     unknown: record.technologies.filter((id) => !known.has(id.toLowerCase())).sort(),
   }, 'Level');
 }

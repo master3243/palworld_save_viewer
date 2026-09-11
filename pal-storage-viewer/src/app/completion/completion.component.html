@@ -107,18 +107,29 @@
             >
           </div>
         </div>
-        <div class="group-chips" [class.progress-groups]="open.key === 'research' || open.key === 'relics' || open.key === 'technologies' || open.key === 'fastTravel'" *ngIf="open.groups.length" role="group" aria-label="Type">
+        <div class="group-chips" [class.technology-points]="open.key === 'technologies'" [class.progress-groups]="open.key === 'research' || open.key === 'relics' || open.key === 'technologies' || open.key === 'fastTravel'" *ngIf="open.groups.length" role="group" aria-label="Type">
           <button
             *ngFor="let group of open.groups"
             type="button"
             class="group-chip"
+            [class.point-summary]="open.key === 'technologies'"
             [class.active]="group.key === groupFilter"
             [class.complete]="group.done === group.total"
+            [attr.aria-pressed]="group.key === groupFilter"
             (click)="setGroup(group.key)"
           >
+            <span class="group-chip-head">
             <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" [style.transform]="open.key === 'relics' ? 'scale(1.1)' : open.key === 'research' || (open.key === 'fastTravel' && group.key === 'statue') ? 'scale(1.2)' : null" alt="" decoding="async">
-            <span>{{ group.name }}</span>
+            <span>{{ open.key === 'technologies' ? (group.key === 'ancient' ? 'Ancient tech' : 'Tech') : group.name }}</span>
             <b>{{ group.done }}<span>/{{ group.total }}</span></b>
+            </span>
+            <ng-container *ngFor="let balance of open.technologyPoints">
+              <span class="point-values" *ngIf="balance.key === group.key">
+                <span class="point-row"><span>Cost</span><span class="point-value">{{ balance.remaining | number }}</span></span>
+                <span class="point-row"><span>Have</span><span class="point-value">{{ balance.available === null ? 'Unknown' : (balance.available | number) }}</span></span>
+                <span class="point-row points-needed"><span>Need</span><span class="point-value">{{ balance.needed === null ? 'Unknown' : (balance.needed | number) }}</span></span>
+              </span>
+            </ng-container>
           </button>
         </div>
         <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" or "+ Folder" above.</p>
@@ -135,7 +146,7 @@
               <th>Name</th>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
               <th *ngIf="isPalList" aria-label="Pal links"></th>
-              <th *ngIf="!isPalList">Details</th>
+              <th *ngIf="!isPalList">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
             </tr>
           </thead>
@@ -157,7 +168,7 @@
               </td>
               <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
-              <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="effigyIcon(open.key, item) as icon" [src]="icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
+              <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
               <td *ngIf="isPalList" class="pal-links-col">
                 <span class="wiki-links" role="group" [attr.aria-label]="item.name + ' links'">
