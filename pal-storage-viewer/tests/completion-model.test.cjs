@@ -22,6 +22,28 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('side missions have distinct start locations without changing completion', () => {
+  const c = category('sideQuests', { quests_completed: ['Sub_Zoe03'] });
+  assert.equal(c.total, 58);
+  assert.equal(c.done, 1);
+  assert.equal(c.items.filter(i => i.coords).length, 58);
+  const critics = c.items.filter(i => /^Sub_PalDisplay_[A-I]_01$/.test(i.id));
+  assert.equal(critics.length, 9);
+  assert.equal(new Set(critics.map(i => i.coords)).size, 9);
+  assert.ok(critics.every(i => !i.detail.includes('critics at')));
+  assert.equal(c.items.find(i => i.id === 'Sub_Zoe03').coords, '65, -411');
+  assert.equal(c.items.find(i => i.id === 'Sub_RookieExpeditionTeam02').coords, '-665, -743');
+  assert.equal(c.items.find(i => i.id === 'Sub_LoneWolf03').coords, '-1034, -938');
+  assert.equal(c.items.find(i => i.id === 'Sub_LoneWolf02').coords, '-628, 230');
+  const { mapObjectives } = require('../src/app/completion/tracker-map-model.ts');
+  const points = mapObjectives([c]);
+  assert.equal(points.filter(p => p.map === 'palpagos').length, 57);
+  assert.equal(points.filter(p => p.map === 'tree').length, 1);
+  const guardian = c.items.find(i => i.id === 'Sub_HowSurviveWorldTree');
+  assert.equal(guardian.map, 'World Tree');
+  assert.equal(guardian.coords, '102, 773');
+});
+
 test('technology FName aliases count once and only genuinely unknown IDs are reported', () => {
   const c = category('technologies', { technologies: ['PalBox', 'PALBOX', 'ShotgunBullet', 'OverHeatRifle',
     'SkillUnlock_Sakurasaurus_Water', 'UnknownTechnology'] });
@@ -30,6 +52,46 @@ test('technology FName aliases count once and only genuinely unknown IDs are rep
   assert.deepEqual(c.unknown, ['UnknownTechnology']);
   for (const id of ['PALBOX', 'ShotGunBullet', 'OverheatRifle', 'SkillUnlock_SakuraSaurus_Water']) {
     assert.equal(c.items.find(i => i.id === id).state, 'done');
+  }
+});
+
+const pointData = { ...data, technologies: [
+  ['Free', 'Free recipe', 1, 0, 0],
+  ['Known', 'Known recipe', 2, 0, 3],
+  ['Regular', 'Regular recipe', 3, 0, 5],
+  ['Later', 'Later recipe', 70, 0, 4],
+  ['AncientKnown', 'Known ancient recipe', 10, 1, 2],
+  ['Ancient', 'Ancient recipe', 20, 1, 7],
+] };
+const pointsCategory = extra => summarize(record(extra), pointData).categories.find(c => c.key === 'technologies');
+
+test('remaining technology costs exclude unlocked aliases and subtract each point balance separately', () => {
+  const c = pointsCategory({ technologies: ['KNOWN', 'known', 'ancientknown', 'Unknown'],
+    counters: { technology_points: 2, boss_technology_points: 10 } });
+  assert.deepEqual(c.technologyPoints, [
+    { key: 'regular', name: 'Technology points', remaining: 9, available: 2, needed: 7 },
+    { key: 'ancient', name: 'Ancient technology points', remaining: 7, available: 10, needed: 0 },
+  ]);
+  assert.equal(c.items.find(i => i.id === 'Free').detail, '0 technology points');
+  assert.equal(c.items.find(i => i.id === 'Ancient').detail, '7 ancient technology points');
+  assert.deepEqual(c.unknown, ['Unknown']);
+});
+
+test('unavailable point balances stay unknown; zero balances and completed technology trees need no guesswork', () => {
+  const missing = pointsCategory({ counters: { technology_points: null } });
+  assert.deepEqual(missing.technologyPoints.map(p => [p.remaining, p.available, p.needed]),
+    [[12, null, null], [9, null, null]]);
+  const zero = pointsCategory({ counters: { technology_points: 0, boss_technology_points: 0 } });
+  assert.deepEqual(zero.technologyPoints.map(p => p.needed), [12, 9]);
+  const complete = pointsCategory({ technologies: pointData.technologies.map(([id]) => id) });
+  assert.deepEqual(complete.technologyPoints.map(p => [p.remaining, p.needed]), [[0, 0], [0, 0]]);
+});
+
+test('every bundled technology retains its source point cost', () => {
+  const source = require('../../completion_sources/raw/psp/technologies.json');
+  for (const [id, , , , cost] of data.technologies) {
+    assert.equal(cost, source[id].cost, id);
+    assert.ok(Number.isInteger(cost) && cost >= 0, id);
   }
 });
 

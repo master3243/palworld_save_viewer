@@ -184,7 +184,7 @@ def partner_skills() -> dict:
 
 
 def map_data() -> dict:
-    result = {"ruins": [], "journals": [], "regions": [], "palCritics": [], "towers": {}}
+    result = {"ruins": [], "journals": [], "regions": [], "palCritics": [], "towers": {}, "npcs": {}}
     for name in ("palpagos", "tree"):
         src = (RAW / f"paldb_map_{name}.js").read_text(encoding="utf-8")
 
@@ -197,6 +197,8 @@ def map_data() -> dict:
         for marker in grab("fixedDungeon"):
             pos = marker["pos"]
             position = world_to_map(pos["X"], pos["Y"])
+            if marker.get("type") == "NPC" and marker.get("id"):
+                result["npcs"].setdefault((name, marker["id"]), set()).add((round(pos["X"]), round(pos["Y"])))
             if marker.get("type") == "Ancient Ruin":
                 result["ruins"].append({"map": position, "item": text_of(marker.get("comment") or "")})
             elif marker.get("type") == "Journals":
@@ -208,6 +210,22 @@ def map_data() -> dict:
         result["palCritics"].extend([e["ipos"]["X"], e["ipos"]["Y"]] for e in grab("extrasIngame") if e.get("type") == "Arrogant Pal Critic")
     result["palCritics"].sort()
     return result
+
+
+def quest_start_locations(paldb: dict) -> dict:
+    entries = json.loads((ROOT / "completion_sources" / "quest-start-locations.json").read_text())["quests"]
+    locations = {}
+    for quest_id, entry in entries.items():
+        if "npc" in entry:
+            positions = paldb["npcs"].get((entry["map"], entry["npc"]), set())
+            if len(positions) != 1:
+                raise ValueError(f"Missing or ambiguous quest NPC: {quest_id}: {entry['npc']}")
+            locations[quest_id] = next(iter(positions))
+        elif entry["map"] == "palpagos":
+            locations[quest_id] = map_to_world(*entry["position"])
+        else:
+            raise ValueError(f"Unsupported quest coordinate system: {quest_id}")
+    return locations
 
 
 def build(cache: Path) -> dict:
@@ -268,6 +286,7 @@ def build(cache: Path) -> dict:
 
     quests_raw = load(cache, "psp/missions.json")
     quests_l10n = load(cache, "psp/l10n/missions.json")
+    quest_starts = quest_start_locations(paldb)
     quests = {}
     for quest_id, value in sorted(quests_raw.items()):
         kind = value["quest_type"].replace("EPalQuestType::", "")
@@ -275,7 +294,10 @@ def build(cache: Path) -> dict:
         # Replays repeat an already counted quest; disabled ones never appear in a save.
         disabled = 1 if value.get("disabled") or quest_id.endswith("_Replay") else 0
         location = value.get("location") or {}
-        quests[quest_id] = [kind, name, disabled, round(location.get("x") or 0), round(location.get("y") or 0)]
+        x, y = round(location.get("x") or 0), round(location.get("y") or 0)
+        if kind == "Sub" and not disabled and not (x or y):
+            x, y = quest_starts.get(quest_id, (0, 0))
+        quests[quest_id] = [kind, name, disabled, x, y]
 
     bosses = []
     for value in load(cache, "psp/bosses.json").values():
@@ -353,7 +375,7 @@ def build(cache: Path) -> dict:
         if value.get("disabled"):
             continue
         name = (tech_l10n.get(tech_id) or {}).get("localized_name") or humanize(tech_id)
-        technologies.append([tech_id, name, value.get("level_cap") or 0, 1 if value.get("is_boss_technology") else 0])
+        technologies.append([tech_id, name, value.get("level_cap") or 0, 1 if value.get("is_boss_technology") else 0, value["cost"]])
     technologies.sort(key=lambda t: (t[2], t[3], t[1]))
 
     # Raid bosses: one entry per summoning slab; the save counts defeats under the slab's item id.

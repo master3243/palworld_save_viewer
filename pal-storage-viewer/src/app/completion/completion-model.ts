@@ -16,7 +16,7 @@ export interface CompletionData {
   fastTravel: Record<string, [string, number, number, number, string, number]>;
   /** note id -> [name, x, y, z] */
   notes: Record<string, [string, number, number, number]>;
-  /** quest id -> [Main|Sub|Hidden, name, disabled, quest giver x, y] */
+  /** quest id -> [Main|Sub|Hidden, name, disabled, reference x, y]; side missions use start/giver positions. */
   quests: Record<string, [string, string, number, number, number]>;
   /** [spawner id, name, level, alpha|boss|bounty, x, y, z] */
   bosses: [string, string, number, string, number, number, number][];

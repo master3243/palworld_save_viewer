@@ -158,6 +158,11 @@
     "server-manager/passive_skills.json": {
       "url": "https://raw.githubusercontent.com/amantu-qbit/palworld-server-manager/ef12f443a855c896ecd04e85e0fd0e871158a627/bridge/data/passive_skills.json",
       "sha256": "f4e09c0cb6911625af29754b253ca8cf7e3a95d3396d85c8d1a0c8731b20bc42"
+    },
+    "mission-locations.db": {
+      "url": "https://paldb.cc/en/Mission",
+      "retrieved": "2026-09-10",
+      "sha256": "3c78ed6885e530374311c9d37776e704d3126846083377f0cdc79b38f361a1b8"
     }
   }
 }

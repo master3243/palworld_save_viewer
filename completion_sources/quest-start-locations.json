@@ -1,0 +1,263 @@
+{
+  "verified": "2026-09-10",
+  "notes": "Only fills missing side-mission locations. NPC IDs resolve against the preserved PalDB map snapshots. Explicit positions use the Palpagos in-game map readout. Mission-page evidence is preserved in raw/mission-locations.db. Start/giver positions are selected individually, not by objective order.",
+  "quests": {
+    "Sub_BossDefeatReward": {
+      "map": "palpagos",
+      "npc": "U_Reward_BossDefeat",
+      "source": "https://paldb.cc/en/Mission#request-from-a-veteran-hunter",
+      "basis": "Reward NPC matches the quest and its single objective location."
+    },
+    "Sub_DeliveryQuartz": {
+      "map": "palpagos",
+      "source": "https://paldb.cc/en/Mission#stockpiling-pure-quartz",
+      "basis": "Mission delivery-client location; excludes resource-gathering objectives.",
+      "position": [
+        -100,
+        304
+      ]
+    },
+    "Sub_DeliveryRainbowCrystal": {
+      "map": "palpagos",
+      "source": "https://paldb.cc/en/Mission#stockpiling-hexolite-quartz",
+      "basis": "Mission delivery-client location; excludes resource-gathering objectives.",
+      "position": [
+        -1031,
+        -934
+      ]
+    },
+    "Sub_DeliverySkyIslandOre": {
+      "map": "palpagos",
+      "source": "https://paldb.cc/en/Mission#stockpiling-soralite",
+      "basis": "Mission delivery-client location; excludes resource-gathering objectives.",
+      "position": [
+        -338,
+        -1390
+      ]
+    },
+    "Sub_DeliverySulfur": {
+      "map": "palpagos",
+      "source": "https://paldb.cc/en/Mission#stockpiling-sulfur",
+      "basis": "Mission delivery-client location; excludes resource-gathering objectives.",
+      "position": [
+        -479,
+        -746
+      ]
+    },
+    "Sub_DeliveryWood_Fine": {
+      "map": "palpagos",
+      "position": [
+        -474,
+        -749
+      ],
+      "source": "https://paldb.cc/en/Mission#stockpiling-hardwood",
+      "basis": "The mission lists this single delivery-client location; nearby NPC names are ambiguous."
+    },
+    "Sub_FoodReward": {
+      "map": "palpagos",
+      "npc": "U_Reward_Food",
+      "source": "https://paldb.cc/en/Mission#request-from-an-arrogant-foodie",
+      "basis": "Reward NPC matches the quest and its single objective location."
+    },
+    "Sub_HowSurviveWorldTree": {
+      "map": "tree",
+      "npc": "U_Female_WorldTreePeople01",
+      "source": "https://paldb.cc/en/Mission#surviving-the-world-tree",
+      "basis": "World Tree Guardian at the mission delivery location; preserve World Tree world coordinates."
+    },
+    "Sub_LoneWolf01": {
+      "map": "palpagos",
+      "position": [
+        -628,
+        231
+      ],
+      "source": "https://paldb.cc/en/Mission#the-sable-loner",
+      "basis": "Initial encounter with the wounded Kitsun Noct; the first two objectives treat and feed it.",
+      "corroboration": "https://www.reddit.com/r/Palworld/comments/1uzgmea/does_anyone_know_what_will_happen_if_you_select/"
+    },
+    "Sub_LoneWolf02": {
+      "map": "palpagos",
+      "position": [
+        -628,
+        230
+      ],
+      "source": "https://paldb.cc/en/Mission#reminiscent-wandering",
+      "basis": "Automatic follow-up after inspecting the dropped bag in Sub_LoneWolf01. The Feybreak clue is a later destination.",
+      "corroboration": "https://www.reddit.com/r/Palworld/comments/1utvg06/is_there_a_follow_up_quest_to_reminiscent/",
+      "position_source": "https://paldb.cc/en/Mission#the-sable-loner"
+    },
+    "Sub_LoneWolf03": {
+      "map": "palpagos",
+      "npc": "Police_dependable_Lonewolf",
+      "source": "https://paldb.cc/en/Mission#the-unsheathed-katana",
+      "basis": "PIDF officer gives the request; the Kitsun battle is elsewhere.",
+      "corroboration": "https://www.reddit.com/r/Palworld/comments/1utvg06/is_there_a_follow_up_quest_to_reminiscent/"
+    },
+    "Sub_PalCaptureCountReward": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalCaptureCount",
+      "source": "https://paldb.cc/en/Mission#request-from-a-wise-hunter",
+      "basis": "Reward NPC matches the quest and its single objective location."
+    },
+    "Sub_PalDisplay_A_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_A_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_a_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_B_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_B_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_b_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_C_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_C_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_c_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_D_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_D_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_d_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_E_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_E_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_e_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_F_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_F_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_f_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_G_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_G_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_g_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_H_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_H_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_h_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PalDisplay_I_01": {
+      "map": "palpagos",
+      "npc": "U_Reward_PalDisplay_I_01",
+      "source": "https://paldb.cc/en/Mission#sub_paldisplay_i_01",
+      "basis": "Quest and critic NPC share the same area ID."
+    },
+    "Sub_PaldexReward": {
+      "map": "palpagos",
+      "npc": "U_Reward_Paldex",
+      "source": "https://paldb.cc/en/Mission#request-from-a-pal-ecological-researcher",
+      "basis": "Reward NPC matches the quest and its single objective location."
+    },
+    "Sub_RookieExpeditionTeam01": {
+      "map": "palpagos",
+      "position": [
+        -130,
+        -445
+      ],
+      "source": "https://paldb.cc/en/Mission#the-rookie-expedition-team",
+      "basis": "Initial expedition-team encounter and dialogue location; nearby Direhowl is the battle objective."
+    },
+    "Sub_RookieExpeditionTeam02": {
+      "map": "palpagos",
+      "npc": "U_SurveyGirl02",
+      "source": "https://paldb.cc/en/Mission#budding",
+      "basis": "Fia starts the quest on the beach; Lovander and Cara are later battle objectives.",
+      "corroboration": "https://steamcommunity.com/app/1623730/discussions/0/588433527532633578/"
+    },
+    "Sub_RookieExpeditionTeam03": {
+      "map": "palpagos",
+      "npc": "U_SurveyGirl03",
+      "source": "https://paldb.cc/en/Mission#growth",
+      "basis": "Fia requests the Might Remedy at the single dialogue/delivery location."
+    },
+    "Sub_RookieExpeditionTeam04": {
+      "map": "palpagos",
+      "npc": "U_SurveyGirl04",
+      "source": "https://paldb.cc/en/Mission#a-sterile-flower",
+      "basis": "Initial encounter is Fia attacking the player at her NPC position."
+    },
+    "Sub_StrongOldMan01": {
+      "map": "palpagos",
+      "npc": "Male_StrongOldMan01",
+      "source": "https://paldb.cc/en/Mission#captured-adventurer",
+      "basis": "Harold at the captive-adventurer encounter; enemy positions are nearby."
+    },
+    "Sub_StrongOldMan02": {
+      "map": "palpagos",
+      "position": [
+        -355,
+        306
+      ],
+      "source": "https://paldb.cc/en/Mission#taking-down-a-bounty",
+      "basis": "Harold at the encounter/dialogue location; the bounty fight is at -353,302."
+    },
+    "Sub_StrongOldMan03": {
+      "map": "palpagos",
+      "position": [
+        -274,
+        -1514
+      ],
+      "source": "https://paldb.cc/en/Mission#the-proxy",
+      "basis": "Harold gives the request and receives the report here; the Flopie fight is at -263,-1531."
+    },
+    "Sub_StrongOldMan04": {
+      "map": "palpagos",
+      "position": [
+        -676,
+        314
+      ],
+      "source": "https://paldb.cc/en/Mission#the-past",
+      "basis": "The single objective is listening to Harold at this location."
+    },
+    "Sub_StrongOldMan05": {
+      "map": "palpagos",
+      "position": [
+        -676,
+        314
+      ],
+      "source": "https://paldb.cc/en/Mission#the-knight’s-last-stand",
+      "basis": "Continuation of Harold's cemetery encounter from Sub_StrongOldMan04; the battle is nearby at -674,311."
+    },
+    "Sub_Zoe01": {
+      "map": "palpagos",
+      "npc": "GrassBoss",
+      "source": "https://paldb.cc/en/Mission#dont-get-cocky",
+      "basis": "Zoe at Desolate Church gives the request; item and enemy locations are objectives."
+    },
+    "Sub_Zoe02": {
+      "map": "palpagos",
+      "npc": "GrassBoss",
+      "source": "https://paldb.cc/en/Mission#i-still-dont-trust-you",
+      "basis": "Zoe at Desolate Church gives the request; item and enemy locations are objectives."
+    },
+    "Sub_Zoe03": {
+      "map": "palpagos",
+      "npc": "GrassBoss",
+      "source": "https://paldb.cc/en/Mission#a-warm-memory",
+      "basis": "Zoe at Desolate Church gives the request; item and enemy locations are objectives."
+    },
+    "Sub_Zoe04": {
+      "map": "palpagos",
+      "npc": "GrassBoss",
+      "source": "https://paldb.cc/en/Mission#zoes-sphere",
+      "basis": "Zoe at Desolate Church gives the request; item and enemy locations are objectives."
+    },
+    "Sub_Zoe_Halloween": {
+      "map": "palpagos",
+      "npc": "GrassBoss",
+      "source": "https://paldb.cc/en/Mission#happy-halloween!",
+      "basis": "Zoe at Desolate Church gives the request; item and enemy locations are objectives."
+    }
+  }
+}
