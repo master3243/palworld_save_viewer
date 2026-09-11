@@ -1,0 +1,2494 @@
+{
+  "files": {
+    "resources/completion/crafting-icons/accessory_airdash1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_airdash.webp",
+      "sha256": "21ce637096569a2286c742d0d9d8e1cb1b8556d6976cc90e3c3a824d19b239d2",
+      "image_sha256": "907105d2b36f094987e13291694303bbc93ec54f591233a39826ede065c65ca4"
+    },
+    "resources/completion/crafting-icons/accessory_airdash2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_AirDash.webp",
+      "sha256": "246874d2a2e42a05bae6b5b8efe325b227536fe2d7781d3b7703a16f397e7c3c",
+      "image_sha256": "cc783d35b9456b2849772f365ee8476178d04764478f6975a9aa3a583445ef17"
+    },
+    "resources/completion/crafting-icons/accessory_airdash3.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_AirDash.webp",
+      "sha256": "246874d2a2e42a05bae6b5b8efe325b227536fe2d7781d3b7703a16f397e7c3c",
+      "image_sha256": "cc783d35b9456b2849772f365ee8476178d04764478f6975a9aa3a583445ef17"
+    },
+    "resources/completion/crafting-icons/accessory_aquaresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_AquaResist_1.webp",
+      "sha256": "cbef81ddefa895f85d0ed0e38297a85b2355b920bd11edf0dff7300fe1026e5e",
+      "image_sha256": "861baba3b0abe944cfe57d67b58009ecafdcc4ffa7be1416be7a4ad79aeb7213"
+    },
+    "resources/completion/crafting-icons/accessory_at.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_AT_1.webp",
+      "sha256": "ea00462a00946d7d545b2ae64522f67700c1d8af7e50d7b240cd41070d3c130d",
+      "image_sha256": "9abec4c2f7c61490f06da45683167fae043f8193a0c495ac66310bd8995adda8"
+    },
+    "resources/completion/crafting-icons/accessory_avoid_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_accessory_avoid_1.webp",
+      "sha256": "118f6420da03df96ffcc2e15d30c76404fe7c217d115cb03b775759a5140b677",
+      "image_sha256": "095a0b961dbb97b3d684906a35a6e8fcfde362d1f1232d865f39a2a5740d9539"
+    },
+    "resources/completion/crafting-icons/accessory_coldice_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_ColdIce_1.webp",
+      "sha256": "75be09677ef2971716bae04d8c3a5c4feb1f2f8065ab1cb1de3f77e58173d622",
+      "image_sha256": "3910cb2d23b76e3786bf12f42571b9263d1dcafcd1b47050a38abeb556d952ba"
+    },
+    "resources/completion/crafting-icons/accessory_coolresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_HeatResist_1.webp",
+      "sha256": "d2da33d630f8b28e89a5519f1d4fa36fd086b2ce4edf42b8ab6a3341352839a5",
+      "image_sha256": "3aad036fca1985168cef123490271f07d73ae35a471c0ce5b3ba07e5f3c02e6b"
+    },
+    "resources/completion/crafting-icons/accessory_darkresist.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_darkresist_1.webp",
+      "sha256": "7d780ed2c07940abdd610eb15514f4b8068f4125e31af7272826bd6bc8ecee39",
+      "image_sha256": "cd69292435c7f19130a8e81a91ba3ef59bd1f1c9054e1c771e9d5436ca0d1a1e"
+    },
+    "resources/completion/crafting-icons/accessory_defense.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_defense_1.webp",
+      "sha256": "e45331ec4d4c972d10922b24ac2caf32f7e7eab38d44ec9a7c4c85769eb777a1",
+      "image_sha256": "a400361e5e16401ea28da91aff0b58c8da79c52d3cce698cd5fbe91c8be91bae"
+    },
+    "resources/completion/crafting-icons/accessory_dfhp_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_DFHP_1.webp",
+      "sha256": "153337260ccdb7e556398e3c31d3b11b8824b42ab2242f5a9ec837ca16566528",
+      "image_sha256": "bdfa2fb38f332ce81471d31eda0cc5e19c35e1a77a3ec75a00451bd450e170a4"
+    },
+    "resources/completion/crafting-icons/accessory_dragonresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_DragonResist_1.webp",
+      "sha256": "42390d70891fd1ca94a69cc93691c11168928f701311e641d3322e3da9517a4d",
+      "image_sha256": "51f889c12b39cfadd0fa89c533b3a2658ba7455ed976772dc6f3e774ae6cbc96"
+    },
+    "resources/completion/crafting-icons/accessory_earthresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_EarthResist_1.webp",
+      "sha256": "1834f514dc5985d8fbb52cebdf52d83ab15171a08386e3606fcddec7bc6413cc",
+      "image_sha256": "b8d8c6fdcd843b16904a0f8cba48a9e1b5f275fc4a096129d301d0a67c665271"
+    },
+    "resources/completion/crafting-icons/accessory_explosionresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_ExplosionResist.webp",
+      "sha256": "ae36133cd3c93333059486aa5efbef400c471b4e488057c4fe3d428a1db2ba6d",
+      "image_sha256": "085b46dd8a6f908488ebcb9f7662d7a380e0b7e0b123c4331420600e48a76392"
+    },
+    "resources/completion/crafting-icons/accessory_fireresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_FireResist_1.webp",
+      "sha256": "0dfb9f86c88d6f6e2670ee12d0dd537f25703419fbc418911d7a6b4e3bc65f01",
+      "image_sha256": "28093c8346d90b111573e11c774decb59ed8f2840eb4894677a947d706ca5f53"
+    },
+    "resources/completion/crafting-icons/accessory_hchp_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_HCHP_1.webp",
+      "sha256": "a2895fcf57aa65d8237e39b72d99bd684ab1753bc611f079fe369420131f93ea",
+      "image_sha256": "6090d808babbe2c40f6eeec8c269d26a1042c25f1e34fa162c5d92cd75e996d6"
+    },
+    "resources/completion/crafting-icons/accessory_hcmw_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_HCMW_1.webp",
+      "sha256": "35fcf319dd71205e897796be81cedbd1162941d9c04b6ef3a101fbd71b7a11c9",
+      "image_sha256": "4190515a3527457c081b9e9fc8c8649f48b7205984037360aee63d7a74fbd7ae"
+    },
+    "resources/completion/crafting-icons/accessory_heatcoldresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_HeatColdResist_1.webp",
+      "sha256": "d3d35087634b2dc81dbab225d24995c5716b6867bb785be911aa1033a60b2cda",
+      "image_sha256": "22758a6aaf6e6497577e6d10c35c7a0ea4aeb608768f137d214dd99a59c4c18e"
+    },
+    "resources/completion/crafting-icons/accessory_heatfire_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_HeatFire_1.webp",
+      "sha256": "2c001ca338a55c23051a37dc3fec249badebae101fbf552185d3380e9177989f",
+      "image_sha256": "18fe9f8b8be928da946070c2585962088e276b88c2777c07b6b89ee5c2f88f27"
+    },
+    "resources/completion/crafting-icons/accessory_heatresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_CoolResist_1.webp",
+      "sha256": "5874600d1bd6b27b329153a20198045053396f9306cb27911ebf3a6799090395",
+      "image_sha256": "75776e56857c1b0d4f523c659d52219850a6f3488779129c38674b9baceaaf82"
+    },
+    "resources/completion/crafting-icons/accessory_hp.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_HP_1.webp",
+      "sha256": "ada890d790ba9840c4c924d67a427e68ba5c54c6d8e67bc01dd01701caf872d9",
+      "image_sha256": "6878d9977a7cc64149db729ff8b56c9bc50121db59715f52a38388352a4e25a7"
+    },
+    "resources/completion/crafting-icons/accessory_iceresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_IceResist_1.webp",
+      "sha256": "df009c1bd74e4b2318b6d4525a1aec3ba19a9be8f75a03934fcb3bfcbbf011a8",
+      "image_sha256": "630c6ada50a95bce003e05029b21aa22baea986160d99a75fa7afa14a68a1765"
+    },
+    "resources/completion/crafting-icons/accessory_jumpair_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_jumpair_1.webp",
+      "sha256": "373494d24e569761424202c619caa5a6aa685a5a67258fdc1b6182db4a46a1d2",
+      "image_sha256": "f6738f1c2274b98dbe19a1c6ef2c961e2e6cf4b46b0849c58bd8f42384537d82"
+    },
+    "resources/completion/crafting-icons/accessory_jumpair_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_jumpair_2.webp",
+      "sha256": "42be7f8881b659063c864d57265ba563e27f98c82d88644818e82d144d7ade6a",
+      "image_sha256": "aff1efd13fcedbaabc23c81fe01c17e1e8f902df8d4119c2c33db7289e3d37a8"
+    },
+    "resources/completion/crafting-icons/accessory_jumpcount_increase1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_JumpCount_Increase.webp",
+      "sha256": "ad8b60c8a2d20671bcb43d57b320686a9e7c7b8f511651035f7a7dd88ee7c87f",
+      "image_sha256": "1af4848f9f0d8716f6708070e23de66d8e7735e6e94639ef9cc829048a22d4f3"
+    },
+    "resources/completion/crafting-icons/accessory_jumpcount_increase2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_jumpcount_increase.webp",
+      "sha256": "1fef88fb82af9ee42f67d36e01910bed8d627271dfc91657dc865f4ccb688278",
+      "image_sha256": "d0b1af18af44c2d22eb393564898baa725616a3e48c8f02ad5fc0b3cd3acc2f8"
+    },
+    "resources/completion/crafting-icons/accessory_jumppower_increase.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_jumppower_increase.webp",
+      "sha256": "22c9b356f7a176e2fa2710b58e6de49cc4ef42c40171aa9139506f2db612319e",
+      "image_sha256": "543e4cbf4d3d1603b26d49ef13b327c48ff0ab94deb2164b5cb3ce859954ceed"
+    },
+    "resources/completion/crafting-icons/accessory_leafresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_LeafResist_1.webp",
+      "sha256": "ea57853c0735a0080d3c0b91672663da29abee547c65209e7e212279c9d21142",
+      "image_sha256": "a1f0170edd61c4a626372d7e8bead42fd29dc5e5e169356f4017d7ab2fb44ef3"
+    },
+    "resources/completion/crafting-icons/accessory_maxweightup.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_MaxWeightUp.webp",
+      "sha256": "9fe702e5d909c097fa07e0f5a041d267e3f67882ea308985c517d156839409b8",
+      "image_sha256": "31171977ac32874bb8d65d76aad03634cc491e588f19c5f69b5596db29f6e088"
+    },
+    "resources/completion/crafting-icons/accessory_nonkchecker_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_NonkChecker_1.webp",
+      "sha256": "e3c7affa4951b9c8bba842041aa915ff4991fb03beaf32653a1dc9770dff6b4b",
+      "image_sha256": "b9f83f50f3a3f05923df4ddc08dd32881364645cd806c588b21e99a1ff07f4dc"
+    },
+    "resources/completion/crafting-icons/accessory_nonkilling.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Nonkilling.webp",
+      "sha256": "d966efb0ffd319387c5fd5d86e6d9f43dc0fb8805d2e0fd2dfdd11562f2e9173",
+      "image_sha256": "2ce89c1b2a9599b43528f8fd9f577e89d3617cd5a1d63712f506c43bdf8aec8d"
+    },
+    "resources/completion/crafting-icons/accessory_normalresist.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_NormalResist_1.webp",
+      "sha256": "0c5b131adc8d832aeca422158ab8789cb06d1b87ddefdd6f48b68de64daf421b",
+      "image_sha256": "bea3d15b2e7e1789e90fef817b7fc0ff81118ff63d92c31e4cdc91c0a7b80b53"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_attack_up.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_attack_up.webp",
+      "sha256": "1b382b8e052e291c99cec61d9f5104b9060743e7426837859142f54fda15f3b8",
+      "image_sha256": "0bbc730af8db8bcf944e03240bc2cf10bed6a3843e1e2a5032de3841684561cb"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_dargon_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_dargon_1.webp",
+      "sha256": "1e3295b53a89b53c438ce5d7b337a2b6383ab9f6d35b792574fab70ebf92746a",
+      "image_sha256": "72bbf45bcf2ef69ea770d363995183b58b0eb23a18411a16be445f1277d8d0bd"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_dark_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_Dark_1.webp",
+      "sha256": "b3d3f29ae191353cd3cd73f5f4399177d188f436a540dbd9aa9bfd3ad0fb84bf",
+      "image_sha256": "44b1edcc5732d771efecc0577aa4155462c6330b5ef02611c25d44623246a140"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_defense_up.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_defense_up.webp",
+      "sha256": "e96ec3a3ddd08769992f203bdebb3af1827e9af6d86782c23ec0d5129c87375e",
+      "image_sha256": "877985645e50dcf80105a5ae9af82a00a98289ef566e5a7494ddd47167e85c18"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_earth_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_earth_1.webp",
+      "sha256": "e42bd21dbf2b8ed68b4f32aa637ac40594d1e3b9a1e15c31480297238ea19dde",
+      "image_sha256": "f7a5064770d1d7740c2c2355e082c1262fc7c401a65d351f94aafd7161b86c7d"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_electricity_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_electricity_1.webp",
+      "sha256": "ab72f5c96d971d29ed895677e2960e60d31429635cea96917dd361b5877e9a03",
+      "image_sha256": "8f807ff129512b861c73440bd496602e536f2c88a35bb744090037001395bdc8"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_dark.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ElementBoost_Dark.webp",
+      "sha256": "10fd87c22b3df75608fbd6c7f7b5bb6a8dad56a9bc5afd5855b7cd6f9de4b9e6",
+      "image_sha256": "4378bd3b4b302588ccbedacc05620532a5a0489aa24e9b815e12753a186b90a9"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_dragon.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ElementBoost_Dragon.webp",
+      "sha256": "26f7d7b203b12b70833b15e1ec2f2ac2217910fb02d5db1ce4920c9fa80bc325",
+      "image_sha256": "7a6d4449deecfda93792d1c7658b995c66db98149598e29c5f220e5d9d41c6ba"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_earth.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ElementBoost_Earth.webp",
+      "sha256": "1b39250401b5e0249821818f7260ec6080ee9960299a4ec848b0ada2b6378a9a",
+      "image_sha256": "f48184f838f5200215d13d86e195dfa7483a0d74fffa384acb4a34d03cdddd24"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_electricity.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ElementBoost_Electricity.webp",
+      "sha256": "c6b99a29614057ab4401a67fe7c05b02dffc1c9ef246aa0f4b4718b8d9c45888",
+      "image_sha256": "ce1560b8721f2ba7a35404cc772ce9fe9859105e341fb4976cdad940ad425637"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_fire.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ElementBoost_Fire.webp",
+      "sha256": "1d8dcf3744dafd59b93340014c4a1ce9a747f255ab3d66099e694603f7c8e18a",
+      "image_sha256": "61fbd4cdda0192d81b1a6d32f37a4a189bbac50aa5e6a87b535410e7fa1a6ebf"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_ice.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ElementBoost_Ice.webp",
+      "sha256": "c0a944ad4e20dc09c1e68bb135e81bbc6cdab01dfa9fccdb02dc14bd0145937f",
+      "image_sha256": "d7b10fb696ac5485ba9bd8081bcc08edfb0515c3477c9057aa68b0614a805a83"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_leaf.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_elementboost_leaf.webp",
+      "sha256": "151fecd866d13551c820569cca07db30376fad744be3054728ccd6139c73b8c9",
+      "image_sha256": "e716fc905d839851a308198b316e2dd9bf0b9ac66f17662ff6d3b3fd452e29d2"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_normal.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_elementboost_normal.webp",
+      "sha256": "0c1b92238f69817827a3e64398adafacd572c09416fb78b82f9814ce4534b5f3",
+      "image_sha256": "7a78caf9353f214997af6b182d3b1b35ef0ae8929b31dfebff959794d7984176"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_elementboost_water.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_elementboost_water.webp",
+      "sha256": "e7c02bcbb1802e9dde00ad69341036de94334fc20e93750a9168a99a938942fe",
+      "image_sha256": "427fc898bb48654fcdc966ed1e7de34b616f01a49b64f39b1a6c3bbbe08590ab"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_exp_up.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_exp_up.webp",
+      "sha256": "a1a9eb3dd4a649bd12cbac488d1061f7423466ef93453fb431328f8ffac9534e",
+      "image_sha256": "1e15fb2dd537a27902c63ee802d67d4e5097ec42888714d531b1fca132b4ff9a"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_fire_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_Fire_1.webp",
+      "sha256": "a1fcc151295b16bc3c900b6ee728c0fc163dd648c39862d775be6437d493ba7c",
+      "image_sha256": "d7f66b03277406108e303ec09e06c4576bfbcdd16a5dcc5ccc9f9c9dbf0f171f"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_fire_2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_Fire_2.webp",
+      "sha256": "77df5365580d6189092024e36cbf79759647f6397e056f45b2e75047d4ccb371",
+      "image_sha256": "76ca39505a6fe3cd107692588e73fff4c9cb1324f5d37cc797dcc6a5246aec51"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_ice_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_ice_1.webp",
+      "sha256": "69101f8f32b84488af872a59c71eb1a06debe2baf6209f44b8de7f30c3230dd1",
+      "image_sha256": "b31b30d8c115f7b655008695c9118f7fb7c3b1b88143e8b847408a44d3682cfc"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_leaf_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_leaf_1.webp",
+      "sha256": "a8b8eeb3ce1a23481b535f6caab299db236bbcdb952b212a984038011c4718b5",
+      "image_sha256": "96c1655cc46bcd494bdfb93ee0599354c7a6b07031e2a9005d43408eed687565"
+    },
+    "resources/completion/crafting-icons/accessory_otomo_water_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_Water_1.webp",
+      "sha256": "c52a849f00f02ec8e5fee1897a995348f8b1a0ae10d8bec0db4f13dcacaf664d",
+      "image_sha256": "ef4833bdaafb45147f180cd1e193bd38a562a6c273f623c09f760265d9801c89"
+    },
+    "resources/completion/crafting-icons/accessory_ppat_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_ppat_1.webp",
+      "sha256": "847ccec744a0049c813709fb14a7d21b505b0c6c028948d9681d1fcd4063f6c2",
+      "image_sha256": "01dbc2530f248df1f52842a5486090aaa5e332f1589c3fa1660aeaabd7540290"
+    },
+    "resources/completion/crafting-icons/accessory_ppdf_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_PPDF_1.webp",
+      "sha256": "8b3c41f75da89cf799f2def48f2d57f9470250ea184360bde8815bca2562ecab",
+      "image_sha256": "08b2791bd909bb86e6ba8fb56e19e012603693d9808855a683ae2ebc5e33c968"
+    },
+    "resources/completion/crafting-icons/accessory_superjumpair_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_SuperJumpAir_1.webp",
+      "sha256": "06caffba680b3784e0cc7d4b4210b1fb977cffd1b82993ca61cd859ba1e48c82",
+      "image_sha256": "34a0601ab6700011b6162c5239a3a23fbcffc2295119d101f8917889935ab8ca"
+    },
+    "resources/completion/crafting-icons/accessory_superjumpair_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_superjumpair_2.webp",
+      "sha256": "217f07216b9364fad10f3733c7b6999285a8e5daf4a23590ade96e0ad0ee2c99",
+      "image_sha256": "1e907e9b209283819565044220f4a71c597b2076727732535398a1cb8b451464"
+    },
+    "resources/completion/crafting-icons/accessory_talentchecker.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_talentchecker.webp",
+      "sha256": "ca919ea180f1cb85e8b906701fd7d3d58a798e3398e930fb71ec133ede44abe8",
+      "image_sha256": "838bbd2c8655910f11c8aac0f6fe4bc557b67e7adcd0e121eb641e90f547e0c1"
+    },
+    "resources/completion/crafting-icons/accessory_thunderresist.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_thunderresist_1.webp",
+      "sha256": "05b0bfbfef393fc5a031c48daf1bd7a2599f3fa918536976fd509c6f72d28565",
+      "image_sha256": "7bbbb915d65a99b4d005a609371ef116056cb20fe01a04c623fcda4d1b847447"
+    },
+    "resources/completion/crafting-icons/accessory_wkmc_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_WKMC_1.webp",
+      "sha256": "1fde6774bc26591450adfe83aabdb8dfc3df661289c1a0270e77bded0e143606",
+      "image_sha256": "1ea62374351c59180a15dfd1841023f7d55ebf2e97110cc90d59bc96c4532263"
+    },
+    "resources/completion/crafting-icons/accessory_workspeed.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_WorkSpeed_1.webp",
+      "sha256": "2dfdd01351d2ee5252b15d01c8ef3756bad53e69fb6bb9243bc27cd3884c486a",
+      "image_sha256": "7f12d1bbe0a84611c9bdaa9c7f85c3fefb12604442f2e565899aa7cc9dec819b"
+    },
+    "resources/completion/crafting-icons/additionalinventory_001.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_additionalinventory_001.webp",
+      "sha256": "a4579b3b9642e9517623c4b0e4ab4a48d6f7f50c1befa78471943261cb12c569",
+      "image_sha256": "83ffadb73cf66ad700b2f781f82c413a4e82f9f3d75f79c42f0d94f36abd4d03"
+    },
+    "resources/completion/crafting-icons/additionalinventory_002.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_additionalinventory_002.webp",
+      "sha256": "6e90c61dd369b0953f0ced5e02b13986d4ca5683242181bcb6247d27d617bae3",
+      "image_sha256": "4ded8854f196888e80233dc2445bfe4ada23cdaa244cd6dfc7be5df7c06ab612"
+    },
+    "resources/completion/crafting-icons/additionalinventory_003.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_AdditionalInventory_003.webp",
+      "sha256": "28efe9e6d0f94dac5db20e558923ff3b744f90a0334979aef5d27dab9e077eb0",
+      "image_sha256": "2f3f0eee67fc94a937b3056c3296bd1d8d79e061a12682bbf3b779085624b2e9"
+    },
+    "resources/completion/crafting-icons/additionalinventory_004.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_AdditionalInventory_004.webp",
+      "sha256": "d3f523868d1568c20ef7711bf0a5c16d97d7182bffa4b7d81091415c486a587f",
+      "image_sha256": "371eab1f72389fc10dec4dccf4e46523af8c29a2229519f6268f9f29572fc076"
+    },
+    "resources/completion/crafting-icons/aicore.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_AIcore.webp",
+      "sha256": "04c48f4d6e24ddbcc3c6566c76b370bc4e8d52a9c1157f60821c5cb993752315",
+      "image_sha256": "07caec67b3a6044f7f4f6f2a99ad06e05466ec4c34c6541f922b5d15d5709e97"
+    },
+    "resources/completion/crafting-icons/ancientarmor.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_ancientarmor.webp",
+      "sha256": "8e940847be4fce49cd20b4405fc0732040fc687c52cd6b2f3b0b2f55e9ba0ee2",
+      "image_sha256": "cda7f7b0066edf3daf05ae1b4172db32a6dd96dd22e8349c27dd700fc669031a"
+    },
+    "resources/completion/crafting-icons/ancientarmorcold.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_AncientArmorCold.webp",
+      "sha256": "723b94c126d76617cf5cb23bd61864ea00562b363c0ccc80bdc649fdf0bca728",
+      "image_sha256": "f20a276916725fbd6fba98b7e34c6789a29250dc80024a699f85899e0f5f68a9"
+    },
+    "resources/completion/crafting-icons/ancientarmorheat.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_AncientArmorHeat.webp",
+      "sha256": "ee21eef46b9a1692b77519680c00846f2d44d34ad49d0c30a181a3beaa91f6fc",
+      "image_sha256": "d9d1e26c52c1c85c123fdbc5c8b510d49199da0e6abbe9c0b90d27878913b283"
+    },
+    "resources/completion/crafting-icons/ancientarmorweight.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_AncientArmorWeight.webp",
+      "sha256": "535080c46223a6450c0912c413efd0a3ab6092d9c776ff671024d2db58b1c71e",
+      "image_sha256": "f2ced7bcc6f7e09d76c346175e1fc3448f328ac36b78e2c25565a0f00a2a8d3d"
+    },
+    "resources/completion/crafting-icons/ancienthelmet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_AncientHelmet.webp",
+      "sha256": "a6001f0f634ac317ed3669144568d3bb673146f0c7ea42b0fb6b7879f07ada6a",
+      "image_sha256": "58b6f113205012381cd56d47af202429591e85c32c60689013144827ecd2ad1c"
+    },
+    "resources/completion/crafting-icons/arrow.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_Arrow.webp",
+      "sha256": "d6a65a43ab72cd7bcba6d39c87036d6e871016b9d46cdf6dabeef68fa7296411",
+      "image_sha256": "018db376eb9c24397dc83995799d31e67697ecc451488a2e61564c61cd637490"
+    },
+    "resources/completion/crafting-icons/arrow_fire.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_Arrow_Fire.webp",
+      "sha256": "b6e55cd37bb2f0f4a5845ea3e358b044d60be926b087a2d7e227cde2fbcf727f",
+      "image_sha256": "aaed6e3683942d359cae4922cbffd421c1495772399ebf4dffa56d1c72fe637a"
+    },
+    "resources/completion/crafting-icons/arrow_poison.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_Arrow_Poison.webp",
+      "sha256": "014ef5508c64a9ef4c5b1b0cc299a96737b6000f85ba6f5b71d8b78cd0f24df2",
+      "image_sha256": "c9db9821cc3dba01d607e54a0d269c54fe9451ff147284d1f6693f58904c312b"
+    },
+    "resources/completion/crafting-icons/assaultrifle_default.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_assaultrifle_default1.webp",
+      "sha256": "7243465c9c5f78ad5a79baa02feb4b92dccd8f9df6dfc47847773d49af377655",
+      "image_sha256": "770fe9a405a69ae96e09ef22b64ca0a5a7d12bf4ec50cf59c1ad232e4e63f563"
+    },
+    "resources/completion/crafting-icons/assaultriflebullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_AssaultRifleBullet.webp",
+      "sha256": "d7ce91a43877a7ba3ec2392f08750c88dcfe43326019d4a50836c94530541655",
+      "image_sha256": "92053dc189eaffd8954b4cae917939bf82c85a50050077b48f7d8335e8f132f1"
+    },
+    "resources/completion/crafting-icons/automealpouch_tier1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_AutoMealPouch_Tier1.webp",
+      "sha256": "ecbcd47c324a0a4429bdabdf83224b5586d1d1ccaa828a3f5c85ca1360ffbf8e",
+      "image_sha256": "c6458fe9abd0e14639620b4d69f80d74d446128af8ab60148cf7bb774527c608"
+    },
+    "resources/completion/crafting-icons/automealpouch_tier2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_automealpouch_tier2.webp",
+      "sha256": "9c6009ddafc5e75e6a6c2cdb9b917fdaa1e63b93bfc4dc69917f3eac4956ddd0",
+      "image_sha256": "fdfc73e5099944a2506d95041ebec699eff98a60ef4242b4cb8c2d0bd2325755"
+    },
+    "resources/completion/crafting-icons/automealpouch_tier3.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_AutoMealPouch_Tier3.webp",
+      "sha256": "703b1fde461c5be81668ee2a2deb518aa771b09d92144ecc5bd9c185711621cd",
+      "image_sha256": "552f9022977e9b2ae048de2b5802559171ef9bb34696d4a2ea75ca066fa29255"
+    },
+    "resources/completion/crafting-icons/automealpouch_tier4.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_AutoMealPouch_Tier4.webp",
+      "sha256": "ead23c7ec5bab47bdfe0438ae0561688e2d6ad546f07875c4132a454bb81c8f3",
+      "image_sha256": "d4917a7661b125c9b2a7b028b8e0434d6e6b3c8edbef43d3f79ae0ddf4ab0662"
+    },
+    "resources/completion/crafting-icons/automealpouch_tier5.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_automealpouch_tier5.webp",
+      "sha256": "81d9e8291434ec83d2d4ba836575e8202dfa8af695a252ed5ff136a1300b6a52",
+      "image_sha256": "b9884b031f159259aa1314f506542247bd5c0e79954a1dde10f1b6190f3f8dd8"
+    },
+    "resources/completion/crafting-icons/axe_default.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_axe_tier_00.webp",
+      "sha256": "f2ddfc1e283d3f5c46fea3e23f0b1232f7dc8cb530699059f2e37ca26cc62c8d",
+      "image_sha256": "e3ec66bb248c6e8e802677e885a4a960ab06d9ad63edfec8ee359325db5b82df"
+    },
+    "resources/completion/crafting-icons/axe_steal.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Axe_Tier_03.webp",
+      "sha256": "1a44f890f4f26779de77af0f51f2f2070a37dbd05adaa1b405a8dadacf0633e5",
+      "image_sha256": "251f7e3943b430e5b591d800480458b774ae51537e6ffd9d3715a8a614bc4bac"
+    },
+    "resources/completion/crafting-icons/baconeggs.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_BaconEggs.webp",
+      "sha256": "00b4926cf6f31bbb8b66d41b5b2eb39a1880588f8411f34ae51f276d847dcb6a",
+      "image_sha256": "dd99e5f8d17f26203491ac89b00f984fbe4236b2e28b064cf689efb18da7600b"
+    },
+    "resources/completion/crafting-icons/baked_berries.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Baked_Berries.webp",
+      "sha256": "cdfb73a415c246f2c5a2adbdc096c3ef45446d706c48167288d11ec7f791755b",
+      "image_sha256": "9935b83d73cdaff3c75f066b713ff686475185defb047ea0a412e397fb72e1c7"
+    },
+    "resources/completion/crafting-icons/bakedmeat_berrygoat.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_berrygoat.webp",
+      "sha256": "eb3776035664cdd19740b224be9e308aa3c6c0d93df2fd1099796614e67f3ec6",
+      "image_sha256": "d644554021bf530be613b15bfab616b3ec29ade1d4f43858dd7ed54a0e2ca9fc"
+    },
+    "resources/completion/crafting-icons/bakedmeat_boar.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_boar.webp",
+      "sha256": "4c5f2386e7c10a238af6a07d46455b7ff28a6f8ef370fdecaaa1ac1d974ffbf6",
+      "image_sha256": "845b0dff5343f62fe3f63e9f1b97f2485bce3c29fd3d2e07d97c2bda8530514c"
+    },
+    "resources/completion/crafting-icons/bakedmeat_chickenpal.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_chickenpal.webp",
+      "sha256": "3978842945502590652090b566c514e3f7d6177fbee9888332d1d3c2b2918492",
+      "image_sha256": "24ade4ac396d580a1294b307199d054444fe367c5745d4098bd005855b03f5b0"
+    },
+    "resources/completion/crafting-icons/bakedmeat_cowpal.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_cowpal.webp",
+      "sha256": "bd88d17f289bcbdb78243870888804d7c321abd2d0f4a2d2e0da0d515422f4a8",
+      "image_sha256": "8f9a4f563e006143d952c1339e0c7a35a329d95678d8f2a3252d156003316c5f"
+    },
+    "resources/completion/crafting-icons/bakedmeat_deer.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_deer.webp",
+      "sha256": "d188ddb5adeba896123c7798358cceeb52ec345012a397a6f3fa009d44fa6d06",
+      "image_sha256": "a5c2be60e6fd4a23f9d7f0a7a3264863666b1e4d2a76bd73d4a8c41ca2aea665"
+    },
+    "resources/completion/crafting-icons/bakedmeat_eagle.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_eagle.webp",
+      "sha256": "cb0cc2f8a6cde0230058728087db43ee268a2507e196f6824c7cc180a6e60e8a",
+      "image_sha256": "13d5f6b520c9e7cd85d59559322116d01d03130605b2916dc9afac441484c519"
+    },
+    "resources/completion/crafting-icons/bakedmeat_grassmammoth.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_grassmammoth.webp",
+      "sha256": "21957d5b222a19a8480fb32dc618888fcb170b68bbe12c78c6625f38c514420f",
+      "image_sha256": "17b02e27cc168cdc55fb9fb9e3f9b3b90f35e5a8e12d0ae006f1946208884222"
+    },
+    "resources/completion/crafting-icons/bakedmeat_icecrocodile.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_icecrocodile.webp",
+      "sha256": "b333a199a0c724645fea202850d4d91a61f593923c72d062603fb00920ab9a7d",
+      "image_sha256": "2f280cc0d7b00cc910f66a64e70caf3cbf760e2533b164ca41d8b0cb8f29a008"
+    },
+    "resources/completion/crafting-icons/bakedmeat_icedeer.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_icedeer.webp",
+      "sha256": "379ecd8cb30095b64f2b9aea760bae3f9f2430109e7595bd7f694c527a8cba56",
+      "image_sha256": "38730afe976bed726d355e94acb28486ccb67a13267021b06601359aaf7a4122"
+    },
+    "resources/completion/crafting-icons/bakedmeat_kelpie.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_kelpie.webp",
+      "sha256": "c5270c274275d8513ffa77efa1859bdac323a73e11a9d21c4cfb060c1cd7dcae",
+      "image_sha256": "b293a0c4d28197c60aa97295447ad6da97c62738a0db019cf92096e3f101c53e"
+    },
+    "resources/completion/crafting-icons/bakedmeat_lazycatfish.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_lazycatfish.webp",
+      "sha256": "0f2f60c716ff1456c99bf8517584d05b654664f83b7347d46d98d84cabd22810",
+      "image_sha256": "10407d74a5c00fe2b02b06f645c6b21186329fed85067f993caa195e2d073abb"
+    },
+    "resources/completion/crafting-icons/bakedmeat_sakurasaurus.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_sakurasaurus.webp",
+      "sha256": "af7d2e7cff258c4a91b8a4477c8fae1d77dea930e36427a50b3b99852f8b6afa",
+      "image_sha256": "d3086ee4bd8f8e681b9cb60e09d7a8b9636669a3a1b2909161a4b9193b2cf86d"
+    },
+    "resources/completion/crafting-icons/bakedmeat_sheepball.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_bakedmeat_sheepball.webp",
+      "sha256": "59d6268a2a21ade3dbb6fdc7f9fbd272e8d93ad5c4e70e180600b9e0f035da63",
+      "image_sha256": "4767582f843a9157e50d666c6c6aef74de19716f122f456d5b3991dc418cda0f"
+    },
+    "resources/completion/crafting-icons/bakedmushroom.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_BakedMushroom.webp",
+      "sha256": "30d5e114c4950a7b3862a4558da831bd275a560b49c2798d4f37eebe9e1a0391",
+      "image_sha256": "e72aace74edbb5ba7628932cbf2f661f0fbfd6d1159a8e16b8b675c6e5f41a6f"
+    },
+    "resources/completion/crafting-icons/bat.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Bat.webp",
+      "sha256": "7ebc33be72707202ac178c2f210c426a456a7cf0673bd127fa06f4c7d3d2731e",
+      "image_sha256": "41723946a935b7c83f4c757f12ccdd782df91cebb82b44f6c07ee92368099eec"
+    },
+    "resources/completion/crafting-icons/bat2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_spear_bat2.webp",
+      "sha256": "a18704898837a592acd24e29ae157b8e23bc075ce0878779d2e1fc962a6ef737",
+      "image_sha256": "203f5d75938c62ab216d15cf307acc11d8e72b0443c463952e06a640834b9647"
+    },
+    "resources/completion/crafting-icons/bat3.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_bat3.webp",
+      "sha256": "ba7884d669ec8f5d1f932fe67bc3dc2231d854c661b2c603bf943a2195d27980",
+      "image_sha256": "13622bec394e22cf719a980b6d42c9b1b8353e1c404e93f268984ccc135093bb"
+    },
+    "resources/completion/crafting-icons/beamlauncher.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_beamlauncher.webp",
+      "sha256": "ced8ceaaf7096fc12d213adeb4437d09c5fb5a91fd0426990ddeb7925ef8f5d5",
+      "image_sha256": "2beaf34b2f42f57a5e0323d6a11a45852c6429cd9d71f4e58dab416518ae8bf9"
+    },
+    "resources/completion/crafting-icons/beamlauncherbullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_BeamLauncherBullet.webp",
+      "sha256": "3ca3dfd7bbb81ded36a4dc5d01a2a7a3fbe8063a80a077d48275f660800013a4",
+      "image_sha256": "799e862248ef607eb5580b241ae38fba72f7f8d1c9236e3bf74d878787cf9423"
+    },
+    "resources/completion/crafting-icons/beamsword.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_BeamSword.webp",
+      "sha256": "7db1106b6198f61d701874439c444d1b2417c6f61a1437204af3602cb15b5f28",
+      "image_sha256": "a59641daaa8fffa2a3e27b999e3db129e1eca2a05fc05a7b8b44f2b681ffb584"
+    },
+    "resources/completion/crafting-icons/bio_battery.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Bio_Battery.webp",
+      "sha256": "65835172f414078c6dc91489bad76486ed74cd0a6ff9025e1d993c5323050b19",
+      "image_sha256": "c2ca088fc48e02db4b17f882b8a21536b7a425ef15ab72a4b7f7f59688830294"
+    },
+    "resources/completion/crafting-icons/bio_coolant.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_material_bio_coolant.webp",
+      "sha256": "5272f80c5d950d0e49b7e9a6602454b6060f2b214b0af8e90772a58874ea0a23",
+      "image_sha256": "0ef668cd9bcaa8fd7632de14902ddb088a67a9736ab643f0e5abf9a117bc23e9"
+    },
+    "resources/completion/crafting-icons/blueprint.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Blueprint.webp",
+      "sha256": "11f8be6fc4ca8e3a130effb55824183ee56521c42f0088863ab02df90d01e127",
+      "image_sha256": "6342cb6e50c6470b26885bc4b89e133e48d784631f21dce69ea47799f2ed11f8"
+    },
+    "resources/completion/crafting-icons/bow.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_WeakerBow.webp",
+      "sha256": "b1ecf776da7e59d58f78662d06162c250db89fa54d1c1aa6c7608d4d2da45334",
+      "image_sha256": "a682ef3f045413127df2d1e3f851eb6888adc4dd6978adae98b591c2feadbcba"
+    },
+    "resources/completion/crafting-icons/bow3.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Bow.webp",
+      "sha256": "7e852739e37b4f00585a8aad4914bab6ca12d84d499fc6e3fc252f1f25935ec7",
+      "image_sha256": "d45c9091178d7aa3ad9037af0eb8033fd48ebf562240ae03327ae5e526e52301"
+    },
+    "resources/completion/crafting-icons/bowgun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_bowgun.webp",
+      "sha256": "6c9e28bd3f443796e583f42f415ec5f34b43a6c40e519766b0502f3c7b6a6b9c",
+      "image_sha256": "848585dad638d929dad2059381aa223a215281bbdaa32442ec37846b639dad83"
+    },
+    "resources/completion/crafting-icons/bronzesword.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_bronzesword.webp",
+      "sha256": "97852fb29424c89f2f3129a1b45f3671bfc42717826757e5422739e929360dc2",
+      "image_sha256": "8b3297de0d8a3d3152b93e4c4ccec24ab696884014ab642ed2b5b5dac92b0bea"
+    },
+    "resources/completion/crafting-icons/cake.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Cake.webp",
+      "sha256": "e544bd6e4fb505f01f5e13c33f65b2fe347d962dda9619ad19efae2cf5f2ade6",
+      "image_sha256": "29a7ae1a9bc793fa7f2c79a6ae52876fcc16f6a829b0ff8e2c8c491d50ad3f10"
+    },
+    "resources/completion/crafting-icons/cake02.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_food_Cake02.webp",
+      "sha256": "c73e986f56f9a005ad25cebd98c7bbef021b5b6d2b53bb25323d6db16ab4efc9",
+      "image_sha256": "550be191cb28a95e74d0eddf60281d3f0c8fadc67e1788655e54097049b1051c"
+    },
+    "resources/completion/crafting-icons/cake03.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_food_Cake03.webp",
+      "sha256": "f294710f8df33a04149a2b55c993f40394290883ac13761da094cc878f9fcd68",
+      "image_sha256": "534df1b45373e4c70a9b8723befc64271d22378f3fdf09a40205418453c29c23"
+    },
+    "resources/completion/crafting-icons/cake04.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_food_Cake04.webp",
+      "sha256": "f9a98318743b910cb56bd17adfbc46676cc1447a3b8454ca0ba71f5219268979",
+      "image_sha256": "e31e07e8bf369924798ab1da256294a3661ef8e272e7e8cecfad7389fe30286b"
+    },
+    "resources/completion/crafting-icons/cake05.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_food_Cake05.webp",
+      "sha256": "9595255946abef450ac3c5c5e3e2575e24b68cc883a7808e24c0470b9d5e0f1a",
+      "image_sha256": "cce8d3ad2e4332b2841b1fbbc9d10a2c434bcece1917554bde6ea0fc69ed471d"
+    },
+    "resources/completion/crafting-icons/captureprism.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_PalSphere.webp",
+      "sha256": "238e67a2e83038e3c4b7779d82fb94cb53a6423f89dcad1c054f0f13ecf2ad21",
+      "image_sha256": "78377f2c539ccf4cfeda0b002c97bb8832a70f4557d7a12379523f70165e06a5"
+    },
+    "resources/completion/crafting-icons/carbonara.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Carbonara.webp",
+      "sha256": "fa96133b6f3fccd5c0577433dd3a015c4f49e1d0b92ee9f04fea34406969ee69",
+      "image_sha256": "9386c53346cb014b6692e874bd4c87c9fdce7a9b411da3b0817a8eb94dfb4931"
+    },
+    "resources/completion/crafting-icons/carbonfiber.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_CarbonFiber.webp",
+      "sha256": "b218e16a0a4182da55c856e7f258952bd372c1caeb1a0508d7321457b9817e99",
+      "image_sha256": "335752e627881f035cdc1436769f4701bd8a8dbc6796ad744c1d46709074db1c"
+    },
+    "resources/completion/crafting-icons/cement.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Cement.webp",
+      "sha256": "3a7eae47733ac512babf6f3aeff1c38b134e96bfb1d6f02a0e6449601c8a1eaa",
+      "image_sha256": "e4cee9038ab4332b66b83b7620f800e0a3e9cf9ecc1dafd54b1befc402e67514"
+    },
+    "resources/completion/crafting-icons/charcoal.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_material_charcoal.webp",
+      "sha256": "3cf217d69139a46f969ac2f393d7cf755d7dd5f9d9e00e40b77711e445913093",
+      "image_sha256": "ff64cd18a5a03b488c8e7c0896ae9a319b34d8c4832c9b317d845b051f8e958f"
+    },
+    "resources/completion/crafting-icons/chargelaserrifle.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_ChargeLaserRifle.webp",
+      "sha256": "6100726b801cc0baa7d3f776ed1ebb06ce704bd7600f1378177a702cd4c927a4",
+      "image_sha256": "00579c03d475f46227d2ff43aa6112440a5e4e44ba63699be3b16a69545e1a80"
+    },
+    "resources/completion/crafting-icons/chargelaserriflebullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_ChargeLaserRifleBullet.webp",
+      "sha256": "6382e252ce4e626c4c4691540a52f9730b2e7802d66f3e2373325d4846e6c875",
+      "image_sha256": "21169c6a4ff44379f85a14afb6913634f90c5314adda5bfd217af190b0745a95"
+    },
+    "resources/completion/crafting-icons/cheeseburger_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_cheeseburger_2.webp",
+      "sha256": "43129dd4ec6156514174e6bcc34c571fe290e3e2d6b30f9de0743bfcf7b82ff5",
+      "image_sha256": "e1a67fbefcfaee8b93e850bd78fd8f5ce79f6cdecd0bcd6f858c8e372d600139"
+    },
+    "resources/completion/crafting-icons/chickensaute.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_ChickenSaute.webp",
+      "sha256": "08f54076a130f56be76edb83a3175de2585440e44862e624fe9bb0c18664080d",
+      "image_sha256": "c81d8d18172f8b63e23e94b130c2e92b4d16ba0e8840c0b8cce0e7f1be69a369"
+    },
+    "resources/completion/crafting-icons/chowder.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_chowder.webp",
+      "sha256": "951c1658f7760f4ef040ef14f65d00a5eafc629c4538f064b004b1d64b937d9a",
+      "image_sha256": "b2575dc303bd8d6042241ffcdd7dd8800de0a6ff8d1ba2eea1fb9a6a50889d76"
+    },
+    "resources/completion/crafting-icons/cloth.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Cloth.webp",
+      "sha256": "066a340e98e24d3e10f7bf852fcb377740f532e03e255e497338e7957176389f",
+      "image_sha256": "873ccca11e717263ef228e17a83f5c498108caee80d250d96461c22f5202f708"
+    },
+    "resources/completion/crafting-icons/clotharmorcold.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_ClothArmorCold.webp",
+      "sha256": "746d528a05f30d81f73e0bb1c5a5e7d105f21c1aa1d6ca29aeaeb71144bca2af",
+      "image_sha256": "5126c1ee67ff773298cb959e780038558db7fb9765917d278c91a5fe98e9231a"
+    },
+    "resources/completion/crafting-icons/clotharmorheat.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_ClothArmorHeat.webp",
+      "sha256": "274306937c85b840241e2c34943ee24988e610594bb5a99813512d8a890651a7",
+      "image_sha256": "cec1fe9507375cc922f9595087cfaf71406ecf97c22f6339078adf07dba6e06e"
+    },
+    "resources/completion/crafting-icons/compoundbow.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_compoundbow.webp",
+      "sha256": "cb893ec59e1efbfe40b8e4d403755d4765907d74b114100a02643d131353cf71",
+      "image_sha256": "8add64cfca611780be8ccfd8a6cae071676989834e1fce36b2bd98a770178d8f"
+    },
+    "resources/completion/crafting-icons/computer.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_material_computer.webp",
+      "sha256": "d98898c4dbd6fae719e036614fb1d8ddd87a83ca4d00a2e64b84dcba6d33b3e3",
+      "image_sha256": "3f16ac36284ed81537ebbd7c49e4556fab531886d5bd8ca85f21864047a2f17d"
+    },
+    "resources/completion/crafting-icons/copperarmor.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_CopperArmor.webp",
+      "sha256": "e3474299aa20c68446cde46b4e284b57ac1789ef2af55b87836c51ba554deafb",
+      "image_sha256": "18cb5ab6f6d77e19dc6b3bf7d022f6af2c65cb65d84bf69cee134322229dcad0"
+    },
+    "resources/completion/crafting-icons/copperarmorcold.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_CopperArmorCold.webp",
+      "sha256": "e6de4ff1607c4bdc74e7e16bb7bf89d5d6c007a0b2aece6f97a55861639c2d7c",
+      "image_sha256": "43a7dff6f4547d7a196a1d0e8c511777ef73c4c585b2348ade3bc5beab7e7557"
+    },
+    "resources/completion/crafting-icons/copperarmorheat.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_CopperArmorHeat.webp",
+      "sha256": "b7adfebf15a40d044fcf069506676f5de0eef3b9fe21f33c15ace32a0a50479d",
+      "image_sha256": "845e8a73a2bcb7a970e453ab03926feb0f44a78ffdc2ed05757450a056286d75"
+    },
+    "resources/completion/crafting-icons/copperhelmet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_CopperHelmet.webp",
+      "sha256": "85003346a1f8fdd2beb71fc6c7d342d1cb403f047955103c75ed3a2c2ae68b16",
+      "image_sha256": "c0b78dd8c560e2a07e579986b7d4cb85de81de22bebbfa1d8effd9889a17c211"
+    },
+    "resources/completion/crafting-icons/copperingot.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_CopperIngot.webp",
+      "sha256": "6d9f4344828602df3b6b0e7963b7281e96bbc7d87416d17d44569edb3fe123e4",
+      "image_sha256": "093f5feaf279526bb4be4a3cb8ad0b56569cbe1961b4d5f1e7bd92cf13167190"
+    },
+    "resources/completion/crafting-icons/corrosive_solvent.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_material_corrosive_solvent.webp",
+      "sha256": "cba7a68faba2cb3dc32594f5dd5178e6b6e1db98bcd4be8556f007f01b197544",
+      "image_sha256": "652e1003fa9ef5229ff53582985e853e904d4145c990c68260458b24177f73a2"
+    },
+    "resources/completion/crafting-icons/curry.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Curry.webp",
+      "sha256": "81308f2c6481f17999fcb65408752216fdb867b09169994b65957d944ef5a043",
+      "image_sha256": "0119ba43b586298cb05fec4b772b5548a293bbafd69e7d7cccb612dc3867f0b6"
+    },
+    "resources/completion/crafting-icons/decalgun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_decalgun.webp",
+      "sha256": "3f5dade66e81ab288815f8b2c89f3879847c72495c1d13130eba9be25f668cc7",
+      "image_sha256": "c33ef6a4b50688886a4538adfc1077b6a63a3161a080d3fd8c7647007e81dcbf"
+    },
+    "resources/completion/crafting-icons/deerlocomoco.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_deerlocomoco.webp",
+      "sha256": "7688c44d03857a795a1b9faf3f7e27fbf435e6b4fbc6eeb1313184d2511aa830",
+      "image_sha256": "caa1048d9e396d3d927dc95872d5b21f535456e50a5dcec06e2608e0a348fae2"
+    },
+    "resources/completion/crafting-icons/deerstew.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_DeerStew.webp",
+      "sha256": "b9800b78a0c0cb8eb52d08f3d5f09e49fb66e32621fa1f99c3828857ae4ddd45",
+      "image_sha256": "01dec5e9869836f825bb6a730d633ebdf1211c2d5783c7190362f2b5e2cf84c8"
+    },
+    "resources/completion/crafting-icons/doublebarrelshotgun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_doublebarrelshotgun.webp",
+      "sha256": "7c9cc9604f09a6c1206b8ac28bffd2f6e37d80a91b91f401d274ea7c2e250867",
+      "image_sha256": "f30914a7389ab37bf70dba23674afd4a27ad8c760c869c1659df7597e898c33d"
+    },
+    "resources/completion/crafting-icons/dronelauncher.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_DroneLauncher.webp",
+      "sha256": "c890d61b584ecde0ccdb9355303ecc6c86144afe65e5697d3281b1e2181456a7",
+      "image_sha256": "778c3f9275d2b1f9058a85e04229231093e301227d7801a523bae4a206fb7ad2"
+    },
+    "resources/completion/crafting-icons/eaglestew.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_eaglestew.webp",
+      "sha256": "b2fc8821ea469898c931d82ca38442239b57a066350336b4fea9c673cf11d856",
+      "image_sha256": "94782d6ebb1c010ce0e08fbf3f5e68eb4322ddb10ab0764dc261b6c02e39b98c"
+    },
+    "resources/completion/crafting-icons/elecbaton.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_ElecBaton.webp",
+      "sha256": "4215c0a201b098cffc3e73199a99e9a859b4b4bd44aee7bde544a847e740d714",
+      "image_sha256": "d33157ef0cda28e017b1d478727bcd39357a9a41b427366da01ed6b8c35c76b3"
+    },
+    "resources/completion/crafting-icons/electricarcassaultrifle.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_ElectricArcAssaultRifle.webp",
+      "sha256": "f59922104a9d632d283bf5caeebeb625e0a0deba7e49c92a31245e6262376ae6",
+      "image_sha256": "fb386b87f70b601a40305ac15ff52334cb270866f4ba3c0625d23906ceabd1c0"
+    },
+    "resources/completion/crafting-icons/electricarcassaultriflebullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_electricarcassaultriflebullet.webp",
+      "sha256": "9f91663368458fbe5edb680d8198f4c6083c05cd01fb08a77cf2760ec2d1977d",
+      "image_sha256": "20497ad15dfd7de2ef6c457deab67b86131e1e86c932f802cb79711fcbedb0b9"
+    },
+    "resources/completion/crafting-icons/electroniccircuit.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_material_electroniccircuit.webp",
+      "sha256": "e6e9f67ff372709faa49d3b0541c0b5bdb65f63db04e656ce932a6638bf2d2a6",
+      "image_sha256": "f299e1c77dcae0d5b9a136d2e467bd7803b635e654fedd2358e793fb986c4421"
+    },
+    "resources/completion/crafting-icons/elixir_attack_01.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_elixir_attack_01.webp",
+      "sha256": "a5f330262013783eb0be10cff25c919bd77c75778e1a3646ad89846ef65542b0",
+      "image_sha256": "f45f6570cb330151e3549e3601929d3a0468e350d459754c05c664353c1b2373"
+    },
+    "resources/completion/crafting-icons/elixir_attack_02.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Elixir_attack_02.webp",
+      "sha256": "e9e2284b0301e9f9c04aff4321b70e13b0e4d369a4b6b4c263d2b0067210be43",
+      "image_sha256": "85f884701bd562e0c91adabab23110d1a3b7da8e8e0eae709a65570ecf8e0351"
+    },
+    "resources/completion/crafting-icons/elixir_hp_01.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_elixir_hp_01.webp",
+      "sha256": "998e87483361ea5f9fca5f78e0d3ed8143b5d8eb7f36667f4bbf6aac7a9947b4",
+      "image_sha256": "5add522aa18cf923e91513f3353d1d7266361be6cd412b7dcd3f52a929844117"
+    },
+    "resources/completion/crafting-icons/elixir_hp_02.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Elixir_hp_02.webp",
+      "sha256": "2e4d7b612c4722837da3e9d6429d7ea4a2dbb9ea2a6e9df3317d523b2e0294f4",
+      "image_sha256": "53933cc995ddf3bac8859cd006b726dd0132f894eec7b98a023a2325d9554739"
+    },
+    "resources/completion/crafting-icons/elixir_stamina_01.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_elixir_stamina_01.webp",
+      "sha256": "5e2b9978067c4e2c5da13b46f4ac612705f29d8d144da2747bde3d43ca3343ad",
+      "image_sha256": "8a26d2c952163082749200ed8b781dea605705ca12e17d32eb1bb2bb3c3fed9a"
+    },
+    "resources/completion/crafting-icons/elixir_stamina_02.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Elixir_stamina_02.webp",
+      "sha256": "c48784452ea49102c660ae9c7c1f830c011fdaa54e6bad680651f44a9565bdf5",
+      "image_sha256": "9337e8d99691c3b9491841147d3737fc07ef6cef0588711e3e80031c9616e9ae"
+    },
+    "resources/completion/crafting-icons/elixir_weight_01.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_elixir_weight_01.webp",
+      "sha256": "9d2a7d61903699d1497b0b4d9895569eb03092c682c0694983659c66f9f8c441",
+      "image_sha256": "c6d8a1865d7b3cbe8cea26e5cc50dae46f4a424fe140ba4dd9265e562d104ad8"
+    },
+    "resources/completion/crafting-icons/elixir_weight_02.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_elixir_weight_02.webp",
+      "sha256": "2b2cadb58f47db00ec3dc378b9fade450aa65a97a8bb0fd8becb00dba167b286",
+      "image_sha256": "de3554d60a43c49780a4b5b6f5dcd982aa537751a038f79c3f751580a92108fb"
+    },
+    "resources/completion/crafting-icons/elixir_workspeed_01.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_elixir_workspeed_01.webp",
+      "sha256": "4120d104cd454d3a44a0e42dcd5626c4950d953f4a4824465d1d69843357a67e",
+      "image_sha256": "57523616be8857b30b95d6f882ac62fa9f5b46950286e2b751128415f5cf5612"
+    },
+    "resources/completion/crafting-icons/elixir_workspeed_02.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Elixir_workspeed_02.webp",
+      "sha256": "34fd5b0759a10707152c06356d017d4029da128949037d037093123e68119f41",
+      "image_sha256": "f405ce96275ebe2a96f99c572c8a4927fb30b3de37492f3b3e6faf17d1704ae6"
+    },
+    "resources/completion/crafting-icons/energylauncherbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_energylauncherbullet.webp",
+      "sha256": "3c1f9f6332cffe6b9cc1f7a94ba112992e3b869a4db9c97e39f92886ef78ad30",
+      "image_sha256": "659b07b7241a85b9c7088ce973bd833cafd45ebde56a6cd9595b6e9b5a9ece5c"
+    },
+    "resources/completion/crafting-icons/energyrocketlauncher.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_energyrocketlauncher.webp",
+      "sha256": "bb7bd98efa4ff1eda5bd36b99397306c4ee56c4f1c1688e0cae721893669018e",
+      "image_sha256": "cfd10f3f56f6ec888431c942df5157332a38caac43ea7f2b6f30f40621bb0ba7"
+    },
+    "resources/completion/crafting-icons/energyshotgun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_EnergyShotgun.webp",
+      "sha256": "efbebb270e2272c760b1759f9e44cdafc2058d8dcd858181928ae7798094a699",
+      "image_sha256": "517459c2f37aae20d1a2dd7dae5e8707260604358252391d9cd3a25a8b15e9ca"
+    },
+    "resources/completion/crafting-icons/energyshotgunbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_energyshotgunbullet.webp",
+      "sha256": "d8dcdd678236de7ec796d7b38da9ad1dd247c35109c2e2056c3033b655dcb5ca",
+      "image_sha256": "9880e2ffb06e6e9855358e7794187c13ba4fc5bdee04eb55bcec6208ba8dc327"
+    },
+    "resources/completion/crafting-icons/expboost_03.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Consume_ExpBoost_03.webp",
+      "sha256": "da4d6e4dbf4b8a7e7042632b42332b9cbb17035ff374c7d907f4d4b9cb9664b6",
+      "image_sha256": "6209ca7562cbc97ef4672fccbdb794690e7bf06dabb8f68ae5b44183c2a392b0"
+    },
+    "resources/completion/crafting-icons/expboost_04.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_expboost_04.webp",
+      "sha256": "d96c6a97725aaf8366ffae9812616720482859c059767d7b8e2bed4ea0c2c35a",
+      "image_sha256": "0d3ee3ae59472be1f478b28bd2c90700fa348aba7bd786963b073b55ac7b9aa0"
+    },
+    "resources/completion/crafting-icons/explosivebullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_explosivebullet.webp",
+      "sha256": "ddfd3c23fc50435915a0bd3239624dd6cf873dfeaa98106312dcb47069962b37",
+      "image_sha256": "5cbd093cdf5cbaa5ced7d5e4480d62c19c82a73c30b885d61c14775082979598"
+    },
+    "resources/completion/crafting-icons/fiber.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Fiber.webp",
+      "sha256": "3b0d89c1b2a546d995e424d11c81e55f367d5c0e508b44baeea5a8f2ab789626",
+      "image_sha256": "dccde501d03b4875b6437cda75243c11e24029bc19b8e7c8cbecc81472bdf36a"
+    },
+    "resources/completion/crafting-icons/fishingbait_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Consume_FishingBait_1.webp",
+      "sha256": "96897714f0705b4c744077c974580856f2dd1ededbf50b6c4235079564535e0e",
+      "image_sha256": "cb1e5bb8e0d548a1eed5acf0498be85235078c9e8fd1195f2157bbcdb6fb0005"
+    },
+    "resources/completion/crafting-icons/fishingbait_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_fishingbait_2.webp",
+      "sha256": "09a864677714cc31df6115a004fdf20d923dc2f69c38e2f3fcdb22917bddcad7",
+      "image_sha256": "ba3dde9cc90cdbddf7a878b5f7449351127ce8fe25d9bba65b542e4f481f3ed5"
+    },
+    "resources/completion/crafting-icons/fishingbait_3.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_fishingbait_3.webp",
+      "sha256": "788e8cc9e931f92e77b7d4537becafb9ee33ecb24ecf1917ba1706a94b870128",
+      "image_sha256": "b65ae3e40ca10b97ded726268ff25147ebbca674f5b60f93c5a203745cfcf555"
+    },
+    "resources/completion/crafting-icons/fishingbait_3_a.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_fishingbait_3_a.webp",
+      "sha256": "311884498c474f3dd58cc4d74ea48067bc8c83cf9600ed4170ac92b239351719",
+      "image_sha256": "cd228af85ff4192196ea01e47c272074099e669a5479f9e15fddfda78de77b3e"
+    },
+    "resources/completion/crafting-icons/fishingrod_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_FishingRod_1.webp",
+      "sha256": "6140cd0a3762b43de816c9d9bf9263a92cf9dde4b17fccca2b38c7ea887a795d",
+      "image_sha256": "e127df7f247dec3a2f031f8388e717e640190af7e5dc0b945c590919c42fdfc2"
+    },
+    "resources/completion/crafting-icons/fishingrod_2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_FishingRod_2.webp",
+      "sha256": "bd5d87aba0e9b17295ff474f7e02768332bbe8ed021367530ba0cb4b5271522d",
+      "image_sha256": "06e781165ecf62cdf4fd70f4689fdb008983d0cbc2fb6f2c2100e46723e9c1cc"
+    },
+    "resources/completion/crafting-icons/fishingrod_3.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_FishingRod_3.webp",
+      "sha256": "f1eee9808469e4d7e303fe5224bbe2fc62c38b46bf214fad9abe241f37dedde9",
+      "image_sha256": "c1f710782138d5963e5ed59c42d034cfad8becd3f95578312202a364ba69f714"
+    },
+    "resources/completion/crafting-icons/fishingrod_4.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fishingrod_4.webp",
+      "sha256": "62b8176d620fc10746c829ae25f0e95b2b25f54192668bd8136edb69ebc00648",
+      "image_sha256": "f69a63f3d272094e654ba948d7904a47649a4d7dd8130f599b562abb5c87d288"
+    },
+    "resources/completion/crafting-icons/fishingrod_5.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_FishingRod_5.webp",
+      "sha256": "6e55bd6a9bbb0db5510eb86e26c9ca4cf216acf5952f792129dec22fe9358a9c",
+      "image_sha256": "b7049d30744a9f9137214e3d6ab2e2e82f01a91a2b4beb9b0d37478bf7495827"
+    },
+    "resources/completion/crafting-icons/fishingrod_6.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fishingrod_6.webp",
+      "sha256": "f640e7cfb5c97642b7a62f16dde3b90237ba80f961bf6993c5b49c1eb7f13c22",
+      "image_sha256": "0b06e3ff757797bafdaa60038faa7677accb6bb6c69cea159fef2109449f7e08"
+    },
+    "resources/completion/crafting-icons/flamethrower.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_flamethrower_default.webp",
+      "sha256": "983bed768ad94df142409bce6097168fc513e00dc04d0d05dce333a20a49699d",
+      "image_sha256": "b4230b53e2c70f315865e149e85f54656c19c2fc9eb8975c91233153204ce7bc"
+    },
+    "resources/completion/crafting-icons/flamethrowerbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_flamethrowerbullet.webp",
+      "sha256": "47a648d318883e9ea4f498dd72ced44aab57622ca4f3947e54d334ae311a23c3",
+      "image_sha256": "829dba602e24ea6aeaaa625b395c107a2951f54b6937621d3d8b70f87fca295e"
+    },
+    "resources/completion/crafting-icons/flour.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Flour.webp",
+      "sha256": "759d1f3360c9eec4e537cdd7239920325948b91fc8aa0da984aa9098fb6c281f",
+      "image_sha256": "cfb8498098f96dd7aebbd2ec7e4a4fed5ec14e21da31f94f6e2aec8a0a5b1149"
+    },
+    "resources/completion/crafting-icons/fraggrenade.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade.webp",
+      "sha256": "5ab6902a3fc781dacebfe31d21072b212b5f0f6031df68f4953c730450d62a03",
+      "image_sha256": "39b7c0974aff22326ba971dd54d8ee963e4a32ca04b5277614e8de30e62cd460"
+    },
+    "resources/completion/crafting-icons/fraggrenade_dark.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_FragGrenade_Dark.webp",
+      "sha256": "7cc0cd217d54572f097a1c4fd76f0db6890793f81b18caea39eff7b4d1f04ac6",
+      "image_sha256": "0ff14d87f0aea788179e28a40c43507a3fff04766ba1456676217cfddf774b10"
+    },
+    "resources/completion/crafting-icons/fraggrenade_dragon.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade_dragon.webp",
+      "sha256": "442c778a02bb0587d8a65a70eb04567e503e9c0a9bd92549c92260d53a59f798",
+      "image_sha256": "37b6038a1098c426aec60bd20f63a384faeddc411088cf59c48711ac975b08fd"
+    },
+    "resources/completion/crafting-icons/fraggrenade_elec.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade_elec.webp",
+      "sha256": "3cd9066bd59061d213d565fdcf10de88db71500f488128917f1f005b5c11fabd",
+      "image_sha256": "c4d6f699d7ddd4b45cb490f03665f60d1685484cf865335f859486cc8aea279c"
+    },
+    "resources/completion/crafting-icons/fraggrenade_fire.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade_fire.webp",
+      "sha256": "3db0d1f311af91fec16cac12e7b3c9fdb47762257c68c6e71338a3537dd59fee",
+      "image_sha256": "5a65cee1d5c71350224e982b99f790b0871aa213f031afa71a6aec587f09c060"
+    },
+    "resources/completion/crafting-icons/fraggrenade_ground.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_FragGrenade_Ground.webp",
+      "sha256": "f90a04297096710cbe8fcfa1398a86573c7249f0cd3abe46aaa08b8c3bd130c6",
+      "image_sha256": "594281a3975e2ce77ede02db86af51b68b8abdff6dcf774353a4ba0b4021f2fc"
+    },
+    "resources/completion/crafting-icons/fraggrenade_ice.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade_ice.webp",
+      "sha256": "cdeb302ab9e701e07a13dea5627b94242c21f5b311d4808895c11bf254e33d60",
+      "image_sha256": "9fb81c0cc233c52f670c5ab7a9a89c8046b5625fead6a52099e39baf2979a939"
+    },
+    "resources/completion/crafting-icons/fraggrenade_leaf.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade_leaf.webp",
+      "sha256": "ef84d96f397705b87d26f87e0f4d65e70919ee40a8ea7182bbbbcc28123b219b",
+      "image_sha256": "b108496a12411fa4fa9448ee702fa1ba89cd0d21d7db5f871a92f159529ec6cb"
+    },
+    "resources/completion/crafting-icons/fraggrenade_super.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade_super.webp",
+      "sha256": "b6fd961294bc1525bf8f4b9da1670278e270cd3c883a6e737244c0f470afff90",
+      "image_sha256": "c6273da7fdb276552f4ffd82c2778557efc85d92ba287ec65ecdb80b99e34658"
+    },
+    "resources/completion/crafting-icons/fraggrenade_water.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_fraggrenade_water.webp",
+      "sha256": "541d2198fe650910cbca7ee77378783d59a124eb24d4dc7247ee1d2d2ba367e4",
+      "image_sha256": "81962ada9e1ad90961b16da35d7cdfe0c26308aa3dfe7aeb3092f8d1ea2b647a"
+    },
+    "resources/completion/crafting-icons/friedchicken.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_FriedChicken.webp",
+      "sha256": "6a69b787429b2beec9cfe7ae110ecfb42c32859d8667f10c10a02381c41680d7",
+      "image_sha256": "03f20e0a7ab6fcd4d298180330afd67ae16c51f7ef3d751c022426f8c29471e5"
+    },
+    "resources/completion/crafting-icons/friedeggs.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_friedeggs.webp",
+      "sha256": "e4d4af49e3ffe012e5ce39b35a270e04dd01adf5ae73eb92f140153c69b4b5c0",
+      "image_sha256": "d70d565312bbab04dce58d6e3fcf1f0eb344d2ccf2c3e70a22eb271db61cf01f"
+    },
+    "resources/completion/crafting-icons/friedkelpie.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_FriedKelpie.webp",
+      "sha256": "81dc802610a5f6956792194f26e0988ba887eebd4ad32a0ed06e00f0f71ab3d9",
+      "image_sha256": "4db80fdcc2ae5a5fdac9405f0e2188863dda8d7fd8de25b4ebc812f5827a046a"
+    },
+    "resources/completion/crafting-icons/fruit__defense_01.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_fruit__defense_01.webp",
+      "sha256": "713766542481bf98b34afbf5b55d457d6b80e8fc00c32d1890703a2f251182e4",
+      "image_sha256": "d51ab37f305bebdc715a317143fcd092ac12c910b2c0a7eb63bf8b6250feddba"
+    },
+    "resources/completion/crafting-icons/fruit_attack_01.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Fruit_attack_01.webp",
+      "sha256": "c656cdfc9beaf01895bb1e944ccc121d6d86dbf433e3bd0c05a26ee370421a79",
+      "image_sha256": "634125799c8d82e68f7c9236b3783df9b1a9266df4ee059bbe12d9bca752a176"
+    },
+    "resources/completion/crafting-icons/fruit_hp_01.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Fruit_hp_01.webp",
+      "sha256": "35f9f49c2af0ed350cc5753c8d11ce969b4a300d38de6b8ad3dbe27d63805f8f",
+      "image_sha256": "ae798e37a02bab2d8baa78a0f3bc3be83ccc21747a245373410e115d14cefeb3"
+    },
+    "resources/completion/crafting-icons/furarmor.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_FurArmor.webp",
+      "sha256": "2cb14eb15d37dfb78f4cc08c9a92502da4d91bd546ea2cb639d8b5c8895b7f4c",
+      "image_sha256": "a5816f163ab4e6ab341eeb757bd82015569d891b24599b0033dcfa584430f6e7"
+    },
+    "resources/completion/crafting-icons/furarmorcold.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_FurArmorCold.webp",
+      "sha256": "dfec1e8b3227cec92333541a92f5cbe0cdf9c5dcdc53d6ccbddac7c07c0d89bc",
+      "image_sha256": "4024c84dd8265451c687c0e596e9156ed36fc823220e54fce446b03edde5f275"
+    },
+    "resources/completion/crafting-icons/furarmorheat.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_FurArmorHeat.webp",
+      "sha256": "91ce0e44ded1d481ef4fa4cdcea5d34ac6e27a2b235ab6ac6178d52c486b1822",
+      "image_sha256": "f5b22ca0fb230b75837d3000227487ab992a52035c901727a38b8878e44b6928"
+    },
+    "resources/completion/crafting-icons/furhelmet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_furhelmet.webp",
+      "sha256": "3e3e8b0606e2c075585c3c874341e39dd0b4cb0d470adab8d2e52d185d28ca47",
+      "image_sha256": "36793efbbe421c4d2e1dbf508917341c6d35ae717603e38430227c34a3864f1c"
+    },
+    "resources/completion/crafting-icons/gasmask.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_GasMask.webp",
+      "sha256": "1249c5f2f20ab85927f4a7dd3b3ed4e70de046221306e09272dc899b7d854204",
+      "image_sha256": "131fa3725576b4cf30ec52d6abcd238f4657bcf02dd3c0281a70ff66420ec2d9"
+    },
+    "resources/completion/crafting-icons/gatlingbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_gatlingbullet.webp",
+      "sha256": "b2fae2204e25bc569efa47aa11b731c556459097ec05edf3fc5cb1e7322a0178",
+      "image_sha256": "46ac64cb19e14a9faa2359e746662ca36177d32777235274fbc6d2371c745f54"
+    },
+    "resources/completion/crafting-icons/gatlinggun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_gatlinggun.webp",
+      "sha256": "a90a0453fce6a8f1bae952e4ce4be6ffeb48e64f0b94bc00eb7dfc31c2f3eaa5",
+      "image_sha256": "752e274b8a7c9cd25278a337edbb032be3399fb137ab2142389533f48b9bf551"
+    },
+    "resources/completion/crafting-icons/genghiskhan.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_genghiskhan.webp",
+      "sha256": "c3ff3f18022026507fae79f3eafffec7dc3932c829a41cf7e2ecec5b45319178",
+      "image_sha256": "478f9c046094e61ee4b13c45ac0db104b27da0eb4b94473776007ab244137221"
+    },
+    "resources/completion/crafting-icons/glider_good.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_glider_glider_good.webp",
+      "sha256": "18c5b3558d48eebb446aac8ed090b1d0409c1efe06ec13c11313305b406cb0f5",
+      "image_sha256": "f87e2b46df29404ba52f1783a4ef910b982d763db2231d6c305daf5f66b4fe8c"
+    },
+    "resources/completion/crafting-icons/glider_legendary.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_glider_glider_legendary.webp",
+      "sha256": "f8cc0a1838b82c3e7953d00329717e431661b56d236886b3b89d797219057ee8",
+      "image_sha256": "786f6516cc69daa6ea86ec80de9903b59a57b1b31877c8d09e6b1a7ad37eb8e8"
+    },
+    "resources/completion/crafting-icons/glider_old.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Glider_Glider_Old.webp",
+      "sha256": "fcd16cebcf372fdc04ff8aa1d03feeed615ab4f08bb88a5d0384840669cf96c6",
+      "image_sha256": "e4b6d6515cf5ccd96e919e58b5824bb4a43e481be99e1f6aa2fc1cc02ad0836c"
+    },
+    "resources/completion/crafting-icons/glider_super.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_glider_glider_super.webp",
+      "sha256": "36bf27e8268e9bfa5b92efeddbf6bde2c5e7fe23618c6c547fe6e35041d26cf0",
+      "image_sha256": "1bbfbe4d914baf294f59c31d0a6bfad323ab99668df73e3e14c12340577867d4"
+    },
+    "resources/completion/crafting-icons/grapplinggun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_grapplinggun.webp",
+      "sha256": "841888e18b212e1796ea2b5ea5b3500b3fab4ae2acd75e43cabcce004b0505e2",
+      "image_sha256": "4150d07ea3993055f3d39875c531457f0a2e03544749fb83fcfb960756e51ba3"
+    },
+    "resources/completion/crafting-icons/gratin.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_gratin.webp",
+      "sha256": "b81df5c2e2a5627ab184d4881324d192151568f75d936550f2e7a78ab32a814f",
+      "image_sha256": "7586568356c6ed695e463420ea959ef8baab5d4a11e4662d87d6245446437655"
+    },
+    "resources/completion/crafting-icons/grenadebullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_GrenadeBullet.webp",
+      "sha256": "8375302e9400b518ecd5b44d53918029164e0d840dc598fdd26aee2266204bce",
+      "image_sha256": "512ee462a4d044af94c7585516cd0899fdaaffa47118c3ea4cd3a9c0967a29af"
+    },
+    "resources/completion/crafting-icons/grenadelauncher.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_GrenadeLauncher.webp",
+      "sha256": "7e68706110669b11276abde455a9fcfbb1c4a87ddf6364311013052f00f078b7",
+      "image_sha256": "595924c2164b77e9f720fb399576eaac091c6c59ded1fd4d4e15e2e4e91958f2"
+    },
+    "resources/completion/crafting-icons/grilledsheepherbs.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_grilledsheepherbs.webp",
+      "sha256": "093b9270932ffb207f69a2eef59e39168981ae0800b4064a69c9f32a60dc3542",
+      "image_sha256": "5015ee1cfaf71c62e5748d2f7a089220456d554de0c78cb77e655c12b55032e9"
+    },
+    "resources/completion/crafting-icons/grilledswordcutlassfish.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_grilledswordcutlassfish.webp",
+      "sha256": "c610e5b2d8ccc4dc01b493241232531df47e13ff785204ad382ae70b48e25c91",
+      "image_sha256": "e371ecd0b9a89721188683cdb500efe83abb94ed3a4b2e47215b8a5a9251acf8"
+    },
+    "resources/completion/crafting-icons/guidedmissilelauncher.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_GuidedMissileLauncher.webp",
+      "sha256": "f2d98f459f4ecbb707fedee3d8d2852469463e071e887ec9cc1b6dc7cc0ed3a4",
+      "image_sha256": "0fea00b0490b3fde8b8a98f7187fd370a490008791b9ae60819209c34aef72b1"
+    },
+    "resources/completion/crafting-icons/gunpowder2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Gunpowder2.webp",
+      "sha256": "455f0ce04deb0e94a441c5bda38be09573fe49b7b981a8c366d6fa370bc4630b",
+      "image_sha256": "ae9bac8c9720f3f450e7583282662c05e883935910486c9dcb556680c8605f8f"
+    },
+    "resources/completion/crafting-icons/gym_head_desert.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_gym_head_desert.webp",
+      "sha256": "eee85c659aba54a7623d6ed78e0896a12837a6011d8095ad28098b14ac3f8f78",
+      "image_sha256": "bcc34f37bbd44e7f09714d2df7771847ee7d4d3d3b37c5f25caf0172d524f6e3"
+    },
+    "resources/completion/crafting-icons/gym_head_electric.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_gym_head_electric.webp",
+      "sha256": "0974f485d0ffa63386f7c2f374042cacee941b6e71d72f5df18eeb73a910596a",
+      "image_sha256": "f1bde99b280c5a085c0f3566386df918b366b91cbcb50400f5c321479a8becbb"
+    },
+    "resources/completion/crafting-icons/gym_head_forest.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_gym_head_forest.webp",
+      "sha256": "f75a3f27f5ae78b71adaa8b0ed70171ea6edb8ff7301868f1f38c24817b0141a",
+      "image_sha256": "2327455ce76eeabd3605d5475773415b5a152b3c5dcc8ff9448bb36053949d5b"
+    },
+    "resources/completion/crafting-icons/gym_head_grass.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_gym_head_grass.webp",
+      "sha256": "bc291d019fb79cc75f916eb18e240e52e9d303160a4ec90285ddb9ccb51d780b",
+      "image_sha256": "d2ee6e127a44229678893df182d1cf52165730c0f41d63de73b4aabbf41f7e02"
+    },
+    "resources/completion/crafting-icons/gym_head_sakurajima.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_gym_head_sakurajima.webp",
+      "sha256": "9cc2020774cdec404c56e7c7858a19e065b09aeb498c545a283cb3fd9c201d9f",
+      "image_sha256": "4b23ff2e2fe1bb00b992e4309a843cf34bde92955076931f82a4524b5b86aaa1"
+    },
+    "resources/completion/crafting-icons/gym_head_snow.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_gym_head_snow.webp",
+      "sha256": "d6f2f6783506f829a63e23214b536991dcd58feab0ac56cf23d562d0428bcb98",
+      "image_sha256": "f019d9a443d637d49878c6519d1e57cb942fb0b06c0f5780b159898a5f8127a4"
+    },
+    "resources/completion/crafting-icons/gym_head_viking.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_gym_head_viking.webp",
+      "sha256": "dd6bd587fa2ef085e9a81c12990a030d8ee257149a7c51ca2cda3b06c946ddf6",
+      "image_sha256": "70262d781f291262371c3049d52e8e5f1197e738ec135241f4dd2de30b2e66c0"
+    },
+    "resources/completion/crafting-icons/gyoza.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_gyoza.webp",
+      "sha256": "f743921c34fbbfd6901db1126d5961cd4dec1811a6033b5f6573c3a8162ab5ce",
+      "image_sha256": "87474384c52314fb2405e5d52789befd23b603d112361a0bba7079fef6367359"
+    },
+    "resources/completion/crafting-icons/hamburger_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_hamburger_2.webp",
+      "sha256": "3f5030f7f3bc0c99e4ab2649e216408c6cb3f205c53268205fba6ffd0a6007e8",
+      "image_sha256": "4585c32bf6ee530559668b7c4e0f2424c86f456ef0f7562d24ab33abe96f30c3"
+    },
+    "resources/completion/crafting-icons/handgun_default.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_HandGun_Default.webp",
+      "sha256": "cf24eb279b07f7ac79c472664805d8d79a4d6b052e35042900d66e588cd00cfd",
+      "image_sha256": "f8392ecd869b93fdd37203118a0dbbc7663eaa64558cb42c0fcc4195d7ca00d5"
+    },
+    "resources/completion/crafting-icons/handgunbullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_HandgunBullet.webp",
+      "sha256": "0c1995f0504b0956ba35f988ef69772d9db06787566009c51d9ab7c339bddb9b",
+      "image_sha256": "2081e462044700a905ada1ca9e4fa0d99b702e6699facf5d8d25a5e51be40acb"
+    },
+    "resources/completion/crafting-icons/head001.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head001.webp",
+      "sha256": "f2e3269bea08d11364dd92e6eb994cf7be4984550729253fc9db2f3f172b3e46",
+      "image_sha256": "5e9842c02f78f9dafee93ffea65e831901b90a4e7a16a269902d4d595751192a"
+    },
+    "resources/completion/crafting-icons/head002.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head002.webp",
+      "sha256": "766d9cc974c4e3a5c7f513cfa171e5b5f5688b0ab54b7a7730adda9e278ddb64",
+      "image_sha256": "f45bd1d8ed12e982f1ce88aba540ca9038aa270425f831b8441a3905c1091d29"
+    },
+    "resources/completion/crafting-icons/head003.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head003.webp",
+      "sha256": "cba3f5b2d6d88a13f23f5fc3c50a20d48ecc2861419b0b5fd12c740ebbea07bc",
+      "image_sha256": "4b499c782c840f1ba4bd4ce55bfc5c1fdc250c33a23fc31d83b4ebc2f3101d3f"
+    },
+    "resources/completion/crafting-icons/head004.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Head004.webp",
+      "sha256": "47e8d658955c21fa68f2180972c12b14dac70ea2bdec9ea7796425e4abe77296",
+      "image_sha256": "e4211396e9535faf8cdc7d03ed96be80dd14f94a0ecba6dbd28e97f7e60e46f1"
+    },
+    "resources/completion/crafting-icons/head005.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head005.webp",
+      "sha256": "2b8ac48c495af2d25f3f01fb9f076755850d39e8df44bd91c680b2be724ac98a",
+      "image_sha256": "7f1120d45a235e37ed71ee07e8a303082e1d9ff96fd1ce8dc00c8fd1880a49b3"
+    },
+    "resources/completion/crafting-icons/head006.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Head006.webp",
+      "sha256": "947c44920ba9c493403a06ab466a8645dedc9e83c2a4c64af201edc9ae572b1a",
+      "image_sha256": "9c013ee5fb7a3264eb2bee62c6f3863061141b813af6b9aff5c74b909b32108a"
+    },
+    "resources/completion/crafting-icons/head007.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head007.webp",
+      "sha256": "29876e9e19f725202d37c992b3952a6c62cd1ff80a984ece0efcf0ae35a838e4",
+      "image_sha256": "82ca924f2878cd978542bddf5c4079b479bd4f980547e20060337c3528845fb9"
+    },
+    "resources/completion/crafting-icons/head008.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Head008.webp",
+      "sha256": "56ac01fc52f5d80cf994029cbf7be6b30b59c07befe9a78dd2e90b0790450343",
+      "image_sha256": "b88c22b7249ba025d1ba54a5c178162664e5046c41b02f9e31811774708a5e84"
+    },
+    "resources/completion/crafting-icons/head009.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head009.webp",
+      "sha256": "4d42b9fa04ec3279f1c83c87839fe3e4937a5ca2da3a164abc9db6f4619bd01e",
+      "image_sha256": "af30426a4aab64cb26ce8bb8eabc0249de4f20a57f556c1903dd6df4e3be0ee7"
+    },
+    "resources/completion/crafting-icons/head010.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head010.webp",
+      "sha256": "e595394c8abee1b555082c27e4844e80459cb8265a36567e7ff01685f427452f",
+      "image_sha256": "824e7f67487aad5a539b72109f66b32f56e7d35091e665fc70aadcd64fe2ce94"
+    },
+    "resources/completion/crafting-icons/head011.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head011.webp",
+      "sha256": "783f4b547ec8c965324b1a5604fac67d2cadeab64c8bbc5a14c4a027005157e9",
+      "image_sha256": "58a2e99b079c22388f8831d4d4dfa89cf90cc6de281bfa3f80e542b81c9d08c6"
+    },
+    "resources/completion/crafting-icons/head012.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head012.webp",
+      "sha256": "27456dc6e029027f42ba2eef86deade1e2a9925b93d13e44b3c6f247b9076e2c",
+      "image_sha256": "9256a73c60eb07ed320e7d5eae57f846e680c8e5d45680ef015aac3ae51ff304"
+    },
+    "resources/completion/crafting-icons/head013.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head013.webp",
+      "sha256": "459f1aa42570839885c437a478354d4b62257ab0a562d4cddc48233a65697097",
+      "image_sha256": "5ef939146f3b74ca4f22132939e615706ab5048c6cd8a16254553027568ce249"
+    },
+    "resources/completion/crafting-icons/head014.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head014.webp",
+      "sha256": "2f46e6ada1789a75934d6e6388e4e5b0fbb2065bdc8b3f614f18b0de4a55b3bd",
+      "image_sha256": "8145dcd74b4103901e3052deb7bc4758da448daf31b01cf4c3fd575792b3b5d4"
+    },
+    "resources/completion/crafting-icons/head015.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head015.webp",
+      "sha256": "3eabeab8b97dc10354b35191153a82fddb875a3d6c62f180a0c4835c62f8d1af",
+      "image_sha256": "289fdc568ec65d00b64d478534dbb2191e0276e521b4d4f598322054eef7d36b"
+    },
+    "resources/completion/crafting-icons/head016.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head016.webp",
+      "sha256": "b14c238875505c3f4ecef63172ec6a89f7e41b5dafca96cd7d5518818ad67978",
+      "image_sha256": "ef45345dfe6c78eb4b3af6e793b4ef09af024ce7cc6042f59ccea4564ac76228"
+    },
+    "resources/completion/crafting-icons/head017.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Head017.webp",
+      "sha256": "3a843719d30055e7c53bb135f45ffc7bc376370dc2a9df781dba7ca3139bd8fd",
+      "image_sha256": "ebb80956fb94159dfb2b138d08d6e5042e729e60c4a9b8820e0f4e1aa295eac6"
+    },
+    "resources/completion/crafting-icons/headequip001_purple.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_head001_purple.webp",
+      "sha256": "918ad91de25db19043867ef6227c2f40bc21d7b57af446af0a4f14f20aacf630",
+      "image_sha256": "189ff03efeef3ada77901b239704c476d5854c203d0a822487ef17c999e8affb"
+    },
+    "resources/completion/crafting-icons/headequip023.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip023.webp",
+      "sha256": "05117af09b3521e198bcf7922c87ce1fce24416471adab90dd2e5af2b6b9c201",
+      "image_sha256": "1fdb299d4e552314280119ea3103de90b180bbe6462acd2a606a11d07ebbd9df"
+    },
+    "resources/completion/crafting-icons/headequip024.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip024.webp",
+      "sha256": "9b7c08f0892420bf38187b9ab20fab11d72060b85ca5f077f3c4f5d126cfa3c7",
+      "image_sha256": "f40793cdd87a3916f44a288cfb465c5618f2271136181e9b6043267608d37dc2"
+    },
+    "resources/completion/crafting-icons/headequip025.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_HeadEquip025.webp",
+      "sha256": "0f2b0b95adcf8dd62636d9b4998bd7c5fd3496abec858fa8dc27e3a3a6cf0edd",
+      "image_sha256": "f39cd1760963d151c4d0be5746e736d0aed284b0b88bc0eaeb36041f3e87ceab"
+    },
+    "resources/completion/crafting-icons/headequip026.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip026.webp",
+      "sha256": "8841595922306efe86df925038c24c327fea56f50815f067a0f7b55a97d1ff5e",
+      "image_sha256": "8b4768d4eff43a4d716440ffb3dcb743fc1ed6485fde84635d9041ab96b0ee9b"
+    },
+    "resources/completion/crafting-icons/headequip027.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip027.webp",
+      "sha256": "939eaaf4f065c1bf12d9d7c9a0243f380e64080733f3e617c460d56d723fe5de",
+      "image_sha256": "200258116c9a9ee725bce4e4149c773b347e2dc57ea99ad5a6d0a753f7554606"
+    },
+    "resources/completion/crafting-icons/headequip028.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_HeadEquip028.webp",
+      "sha256": "866a415a5422ec7d3a814bb409680a247ec81f42f51f11986eb7b4a0c752125a",
+      "image_sha256": "900911025d3a139f1aee83740ecd0dfb53e1d1879413d8b2452269a869167181"
+    },
+    "resources/completion/crafting-icons/headequip029.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip029.webp",
+      "sha256": "fbdda5904ac85dd280d27bbe044e7e4f335d376aa1e1b87bdd902f11e602e9d5",
+      "image_sha256": "5e70f73210d739104300a45621d263d539d95db3579bbf23cfae60f4ee5acd03"
+    },
+    "resources/completion/crafting-icons/headequip030.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip030.webp",
+      "sha256": "b2485ffddde4004c63dd4add460232d895e615c27915e25b7d94dac6b73027a4",
+      "image_sha256": "0d00ab98ac4b59d895c6b6a3b618f168e7d2120410c5096c23e4b080fb4087ea"
+    },
+    "resources/completion/crafting-icons/headequip031.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip031.webp",
+      "sha256": "4eb89574608647b466b7c3169ffa7edf94f0a58c75e51fee990156a536411d4b",
+      "image_sha256": "2121302006ce8fe7939eabba0fca02701a309c1e485f3f444eaa437adcd1971e"
+    },
+    "resources/completion/crafting-icons/headequip032.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_HeadEquip032.webp",
+      "sha256": "61a959d2a6320dd37302035a63575f6ae449f51e4c6d77988fcd44b96818ab80",
+      "image_sha256": "28b79d483baad67d778f75dd4aa8eb1c2ecb9605f2dd96a4cdfc924119c84f5b"
+    },
+    "resources/completion/crafting-icons/headequip033.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip033.webp",
+      "sha256": "77d159291de0200abc8e9e6f0147276115cfa242bb16b3af227528af0f5fe437",
+      "image_sha256": "a32c22a032f10231b7b4accf8c3f4e4bdcf0b55c8b45a2170d40eb19c4e4ee29"
+    },
+    "resources/completion/crafting-icons/headequip041.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip041.webp",
+      "sha256": "943f9b0534eb68b8c8a0d651d2eabe56abecefe9f0a5d6049fd7959500625f2a",
+      "image_sha256": "e30596ed00914afcea75fb2a0f40d17b7af563861c411bfaff386b2eacf7630e"
+    },
+    "resources/completion/crafting-icons/headequip044.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip044.webp",
+      "sha256": "7b54fabe40df020fb82de7f81ef513ba9cedfc5caeeb102d2e0e89a2f51ae947",
+      "image_sha256": "16332438bb5808d7fef8c484d3aed2481e17410e83501e8692b683ab9305be10"
+    },
+    "resources/completion/crafting-icons/headequip046.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip046.webp",
+      "sha256": "ad1ff47ca1b27331156d6744eea42ffbd52c3aba20e1c029db3037332c2da188",
+      "image_sha256": "4d9e0e1c3586a70efe91462092a746b5b468911d86bb36bb23643193e658a89a"
+    },
+    "resources/completion/crafting-icons/headequip048.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip048.webp",
+      "sha256": "3bb8494cc882fd75f340bd2d666e31ae8873f0cd8ebc8423218eb408e7263fb7",
+      "image_sha256": "b51a9950cec21a5668132b729373441a4cf597924e9ccd902de4bde440619af5"
+    },
+    "resources/completion/crafting-icons/headequip049.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_headequip049.webp",
+      "sha256": "0d53f81d592543894c90d83be420d5ee80d21d241fec7d8b4768520d05d2fcf1",
+      "image_sha256": "a9b1dd5f909f17617640f151886949ea794e3150a916e2b92ef37fac23f08cd8"
+    },
+    "resources/completion/crafting-icons/herbs.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Herbs.webp",
+      "sha256": "8b2b003a893f0fa1d5dabf9c41f9a07b382e6445440dd5cddb6e43b0d7011fbd",
+      "image_sha256": "756c7a583029df5bb6ef22297996b27b080dd28f27719ee2b31dd027dfac21f1"
+    },
+    "resources/completion/crafting-icons/highgrade_processed_wood.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_material_highgrade_processed_wood.webp",
+      "sha256": "63e52df9808eef9c4bbb7942b35cd83bc31339c5eca62e26496f3329a7dae997",
+      "image_sha256": "2392e761c7f790ad91029c22153f64fe196b65dcd8da4285e86bb4ffddfd443f"
+    },
+    "resources/completion/crafting-icons/homeward.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_homeward.webp",
+      "sha256": "807ce5547f3ba7c459a7bb0697ef21f806b9038b3a125f910d6a1ce5c2f42407",
+      "image_sha256": "45c269cfeaee4b0f59c00ac22df4fac777b24dc97b383b4bcfa7e2c4e750ff8b"
+    },
+    "resources/completion/crafting-icons/homingspherelauncher.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_homingspherelauncher.webp",
+      "sha256": "33d02d8d7338d6fc4d017f7e5f35e94514661251013ba6d5b362ad8ea8b3aa88",
+      "image_sha256": "d8749ed073cfa1ce7a6045673cf068766bbd1062454ba2d564b7b6bdf4142eca"
+    },
+    "resources/completion/crafting-icons/hotdog_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_hotdog_2.webp",
+      "sha256": "6db2b52ed9e721125dda014aeea7105b2ee5c1bcb3732c845e8d05863ab99238",
+      "image_sha256": "08b95357b8b7500109a362fabe92c1c94da7ed0b9a7a426dd0aa802f89a0d233"
+    },
+    "resources/completion/crafting-icons/hotmilk.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_HotMilk.webp",
+      "sha256": "5e0067df38906b31fa68e1317b29f975a64ea18d318a1cca1401586139d89eee",
+      "image_sha256": "9b2df2c8c71fb6e3929efea86abeb62ed923f06a83e53fa90ec510f6bce272a7"
+    },
+    "resources/completion/crafting-icons/inkbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_inkbullet.webp",
+      "sha256": "2131946996d6234aa84ad6abea730a581f8a9218af2c1c97a47e82121474cdf4",
+      "image_sha256": "72638c4a588ffa8447030f671cc5ae860f10bad42b82ca045f304a30b6436979"
+    },
+    "resources/completion/crafting-icons/ironarmor.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_IronArmor.webp",
+      "sha256": "45fb906f3158772b9178ef67c99d70f14877e6603f0f3905d5d4ec8b8dd32000",
+      "image_sha256": "4feb5954d0d36f01d793354b05cea849297957582b9123dcf46fbde0597e59d7"
+    },
+    "resources/completion/crafting-icons/ironarmorcold.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_IronArmorCold.webp",
+      "sha256": "2310d6745e0ab14c6a6e9930073e33340fe4040668f7911ca11f5ceaf266095a",
+      "image_sha256": "2540b43f8b508b7c3961f329e8939a9a35bc9cf73a008276e4fa8c1022090f9b"
+    },
+    "resources/completion/crafting-icons/ironarmorheat.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_IronArmorHeat.webp",
+      "sha256": "1d3a7673d1d842c4ff116d30cb8f15cc80137fbea5702c2b3190fdd4b1fe08b3",
+      "image_sha256": "c4635a28e6809b92eabe72444824787964940a28188a6f47a9a6d76bc5fc37eb"
+    },
+    "resources/completion/crafting-icons/ironhelmet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_IronHelmet.webp",
+      "sha256": "9cd9de6a5f138ddadc05fc3a8dcc81afba5c1a668b1f58e1c433b2c533c81f1b",
+      "image_sha256": "c8ccb41afac78c5a14d62442b53ee2c36636faa3848f90dc4a76ca07eaa649df"
+    },
+    "resources/completion/crafting-icons/ironingot.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_IronIngot.webp",
+      "sha256": "1d8e18d16a059583d3a4078950c1edf4a2ef45806501abc380f4ec834e5764fb",
+      "image_sha256": "da04fcb2c50412139488b3e0e447210f147a51e1f1af91cedd8b9d6be39e2c6a"
+    },
+    "resources/completion/crafting-icons/jambun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_JamBun.webp",
+      "sha256": "c55f826d8bbecb42b1828d73a606ff1840487b3963fdb5cf669861bee190875d",
+      "image_sha256": "0a6093d606ab81063c80a6b58d4f21b04e43a253f70142f11d51d0b01b049449"
+    },
+    "resources/completion/crafting-icons/jellyfishfairy_jelly.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_jellyfishfairy_jelly.webp",
+      "sha256": "5bf2f7a68026550a00b097796387ca1019c14530a1da2ebcb1fbe6d2d050538a",
+      "image_sha256": "3b50499246e295e3f1c132d0f8aef6c5e08ef03cc6d97a14d6563022afa7aab8"
+    },
+    "resources/completion/crafting-icons/jellyfishghost_jelly.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_jellyfishghost_jelly.webp",
+      "sha256": "468af5ca6dba61db11f4467c9ae04b2e0cb266477b3016ea5414e60da96cdb45",
+      "image_sha256": "9d63e8fe9e09fdd5737f9ad202fa36ff0e58e72c975b7ba3d3ab4440deccb1a9"
+    },
+    "resources/completion/crafting-icons/katana.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_katana.webp",
+      "sha256": "3caada96584fa7b7583b9d0fe09871ec62d7ae7ac519057903deee9040f51faf",
+      "image_sha256": "8de1bd4cda2367b2a1f5f4828c0fd2635e159f39e8836330780923ba333d406b"
+    },
+    "resources/completion/crafting-icons/kigurumi001_armor.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_kigurumi001_armor.webp",
+      "sha256": "841ae8dd45aae7a2d52e3badc73a3d787bb9f54f915a72069b8ca53a37df07c9",
+      "image_sha256": "4c911ebf184ab477977d73c70178cbdc03ef9345150c9c686f6caf068de856f3"
+    },
+    "resources/completion/crafting-icons/kigurumi001_helmet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Kigurumi001_Helmet.webp",
+      "sha256": "664e7687a96fc57e1be5fd69cfb2c5f9043bbecf49d4c4e49d34990ba7e93c2f",
+      "image_sha256": "3e321fced6901859eb4f26288fce6d7b4fd7146efb7d70fff41d18bf03d62ad8"
+    },
+    "resources/completion/crafting-icons/lantern.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_lantern.webp",
+      "sha256": "64a6bdd3c1c876829bf4e3f279f48aa8a32bc749ab914e37cb05447c00bb0388",
+      "image_sha256": "0bf14f32811436c8be864333f7e7631e8235e5d66271b0a74321d3b5e1a8ae47"
+    },
+    "resources/completion/crafting-icons/laserbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_laserbullet.webp",
+      "sha256": "8f37ab47d14504e6cc757dce480092e189350b0c8a453bee9755d864836ba970",
+      "image_sha256": "04fb8e40680ce0767c0b3511313dd4da34b94d7b1389bfd8e1181ea590215831"
+    },
+    "resources/completion/crafting-icons/lasergatlingbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_lasergatlingbullet.webp",
+      "sha256": "6af03d1794e7a172c1f64783f76d3f2274f66c8987a4d27548237002a3193ca1",
+      "image_sha256": "34a436f3569fcadb246e00101c6e03e30ba603a1c7682510e7758067e3294283"
+    },
+    "resources/completion/crafting-icons/lasergatlinggun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_lasergatlinggun.webp",
+      "sha256": "91786bd41b18878c34125a2d9a1b488c1b1a22bbbd7a740c816a8d9c33dbbebb",
+      "image_sha256": "1e8cf3af033b1a4cb2fcf4c1924cb5b83e98e11b7bc0bf7dc3d8e7d5fcd38b47"
+    },
+    "resources/completion/crafting-icons/laserminingtool.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_LaserMiningTool.webp",
+      "sha256": "e9ef2c11633f3e031bf5460adde57848884703144d0377d3a97d649b19ceed0e",
+      "image_sha256": "64c2cd2e3da1c6a87e966aa29229be09cb3e62f0ad0814be8904abb9f9243fdb"
+    },
+    "resources/completion/crafting-icons/laserrifle.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_laserrifle.webp",
+      "sha256": "a36f3799b40c5f5336e592a82f16daba583d611831091883430912e8e93df058",
+      "image_sha256": "d6fa3eb435c8abb8188101a49c95e8958a43b4e6ff8bceebb489122b66bf4bd8"
+    },
+    "resources/completion/crafting-icons/launcher_default.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Launcher_Default.webp",
+      "sha256": "419fd466c5f0cb5654d853501edcdada2937bed798fef81904ad7736774a5c42",
+      "image_sha256": "c621845925dc519e1990fdd3de33440b638f61264b34eaba032d3b40524bc951"
+    },
+    "resources/completion/crafting-icons/launcher_meteor.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_launcher_meteor.webp",
+      "sha256": "12973c3ff5ad529b81961ce1c89afa660ed3a6e049b1f154016d5af08527325c",
+      "image_sha256": "aec8537cbaaee89fb7c287846761d5fa68d27554a57052c266ff7d5656c140e3"
+    },
+    "resources/completion/crafting-icons/leatherclothing.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_ClothArmor.webp",
+      "sha256": "f39648b0d172d3af9059d6cfe28cde4adc0702f62616ccf8d7932c2a00a00144",
+      "image_sha256": "9c5f1944abed08276fdff717d60e8baf360f1f3fe12e81f8f45b6bd2af63ec96"
+    },
+    "resources/completion/crafting-icons/luxurymedicines.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_LuxuryMedicines.webp",
+      "sha256": "c4a37c1fc3d05765e3d72fa23c46ee7167ecdbac12e2c3dd19e32b3f61ce2076",
+      "image_sha256": "ca66afb6b9e56ecb466d4f3741493f0581b1879991f786aaebfe7f914f966412"
+    },
+    "resources/completion/crafting-icons/machineparts.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_MachineParts.webp",
+      "sha256": "b6c5f8fe09ad2660ffea1f1230ba793f33f594b4c8a3e6603436babe4e07a53e",
+      "image_sha256": "d468b4359da66dc4fbc63ef409135fac76a0802abee88ceee1d87783e7ba88a8"
+    },
+    "resources/completion/crafting-icons/makeshiftassaultrifle.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_makeshiftassaultrifle.webp",
+      "sha256": "3538be2ec892d5fe7896cc5242f3d4f1764558251fc08d7a9dc37d90813c76ab",
+      "image_sha256": "ba934728d9e41af1a4f1774a8892f2a7c5f117bb26c2e0f22d98c3ea14459a0b"
+    },
+    "resources/completion/crafting-icons/makeshifthandgun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_MakeshiftHandgun.webp",
+      "sha256": "46c4767383b7d2421e2c82e1088273f66c77c850bf474626c783862aa4309686",
+      "image_sha256": "1fee7a953dffb87918f16ccf539854b2bc81d5c8bd6d90077289492589ce1768"
+    },
+    "resources/completion/crafting-icons/makeshiftshotgun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_MakeshiftShotgun.webp",
+      "sha256": "7a6cb63c2c0746856c7d3e27a1705276c10ac6e18e96cfc8d4901de6ab1e1942",
+      "image_sha256": "4307b2fa17854fcf6905ea5f4f550b6389fbb605966c5b04680efecb971d9fc3"
+    },
+    "resources/completion/crafting-icons/makeshiftsubmachinegun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_MakeshiftSubmachineGun.webp",
+      "sha256": "c7cc6f71f0866b452911ac4f218ef1b00ff1ea0a91cc9e66c3334ed42d206c90",
+      "image_sha256": "707786dfd8573116a878cecf2e6581b8ecb093185698dcbec4004e61a386ed2f"
+    },
+    "resources/completion/crafting-icons/manganeseingot.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_ManganeseIngot.webp",
+      "sha256": "ff0f5b479427e6e590f7da22de1993cad90e7bc86376b997024e6025c4919aa3",
+      "image_sha256": "911558a6c456b0a0515264da507db8c942aec27334254210c7aca89889a9c6d4"
+    },
+    "resources/completion/crafting-icons/marinatedmushrooms.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_MarinatedMushrooms.webp",
+      "sha256": "c62212e3d98175bc3470b2de59192531c82bf3d30cf9fef9d294bc579ed3cd5e",
+      "image_sha256": "d12877e3e4ee4af6022f2d956ec93d4d6af0d3e0dfe81fe11a675cd87861dbe6"
+    },
+    "resources/completion/crafting-icons/meatandpotatoes.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_meatandpotatoes.webp",
+      "sha256": "8b27153f555706c8fd1502f0dc46be11f0ce8fbe8211bc7f3f6756e06e2c8d10",
+      "image_sha256": "3c2babc9dbc4667aa29b6ebafa2454aabb9e59f6f5e249fea397852d7d8201b6"
+    },
+    "resources/completion/crafting-icons/meatcutterknife.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_MeatCutterKnife.webp",
+      "sha256": "9fe5acf73321c5d6a1707b6cc8e9e50f2ca02a386c3a56f2c881e68c29a91c39",
+      "image_sha256": "c164ddf805cc600707526ea6c34af3c9392c87116d8fc8a11d91208d8ac1fffa"
+    },
+    "resources/completion/crafting-icons/medicines.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Medicines.webp",
+      "sha256": "71b0c746165fe7a3995764e382d4984a288262191ae61012447995f30c63d95b",
+      "image_sha256": "b599eb923b5723a7268483de548036f492c73d0fb78673e6b6daddf750bae007"
+    },
+    "resources/completion/crafting-icons/metaldetector.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_MetalDetector.webp",
+      "sha256": "d644f10ce2b53147ac324e20aca21b69b791b448af6dd4d555ed697a649e5593",
+      "image_sha256": "cb52c0f7ecc60e495a2719310745dc85a10e016023de7344befdd01183056bdf"
+    },
+    "resources/completion/crafting-icons/meteorbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_meteorbullet.webp",
+      "sha256": "a50cef6a18fdffb2041506d132e9b2919d4b3744ac6a79521d7c4cd41e466a6f",
+      "image_sha256": "ebe71f1f25a5031f7474f3e54cc1fce506608db670f83c1fb2f1694cfda17357"
+    },
+    "resources/completion/crafting-icons/minestrone.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_minestrone.webp",
+      "sha256": "46faf3104625a1795c13831073443dfa152f883809c4d39f5d308f6d263f0e33",
+      "image_sha256": "c539361c64df3310a4c075fdde43547ba673c1db30bf9c55a2047fe94545aef0"
+    },
+    "resources/completion/crafting-icons/missilebullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_MissileBullet.webp",
+      "sha256": "2ee8651975fe82e3bfaf04d0b53877248ed6fdfc46c767a4fa4ab79bb5ee8144",
+      "image_sha256": "4ff07bad6945bbfc86bf8ea21e1b190c9bb3e0451a43f032045e43e5d5f9408a"
+    },
+    "resources/completion/crafting-icons/money.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Money.webp",
+      "sha256": "cc4ac3224770686367d33da22aa926a5b587d5a1476ced42600bf498ce243b5a",
+      "image_sha256": "aa1417ab2bab689d1e4891aba869f1e708099e02b9d2e2b352d0a684af44e1e8"
+    },
+    "resources/completion/crafting-icons/multiguidedmissilelauncher.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_MultiGuidedMissileLauncher.webp",
+      "sha256": "3914cd8eb9b2de4d4189077bde757ef9582336d8956ff765e48f6ad3a7e30f51",
+      "image_sha256": "5f8736c715ab2c1e799adbb4fbf95ada47aad077c7c1eb5a5c2c9fbf497ae285"
+    },
+    "resources/completion/crafting-icons/mushroomjuice.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_mushroomjuice.webp",
+      "sha256": "30b60fa1ef18f39e3dc3b55ca0e043a205e6cb1356b01e2c230f2165bf7efe26",
+      "image_sha256": "039e9a97f9be3bb29464e8c8262b1f4f6c714a06ceaea5739196b508785780a0"
+    },
+    "resources/completion/crafting-icons/mushroomsoup.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_MushroomSoup.webp",
+      "sha256": "3281524f54118957b654628ced28d6c348f4ff1c8a81192128bb782965a83866",
+      "image_sha256": "ef3bc611874f784671cee78d016a51fd3b4c636d839b0b926d7e0aa340d82908"
+    },
+    "resources/completion/crafting-icons/musket.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_musket.webp",
+      "sha256": "1a591674a0e3ae39f52806a022111eb5f34b1aae0c8b270d718cd14c6f79234f",
+      "image_sha256": "cd62f3843b7698a5180210f2c952d916ad14edc87922f1e702d84163ca7ee1bb"
+    },
+    "resources/completion/crafting-icons/narcotic.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_narcotic.webp",
+      "sha256": "ae69dc3ebf9a776c355c3602211898f27336e61d808ef97c25efe8f6075e5c17",
+      "image_sha256": "84fc0bf6dffdef14419b58b54912f61e8963160eab25822c7568158e82fc436f"
+    },
+    "resources/completion/crafting-icons/octavia001_armor.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Octavia001_Armor.webp",
+      "sha256": "6f579a3d786666efacfefe392c27dc9c0b58b1cf6044ef5b64f70f223341dac3",
+      "image_sha256": "55a56cd210d568cc8fd0b8cd415af671fa5754c0772c034c43345efa3c62bf77"
+    },
+    "resources/completion/crafting-icons/octavia002_armor.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_octavia002_armor.webp",
+      "sha256": "266f8a9c2d88571feb1d0966a852b8a3ca18d1b30864009a0e20cd3b0b87bc13",
+      "image_sha256": "ef4ce3d02507a7021f26dfc16a24b0224229c7cca7c897cdd9d01ed8d9760f94"
+    },
+    "resources/completion/crafting-icons/octaviarevolver.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_octaviarevolver.webp",
+      "sha256": "0d35f62568df7145406200e7f98c7220c3833b67bbbd498a738d369de9d24d33",
+      "image_sha256": "226dd6f05bf9cc737d3e556cb33bc03b14bf63b05f408148a60defb4c2cac8aa"
+    },
+    "resources/completion/crafting-icons/octaviashotgun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_OctaviaShotgun.webp",
+      "sha256": "a3550028bca85a10af2dbef9c45563c62234d3206bd7f38c07fe3e469fd77368",
+      "image_sha256": "aea1fd9c596386725fc4cbd285eb723769eb0ac32a767832dbe7f48f9a76bf61"
+    },
+    "resources/completion/crafting-icons/octopusgirl_takoyaki.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_octopusgirl_takoyaki.webp",
+      "sha256": "c47f82fdc61719e076bc0a96d47af1c08be356c53c02f4c371a2465e5066d35b",
+      "image_sha256": "620f0586fed9aa0bc66b352eb515b450271d4da4c0114eb0dc85e9877989241f"
+    },
+    "resources/completion/crafting-icons/octopusgirl_takoyaki2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_OctopusGirl_Takoyaki2.webp",
+      "sha256": "784a2271e0e3997864e78c925ae1c2b43ac55300ef9f16d7f7e72eaa9360c5e5",
+      "image_sha256": "d5bb1ecebb7f561fee293ab4a543ccbde06a1c4cfdc8a609ed13c6f4e827f0ff"
+    },
+    "resources/completion/crafting-icons/oldrevolver.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_oldrevolver.webp",
+      "sha256": "a4e261deee7ee0c40215b60a4a7d3df920c1743d60031f00bca9eaf9ec27bb3b",
+      "image_sha256": "e8203dae786bc2a69a02dc49734860fddae0ba1c121a3c12cec5144963bee9a1"
+    },
+    "resources/completion/crafting-icons/omelet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Omelet.webp",
+      "sha256": "356df8decf261607039a6263a801db89eb380dff05ff16f35cf0c1531d89d33f",
+      "image_sha256": "41e0085af69d429f7c5f78d24ed49d89b6d93b02b74038152abadf20fe8a1604"
+    },
+    "resources/completion/crafting-icons/opium.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_opium.webp",
+      "sha256": "44ca446e7e143d93f4208ff6a4dea262ac0e4bbbc5f3e2792458e979643aa272",
+      "image_sha256": "b58c3eeb2c0b123e204354a280502addda036e5978b1211ef222cdf7a49c0e1f"
+    },
+    "resources/completion/crafting-icons/otomo_atdark_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATDark_ElementBoost_1.webp",
+      "sha256": "5057a848a286c08e1f53a5a995bca744f2a7a582cb26ed11c0b493761cc5bb6e",
+      "image_sha256": "7748f4e395e4979f5cd5ebd3d058ab6aff9f02b6bbd32c91b5867fdf19534e6c"
+    },
+    "resources/completion/crafting-icons/otomo_atdragon_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATDragon_ElementBoost_1.webp",
+      "sha256": "c65fa98a07f2454ab74dc270f2051f6293d11dda0365ecee8994355a9e8d4a57",
+      "image_sha256": "455a9b2e3617060d2e6b60ec634a89cce802adc9af50564f953300019d0a6128"
+    },
+    "resources/completion/crafting-icons/otomo_atearth_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATEarth_ElementBoost_1.webp",
+      "sha256": "bcccb10f1a1599b7380a423a79fcefe5bf2711e251a2cc7746516af9708d09cd",
+      "image_sha256": "6e7084a90d24c36150a601784bb42e5d7850e21e9755bdb945d52221d1e9b665"
+    },
+    "resources/completion/crafting-icons/otomo_atelectricity_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATElectricity_ElementBoost_1.webp",
+      "sha256": "be66ed6bb7103b10ac3aca0053ddf1ccada60f74026d7227cf72b6ebb8b14ff6",
+      "image_sha256": "f2cb409db4aa1abd84087dec1b2bcaceb4b6da7015f2981bf93df5f81f342630"
+    },
+    "resources/completion/crafting-icons/otomo_atfire_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATFire_ElementBoost_1.webp",
+      "sha256": "146bb41c78bcc1dbb558f2c1b20bc484285f243cd985dbe7386ac5274bfd085b",
+      "image_sha256": "9b9f74320df6929ffad612ad2cd6e86099ec61f23494c76f37216a442d6b9c61"
+    },
+    "resources/completion/crafting-icons/otomo_atice_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATIce_ElementBoost_1.webp",
+      "sha256": "c5bd43df8dee6db39ab062b05fd615a921175760a376a5285fb99dca6b0f329c",
+      "image_sha256": "519626f9d5f76b06b8af8a6131057b483613d4557d4964245c6dd2ffc3dc1d46"
+    },
+    "resources/completion/crafting-icons/otomo_atleaf_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATLeaf_ElementBoost_1.webp",
+      "sha256": "959def8daeb7c10d732f784a520b84e743e6a4b67351f1d84d415d3b2e75b7e9",
+      "image_sha256": "149c499347d371b4649c37cd814472f7cb42b2ce1deb575d74a9c622a0ba97ab"
+    },
+    "resources/completion/crafting-icons/otomo_atnormal_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATNormal_ElementBoost_1.webp",
+      "sha256": "629a17042b9eec38c199d4e566eca9d9b0b6a24bb5c980738f3f7742777876b5",
+      "image_sha256": "09df70708bc1ffc0a0b14c3070b167bb6f56b238fef8cc0c2b2629b9690f1765"
+    },
+    "resources/completion/crafting-icons/otomo_atwater_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_ATWater_ElementBoost_1.webp",
+      "sha256": "91113f73db696e1a088f5b558b7bc70634d72a2b8277eeadb167383ff56e2b47",
+      "image_sha256": "2b96fa795849a4b20f78d6994aa475326c317b71babd835c5d6e1a65cee5601d"
+    },
+    "resources/completion/crafting-icons/otomo_dfdark_elementboost_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_dfdark_elementboost_1.webp",
+      "sha256": "2159657bf4643fa020bfae21972661b916e42e51d5b2f4d46d68e732b54d9b0d",
+      "image_sha256": "caabbcf8a8c81944de94eb0bc95a4b4a2e73f017a28d891ba49c9d78cbd3ab90"
+    },
+    "resources/completion/crafting-icons/otomo_dfdragon_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_DFDragon_ElementBoost_1.webp",
+      "sha256": "f5087412627e3a45f45333a96c61face2559a296450bf7e9b6b33ea830c7b63d",
+      "image_sha256": "718f63d10333970319fc83092fd70e14218ed76fbeb270c7ac69f9515ea82a49"
+    },
+    "resources/completion/crafting-icons/otomo_dfearth_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_DFEarth_ElementBoost_1.webp",
+      "sha256": "755c4bcddb3ebadffc14004f25bda17557f5dd88ce7eba4fd2112bf73a78becc",
+      "image_sha256": "a3a26a4e8e568c4dbb578fed9ce1a207bf308a97057c6630db3fd8a709b4f281"
+    },
+    "resources/completion/crafting-icons/otomo_dfelectricity_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_DFElectricity_ElementBoost_1.webp",
+      "sha256": "ab5c580e190c6f865e1237992208811c064c42a66e1490790d951b9e8b9e0502",
+      "image_sha256": "884c3241d0a6d9b19d0b6a50e5afdc36a73c9325a240b5d9f0afc44563623f07"
+    },
+    "resources/completion/crafting-icons/otomo_dffire_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_DFFire_ElementBoost_1.webp",
+      "sha256": "bfbb29416128733fd2a62a9293dc687f5511d91fcbca664ccf0d00dddd17a766",
+      "image_sha256": "abe2c488f8fc8f1a7372d7d7723e1d7803a6ad908969140526ebdb4786d652ea"
+    },
+    "resources/completion/crafting-icons/otomo_dfice_elementboost_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_dfice_elementboost_1.webp",
+      "sha256": "05b5a86ffd632c9a9620400a6895bc83657306bd492475c34062e6bc4a6e11fa",
+      "image_sha256": "3b9c693c0e098a92605a055092df2741bb62ccbe83dc436b913fdbb775bd426d"
+    },
+    "resources/completion/crafting-icons/otomo_dfleaf_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_DFLeaf_ElementBoost_1.webp",
+      "sha256": "4a7942caa854c6082fafb3d1e5ab9e569c6304a4ec2257adfac2ba10f385c931",
+      "image_sha256": "4e0d7d5a9cf30aea2f78cef7fddbeb867ad91f2f771f3d8c5aa79311dcc69d0e"
+    },
+    "resources/completion/crafting-icons/otomo_dfnormal_elementboost_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_accessory_otomo_dfnormal_elementboost_1.webp",
+      "sha256": "3253acedfb6fb7e462bb8c4a639c48bec51d02ef26148d433c1af86df4269821",
+      "image_sha256": "0638a7d572b1022f38c20d1508a8f83504c3ab7bfb99e61288e8ee97eef457c9"
+    },
+    "resources/completion/crafting-icons/otomo_dfwater_elementboost_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_DFWater_ElementBoost_1.webp",
+      "sha256": "855f12447427c2c113c72a2e3b076b8354570d2635a004a2381998a1c4632dec",
+      "image_sha256": "fc7469d4487815fab3d48f0f9781ee4d2d97af20d81930e323722fc4b2a76ca4"
+    },
+    "resources/completion/crafting-icons/otomo_palconfidence_increase_1.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_Otomo_PalConfidence_Increase_1.webp",
+      "sha256": "f46d4a99eec4587c3d33f98e39e6ac650304e44dc21a0e156b884cf6fdceacc3",
+      "image_sha256": "08db827b5081fc1762ec2e67b0cf04555ad791f8922b7a9432881e8c1a16103d"
+    },
+    "resources/completion/crafting-icons/overheatrifle.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_overheatrifle.webp",
+      "sha256": "c287abb7058b6c4a570a1abc842e8e2154f6f772b37f465b71840561d9246343",
+      "image_sha256": "3e5076ba1cb308dbb78a4979c313b4d0d45c8f1d37d13d6f9e9d2e53d0960ffc"
+    },
+    "resources/completion/crafting-icons/overheatriflebullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_overheatriflebullet.webp",
+      "sha256": "9997c0b63a6b0a11c8f89fdc61f2dd2e237bc15893639e1f24f3ae607a1ced24",
+      "image_sha256": "e7fa2a9c3a9f626c5742c7871f70d928b2f1aac57b3194bd0cc7f07285303645"
+    },
+    "resources/completion/crafting-icons/pal_crystal_s.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Pal_crystal_S.webp",
+      "sha256": "74020c39741be5ed3a97a75604a7fd1afb42909c5a47836ced74af8da6974472",
+      "image_sha256": "47bf33afcc44374fed6c0321308cd483b86d1fb526660c94be841d9a50592e09"
+    },
+    "resources/completion/crafting-icons/palawakening_dark.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_dark.webp",
+      "sha256": "8a13a94cc35a5177a4812bcf67026616b340a6e54a8372ea203fbeb9df252638",
+      "image_sha256": "51d5b1cb7cb89a3352532ba6f492ef1e2db974cf8e46d9ad9cb0e9c3d56baee8"
+    },
+    "resources/completion/crafting-icons/palawakening_dragon.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_dragon.webp",
+      "sha256": "c9f04b8137270d8d2d80ca34254e40a135f7ee130d92279f4273980edba19927",
+      "image_sha256": "77845c99203920d5072b34454a697590ad78c112d88f9ee0b7536300713aef2a"
+    },
+    "resources/completion/crafting-icons/palawakening_electric.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_electric.webp",
+      "sha256": "4071c8802d0f0403ad079f5bba389d13ac7c3c02b254760dfe53f93f73090f39",
+      "image_sha256": "b700d3bf2e5fe97060bf5765a3e111481a1592e033d1e08fb5d7cc92bfc9216c"
+    },
+    "resources/completion/crafting-icons/palawakening_fire.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_fire.webp",
+      "sha256": "33e2def65a26a6711d9de2da8c2cedc2084d87650fbda2a7159a70895e67a630",
+      "image_sha256": "a20d8a6ad7a35dbdfb248907dc43944f8c93774cbbc8ec0b909e5066330e5e7d"
+    },
+    "resources/completion/crafting-icons/palawakening_grass.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_grass.webp",
+      "sha256": "61866e0a29a898ac7e85138c79c7feb63e5e566dc3fec911b471c0f9e1842ba7",
+      "image_sha256": "19fcf79cca447dee176afcb23f3bb64515c7409fce1a8b2e20e43bb81ca616c7"
+    },
+    "resources/completion/crafting-icons/palawakening_ground.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_ground.webp",
+      "sha256": "ac3e30035e47f930212b32aeaabf97b075d83b7ffa5fc080fd601fb0c3386973",
+      "image_sha256": "b50e2b721a72aecbd210157cd2e442ab6b785d3d4c21b0188a47f142d12deb32"
+    },
+    "resources/completion/crafting-icons/palawakening_ice.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_ice.webp",
+      "sha256": "90867682acf8da6d10aa5c2514183910b88c1557e973096eda3ccf77a67183df",
+      "image_sha256": "d886532e0dab8fd327064de3f0fbb3698ba2bf15d0edb003ca43c12a16490f91"
+    },
+    "resources/completion/crafting-icons/palawakening_neutral.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palawakening_neutral.webp",
+      "sha256": "1e773b8fa940d939062a2e2e186e66a038bb3c7aee5741f1f4932d9000fb65d7",
+      "image_sha256": "467795b828191b224cebf7bf1a33a70b21346ef4c7dcd4493875985e44235f11"
+    },
+    "resources/completion/crafting-icons/palawakening_water.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Consume_PalAwakening_Water.webp",
+      "sha256": "d29349e93898ad7b4dcf3223f72b364c29fb233eedaae73db5786a1b844ee1ab",
+      "image_sha256": "c4e4526238f1164e393e4dac5b978cc19e564f4ea1c5a9d93a4c8c8ff4a20ad8"
+    },
+    "resources/completion/crafting-icons/paldopingshot.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_PalDopingShot.webp",
+      "sha256": "963a05cd364cd4f0ee012ebbaadbe0d0c56c59261c06a4439a30deccbd870b14",
+      "image_sha256": "b75ba89cf59a3e160b0845a90161ef03517859ee7797f4d6aea915e74ade078b"
+    },
+    "resources/completion/crafting-icons/paldopingshot_2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_PalDopingShot_2.webp",
+      "sha256": "aec83b97f209446b2a133596a6d383cc9e29f42d183328be577f9beade08ff26",
+      "image_sha256": "fc080f462931c79ac7ab8a9fe09d7a4cc20a5ba23c99c9365614d35af3abcdbd"
+    },
+    "resources/completion/crafting-icons/paldopingshotbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_paldopingshotbullet.webp",
+      "sha256": "0ad599a8b472011fee94c363f10b56ad21823f31cb7efec503720e13eedc2591",
+      "image_sha256": "cf14a64670194a0ee06ffbaf4c04502811c60652bef7bc0dc8c40f8fbd8f1106"
+    },
+    "resources/completion/crafting-icons/palhealinggrenade.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_palhealinggrenade.webp",
+      "sha256": "797679a0ba4ae15d206d2b6bdb9c54b21098264611ab1078bef54529cfe83af1",
+      "image_sha256": "d48819602020c8530802368348bc388e005589e72c542bab2707afe94ae11e6f"
+    },
+    "resources/completion/crafting-icons/palrevive.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Consume_PalRevive.webp",
+      "sha256": "0e3380a65692a324ef958eb06252382a22e9fb67fc5a697183be094c92a41b19",
+      "image_sha256": "f8e5c674ab0ea99fe008422caa2f636ab5a70e7a55e7782ab1f8ceeb8c9b71cf"
+    },
+    "resources/completion/crafting-icons/palsphere_ancient_1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palsphere_ancient_1.webp",
+      "sha256": "57481db92b0166469f7a15e99487231426438197b567b008b808ae6080c92f4e",
+      "image_sha256": "0e6f485f5b20a23d82ab7e9fc8b3b1e6a455b63f8d6e8b92d6d7b9635ed1c6be"
+    },
+    "resources/completion/crafting-icons/palsphere_ancient_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palsphere_ancient_2.webp",
+      "sha256": "6e2b40383f3e04dba162f9f8c4678de1f567354deb34af8341562306e995c5e9",
+      "image_sha256": "a12138e59a46038ee5bc47a063ed56c040b98505c341de248d39a86ef94fa488"
+    },
+    "resources/completion/crafting-icons/palsphere_exotic.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_PalSphere_Exotic.webp",
+      "sha256": "bc4296237b9c9944bc27f8fed64c873892c17a8c1ab8ac0109e2fc264418ff0e",
+      "image_sha256": "69e1b7103d21108f3b4f57f5efa403b325a28a946086a8ecd2a1a7bc94ca4904"
+    },
+    "resources/completion/crafting-icons/palsphere_giga.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palsphere_giga.webp",
+      "sha256": "88b137e175275ff0b0c3e93af20a4982ea171f0bcc9f3c3506c033acd0124a86",
+      "image_sha256": "7d409f331b6819df0178b248f9179175a678092c0799fb6f86f056e84395515d"
+    },
+    "resources/completion/crafting-icons/palsphere_legend.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_PalSphere_Legend.webp",
+      "sha256": "11f76ee98c059be046c4bd1a5c3b50ab168bec5551d342b73985334771479abb",
+      "image_sha256": "62185cea0873237aaa69aaeb80921a63a416e3c7aaa3e33b1d7c01cfe1f92e1f"
+    },
+    "resources/completion/crafting-icons/palsphere_master.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_PalSphere_Master.webp",
+      "sha256": "bf3e8de94b3e39d2a49c505bf5d79bf36b3828d838c1c685283b208a21d516d6",
+      "image_sha256": "5541787b9146321db7788ae04320dfe961d7454f14c67c0f768e05789de5163b"
+    },
+    "resources/completion/crafting-icons/palsphere_mega.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palsphere_mega.webp",
+      "sha256": "cdfb900213a0cda7da29a0ba438d019eb927d0f77d5c2dca47c64e3430b00b7a",
+      "image_sha256": "03eb5d43b7fc8997e3375019c3946b9b2dfc25d45e3c6b7e0599603e48e24284"
+    },
+    "resources/completion/crafting-icons/palsphere_tera.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palsphere_tera.webp",
+      "sha256": "1184b4aaf0ccd837ad8915043cab079b3fb5f168bf79b8656eb8b5dbfcdc2457",
+      "image_sha256": "3f77a11704ca4e3c1182b36660b57a93bb0b9168454161c1203afe3dba8c5e6a"
+    },
+    "resources/completion/crafting-icons/palsphere_ultimate.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_PalSphere_Ultimate.webp",
+      "sha256": "5e66147f50203304c1df9b2ec8139ba72547f30cb1c57e13f45d7c7f93a4ece3",
+      "image_sha256": "c004a73d524bd6eb5b53b09a2605ebc54964e95a1796e97640926ba768cafe6f"
+    },
+    "resources/completion/crafting-icons/palsummon_darkmechadragon.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_darkmechadragon.webp",
+      "sha256": "cf5666e57995b15b9924d4a5a30fe2560ebcfe7c8fad1d0ebf017bd3e1de82ac",
+      "image_sha256": "b4f31632c0d7212f9b03aad9347d286b51fa68f374e2740d98634e78dd8ded9a"
+    },
+    "resources/completion/crafting-icons/palsummon_darkmechadragon_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_darkmechadragon_2.webp",
+      "sha256": "8dc0504964789fc3644444c004592d7b12a57477b73c5af787174ff65dd07003",
+      "image_sha256": "88d2a43909f30a8e2b2149892fe9903b3ce5dd6420115e48c400d3feee473dba"
+    },
+    "resources/completion/crafting-icons/palsummon_kingbahamut_dragon.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_kingbahamut_dragon.webp",
+      "sha256": "2e476749ae0a333c4f368cb888f9c2e029c2ed847d72f3b35cdd663287c434db",
+      "image_sha256": "fcfd909d9efe925d5c27139db444d90fca3177df9f07f5c86615b6835de4ee92"
+    },
+    "resources/completion/crafting-icons/palsummon_kingbahamut_dragon_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_kingbahamut_dragon_2.webp",
+      "sha256": "30422922d7cc3982d6bede5a4afe156a8835ec04e0d5feefcadb601f85f75b80",
+      "image_sha256": "77b14d21d782e025d11db4dbe58183d76b663953e5c92009d55f02f5721942c0"
+    },
+    "resources/completion/crafting-icons/palsummon_legenddeer.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_legenddeer.webp",
+      "sha256": "4c5b2cce8b1c4fa8d4f582b491ab7a6d9076470535a270aacb1a2f542196d7df",
+      "image_sha256": "e2f9aa3140d33071f6a14ab95b3ff3f899f9c0bb6b3d77e4c1749908ab8c5242"
+    },
+    "resources/completion/crafting-icons/palsummon_legenddeer_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_legenddeer_2.webp",
+      "sha256": "6342084d63731d411b019b0927f586114e327cef5a46ec2d07e18e9a4ab6b092",
+      "image_sha256": "773df6147c19493fe484b924b1dd5c3362d15fc948d0d5fa8f0e6cba19cfeb8e"
+    },
+    "resources/completion/crafting-icons/palsummon_nightlady.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_nightlady.webp",
+      "sha256": "8c357f1daeb5ea34319abba8ac9682fe3fd74b521f45e1a5dd625947d6aa3c69",
+      "image_sha256": "16922a6b26cd8c35ddee77f5a5fec158878b0ba50754479ff20dcec18719cc80"
+    },
+    "resources/completion/crafting-icons/palsummon_nightlady_dark.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_nightlady_dark.webp",
+      "sha256": "7368f9753804404da769fd1343d2063339006abe10754197988a375e8b91fe55",
+      "image_sha256": "045bafbafa9427386498bf4f0735d292a71692e85b87fe86a862cb93bdf58f4d"
+    },
+    "resources/completion/crafting-icons/palsummon_nightlady_dark_2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_consume_palsummon_nightlady_dark_2.webp",
+      "sha256": "ea040dfffbcea98ae37dc399c7c9aac9ef6dd61c6fe8fa726eed4d76d85785c5",
+      "image_sha256": "4f63c93efa57430197446ce76f35d9764594930bd1f3439c46e5da66755e7355"
+    },
+    "resources/completion/crafting-icons/palsummon_yakushimaboss002.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Consume_PalSummon_YakushimaBoss002.webp",
+      "sha256": "c8f737be8aa7d27127354f218fb4e1dec6ca956a3aa17fe69067a7971a2cd21b",
+      "image_sha256": "7958edcc18df6eb3cf5c266e0cfa323073334578a331197622d9b8c9e72cccac"
+    },
+    "resources/completion/crafting-icons/palupgradestone1.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palupgradestone.webp",
+      "sha256": "ce26d9a3758e37973e5253f302888ad94ec9d0b4a5933eac3348be5716f20e92",
+      "image_sha256": "9a9ffe1a668fcc8ef66882e84b8061ab541d11a63a0833faa39318dd82705034"
+    },
+    "resources/completion/crafting-icons/palupgradestone2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palupgradestone2.webp",
+      "sha256": "7ff8c69e1bd10b292af181658a2f59b2244c2f28d37ed57556fb412408b4b3a1",
+      "image_sha256": "6d0878dbb1c1e58032846ebb702c6061d61b0a4a04c2c0eb0cd68c20404ee6cd"
+    },
+    "resources/completion/crafting-icons/palupgradestone3.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_palupgradestone3.webp",
+      "sha256": "480a01654b8a607bf5da2406fc8ac63a40663f2737b5d7e2f80042d62bacb7d4",
+      "image_sha256": "714519cedc5fae9c4dc123c827675f9deae757366e2a7af0f630fdac85db56b9"
+    },
+    "resources/completion/crafting-icons/palupgradestone4.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_PalUpgradeStone4.webp",
+      "sha256": "fcbc5c44978612a9c9513284a0f249074b5d78354789d862fe7b96061793d071",
+      "image_sha256": "c6efb55c1a8a71cc6f10603e54f3c5329a76a53ec6048c7884f2f37d40e3a0c8"
+    },
+    "resources/completion/crafting-icons/pan.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Pan.webp",
+      "sha256": "e9a02407e826865b6a9c254e450ae14d7373d6f9f36b9d8a57372afe8ab457a5",
+      "image_sha256": "a95ebe876707530cc68bfa6259955b2adfe30ef672f5991d19181ad8d080caa5"
+    },
+    "resources/completion/crafting-icons/pancake.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Pancake.webp",
+      "sha256": "4cd09839c0e90178b144f0739e1b5915de57efb57c0bf220b49323b5817d8f9d",
+      "image_sha256": "3803020dcd645684eb7215bf808419d69b94a9bf90f6ac38f8fcb9670380b406"
+    },
+    "resources/completion/crafting-icons/pickaxe_default.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Pickaxe_Tier_00.webp",
+      "sha256": "6f575e73a5ce7e31d3084d6637f127dd48931643bd09537d1f257610d589e0fc",
+      "image_sha256": "2afe5f8af8e1390c7dce2a1ac16f75485d3a325da251f82881f9124123f03e06"
+    },
+    "resources/completion/crafting-icons/pickaxe_steal.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Pickaxe_Tier_03.webp",
+      "sha256": "6c5b4183d3e20511a3387dd42db9b8e34634da5637ab7b2a0d7a8ad655ae878b",
+      "image_sha256": "d65e0ca179bf33bb3066f1602a584a77ce19aa7818cfb8f7127736a1ef612527"
+    },
+    "resources/completion/crafting-icons/pizza.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_pizza.webp",
+      "sha256": "cb7aaf3b285805a660e50d02b50768e8f003a886000f34d980d69a593cb8a8e0",
+      "image_sha256": "c72b522b2e69ce3316e68fc71f64b763451dabfd565b254b3595551863a82973"
+    },
+    "resources/completion/crafting-icons/plastic.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Plastic.webp",
+      "sha256": "cfe022117fe9551d76bb85641e632c2737e8aa1085c4002f6c665cc3cc105d37",
+      "image_sha256": "354ce32e1bb064d786b93a8001b2107773119c60a2a14158e55272d136f159d6"
+    },
+    "resources/completion/crafting-icons/plasticarmor.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_plasticarmor.webp",
+      "sha256": "3ff18c047a334a0b64dbc35bd9d08b5671a3302a6a37fff7533e25f465c1dad1",
+      "image_sha256": "debfdb05c58fe5f625ee986cc55f833a4ac28157ff4554032799f0b05818626d"
+    },
+    "resources/completion/crafting-icons/plasticarmorcold.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_PlasticArmorCold.webp",
+      "sha256": "b141b7f81fd6613909e855def3b5e839ca80cc1b3fc373fbf2d6ea1568b5e4e8",
+      "image_sha256": "fda63da0cad5586b33dd830e635aa3c2c01bf36ed28d7586ded6ea7a4df7bee0"
+    },
+    "resources/completion/crafting-icons/plasticarmorheat.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_plasticarmorheat.webp",
+      "sha256": "634a49131fb7dd10146741ea6f999cb7f21a51237209bbedb705ab7c3517c17d",
+      "image_sha256": "15da3e7d17849964f0b8bb5c0d352df8747e15ebd5e763cfa0fa7ee02bba2568"
+    },
+    "resources/completion/crafting-icons/plasticarmorweight.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_plasticarmorweight.webp",
+      "sha256": "a529a2e916f74a63cec97100caa0bcb938fd60122bff134eaecb3ed1170d35ad",
+      "image_sha256": "efef60ff860f5224c4d25acbed0a1547715aa86f9a979bb1df9181a943c86238"
+    },
+    "resources/completion/crafting-icons/plastichelmet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_plastichelmet.webp",
+      "sha256": "1df51100a6df57f3f81af507aceaaa5e608bf5dfa792956761f778e7a8979134",
+      "image_sha256": "0aa89b0890b1eeac175c1ec1d7d26f6a87812af607b1309b8368cf512ede033a"
+    },
+    "resources/completion/crafting-icons/polymer.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Polymer.webp",
+      "sha256": "168676d7e9a2ac19760449317a9801b97e1b3f05987964614d0870dacbb4b0c0",
+      "image_sha256": "b09664b472d3b574fc59c363decf9630e667bbff67942b04528c52d4352349ea"
+    },
+    "resources/completion/crafting-icons/potatochips.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_potatochips.webp",
+      "sha256": "1887a9800be14c86d533bf740cc34d449f0fbbc607004b8e39156a2a1a300f59",
+      "image_sha256": "61fba487d66bbf5a0b87f826c10461d09812d8396d1aac1eb2a02d456fb3562d"
+    },
+    "resources/completion/crafting-icons/potion.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Potion.webp",
+      "sha256": "62bd741a0edaaeaaf109bc88c6f35c69f6b761d14ed0cb794616cb338c2d4a24",
+      "image_sha256": "705f46eea907fa15531c6c13c1d406f3fce83429f5d2b6f6916bf2304f0f74ad"
+    },
+    "resources/completion/crafting-icons/potion_extreme.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_potion_extreme.webp",
+      "sha256": "c60b261c4cf694a3dd3fc3c3053ba0478920c9091a108b1da2af48606d29514c",
+      "image_sha256": "2fdb0475c94b6eaa8613c69d618828fb7cf464964e6c490b4380226b9ab953f2"
+    },
+    "resources/completion/crafting-icons/potion_high.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Potion_High.webp",
+      "sha256": "cce2a192e085e5bb913b6d167b04ed0415d900882b949b4ae150ffc412fa1845",
+      "image_sha256": "7d0f691747958666b3bbf1a8ea3c6d22a6d004b031a245d3d116e5f7fbd5ae22"
+    },
+    "resources/completion/crafting-icons/potion_low.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_potion_low.webp",
+      "sha256": "4ca4aba407aca5f32d90a4518ce2c67476dd481f82fa172382b134c0ef47b997",
+      "image_sha256": "ad33c2eedca44f41f2c486eadfb04640d7ec19881bcb474aa5e547419cec69fa"
+    },
+    "resources/completion/crafting-icons/processed_wood.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Processed_Wood.webp",
+      "sha256": "f649bafe7b87a47f51b3d109823c24f4a874564b4adf57dd808fcf70ac50cb4f",
+      "image_sha256": "3f4c3dc73f6384bc30cf251ac482828601f90b6bcc5401978d99eca92ed228ed"
+    },
+    "resources/completion/crafting-icons/quiche.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_quiche.webp",
+      "sha256": "ead043e404d89872ab8cda7c2e8f1a0c94d5e181e700fdcbdff0e05ed0202eb1",
+      "image_sha256": "8aebbd635c10a609393b87c86af8a89bf9d64d43d822c4fc5926039bddcaba9d"
+    },
+    "resources/completion/crafting-icons/reinforcedarrow.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_reinforcedarrow.webp",
+      "sha256": "8e8612ca680af00ac55e4b65d209b21cf491ac92d42687da404d60ad068eb355",
+      "image_sha256": "d5f048ac18355ead10e9ef627e72da1c7dc9c6a9482514290cef0c52051c5d16"
+    },
+    "resources/completion/crafting-icons/riflebullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_RifleBullet.webp",
+      "sha256": "5505cb5b72bebfeebe9017b4216076e657af741ed7d0c61c344890eadf4649cf",
+      "image_sha256": "e29c3da1c5fa5bb17421b7d3ccbd096953d7cece439305e8a2441841dba4c63a"
+    },
+    "resources/completion/crafting-icons/roughbullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_RoughBullet.webp",
+      "sha256": "100f4d6c80d41768a4fa5cdb65038cc97bc5ec0d54e9fe7041d3e3a27d5b4186",
+      "image_sha256": "afc27b65f3409ac06c4e54f5efbfbafcd9b13e001be11049a29f00a33dde1515"
+    },
+    "resources/completion/crafting-icons/salad.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Salad.webp",
+      "sha256": "9fb15ec8fb7f0685fd4b52eebe2a2e990cf53cb7627237442362d68683dd3504",
+      "image_sha256": "15c5740681af58f8faab7a7f670c51a0103728e05727fe552f08aaa4de399b33"
+    },
+    "resources/completion/crafting-icons/salvage_treasureboxkey02.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Salvage_TreasureBoxKey02.webp",
+      "sha256": "f22781f641d708521f5cb9c981a49abb1791e3b1db51b15284e132d51058a6fb",
+      "image_sha256": "3592eaeb55731da139ac70e534af33196aa52fe8d15c24c1512be99da7470621"
+    },
+    "resources/completion/crafting-icons/seafood_salada.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_seafood_salada.webp",
+      "sha256": "56e3347c07bb3afb0aff2df98375fa8c00ed6e5d143b34c0656537e0de9c5bee",
+      "image_sha256": "a1bcd7e16a4079340bddceb66bce5bed91bb6b2cac0267b9589eb611230576b8"
+    },
+    "resources/completion/crafting-icons/semiautorifle.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_semiautorifle.webp",
+      "sha256": "ad6a635ba879cf9bdaf626a6bb5f8763aa1748a382361ae84336036433e94d8b",
+      "image_sha256": "a9d6d5e61fa272d4d96df00726b5c54544add310cfe7d11028fcc326b2e39c3a"
+    },
+    "resources/completion/crafting-icons/semiautoshotgun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_semiautoshotgun.webp",
+      "sha256": "250da5d12c45067d896a1cf194ca007756e6225e6e5f8334da64ea282a39b311",
+      "image_sha256": "7f5e8805837bc5dfec4e87dc32dd79886adb2e2f8a54625f9caca819a187c350"
+    },
+    "resources/completion/crafting-icons/sfarmor.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_SFArmor.webp",
+      "sha256": "f94d2f9943f7e4bd6625a234d357230bcecf628b8ac77303f71467820d5baa3e",
+      "image_sha256": "a986450919aed11b52b51a8bd60953dc803071e7a4f2bd0bd44471409191941f"
+    },
+    "resources/completion/crafting-icons/sfarmorcold.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_sfarmorcold.webp",
+      "sha256": "fc35afb98ec7975d4b09d1bc7f235df6c299820be3c6186f0bda78fe07e72f97",
+      "image_sha256": "1728b34ca3ae34bd7c8c421e908dcfa77e975695a874036b1af4c67aa45ac747"
+    },
+    "resources/completion/crafting-icons/sfarmorheat.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_SFArmorHeat.webp",
+      "sha256": "26cfb285476b3b3b98f83e9e1afa51c693d490f98aad760e608bb3fb44c059f6",
+      "image_sha256": "d27c6b026f2b2f11e103937775a8dac7dda259256e9a78ef10908fc76ed0fff8"
+    },
+    "resources/completion/crafting-icons/sfarmorweight.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_SFArmorWeight.webp",
+      "sha256": "a8b30727da456384000819664fed547b9f830dfcc5d48e32d394a14055042750",
+      "image_sha256": "a29d55c8e45f63f121649df98a28511bf72f981236c1784454b50f95e235609c"
+    },
+    "resources/completion/crafting-icons/sfarrow.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_sfarrow.webp",
+      "sha256": "f878164d50ce17e4b67c3357531d72ca7b2b70d40cf88f136b02cbf5ad6a8d61",
+      "image_sha256": "0b7f98fdea796e3b3c246123720db2b129c203284ea0a4ead208f95858730b97"
+    },
+    "resources/completion/crafting-icons/sfbow.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_sfbow.webp",
+      "sha256": "8e911ce53ff9deeeb3a3936855b680a0101a56b8b5dacb12a119d31ad50fb423",
+      "image_sha256": "34aab20ddaa02dfae1bba2f170656bac8f229b38d7c27a29d6802271cb35e369"
+    },
+    "resources/completion/crafting-icons/sfhelmet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_sfhelmet.webp",
+      "sha256": "e5729b289281726f8facd70d90273aac1661b2a37522b18659daaf4da3bee1c0",
+      "image_sha256": "783a0af13f23eb65f5ef1d77b8e2d44fea62c270bebd69a99b2a08b8dd99e6b3"
+    },
+    "resources/completion/crafting-icons/shield_01.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_shield_01.webp",
+      "sha256": "3bef71c9b82b55fc04528c8267e705f369e2b8adc0722caeabf4b2e6f0cf9160",
+      "image_sha256": "4a3a2708afa9c5bf9869fdaa890dfa415a1ab10c59dddad27318a61adb57f31e"
+    },
+    "resources/completion/crafting-icons/shield_02.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_shield_02.webp",
+      "sha256": "0add36a997ee88091ef490de9c0060e1ac2b6d73d247880fad5e92decc068bcc",
+      "image_sha256": "9aa1fbd6eb336769bb1cfa6e95dc016370fad217972434fede4c727878f6c947"
+    },
+    "resources/completion/crafting-icons/shield_03.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_shield_03.webp",
+      "sha256": "6a30d494c157d777536ab2e774faecae4676587929a4fd68f00f6fd5b4ede3af",
+      "image_sha256": "b0ca16116ddfc5169deba9d90fad2e788222dba5f1a6024bd2a1de58f09e1309"
+    },
+    "resources/completion/crafting-icons/shield_04.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_shield_04.webp",
+      "sha256": "2b37ecea6a0c4963f3ed5571c992d3ac1d20dd7c4e66a68c60f5a5fc2c5a5785",
+      "image_sha256": "d51b69038c24b08f000e90ecf8459c1f27a9abc8fa885720393aa2a7cf3afd45"
+    },
+    "resources/completion/crafting-icons/shield_05.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Shield_05.webp",
+      "sha256": "9f8db73c74ba90bc3ad268857e42caf9798e69adfe42dc2645c2e6754d33b4b5",
+      "image_sha256": "93449b828ca7e4a4c467a540f2e1569b01ec78a329c0153121aa060e1ca68ba6"
+    },
+    "resources/completion/crafting-icons/shield_07.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Shield_07.webp",
+      "sha256": "774281d55a01c5a4a2073fcf972cf428aa5443b7f58081e80281c138220484ac",
+      "image_sha256": "59c6128fa2e79583213df8703f178cb66d327f807c85b5beda2e60bf2bd6f45a"
+    },
+    "resources/completion/crafting-icons/shield_sf.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_Shield_06.webp",
+      "sha256": "16352f0e4ac91902170159479f9c4a120259635ab8dcaa812cbdbd4fcb74c011",
+      "image_sha256": "83ea974134680c922f285a9740df6c883fd592e9c38be27fd7a09e331461873f"
+    },
+    "resources/completion/crafting-icons/shotgun_default.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_pumpactionshotgun.webp",
+      "sha256": "deb620363b988a9dff44bab6a87d660a86b33339381375c73fca71d2a7b189bb",
+      "image_sha256": "0cebdee495618872b3b8e6cbc19a09e52fde988e365456c2e82f37edc57982f1"
+    },
+    "resources/completion/crafting-icons/shotgunbullet.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Ammo_ShotgunBullet.webp",
+      "sha256": "ec7b0992be1d6952f1ad8a8baf8a8fbfd3d306098e617fc11a42cebb08e2fbfa",
+      "image_sha256": "32b21c82239b08af9ce1ae2af5358a1b01bda1a0f9cb1bfe935ea2058c4e059d"
+    },
+    "resources/completion/crafting-icons/singleshotrifle.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_singleshotrifle.webp",
+      "sha256": "8c92d0072a66efb205e8e5df8efd119e66c6e7c951f7c81c1efbf72c397bec26",
+      "image_sha256": "dda167f56930b9b7d0239095143d55828b2229aba5636dd1d1c99337406df9ec"
+    },
+    "resources/completion/crafting-icons/skillunlock_assaultrifle.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_AssaultRifle.webp",
+      "sha256": "01ec79bfedf053ed539c5e919b8b229225c3dd96b28a10ec2d9d5272523668e7",
+      "image_sha256": "bc413fec2313cd9e17bd45bd5c02e2e8b7e9f8352c7d299078bbb576c9552526"
+    },
+    "resources/completion/crafting-icons/skillunlock_choker.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_skillunlock_choker.webp",
+      "sha256": "db81a9c576ee66fe0d00a08dd415abcda426dcfd05ca157df98efaccac1fadf8",
+      "image_sha256": "fa5f9c22bbfc774cda186107540330061900d6ab161be08db580e1de05df33e4"
+    },
+    "resources/completion/crafting-icons/skillunlock_gloves.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_Gloves.webp",
+      "sha256": "4174a41c72ca9ec1e7bbae27d75526890077d052d0243505e95fc5dc066183fa",
+      "image_sha256": "1752feef538e893809ada0f993e4a2a036d08da0e0b85bbef47be795201c4c48"
+    },
+    "resources/completion/crafting-icons/skillunlock_grenadelauncher.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_Grenadelauncher.webp",
+      "sha256": "306af5129754458ceea567385d5015be84c18f6b9a9a61278dc0e49e7694b98b",
+      "image_sha256": "68653136b10dc9b724699cfaedcbd7adf970137fe18727004c3fcc0ff267ef4f"
+    },
+    "resources/completion/crafting-icons/skillunlock_hammer.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_skillunlock_hammer.webp",
+      "sha256": "f349b178b71154cab503fb5659e4e7d584c7aa76f711320c51817baf2a2d7304",
+      "image_sha256": "1ac434ef60c16c599085f6d70428a9a6c1128bd5c759b9710f109d28e2abb8c0"
+    },
+    "resources/completion/crafting-icons/skillunlock_harness.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_Harness.webp",
+      "sha256": "cfc712f6c12ee572b7a7362a5726aff0294e980416529c196df97f0d65158814",
+      "image_sha256": "2a06844cc5f96ebbe67867d22ccb36fb057dfe0e67eb271290b06f7f2a089d11"
+    },
+    "resources/completion/crafting-icons/skillunlock_launcher.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_Launcher.webp",
+      "sha256": "cc0c33eb456134e9916894d1ba6234e70b3f176c89d206941ff7afe5926ac1f5",
+      "image_sha256": "f0bb28f675266166aac84c9dd2f24705fef08c02b5ec3520e7b3a7a97457c081"
+    },
+    "resources/completion/crafting-icons/skillunlock_minigun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_skillunlock_minigun.webp",
+      "sha256": "2ae855df8237620150a97278bea79cc308d9b393b3b8818c15ed49e98ca27e39",
+      "image_sha256": "18f9e0447f31535de50c8b2028f2fd02209659db11e0ce5e56c82d8b82a32873"
+    },
+    "resources/completion/crafting-icons/skillunlock_multimissile.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_MultiMissile.webp",
+      "sha256": "2c752e3e66b9d33d2e0979611f2da6377981c80314c1c2878666e81f8354c606",
+      "image_sha256": "1354851dd438fa7d47cff0cb5a8b2968ed0552b93ede16213370fecc58fa65d1"
+    },
+    "resources/completion/crafting-icons/skillunlock_saddle.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_Saddle.webp",
+      "sha256": "4d6cfbdb32e14c6ba5e0aec77eea9cc5d0d07934c83986c87017729f8e073ff3",
+      "image_sha256": "b51abcd0c258b245f7d8009e1b1f8281886423f83c1085dd410f8fd357212fa9"
+    },
+    "resources/completion/crafting-icons/skillunlock_shotgun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_Shotgun.webp",
+      "sha256": "36a84e25d4da7134cd856073af1d1400a8a99d5d8517a36e6a57d6f8a21df555",
+      "image_sha256": "c38e053f8c476dacce17dbe80293387eecd3f10966d27ba38ceb367453cd6cdb"
+    },
+    "resources/completion/crafting-icons/skillunlock_smg.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_SkillUnlock_SMG.webp",
+      "sha256": "4caa1b65854679969f6c39c2740273a07503649bf64c634e657f280ad37df5ef",
+      "image_sha256": "7bb8e0aa6a9603719ddcaeaed8c78ac2245b1edfd194287720e5ef51bd50d444"
+    },
+    "resources/completion/crafting-icons/skyassaultrifle.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_SkyAssaultRifle.webp",
+      "sha256": "c571107bac61c597857bb731d3c129c98dc4822249b70bd433fa84d8d98cefc4",
+      "image_sha256": "d9b86e70c6d465f79b7a663d47411d30f9ef5120d8be3c99867128e9683b91dd"
+    },
+    "resources/completion/crafting-icons/skyassaultriflebullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_skyassaultriflebullet.webp",
+      "sha256": "4a730b0202b820409d4294c646a3e3bde76bd0c67a216ae00bd14197719b3ed3",
+      "image_sha256": "8d3de2206f83eccb7b8c5f9003acbf25bd3f9bf6824e5c730accd47da16a6c66"
+    },
+    "resources/completion/crafting-icons/skybeamsword.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_SkyBeamSword.webp",
+      "sha256": "223ee2637af06287ecd7a8c2a8535b09646faa59263ee537efa35fd6091b3d15",
+      "image_sha256": "4d429e41cfc849a0a1861061cc3030e83e25399e9ed3427c5423cd092be42d0b"
+    },
+    "resources/completion/crafting-icons/skybow.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_skybow.webp",
+      "sha256": "7cf872946a6c3e47a56f994c7560ad0ac44f6e9357aa0349807a221b51b5b085",
+      "image_sha256": "1faf038264b1a6848d28e75dccd1665d5a90a1d2764d30d46f5111de83b0ab94"
+    },
+    "resources/completion/crafting-icons/skybowarrow.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_skybowarrow.webp",
+      "sha256": "7217042a7d9576113e04042f6dec1b9d569a847e7ae1eb62c2a327bd4844bf2a",
+      "image_sha256": "149a900facfebd39f0835ae6a23ca44d17802352ac67da2bf9184ccf2af205f7"
+    },
+    "resources/completion/crafting-icons/skygrenadelauncher.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_SkyGrenadeLauncher.webp",
+      "sha256": "d475c284915bb1ee36ea010f079a6ba9e00595ad6f5e932d956dad4516864f87",
+      "image_sha256": "b46d9ffc1e1be85a60c5e55cd74ff358b7377964e3d76ee9ed1617c0d8df8793"
+    },
+    "resources/completion/crafting-icons/skygrenadelauncherbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_skygrenadelauncherbullet.webp",
+      "sha256": "6fbbe76b990799eb683b7409f56c34cbcea76625ccbd60e763114a9a6ea21d72",
+      "image_sha256": "e4fa3bbc78040a6fa728e5f9d40a6b16b8e49cd244b316b808dab5f7e3f1f5c9"
+    },
+    "resources/completion/crafting-icons/skyislandingot.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_SkyislandIngot.webp",
+      "sha256": "f0dfde1cef4c9474daf0af94543885b5eed12604a21e0837c6b66b9afb6e3b43",
+      "image_sha256": "e58801c18a50d25a0ebc2bd7fc356aab0c5d6f96d539f15490181d0686ebffb5"
+    },
+    "resources/completion/crafting-icons/skyshotgun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_skyshotgun.webp",
+      "sha256": "50b200ced4811a584391e489d1a9587c465fcc44f6958e5e34c053c2183859a4",
+      "image_sha256": "17457e9dbb74b90b7774e144ed850d0dc1db73e0c62ffa80eb75a5c0c8257d93"
+    },
+    "resources/completion/crafting-icons/skyshotgunbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_skyshotgunbullet.webp",
+      "sha256": "99daa2452e5183b0512f1bc0747967a8e725d521c3d50383256789f0cd0d5e8f",
+      "image_sha256": "51bf47b9e498e92d7f3d30a068c483622663e32390494f865d16b957029e24bb"
+    },
+    "resources/completion/crafting-icons/skysubmachinegun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_SkySubmachineGun.webp",
+      "sha256": "0348d04b4a6e9510187518f7986d798c23331d5b5e1dabb8781a002f9c57938e",
+      "image_sha256": "6b7f466df70038be8b4ddd3332fb041b27bce5d0e4c97c0a2262217e1d50140f"
+    },
+    "resources/completion/crafting-icons/skysubmachinegunbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_skysubmachinegunbullet.webp",
+      "sha256": "b1ae4c03edeb072fc647f028f8eab0ef46bcb006086b17024e20b65ef8077b5c",
+      "image_sha256": "66dfa9b45aff49b99e78ad2e6ba9e32a7f7e6821c855b3d9792d239f9fbf857f"
+    },
+    "resources/completion/crafting-icons/spear.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_spear_tier_00.webp",
+      "sha256": "8ee429b4f670de455422edbee92e7bfb200eb116137b08f95c6fbb7e9f3f55b7",
+      "image_sha256": "fef87305c62cb1a0467663704e1feab017a624945d990d2993ea4eeb6e66daed"
+    },
+    "resources/completion/crafting-icons/spear_forestboss.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Spear_ForestBoss.webp",
+      "sha256": "fafb87ca3b8e155863b0dd22a237ec912b42c642c7823cf1815fd18b92e9fd04",
+      "image_sha256": "e634fe646882c309c5eebb4788217bb902140e4bb2ff6afa07338caa40c62351"
+    },
+    "resources/completion/crafting-icons/spear_forestboss2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Spear_ForestBoss2.webp",
+      "sha256": "cd67303210533eb942a7e794c7e3dfa1012c6d2e2d3ce0975516c4c19e745a95",
+      "image_sha256": "4b681ad6858a007a782b70f407d334f54f64fb123cb1f0f8745c4e8ba2fc5a54"
+    },
+    "resources/completion/crafting-icons/spear_queenbee.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_Spear_QueenBee.webp",
+      "sha256": "15095e9c1dac8b1b8dbf1c2cb34e8c3886768afc2d46eaf9a9e705f0014f2e71",
+      "image_sha256": "f01aa28973ce460a7f45d792cb5c5befbd498f60892565e755b9ce479be7b18c"
+    },
+    "resources/completion/crafting-icons/spherelauncher.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_spherelauncher.webp",
+      "sha256": "33d02d8d7338d6fc4d017f7e5f35e94514661251013ba6d5b362ad8ea8b3aa88",
+      "image_sha256": "d8749ed073cfa1ce7a6045673cf068766bbd1062454ba2d564b7b6bdf4142eca"
+    },
+    "resources/completion/crafting-icons/spherelauncher_once.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_spherelauncher_once.webp",
+      "sha256": "33d02d8d7338d6fc4d017f7e5f35e94514661251013ba6d5b362ad8ea8b3aa88",
+      "image_sha256": "d8749ed073cfa1ce7a6045673cf068766bbd1062454ba2d564b7b6bdf4142eca"
+    },
+    "resources/completion/crafting-icons/spheremodule_curve.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_SphereModule_Curve.webp",
+      "sha256": "5f36555572c9b6d9f538abf9f74339884e2ea7393c781aca6df98358767eb638",
+      "image_sha256": "3a23bc6921f4e538f1deed72b0e7dbff11914916ae5382a213f5ca53c11b26ec"
+    },
+    "resources/completion/crafting-icons/spheremodule_curve2.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_spheremodule_curve2.webp",
+      "sha256": "07979aeca8046bf014d3d23b0e6b6d49ecebb9abcc6c9de88ef7110a1ce7f992",
+      "image_sha256": "b1ad47fef8436ed495c2a433a4c8ebd68daa1a8daf2dd38824938cacc9783c5c"
+    },
+    "resources/completion/crafting-icons/spheremodule_heavy.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_SphereModule_Heavy.webp",
+      "sha256": "b5d2a02db11733f008e5184736c83f66e14b1396a5df0f9b679077ff1e38db07",
+      "image_sha256": "c8e006ee04da62ccfefc30ef4e1e8703d9da0130ab35ecb2a82299e2b8f58ec4"
+    },
+    "resources/completion/crafting-icons/spheremodule_homing.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_SphereModule_Homing.webp",
+      "sha256": "0c803792b4bee7c276d41774d030a021643bf882f67d41ed17e1fe0654554c42",
+      "image_sha256": "7f232ea1f207bc0c88cb93bc53456ebb95c93488bade5a6365d700444f7ba579"
+    },
+    "resources/completion/crafting-icons/spheremodule_sniper.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_SphereModule_Spiper.webp",
+      "sha256": "42a87fea8f34ed05b3671e07d44337c1eadabb28c4b42829ff3908af3ff0e761",
+      "image_sha256": "b6ab922fa3ec1b5b0036f70534e79192a692e7b3dc95b3612b1f971bc1e1de29"
+    },
+    "resources/completion/crafting-icons/spheremodule_sniper2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_SphereModule_Sniper2.webp",
+      "sha256": "b07737963279ea662db9feca1090ffe7945ff2bbd1a6d66fa8edad5dbc5222ba",
+      "image_sha256": "70ae689a28324c1b10ef8f4ff852bbef47073d3b3dfb7c80cb0a788f905b68b5"
+    },
+    "resources/completion/crafting-icons/springrolls.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_SpringRolls.webp",
+      "sha256": "d88e80ee2aa3b3a2d93bd80c7b68936e44f64828b50c5b7080947a9e44372506",
+      "image_sha256": "1ca154e632f994f3cf9f36e210189b71b9aab3268672c1efa3a25c701e01ae93"
+    },
+    "resources/completion/crafting-icons/stainlesssteel.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_material_stainlesssteel.webp",
+      "sha256": "3df4021dc4457ea7b5ca71b66248f5189e65d81f9ff354918bf11e905748b78a",
+      "image_sha256": "37f50dc37b27a64de17021662854e22fe59b2a272afa05e0dc2611041c7def51"
+    },
+    "resources/completion/crafting-icons/statuspointresetsan.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_statuspointresetsan.webp",
+      "sha256": "7dbf4a77124105b2df47a713efb74866110e41b5883b4203c755f42de2aa9aa9",
+      "image_sha256": "950fba19c4d30d35b688fefe9514e089576bc934b1f87fb2fea4fbc8ea533535"
+    },
+    "resources/completion/crafting-icons/stealarmor.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_StealArmor.webp",
+      "sha256": "6a6c5da6080cc6795e0ef0cc1a81ab8a83b720c59a6a7554ba55bdb2451d0ddb",
+      "image_sha256": "83147ff37398877e0700f2fe6cb5aad54758723dea704cd78730e8348eb412c1"
+    },
+    "resources/completion/crafting-icons/stealarmorcold.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_stealarmorcold.webp",
+      "sha256": "06813e98b26fc83c4601b05a3e5aa68b87fb87652fff910104a1c86115cedadd",
+      "image_sha256": "4f8d39a8b2127c9db545b8328c0ee8bb920cdda454bf4dcc8a419ba893349767"
+    },
+    "resources/completion/crafting-icons/stealarmorheat.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_stealarmorheat.webp",
+      "sha256": "fa9668ab0e239396dd27a60e8c0e477a4257e01dffe7738e3ba17ff12ad9a1a9",
+      "image_sha256": "2deef30c84bb73a6d9c417bc7b9d536c6b9b7e37eb87fb1c62a301b44a9568fb"
+    },
+    "resources/completion/crafting-icons/stealhelmet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_stealhelmet.webp",
+      "sha256": "522bae5c45f1091cb665d1023d169a2bdbe05db99488dd92b8fd166f60aae9cc",
+      "image_sha256": "bff6b175782e22976ec608bbd0910d931924fba555325af83d118a23bf425d6e"
+    },
+    "resources/completion/crafting-icons/stealingot.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_StealIngot.webp",
+      "sha256": "b57a1eef4fd0b5418b77ab910bc2ec9a706fc381b3ef3fded4dfca6213828a5a",
+      "image_sha256": "58aa7dc12c5d26a8adffe879d45d306216f6451537b435913848821a8a45dc1f"
+    },
+    "resources/completion/crafting-icons/stewedicedeer.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_stewedicedeer.webp",
+      "sha256": "2ae0d4b1ce45a157674acd44b7c6110428a060b6c5984a93f841f57d2e0cba4d",
+      "image_sha256": "953cefd9f29515345e3f71f79142b5ec1edef5f266ba72a8ff63d55a34799280"
+    },
+    "resources/completion/crafting-icons/stirfriedvegetables.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_food_friedvegetables.webp",
+      "sha256": "7d6b564ec93deb4d0d7a46a4eee49d07d45059ac6826f241205cab1087d447b5",
+      "image_sha256": "a3e255006b0f9ae71f83e5f9708fb74fa52ebfb6270f29484440e9692e16e2e6"
+    },
+    "resources/completion/crafting-icons/submachinegun.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_submachinegun.webp",
+      "sha256": "39764059808f7278e11913753a4c36de672a4cbb2327d3753e62ac88f56d9df7",
+      "image_sha256": "0a7045da74dd537037abae8ddc62f8e0390bb40d6e41f6183ad2e34653d9dd5c"
+    },
+    "resources/completion/crafting-icons/supplement.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_food_Supplement.webp",
+      "sha256": "99224e0d7657a88a10e8e52e5579823b8883676e7d5638e716a99174c42f99c1",
+      "image_sha256": "b9c8fb2601243da87910aa4f8d7f71845adbcf597508f3760cd58d7d515a30a5"
+    },
+    "resources/completion/crafting-icons/sword.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_sword.webp",
+      "sha256": "1f18cd167a96490bfaad0896ff1563934af45e960f30a1267aedddffdc03e080",
+      "image_sha256": "9977a38688c02301315485fb275e06ccab0460021e835dcb91d4ba77d0918d3e"
+    },
+    "resources/completion/crafting-icons/thermal_core.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_Thermal_Core.webp",
+      "sha256": "a942b5b242149a83180c6049a323adce4f2ea9904aa0008bdbdf17cac5e39395",
+      "image_sha256": "fb2041cb8e8bd183b00b5c35cf19251de184be9a9cbe06aa5ace4c529800dc32"
+    },
+    "resources/completion/crafting-icons/torch.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_torch.webp",
+      "sha256": "0526a8157b23baa24ac4736ad75ef3ca9b68904920f9b53988fa0fc24121d96d",
+      "image_sha256": "94eb889439cecd1387842ce37b5174b4fe8b69209f7f399d32b7e7841527b6bf"
+    },
+    "resources/completion/crafting-icons/unlock_picking.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_Unlock_Picking.webp",
+      "sha256": "00c2eb95f9cd5961571dbe2c988748a8ba31ccf1a34aec8501f7898e466ff77d",
+      "image_sha256": "3c211a5d4a395941e6ed576731eafcb197836215f72d05a6208e6806b63d89e7"
+    },
+    "resources/completion/crafting-icons/unlock_picking_tier2.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_Unlock_Picking_Tier2.webp",
+      "sha256": "21bb6bd9ed5561c52ce06ed90057a79f2aaabb8e07b276b022cb08d100089298",
+      "image_sha256": "0d14959abc6cc7350a2b84fdd0fb79bb7fe764abc827a056a89f9cdbaec228bb"
+    },
+    "resources/completion/crafting-icons/unlock_picking_tier3.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_essential_unlock_picking_tier3.webp",
+      "sha256": "a32df097a18fcafaeb1226306c25b5f16dd47dd9e8a2410de79c7a2bd8ae9958",
+      "image_sha256": "b34976cc44af2665d6b137f6cd429dbe7999aa4a4ac70daac902ba8e30e5f6bb"
+    },
+    "resources/completion/crafting-icons/unlockequipmentslot_weapon_01.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_UnlockEquipmentSlot_Weapon_01.webp",
+      "sha256": "25d973b5f87b658691461343186dd483d72d89553ed96528f891e02efce95fae",
+      "image_sha256": "905c0a18ae3bb94ab577d06082524d64426d198ab8732b8490707d327ec912c2"
+    },
+    "resources/completion/crafting-icons/unlockequipmentslot_weapon_02.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Accessory_UnlockEquipmentSlot_Weapon_02.webp",
+      "sha256": "fa2b69eb96b96de34569d7dea062043628e43a55a5d6e7c7b8a759f56f1eec02",
+      "image_sha256": "4403b3bd95bfe1a5378e5cf56dad33dfa400260886438eb73fb69ab10f4621f1"
+    },
+    "resources/completion/crafting-icons/waterbuildkit.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Essential_WaterBuildKit.webp",
+      "sha256": "7ba582ebe3e3c22b413af0490c725226795dcc48f7918bdff291bbf2a46673e8",
+      "image_sha256": "cc5e93e406f5a674683f75f8a61c7a9cbbfeae787fbe9535ac684e6db1a6ce6a"
+    },
+    "resources/completion/crafting-icons/widepenetrateshotgun.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_WidePenetrateShotgun.webp",
+      "sha256": "b874200572f487997d3a5399269694670c48b2b74213c2d1ed4c029966110672",
+      "image_sha256": "e397f7b67ca1cf91d4c3b1e47241fb2ef47ab5bf1a46e4dff126cdd0d8dd6628"
+    },
+    "resources/completion/crafting-icons/widepenetrateshotgunbullet.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_ammo_widepenetrateshotgunbullet.webp",
+      "sha256": "db43e98872b15a93416a0a53e9fabe5ccd23801cf3223af20d2fddb3786229e3",
+      "image_sha256": "ee3661d907c491b9494504ff21817b8f2de50e27b7cc2c667b20cf21d4db604c"
+    },
+    "resources/completion/crafting-icons/wingglider.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Glider_WingGlider.webp",
+      "sha256": "97d9b2ad3cc4d1342d747e90f6d38aec9f65dce4eb27da4b886dbbb0b943e300",
+      "image_sha256": "b8d4d6df85127dd7dfdce59c5254ad3905acb5df1dbbce5f7f86b354ac588122"
+    },
+    "resources/completion/crafting-icons/wingglider_fuel.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_WingGlider_Fuel.webp",
+      "sha256": "2a254bb038c9221e53c28fd26845861758d92d4fd81629dd8c4f31b311506e73",
+      "image_sha256": "7991fab8146bfe90918a8cf09110c059e84c1635d9908492134efe4960ef0faa"
+    },
+    "resources/completion/crafting-icons/worldtreeingot.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Material_WorldTreeIngot.webp",
+      "sha256": "4f6604ed21b96942c1ab345e4edbac694c209bdbff10927415216190a119f646",
+      "image_sha256": "8b497e3bb0cb73ef6359589a14c91e5362d635ff51d746cbbb507c7f1d8c1bb6"
+    },
+    "resources/completion/crafting-icons/yakisoba.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Food_Yakisoba.webp",
+      "sha256": "a32631f73f08d66b4788e327dff78363dd84949ab7d46f82db09953d31a237e9",
+      "image_sha256": "1140c7dfc9c426fa9c202683247b1a836154b4405afbc84c29e3b15159286174"
+    },
+    "resources/completion/crafting-icons/yakushimaarmor001.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_YakushimaArmor001.webp",
+      "sha256": "561788bf543cfaff275c1ef5934b6f2ac40c4750abc8897f787ece49deeb0437",
+      "image_sha256": "752ed68a4dc6de334028e75c5b969909449b2b5c6f3d2b8d166677df59b171d3"
+    },
+    "resources/completion/crafting-icons/yakushimablade.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_yakushimablade.webp",
+      "sha256": "eb22ecc6d4fac3cfe4d8edbc27670908de6aa9f8f3ccf7655976de189b7cd25a",
+      "image_sha256": "eb534134dd0c568f67fd9fbb24c948c286c9b29d4f5a86394d7c57686720fcc5"
+    },
+    "resources/completion/crafting-icons/yakushimablade002.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_YakushimaBlade002.webp",
+      "sha256": "38d3cfa9edcca147f0893b2830ca6616637414b47cae736d5531b66e1167cc05",
+      "image_sha256": "7ce0d3f2e1d829b27dd8c29c4f73b813348b3cbf4693c06a5072272067f4c712"
+    },
+    "resources/completion/crafting-icons/yakushimablade003.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_YakushimaBlade003.webp",
+      "sha256": "02746b1664a360d2931c06d7840deee95bdcb29d19c193f6e6ada8a5f6dfbd45",
+      "image_sha256": "ca41a8909ef392564c3f302d1a2925ef576f79760d72224a8fbd709d4642c5f5"
+    },
+    "resources/completion/crafting-icons/yakushimablade004.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_weapon_yakushimablade004.webp",
+      "sha256": "b94afb376140a6ae9a4bfe30d4c8ec68bfe773428090e6766998d31c1ba4a784",
+      "image_sha256": "bee5ff64c95d5ac884b7b3656a2329629565bd0812717757fcaadcfc4e51f14d"
+    },
+    "resources/completion/crafting-icons/yakushimablade005.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_YakushimaBlade005.webp",
+      "sha256": "a258fb5ed9acd531c0d143575b692a4d748c4a995c405585dd546cca06090e51",
+      "image_sha256": "8f321317da4e12942008e96330d7b1bbd589729d07e2a32e538bf19acd57c073"
+    },
+    "resources/completion/crafting-icons/yakushimagun001.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_YakushimaGun001.webp",
+      "sha256": "58de51fad33830e60f424617192b9dc56ef8f27b179005dc4c666f93a57e2b26",
+      "image_sha256": "8c08b4fd6a9b1da5454d810e4d6fb62656d5e44d7f43cd3162fde8a58151aef1"
+    },
+    "resources/completion/crafting-icons/yakushimaheadequip001.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_YakushimaHeadEquip001.webp",
+      "sha256": "393a75633a880fb6be99d2b244c9f13d70a8a6a7c9ebef2f4daa8fd73f4c862c",
+      "image_sha256": "f985f7c9d2340126dfa3754f7b351705aff5a0b39fbc1e2a280b31e0e4cb51cd"
+    },
+    "resources/completion/crafting-icons/yakushimaheadequip002.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_YakushimaHeadEquip002.webp",
+      "sha256": "78bddcaa375d6ef71bd9edbf2d9f6ab88d38d2422376ec0dd5ecfd35b42915a3",
+      "image_sha256": "5b7125667a4b28a2e6f2d09b6294a58122050dcccf4300d3d05b0604ba50a033"
+    },
+    "resources/completion/crafting-icons/yakushimaheadequip003.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_yakushimaheadequip003.webp",
+      "sha256": "c5827c1f788537f9089667b1e2b63f7afa8d4352d2f935d013256da51a9c60ee",
+      "image_sha256": "7167e4516ca4147acc3e286cb0bad94757ce6e17b9af4da16a472cc23af7bc1e"
+    },
+    "resources/completion/crafting-icons/yakushimaheadequip004.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_yakushimaheadequip004.webp",
+      "sha256": "e3018763705ac1140fb47d02f20ecd0d2492361d7b21aa05806ca5e9ee12ea7c",
+      "image_sha256": "fcf6ad52166af928406d8a6416628a3487703b1abad5312636e81195a1387d2c"
+    },
+    "resources/completion/crafting-icons/yakushimaheadequip005.pog": {
+      "url": "https://raw.githubusercontent.com/oMaN-Rod/palworld-save-pal/2d244ae9ea12f2f70a66523bf83764185e22fa83/psp-ui/src/lib/assets/img/t_itemicon_armor_yakushimaheadequip005.webp",
+      "sha256": "6a9f7ef2219e52d630293c41813ad386ea83150cf45499f466bbeac5c47d0e1b",
+      "image_sha256": "c9756a815bbb68107ef5b21c39573b16e54fa1a053a865e6dbbee1837988dc5b"
+    },
+    "resources/completion/crafting-icons/yakushimaheadequip006.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Armor_YakushimaHeadEquip006.webp",
+      "sha256": "86a920b7746eb63b17afef91b9b51523822e739b442d6ed45b5770c5a0a50c8a",
+      "image_sha256": "ef3ed26ea207ad5d8e07d40e8d493c2631519ba3d52555c8f746cbf46dbaf68b"
+    },
+    "resources/completion/crafting-icons/yakushimalantern001.pog": {
+      "url": "https://cdn.paldb.cc/image/Others/InventoryItemIcon/Texture/T_itemicon_Weapon_YakushimaLantern001.webp",
+      "sha256": "181eb1eb1fbd065a8fef33cdaeadcf46b7f7d680f4e04af0e6791d4ce3142b6d",
+      "image_sha256": "db3a3880005b590a3423fd24e495137f4f13714682485ef7414df99ecd007af0"
+    }
+  }
+}

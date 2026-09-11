@@ -2,7 +2,8 @@
   "notes": {
     "github": "Pinned snapshots; all JSON and Lua files verified byte-for-byte against their upstream URLs on 2026-09-06.",
     "paldb": "Existing map and HTML snapshots preserved from the repository/local cache. Original capture dates were not recorded; hashes identify the snapshots. Live pages may change. The Palpagos map also matches its upstream JavaScript response byte-for-byte on 2026-09-06.",
-    "game8": "Unmodified public catalog JSON response saved on 2026-09-06. Only guide links and Paldeck numbers are used."
+    "game8": "Unmodified public catalog JSON response saved on 2026-09-06. Only guide links and Paldeck numbers are used.",
+    "crafting": "Palworld 1.0.4 recipe/item/icon table snapshot from PalSchema Hub, pinned 39ed90b5a1ec0a1789da6d546250c4d926b905df. Crafting catalog includes recipe outputs with bLegalInGame=true; player access is not filtered."
   },
   "files": {
     "admincommands/paldata.lua": {
@@ -163,6 +164,25 @@
       "url": "https://paldb.cc/en/Mission",
       "retrieved": "2026-09-10",
       "sha256": "3c78ed6885e530374311c9d37776e704d3126846083377f0cdc79b38f361a1b8"
+    },
+    "crafting/recipes.json": {
+      "url": "https://raw.githubusercontent.com/Booyaka101/palschema-hub/39ed90b5a1ec0a1789da6d546250c4d926b905df/values/DT_ItemRecipeDataTable.json",
+      "sha256": "79d332c12597de72571d6de66827376eb2701ac27ae985dd7821fd3ed864e076"
+    },
+    "crafting/items.json": {
+      "url": "https://raw.githubusercontent.com/Booyaka101/palschema-hub/39ed90b5a1ec0a1789da6d546250c4d926b905df/values/DT_ItemDataTable.json",
+      "sha256": "0f8f457c9cac9eadfbab0da1f4617510f3500a638c1a97c020b89f3a1f154944"
+    },
+    "crafting/icons.json": {
+      "url": "https://raw.githubusercontent.com/Booyaka101/palschema-hub/39ed90b5a1ec0a1789da6d546250c4d926b905df/values/DT_ItemIconDataTable.json",
+      "sha256": "25bdff1f914099e6fca056871b893cfed4d93831d235c55705030895b2bff0cf"
+    },
+    "crafting/LICENSE": {
+      "url": "https://raw.githubusercontent.com/Booyaka101/palschema-hub/39ed90b5a1ec0a1789da6d546250c4d926b905df/LICENSE",
+      "sha256": "df233e8fac2d562281cce540977cc7190873c587eab832b8a98d6363fa4f7d4f"
+    },
+    "crafting/icon-sources.json": {
+      "sha256": "8c233a0cc7f748867d6a3c75ee247f12d8071f959dfa10b767868ab25ffb9d63"
     }
   }
 }

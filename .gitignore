@@ -28,4 +28,7 @@ Thumbs.db
 
 sandbox/
 
+resources/completion/crafting-icons/*
+!resources/completion/crafting-icons/*.pog
+
 pal-storage-viewer/serve.local.sh

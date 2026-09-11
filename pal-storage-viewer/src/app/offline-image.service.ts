@@ -22,6 +22,7 @@ export class OfflineImageService {
 
   private toDataUrl(encoded: string): string {
     const payload = encoded.replace(/\s+/g, '');
+    if (/^data:image\/(?:png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(payload)) return payload;
     return payload && /^[A-Za-z0-9+/]+={0,2}$/.test(payload)
       ? `data:image/png;base64,${payload}`
       : '';

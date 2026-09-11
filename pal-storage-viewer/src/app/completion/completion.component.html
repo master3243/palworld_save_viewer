@@ -78,24 +78,24 @@
         >
           <span class="card-head">
             <span class="card-title">
-              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' || category.key === 'research' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
+              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'crafting' ? 'scale(1.3)' : category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' || category.key === 'research' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
               <span>{{ category.title }}</span>
             </span>
-            <span class="card-count">{{ category.done | number }}<span>/{{ category.total | number }}</span></span>
+            <span class="card-count">{{ category.unavailable ? '—' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
           </span>
           <span class="bar" aria-hidden="true">
             <span class="bar-fill" [style.width.%]="category.percent"></span>
           </span>
           <span class="card-foot">
             <span class="card-needs" *ngIf="category.needsFile">{{ category.needsFile }} needed</span>
-            <span class="card-pct" *ngIf="!category.needsFile">{{ category.percent }}%</span>
+            <span class="card-pct" *ngIf="!category.needsFile">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
           </span>
         </button>
 
       <ng-container *ngIf="category.key === selectedCategory">
       <section class="category-detail" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
         <div class="detail-head">
-          <h3>{{ open.title }} <span class="detail-count">{{ open.done | number }} of {{ open.total | number }}</span></h3>
+          <h3>{{ open.title }} <span class="detail-count">{{ open.unavailable ? '—' : (open.done | number) }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
             <input
               class="detail-search"
@@ -121,7 +121,7 @@
             <span class="group-chip-head">
             <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" [style.transform]="open.key === 'relics' ? 'scale(1.1)' : open.key === 'research' || (open.key === 'fastTravel' && group.key === 'statue') ? 'scale(1.2)' : null" alt="" decoding="async">
             <span>{{ open.key === 'technologies' ? (group.key === 'ancient' ? 'Ancient tech' : 'Tech') : group.name }}</span>
-            <b>{{ group.done }}<span>/{{ group.total }}</span></b>
+            <b>{{ open.unavailable ? '—' : group.done }}<span>/{{ group.total }}</span></b>
             </span>
             <ng-container *ngFor="let balance of open.technologyPoints">
               <span class="point-values" *ngIf="balance.key === group.key">
@@ -133,11 +133,12 @@
           </button>
         </div>
         <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" or "+ Folder" above.</p>
+        <p class="tracker-note" *ngIf="open.unavailable">{{ open.unavailable }}</p>
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
         <ng-container *ngIf="{ fishing: showFishing } as columns">
-        <table class="item-table" [class.pal-list]="isPalList" *ngIf="!open.needsFile">
+        <table class="item-table" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile">
           <thead>
             <tr>
               <th class="state-col">Status</th>
@@ -145,6 +146,12 @@
               <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
+              <ng-container *ngIf="open.key === 'crafting'">
+                <th>Rarity</th>
+                <th>Unlock source</th>
+                <th class="crafted-col">Crafted</th>
+                <th>Ingredients</th>
+              </ng-container>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
               <ng-container *ngIf="columns.fishing">
                 <th class="fishing-col" scope="col" title="Common fishing catches"><small>Fishing</small>Common</th>
@@ -152,15 +159,15 @@
                 <th class="fishing-col" scope="col" title="Lunker fishing catches"><small>Fishing</small>Lunker</th>
               </ng-container>
               <th *ngIf="isPalList" aria-label="Pal links"></th>
-              <th *ngIf="!isPalList">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
+              <th *ngIf="!isPalList && open.key !== 'crafting'">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : null">
+            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.crafting?.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : null">
               <td class="state-col">
                 <span class="paldeck-status" *ngIf="isPalList; else standardStatus" [attr.data-state]="item.state"><span class="state-dot" [attr.data-state]="item.state" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
-                <ng-template #standardStatus><span class="state-dot" [attr.data-state]="item.state"></span>{{ stateLabel(item) }}</ng-template>
+                <ng-template #standardStatus><span class="state-dot" [attr.data-state]="item.crafting?.count === null ? 'unknown' : item.state"></span>{{ stateLabel(item) }}</ng-template>
               </td>
               <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">
                 <span class="paldeck-number" *ngIf="isPalList; else standardNumber">
@@ -174,7 +181,21 @@
               </td>
               <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
-              <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
+              <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><ng-container *ngIf="item.crafting"><img *ngIf="craftingIcon(item) | async as icon" [src]="icon" alt="" decoding="async" loading="lazy"></ng-container><span>{{ item.name }}</span></td>
+              <ng-container *ngIf="item.crafting as craft">
+                <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
+                <td class="craft-source"><span>{{ craft.sources.length ? craft.sources.join(' · ') : '—' }}</span></td>
+                <td class="crafted-col"><span class="card-count">{{ craft.count === null ? '—' : (craft.count | number) }}</span></td>
+                <td class="craft-ingredients">
+                  <details>
+                    <summary [attr.aria-label]="'Ingredients for ' + item.name">{{ craft.recipes.length === 1 ? 'Recipe' : craft.recipes.length + ' recipes' }}</summary>
+                    <div class="craft-recipe" *ngFor="let recipe of craft.recipes">
+                      <b>Makes {{ recipe.quantity | number }}</b>
+                      <span *ngFor="let ingredient of recipe.ingredients">{{ ingredient[2] | number }} × {{ ingredient[1] }}</span>
+                    </div>
+                  </details>
+                </td>
+              </ng-container>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
               <ng-container *ngIf="columns.fishing">
                 <ng-container *ngIf="item.fishing as fishing">
@@ -192,13 +213,13 @@
                   </a>
                 </span>
               </td>
-              <td class="detail-col" *ngIf="!isPalList"><span>{{ item.detail }}</span></td>
+              <td class="detail-col" *ngIf="!isPalList && open.key !== 'crafting'"><span>{{ item.detail }}</span></td>
               <td class="coords-col" *ngIf="open.hasCoords">
                 <button type="button" class="coordinate-link" *ngIf="item.coords" [attr.aria-label]="'Show ' + item.name + ' on map'" (click)="showMap(item)">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small> ↗</button>
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="3 + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (columns.fishing ? 3 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="3 + (open.key === 'crafting' ? 3 : 0) + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (columns.fishing ? 3 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
             </tr>
           </tbody>
         </table>

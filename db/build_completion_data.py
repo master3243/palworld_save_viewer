@@ -8,6 +8,7 @@ Raw inputs are never modified. Only resources/ contains generated outputs.
 import html
 import json
 import re
+from build_crafting_data import build as build_crafting
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -425,7 +426,8 @@ def build(cache: Path) -> dict:
 
     return {
         "generated": "2026-09-05",
-        "sources": {name: f"https://github.com/{repo}/tree/{sha}/{folder}" for name, (repo, sha, folder) in UPSTREAMS.items()},
+        "sources": {**{name: f"https://github.com/{repo}/tree/{sha}/{folder}" for name, (repo, sha, folder) in UPSTREAMS.items()},
+                    "PalSchema Hub": "https://github.com/Booyaka101/palschema-hub/tree/39ed90b5a1ec0a1789da6d546250c4d926b905df/values"},
         "relicTypes": relic_types,
         "relics": relics,
         "fastTravel": fast_travel,
@@ -437,6 +439,7 @@ def build(cache: Path) -> dict:
         "ruinPickups": ruins,
         "paldeck": paldeck,
         "technologies": technologies,
+        "crafting": build_crafting(cache),
         "raids": raids,
         "statueRanks": statue,
         "research": research,

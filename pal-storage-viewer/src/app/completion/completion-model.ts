@@ -30,6 +30,7 @@ export interface CompletionData {
   paldeck: [string, number, string][];
   /** [technology id, name, required level, ancient (boss) technology?, point cost] */
   technologies: [string, string, number, number, number][];
+  crafting: CraftingItem[];
   /** [summoning slab item id, boss name, ultra?] */
   raids: [string, string, number][];
   /** EPalRelicType short name -> effigies needed for each successive Statue of Power rank */
@@ -42,6 +43,22 @@ export interface CompletionData {
   maxLevel: number;
   /** In-game map coordinates of the nine Pal Critics (which one is which area is unknown). */
   palCritics: [number, number][];
+}
+
+export interface CraftingRecipe {
+  id: string;
+  quantity: number;
+  sources: string[];
+  ingredients: [string, string, number][];
+}
+
+export interface CraftingItem {
+  id: string;
+  name: string;
+  rarity: number;
+  group: string;
+  icon: string;
+  recipes: CraftingRecipe[];
 }
 
 /** World-level (guild) progress that lives in Level.sav rather than the player save. */
@@ -75,6 +92,7 @@ export interface TrackedItem {
   /** Lifetime catches shown against the capture bonus target, without capping. */
   captureProgress?: { done: number; total: number };
   fishing?: { common: number; whopper: number; lunker: number };
+  crafting?: CraftingItem & { count: number | null; sources: string[] };
   /** False for rows shown for information only (paid DLC); they do not count. */
   counted?: boolean;
   /** Short label shown as a chip in its own column (Normal / Ultra). */
@@ -108,6 +126,7 @@ export interface Category {
   hasTags: boolean;
   /** Set when the category cannot be computed because this save file was not loaded. */
   needsFile?: string;
+  unavailable?: string;
   /** Costs of all remaining technologies, independent of the visible list filters. */
   technologyPoints?: { key: string; name: string; remaining: number; available: number | null; needed: number | null }[];
 }
@@ -275,6 +294,33 @@ function technologyCategory(record: PlayerCompletion, data: CompletionData): Cat
     key: 'technologies', title: 'Technologies', items, groups: groupsOf(items, names), technologyPoints,
     unknown: record.technologies.filter((id) => !known.has(id.toLowerCase())).sort(),
   }, 'Level');
+}
+
+function craftingCategory(record: PlayerCompletion, data: CompletionData): Category {
+  const counts = new Map<string, number>();
+  for (const [id, count] of Object.entries(record.crafted_item_counts ?? {})) {
+    if (Number.isFinite(count) && count >= 0) {
+      const key = id.toLowerCase();
+      counts.set(key, Math.max(counts.get(key) ?? 0, count));
+    }
+  }
+  const catalog = data.crafting ?? [];
+  const known = new Set(catalog.map(item => item.id.toLowerCase()));
+  const items: TrackedItem[] = catalog.map(item => {
+    const count = record.crafted_item_counts == null ? null : counts.get(item.id.toLowerCase()) ?? 0;
+    const sources = [...new Set(item.recipes.flatMap(recipe => recipe.sources))];
+    return {
+      id: item.id, name: item.name, group: item.group, no: null, coords: '', map: '', order: 0,
+      state: count !== null && count > 0 ? 'done' : 'todo',
+      detail: [...sources, ...item.recipes.flatMap(recipe => recipe.ingredients.map(([, name]) => name))].join(' · '),
+      crafting: { ...item, count, sources },
+    };
+  });
+  const groups = new Map([...new Set(catalog.map(item => item.group))].sort().map(name => [name, name]));
+  return finish({ key: 'crafting', title: 'Crafting', items, groups: groupsOf(items, groups),
+    unknown: [...counts].filter(([id, count]) => count > 0 && !known.has(id)).map(([id]) => id).sort(),
+    unavailable: record.crafted_item_counts == null ? 'This save does not record crafting history.' : undefined,
+  });
 }
 
 function relicCategory(record: PlayerCompletion, data: CompletionData): Category {
@@ -577,10 +623,11 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     areaCategory(record, data),
     ruinCategory(record, data),
     technologyCategory(record, data),
+    craftingCategory(record, data),
     researchCategory(world, data),
     skinCategory(record, data),
   ];
-  const counted = categories.filter((category) => category.total > 0 && !category.needsFile);
+  const counted = categories.filter((category) => category.total > 0 && !category.needsFile && !category.unavailable);
   const percent = counted.length ? Math.round((counted.reduce((sum, category) => sum + category.percent, 0) / counted.length) * 10) / 10 : 0;
   const done = categories.reduce((sum, category) => sum + category.done, 0);
   const total = categories.reduce((sum, category) => sum + category.total, 0);

@@ -22,6 +22,61 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('crafting lists all available outputs regardless of player unlocks or crafting history', () => {
+  const empty = category('crafting', { crafted_item_counts: {} });
+  assert.equal(empty.total, 1273);
+  assert.equal(empty.done, 0);
+  assert.equal(empty.unavailable, undefined);
+  assert.ok(empty.items.every(item => item.state === 'todo' && item.crafting.count === 0));
+  assert.ok(empty.items.some(item => item.id === 'Launcher_Meteor_5'));
+  assert.ok(!empty.items.some(item => item.id === 'Bow_Poison'));
+  assert.equal(new Set(empty.items.map(item => item.id.toLowerCase())).size, empty.total);
+  const unlocked = category('crafting', { crafted_item_counts: {}, technologies: data.technologies.map(([id]) => id) });
+  assert.deepEqual(unlocked, empty);
+});
+
+test('crafting counts distinct outputs once, preserves rarity variants, and ignores unknown historical items', () => {
+  const c = category('crafting', { crafted_item_counts: {
+    Pal_crystal_S: 200, PAL_CRYSTAL_S: 200,
+    AssaultRifle_Default1: 1, AssaultRifle_Default5: 3, RepairKit: 12,
+  } });
+  assert.equal(c.done, 3);
+  assert.equal(c.total, 1273);
+  const crystal = c.items.find(item => item.id === 'Pal_crystal_S');
+  assert.equal(crystal.crafting.count, 200);
+  assert.equal(crystal.crafting.recipes.length, 13);
+  assert.deepEqual(c.unknown, ['repairkit']);
+  for (const [id, rarity] of [['AssaultRifle_Default1', 0], ['AssaultRifle_Default5', 4]]) {
+    const item = c.items.find(item => item.id === id);
+    assert.equal(item.state, 'done');
+    assert.equal(item.crafting.rarity, rarity);
+  }
+  assert.equal(c.groups.reduce((sum, group) => sum + group.done, 0), 3);
+  assert.equal(c.groups.reduce((sum, group) => sum + group.total, 0), 1273);
+  assert.ok(c.items.slice(0, -3).every(item => item.state === 'todo'));
+});
+
+test('crafting exposes recipe quantities, ingredients, and schematic sources', () => {
+  const c = category('crafting', { crafted_item_counts: {} });
+  const rifle = c.items.find(item => item.id === 'AssaultRifle_Default5');
+  assert.ok(rifle.crafting.sources.some(source => source.includes('Schematic')));
+  assert.equal(rifle.crafting.recipes[0].quantity, 1);
+  assert.deepEqual(rifle.crafting.recipes[0].ingredients.map(([id, , count]) => [id, count]),
+    [['IronIngot', 80], ['Polymer', 20], ['CarbonFiber', 20], ['PalCrystal_Ex', 4]]);
+  assert.equal(c.items.find(item => item.id === 'HotMilk').crafting.recipes[0].id, 'Hotmilk');
+});
+
+test('missing crafting history stays unknown and does not lower overall completion', () => {
+  for (const crafted_item_counts of [null, undefined]) {
+    const r = record({ crafted_item_counts });
+    const c = category('crafting', r);
+    assert.equal(c.total, 1273);
+    assert.ok(c.unavailable);
+    assert.ok(c.items.every(item => item.crafting.count === null));
+    assert.equal(summarize(r, data).percent, summarize(r, { ...data, crafting: [] }).percent);
+  }
+});
+
 test('capture bonus shows fishing tiers for matching species without changing capture progress', () => {
   const progress = {
     capture_counts: { Penguin: 21, Penguin_Electric: 8 },

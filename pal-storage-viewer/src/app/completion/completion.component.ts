@@ -49,6 +49,7 @@ export class CompletionComponent implements OnChanges {
   mapOpen = false;
   mapVisited = false;
   categoryIcons: Record<string, string> = {};
+  readonly rarityNames = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
   private mapIcons: Record<string, string> = {};
   private readonly tabDiscovery = new TabDiscovery();
   private readonly palNumberSuffixes = new Map<string, Promise<string>>();
@@ -114,6 +115,7 @@ export class CompletionComponent implements OnChanges {
       this.mapIcons = Object.fromEntries(sources);
       this.categoryIcons = Object.fromEntries(Object.entries(CATEGORY_ICONS)
         .filter(([, name]) => sources.has(name)).map(([category, name]) => [category, sources.get(name)!]));
+      this.categoryIcons['crafting'] = workIcon('Handcraft');
       this.changeDetector.markForCheck();
     } catch { /* Decorative icons must not prevent the tracker from loading. */ }
   }
@@ -137,6 +139,10 @@ export class CompletionComponent implements OnChanges {
     const name = category === 'relics' ? item.name
       : category === 'statue' ? this.data?.relicTypes.find(type => type.enum === item.id)?.item : undefined;
     return name ? this.mapIcons[name] : undefined;
+  }
+
+  craftingIcon(item: TrackedItem): Promise<string> {
+    return this.images.load(item.crafting?.icon ?? '');
   }
 
   ngOnChanges(): void {
@@ -233,6 +239,7 @@ export class CompletionComponent implements OnChanges {
   }
 
   stateLabel(item: TrackedItem): string {
+    if (this.selectedCategory === 'crafting') return item.crafting?.count == null ? 'Unknown' : item.state === 'done' ? 'Crafted' : 'Not crafted';
     if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';
     if (this.selectedCategory === 'captureBonus') return item.state === 'done' ? 'Captured 5' : item.state === 'active' ? 'Progressing to 5' : 'Never Captured';
     switch (item.state) {
