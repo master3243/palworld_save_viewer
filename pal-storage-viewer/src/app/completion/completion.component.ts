@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
 
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
 import { Category, CompletionData, CompletionSummary, TrackedGroup, TrackedItem, WorldProgress, summarize } from './completion-model';
@@ -9,6 +9,7 @@ import { loadCompletionData } from './completion-data';
 import { TabDiscovery } from '../tab-discovery';
 import { workIcon } from '../trait-icons';
 import { OfflineImageDirective } from '../offline-image.directive';
+import { StickyTableHeaderDirective } from './sticky-table-header.directive';
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
 import { palWikiLinks, PalWikiLink } from '../pal-wiki-links';
@@ -30,7 +31,7 @@ const RING_RADIUS = 52;
 @Component({
   selector: 'app-completion',
   standalone: true,
-  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective],
+  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective],
   templateUrl: './completion.component.html',
   styleUrls: ['../pal-wiki-links.css', './completion.component.css']
 })
@@ -47,6 +48,7 @@ export class CompletionComponent implements OnChanges {
   search = '';
   groupFilter = '';
   prioritizeNotCrafted = true;
+  headerPinned = false;
   mapOpen = false;
   mapVisited = false;
   categoryIcons: Record<string, string> = {};
@@ -95,6 +97,8 @@ export class CompletionComponent implements OnChanges {
     return this.tabDiscovery.shouldPing('map', this.mapOpen ? 'map' : null, this.summary !== null);
   }
   @ViewChild(TrackerMapComponent) trackerMap?: TrackerMapComponent;
+  @ViewChild('trackerScroll') trackerScroll?: ElementRef<HTMLElement>;
+  @ViewChild('categoryDetail') categoryDetail?: ElementRef<HTMLElement>;
   mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
 
@@ -211,9 +215,25 @@ export class CompletionComponent implements OnChanges {
   }
 
   selectCategory(key: string): void {
+    this.trackerScroll?.nativeElement.scrollTo({ left: 0 });
+    this.headerPinned = false;
     this.selectedCategory = this.selectedCategory === key ? '' : key;
     this.groupFilter = '';
     this.search = '';
+  }
+
+  scrollToCardTop(): void {
+    const section = this.categoryDetail?.nativeElement;
+    const container = this.trackerScroll?.nativeElement;
+    if (!section || !container) return;
+    section.focus({ preventScroll: true });
+    const inset = Number.parseFloat(getComputedStyle(container).paddingTop) || 0;
+    const top = container.scrollTop + section.getBoundingClientRect().top
+      - container.getBoundingClientRect().top - container.clientTop - inset;
+    container.scrollTo({
+      top: Math.max(0, top), left: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
   }
 
   showMap(item?: TrackedItem): void {

@@ -1,5 +1,5 @@
 <div class="tracker" *ngIf="players.length; else noPlayers">
-  <div class="tracker-scroll">
+  <div class="tracker-scroll" #trackerScroll>
     <div class="player-picker" *ngIf="players.length > 1" role="tablist" aria-label="Player">
       <button
         *ngFor="let option of players; trackBy: trackPlayer"
@@ -93,7 +93,7 @@
         </button>
 
       <ng-container *ngIf="category.key === selectedCategory">
-      <section class="category-detail" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
+      <section class="category-detail" #categoryDetail tabindex="-1" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
         <div class="detail-head">
           <h3>{{ open.title }} <span class="detail-count">{{ open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
@@ -142,7 +142,8 @@
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
         <ng-container *ngIf="{ fishing: showFishing } as columns">
-        <table class="item-table" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile">
+        <table class="item-table" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile">
+          <caption class="table-start" aria-hidden="true"></caption>
           <thead>
             <tr>
               <th class="state-col">Status</th>
@@ -249,6 +250,10 @@
       </ng-container>
     </ng-container>
   </div>
+  <button class="scroll-to-top" *ngIf="headerPinned && !mapOpen && category" type="button" (click)="scrollToCardTop()" aria-label="Back to top of this card">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12 6-6 6 6M12 6v13"/></svg>
+    Back to top
+  </button>
 </div>
 
 <ng-template #noPlayers>

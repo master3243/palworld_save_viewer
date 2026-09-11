@@ -6,6 +6,7 @@
 }
 
 .tracker {
+  position: relative;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -13,14 +14,20 @@
 }
 
 .tracker-scroll {
+  --tracker-top-padding: 14px;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   gap: 14px;
   min-height: 0;
   overflow: auto;
-  padding: 14px 16px 24px;
+  padding: var(--tracker-top-padding) 16px 24px;
 }
+
+.scroll-to-top { position: absolute; right: 24px; top: 16px; z-index: 5; display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid #63ccec; border-radius: 999px; background: #102c3b; color: #eaf7ff; font: inherit; font-size: .8rem; cursor: pointer; box-shadow: 0 3px 12px #0008; }
+.scroll-to-top:hover { background: #1b4052; }
+.scroll-to-top:focus-visible { outline: 2px solid #95f3ff; outline-offset: 3px; }
+.scroll-to-top svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
 
 .tracker-empty {
   align-items: center;
@@ -391,7 +398,6 @@
   container-type: inline-size;
   grid-column: 1 / -1;
   min-width: 0;
-  overflow-x: auto;
   background: rgba(5, 15, 25, 0.55);
   border: 1px solid rgba(134, 220, 255, 0.14);
   border-radius: 10px;
@@ -544,6 +550,10 @@
   font-size: 0.82rem;
   width: 100%;
 }
+
+.item-table .table-start { height: 1px; padding: 0; }
+.item-table thead { position: sticky; top: calc(-1 * var(--tracker-top-padding)); z-index: 2; background: #07141e; box-shadow: 0 1px rgba(134, 220, 255, .18); }
+.item-table thead th, .item-table thead tr::after { background: #07141e; }
 
 .item-table tr::after { content: ''; display: table-cell; width: 100%; border-bottom: 1px solid rgba(134, 220, 255, 0.07); }
 .item-table thead tr::after { border-bottom-color: rgba(134, 220, 255, 0.18); }
