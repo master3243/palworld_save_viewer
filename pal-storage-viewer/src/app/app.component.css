@@ -362,10 +362,31 @@
 }
 
 .save-location-copy-status {
+  background: #102332;
+  border: 1px solid #527487;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
   color: #c7edff;
   font-size: 0.8rem;
-  min-height: 1.5em;
-  text-align: center;
+  margin: 0;
+  max-width: min(320px, calc(100vw - 16px));
+  overflow-wrap: anywhere;
+  padding: 8px 12px;
+  position: fixed;
+  width: max-content;
+  z-index: 1000;
+}
+
+.save-location-copy-status:empty {
+  visibility: hidden;
+}
+
+.save-location-copy-status.copied {
+  background: #102c23;
+  border-color: #79e6ad;
+  color: #9af0bf;
+  pointer-events: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -384,6 +405,16 @@
     color: #c7edff;
     text-shadow: 0 0 8px rgba(138, 203, 255, 0.45);
   }
+}
+
+.upload-guide .save-location-copy.copied,
+.upload-guide:hover .save-location-copy.copied {
+  background-color: rgba(57, 190, 125, 0.2);
+  border-color: #79e6ad;
+  box-shadow: 0 0 14px rgba(57, 190, 125, 0.25);
+  color: #9af0bf;
+  outline-color: #79e6ad;
+  text-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -80,9 +80,15 @@ export class AppComponent implements OnDestroy {
   readonly gamepassSaveLocation = '%LOCALAPPDATA%\\Packages\\PocketpairInc.Palworld_ad4psfrxyesvt\\SystemAppData';
   copiedSaveLocation = '';
   saveLocationCopyStatus = '';
+  saveLocationCopyPosition = { x: 0, y: 0 };
+  @ViewChild('saveLocationCopyNotice') saveLocationCopyNotice?: ElementRef<HTMLElement>;
   private copyStatusTimer?: number;
 
-  async copySaveLocation(path: string): Promise<void> {
+  async copySaveLocation(path: string, event: MouseEvent): Promise<void> {
+    const button = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const anchor = event.detail === 0
+      ? { x: button.left + button.width / 2, y: button.bottom }
+      : { x: event.clientX, y: event.clientY };
     window.clearTimeout(this.copyStatusTimer);
     this.copiedSaveLocation = '';
     this.saveLocationCopyStatus = '';
@@ -95,9 +101,19 @@ export class AppComponent implements OnDestroy {
     }
     if (copied) {
       this.copiedSaveLocation = path;
-      this.saveLocationCopyStatus = 'Save location copied.';
+      this.saveLocationCopyStatus = 'Copied!';
     } else {
       this.saveLocationCopyStatus = 'Your browser blocked copying. Please copy this path manually: ' + path;
+    }
+    this.changeDetector.detectChanges();
+    const notice = this.saveLocationCopyNotice?.nativeElement.getBoundingClientRect();
+    if (notice) {
+      this.saveLocationCopyPosition = {
+        x: Math.max(8, Math.min(anchor.x + 12, document.documentElement.clientWidth - notice.width - 8)),
+        y: Math.max(8, anchor.y + 16 + notice.height <= window.innerHeight - 8
+          ? anchor.y + 16
+          : anchor.y - notice.height - 12)
+      };
     }
     if (copied) {
       this.copyStatusTimer = window.setTimeout(() => {
