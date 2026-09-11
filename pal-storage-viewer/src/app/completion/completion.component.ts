@@ -46,6 +46,7 @@ export class CompletionComponent implements OnChanges {
   selectedCategory = '';
   search = '';
   groupFilter = '';
+  prioritizeNotCrafted = true;
   mapOpen = false;
   mapVisited = false;
   categoryIcons: Record<string, string> = {};
@@ -180,9 +181,12 @@ export class CompletionComponent implements OnChanges {
     const category = this.category;
     if (!category) return [];
     const needle = this.search.trim().toLowerCase();
-    return category.items.filter((item) =>
+    const items = category.items.filter((item) =>
       (!this.groupFilter || item.group === this.groupFilter)
       && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)));
+    return category.key === 'crafting' && this.prioritizeNotCrafted
+      ? [...items.filter(item => item.state !== 'done'), ...items.filter(item => item.state === 'done')]
+      : items;
   }
 
   get showFishing(): boolean {

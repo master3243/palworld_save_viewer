@@ -97,6 +97,10 @@
         <div class="detail-head">
           <h3>{{ open.title }} <span class="detail-count">{{ open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
+            <label class="craft-priority" *ngIf="open.key === 'crafting'">
+              <input #craftPriority type="checkbox" [checked]="prioritizeNotCrafted" (change)="prioritizeNotCrafted = craftPriority.checked">
+              Prioritize Not Crafted
+            </label>
             <input
               class="detail-search"
               type="search"
@@ -190,9 +194,9 @@
               <ng-container *ngIf="item.crafting as craft">
                 <td>{{ craft.group }}</td>
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
-                <td class="craft-number craft-weight">{{ craft.weight | number }}</td>
-                <td class="craft-number craft-value">{{ craft.baseValue | number }}</td>
-                <td class="craft-number craft-tech-level">{{ craft.technologyLevels.length ? craft.technologyLevels.join(', ') : craft.inheritedTechnologyLevels.length ? '- (' + craft.inheritedTechnologyLevels.join(', ') + ')' : '-' }}</td>
+                <td class="craft-number craft-weight">{{ craft.weight | number }}<img offlineSrc="resources/completion/weight.pog" alt="" decoding="async"></td>
+                <td class="craft-number craft-value">{{ craft.baseValue | number }}<img offlineSrc="resources/completion/crafting-icons/money.pog" alt="" decoding="async"></td>
+                <td class="craft-number craft-tech-level">{{ craft.technologyLevels.length ? craft.technologyLevels.join(', ') : craft.inheritedTechnologyLevels.length ? '(' + craft.inheritedTechnologyLevels.join(', ') + ')' : '-' }}</td>
                 <td class="craft-source"><span [attr.title]="craft.sources.length ? craft.sources.join(' · ') : null">{{ craft.sourceLabel || '-' }}</span></td>
                 <td class="crafted-col"><span class="card-count">{{ craft.count === null ? '-' : (craft.count | number) }}</span></td>
                 <td class="craft-ingredients">
@@ -200,8 +204,9 @@
                     <summary [attr.aria-label]="'Ingredients for ' + item.name">{{ craft.recipes.length === 1 ? 'Recipe' : craft.recipes.length + ' recipes' }}</summary>
                     <ng-container *ngIf="recipeDetails.open">
                       <div class="craft-recipe" *ngFor="let recipe of craft.recipes">
-                        <b>Makes {{ recipe.quantity | number }}, {{ recipe.workAmount | number }} work required</b>
+                        <b>Makes {{ recipe.quantity | number }}</b>
                         <span *ngFor="let ingredient of recipe.ingredients">{{ ingredient[2] | number }} × {{ ingredient[1] }}</span>
+                        <span class="craft-work">Work required: {{ recipe.workAmount | number }}</span>
                       </div>
                       <div class="craft-stack">Stack limit: {{ craft.stackLimit | number }}</div>
                     </ng-container>

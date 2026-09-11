@@ -427,8 +427,13 @@
 .detail-controls {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  max-width: 100%;
 }
+
+.craft-priority { display: inline-flex; align-items: center; gap: 6px; color: #becbd2; font-size: .8rem; cursor: pointer; white-space: nowrap; }
+.craft-priority input { margin: 0; accent-color: #63ccec; }
 
 .detail-search {
   background: rgba(7, 17, 29, 0.8);
@@ -619,6 +624,9 @@
 .crafting-list .craft-source span { display: block; min-width: 180px; max-width: 32ch; white-space: normal; }
 .crafting-list .crafted-col { text-align: right; font-variant-numeric: tabular-nums; }
 .crafting-list .craft-number { min-width: 110px; text-align: right; font-variant-numeric: tabular-nums; }
+.crafting-list .craft-value { min-width: 132px; }
+.craft-weight img, .craft-value img { width: 14px; height: 14px; margin-left: 4px; vertical-align: middle; object-fit: contain; }
+.craft-weight img { transform: translateY(-3px); }
 .craft-stats div { display: flex; flex-wrap: wrap; gap: 4px 12px; min-width: 240px; max-width: 340px; }
 .craft-rarity { color: #becbd2; }
 .craft-rarity[data-rarity="1"] { color: #8ef0c2; }
@@ -629,7 +637,8 @@
 .craft-ingredients summary:focus-visible { outline: 2px solid #91d8ee; outline-offset: 3px; }
 .craft-recipe { display: flex; flex-direction: column; gap: 3px; padding-top: 10px; white-space: normal; min-width: 200px; }
 .craft-recipe b { color: #becbd2; font-size: .75rem; }
-.craft-stack { margin-top: 10px; color: #becbd2; }
+.craft-work { margin-top: 7px; }
+.craft-stack { margin-top: 3px; color: #becbd2; }
 .state-dot[data-state="unknown"] { background: #8097a4; }
 
 .item-table tr[data-state="done"] td {
