@@ -81,7 +81,7 @@
               <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'crafting' ? 'scale(1.3)' : category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' || category.key === 'research' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
               <span>{{ category.title }}</span>
             </span>
-            <span class="card-count">{{ category.unavailable ? '—' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
+            <span class="card-count">{{ category.unavailable ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
           </span>
           <span class="bar" aria-hidden="true">
             <span class="bar-fill" [style.width.%]="category.percent"></span>
@@ -95,7 +95,7 @@
       <ng-container *ngIf="category.key === selectedCategory">
       <section class="category-detail" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
         <div class="detail-head">
-          <h3>{{ open.title }} <span class="detail-count">{{ open.unavailable ? '—' : (open.done | number) }} of {{ open.total | number }}</span></h3>
+          <h3>{{ open.title }} <span class="detail-count">{{ open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
             <input
               class="detail-search"
@@ -121,7 +121,7 @@
             <span class="group-chip-head">
             <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" [style.transform]="open.key === 'relics' ? 'scale(1.1)' : open.key === 'research' || (open.key === 'fastTravel' && group.key === 'statue') ? 'scale(1.2)' : null" alt="" decoding="async">
             <span>{{ open.key === 'technologies' ? (group.key === 'ancient' ? 'Ancient tech' : 'Tech') : group.name }}</span>
-            <b>{{ open.unavailable ? '—' : group.done }}<span>/{{ group.total }}</span></b>
+            <b>{{ open.unavailable ? '-' : group.done }}<span>/{{ group.total }}</span></b>
             </span>
             <ng-container *ngFor="let balance of open.technologyPoints">
               <span class="point-values" *ngIf="balance.key === group.key">
@@ -184,8 +184,8 @@
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <ng-container *ngIf="item.crafting as craft">
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
-                <td class="craft-source"><span>{{ craft.sources.length ? craft.sources.join(' · ') : '—' }}</span></td>
-                <td class="crafted-col"><span class="card-count">{{ craft.count === null ? '—' : (craft.count | number) }}</span></td>
+                <td class="craft-source"><span>{{ craft.sources.length ? craft.sources.join(' · ') : '-' }}</span></td>
+                <td class="crafted-col"><span class="card-count">{{ craft.count === null ? '-' : (craft.count | number) }}</span></td>
                 <td class="craft-ingredients">
                   <details #recipeDetails (toggle)="onRecipeToggle()">
                     <summary [attr.aria-label]="'Ingredients for ' + item.name">{{ craft.recipes.length === 1 ? 'Recipe' : craft.recipes.length + ' recipes' }}</summary>
