@@ -8,7 +8,6 @@ import { CATEGORY_ICONS, objectiveKey } from './tracker-map-model';
 import { loadCompletionData } from './completion-data';
 import { TabDiscovery } from '../tab-discovery';
 import { workIcon } from '../trait-icons';
-import { OfflineImageService } from '../offline-image.service';
 import { OfflineImageDirective } from '../offline-image.directive';
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
@@ -59,8 +58,8 @@ export class CompletionComponent implements OnChanges {
     return this.selectedCategory === 'paldeck' || this.selectedCategory === 'captureBonus';
   }
 
-  palIcon(item: TrackedItem): Promise<string> {
-    return this.images.load(palImagePath(item.id, item.id));
+  palIconPath(item: TrackedItem): string {
+    return palImagePath(item.id, item.id);
   }
 
   wikiLinks(item: TrackedItem): PalWikiLink[] {
@@ -98,7 +97,7 @@ export class CompletionComponent implements OnChanges {
   mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
 
-  constructor(private readonly changeDetector: ChangeDetectorRef, private readonly images: OfflineImageService, private readonly palLookup: Game8LookupService) {
+  constructor(private readonly changeDetector: ChangeDetectorRef, private readonly palLookup: Game8LookupService) {
     void this.loadData();
     void this.loadCategoryIcons();
   }

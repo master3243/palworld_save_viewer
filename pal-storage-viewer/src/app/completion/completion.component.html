@@ -179,7 +179,7 @@
                   <ng-template #plainNumber>{{ item.no }}</ng-template>
                 </ng-template>
               </td>
-              <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
+              <td class="portrait-col" *ngIf="isPalList"><img [offlineSrc]="palIconPath(item)" [alt]="item.name" decoding="async" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <ng-container *ngIf="item.crafting as craft">
