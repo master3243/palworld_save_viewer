@@ -97,9 +97,9 @@
         <div class="detail-head">
           <h3>{{ open.title }} <span class="detail-count">{{ open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
-            <label class="craft-priority" *ngIf="open.key === 'crafting'">
-              <input #craftPriority type="checkbox" [checked]="prioritizeNotCrafted" (change)="prioritizeNotCrafted = craftPriority.checked">
-              Prioritize Not Crafted
+            <label class="status-priority" *ngIf="!open.needsFile">
+              <input #statusPriority type="checkbox" [checked]="prioritizeNotDone" (change)="prioritizeNotDone = statusPriority.checked">
+              Prioritize Not Done
             </label>
             <input
               class="detail-search"
@@ -174,10 +174,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.crafting?.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : null">
+            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.crafting && item.crafting.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : null">
               <td class="state-col">
-                <span class="paldeck-status" *ngIf="isPalList; else standardStatus" [attr.data-state]="item.state"><span class="state-dot" [attr.data-state]="item.state" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
-                <ng-template #standardStatus><span class="state-dot" [attr.data-state]="item.crafting?.count === null ? 'unknown' : item.state"></span>{{ stateLabel(item) }}</ng-template>
+                <span class="item-status"><span class="state-dot" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
               </td>
               <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">
                 <span class="paldeck-number" *ngIf="isPalList; else standardNumber">

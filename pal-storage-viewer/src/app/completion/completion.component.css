@@ -438,8 +438,8 @@
   max-width: 100%;
 }
 
-.craft-priority { display: inline-flex; align-items: center; gap: 6px; color: #becbd2; font-size: .8rem; cursor: pointer; white-space: nowrap; }
-.craft-priority input { margin: 0; accent-color: #63ccec; }
+.status-priority { display: inline-flex; align-items: center; gap: 6px; color: #becbd2; font-size: .8rem; cursor: pointer; white-space: nowrap; }
+.status-priority input { margin: 0; accent-color: #63ccec; }
 
 .detail-search {
   background: rgba(7, 17, 29, 0.8);
@@ -546,7 +546,10 @@
 
 .item-table {
   --column-gap: clamp(20px, calc(20cqw - 140px), 60px);
-  border-collapse: collapse;
+  --status-accent: #8097a4;
+  --status-tint: rgba(128, 151, 164, .07);
+  border-collapse: separate;
+  border-spacing: 0 3px;
   font-size: 0.82rem;
   width: 100%;
 }
@@ -557,22 +560,23 @@
 
 .item-table tr::after { content: ''; display: table-cell; width: 100%; border-bottom: 1px solid rgba(134, 220, 255, 0.07); }
 .item-table thead tr::after { border-bottom-color: rgba(134, 220, 255, 0.18); }
-.item-table.pal-list { border-collapse: separate; border-spacing: 0 3px; }
-.pal-list tbody tr:not(.empty-row) {
-  --status-accent: #ff7b7b;
-  --status-tint: rgba(255, 123, 123, .09);
+.item-table tbody tr[data-state] {
   background: linear-gradient(100deg, var(--status-tint), rgba(225, 237, 241, .025));
   outline: 1px solid rgba(206, 224, 232, .2);
   outline-offset: -1px;
   box-shadow: inset 3px 0 var(--status-accent);
 }
-.pal-list tbody tr[data-state="done"] {
+.item-table tbody tr[data-state="done"] {
   --status-accent: #8ef0c2;
   --status-tint: rgba(142, 240, 194, .07);
 }
-.pal-list tbody tr[data-state="active"] {
+.item-table tbody tr[data-state="active"] {
   --status-accent: #ffd37a;
   --status-tint: rgba(255, 211, 122, .09);
+}
+.item-table tbody tr[data-state="todo"] {
+  --status-accent: #ff7b7b;
+  --status-tint: rgba(255, 123, 123, .09);
 }
 .pal-list tbody tr:not(.empty-row):focus {
   outline: 2px solid #bfe8f4;
@@ -580,7 +584,6 @@
 }
 .item-table.pal-list td { padding-top: 2px; padding-bottom: 2px; vertical-align: middle; }
 .item-table.pal-list .state-col + .no-col { text-align: left; }
-.item-table.pal-list tr[data-state="done"] td { color: #dfe8ec; }
 .pal-list .name-col { font-size: .95rem; white-space: nowrap; }
 .pal-list .name-col span { display: block; max-width: 30ch; overflow: hidden; text-overflow: ellipsis; }
 .pal-links-col .wiki-links { display: inline-flex; gap: 5px; opacity: 0; pointer-events: none; vertical-align: middle; }
@@ -588,9 +591,7 @@
 .pal-list tbody tr:hover .wiki-links,
 .pal-list tbody tr:focus-within .wiki-links { opacity: 1; pointer-events: auto; }
 .paldeck-number { align-items: baseline; color: #f0f5f7; display: inline-flex; gap: 2px; white-space: nowrap; }
-.paldeck-status { color: #ffa3a3; font-size: .78rem; font-weight: 600; }
-.paldeck-status[data-state="done"] { color: #8ef0c2; }
-.paldeck-status[data-state="active"] { color: #ffd37a; }
+.item-status { color: var(--status-accent); font-size: .78rem; font-weight: 600; }
 .paldeck-number-label { font-size: .8rem; font-weight: 650; }
 .paldeck-number-digits { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 1.25rem; font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: .08em; line-height: 1; }
 .paldeck-number-zeroes { color: #8d999f; }
@@ -649,41 +650,19 @@
 .craft-recipe b { color: #becbd2; font-size: .75rem; }
 .craft-work { margin-top: 7px; }
 .craft-stack { margin-top: 3px; color: #becbd2; }
-.state-dot[data-state="unknown"] { background: #8097a4; }
-
-.item-table tr[data-state="done"] td {
-  color: rgba(232, 248, 255, 0.55);
-}
-
 .state-col {
   white-space: nowrap;
   width: 110px;
 }
 
 .state-dot {
-  background: rgba(232, 248, 255, 0.3);
+  background: currentColor;
   border-radius: 50%;
   display: inline-block;
   height: 8px;
   margin-right: 7px;
   vertical-align: middle;
   width: 8px;
-}
-
-.state-dot[data-state="done"] {
-  background: #8ef0c2;
-}
-
-.state-dot[data-state="todo"] {
-  background: #ff7b7b;
-}
-
-.item-table tr[data-state="todo"] .state-col {
-  color: #ffa3a3;
-}
-
-.state-dot[data-state="active"] {
-  background: #ffd37a;
 }
 
 .no-col {
@@ -746,7 +725,7 @@
 
 @media (max-width: 720px) {
   .item-table.pal-list { --column-gap: 8px; }
-  .paldeck-status { font-size: .7rem; }
+  .item-status { font-size: .7rem; }
   .pal-list .portrait-col img { width: 28px; height: 28px; }
   .paldeck-number-label { font-size: .7rem; }
   .paldeck-number-digits { font-size: 1rem; letter-spacing: .04em; }

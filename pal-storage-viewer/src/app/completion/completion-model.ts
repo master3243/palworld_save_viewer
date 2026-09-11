@@ -278,7 +278,7 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
     return { id: tribe, name, detail: '', state, group: '', coords: '', map: '', order: index, no: index,
       captureProgress: { done: caught, total: CAPTURE_BONUS_MAX }, fishing: fishingBy.get(key) };
   });
-  return finish({ key: 'captureBonus', title: 'Capture bonus', items, groups: [], unknown: unknown.sort() });
+  return finish({ key: 'captureBonus', title: 'Capture Bonus', items, groups: [], unknown: unknown.sort() });
 }
 
 function technologyCategory(record: PlayerCompletion, data: CompletionData): Category {
@@ -407,7 +407,7 @@ function statueCategory(record: PlayerCompletion, data: CompletionData): Categor
       group: '', coords: '', map: '', order: typeIndex, no: rank, noMax: max,
     });
   }
-  return finish({ key: 'statue', title: 'Statue of Power', items, groups: [], unknown: [] }, 'Rank');
+  return finish({ key: 'statue', title: 'Statue Of Power', items, groups: [], unknown: [] }, 'Rank');
 }
 
 function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Category {
@@ -418,7 +418,7 @@ function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Cat
   }));
   const names = new Map([['statue', 'Great Eagle Statue'], ['other', 'Watchtower']]);
   return finish({
-    key: 'fastTravel', title: 'Fast travel', items, groups: groupsOf(items, names),
+    key: 'fastTravel', title: 'Fast Travel', items, groups: groupsOf(items, names),
     unknown: unknownIds(record.fast_travel, new Set(Object.keys(data.fastTravel))),
   });
 }
@@ -479,7 +479,7 @@ function questCategory(record: PlayerCompletion, data: CompletionData, kind: 'Ma
   const known = new Set(Object.keys(data.quests).map(id => id.toLowerCase()));
   const key = kind === 'Main' ? 'mainQuests' : 'sideQuests';
   return finish({
-    key, title: kind === 'Main' ? 'Main missions' : 'Side missions', items, groups: [], unknown: kind === 'Main' ? record.quests_completed.filter(id => !known.has(id.toLowerCase())).sort() : [],
+    key, title: kind === 'Main' ? 'Main Missions' : 'Side Missions', items, groups: [], unknown: kind === 'Main' ? record.quests_completed.filter(id => !known.has(id.toLowerCase())).sort() : [],
   });
 }
 
@@ -521,7 +521,7 @@ function raidCategory(record: PlayerCompletion, data: CompletionData): Category 
   });
   const known = new Set(data.raids.map(([id]) => id));
   return finish({
-    key: 'raids', title: 'Raid bosses', items, groups: [],
+    key: 'raids', title: 'Raid Bosses', items, groups: [],
     unknown: Object.keys(record.raid_boss_counts).filter((id) => !known.has(id)).sort(),
   });
 }
@@ -566,7 +566,7 @@ function ruinCategory(record: PlayerCompletion, data: CompletionData): Category 
     group: '', ...place(x, y), order: itemName ? 0 : 1, no: null,
   }));
   return finish({
-    key: 'ruins', title: 'Ruin pickups', items, groups: [],
+    key: 'ruins', title: 'Ruin Pickups', items, groups: [],
     unknown: unknownIds(record.item_pickups, new Set(Object.keys(data.ruinPickups))),
   });
 }
@@ -582,7 +582,7 @@ function researchCategory(world: WorldProgress | undefined, data: CompletionData
   const labs = world?.labs ?? [];
   if (!labs.length) {
     return {
-      key: 'research', title: 'Lab research', done: 0, total: data.research.length, percent: 0, items: [], groups: [],
+      key: 'research', title: 'Lab Research', done: 0, total: data.research.length, percent: 0, items: [], groups: [],
       unknown: [], hasCoords: false, hasNumbers: false, numberLabel: '', hasTags: false, needsFile: 'Level.sav',
     };
   }
@@ -608,7 +608,7 @@ function researchCategory(world: WorldProgress | undefined, data: CompletionData
       const detail = [names.get(category) ?? category, state === 'active' ? `${Math.round((done / work) * 100)}% researched` : ''].filter(Boolean).join(' · ');
       return { id, name, detail, state, group: category, coords: '', map: '', order: 0, no: null };
     });
-    return finish({ key: 'research', title: 'Lab research', items, groups: groupsOf(items, names), unknown: [] });
+    return finish({ key: 'research', title: 'Lab Research', items, groups: groupsOf(items, names), unknown: [] });
   };
   return labs.map(build).sort((a, b) => b.done - a.done)[0];
 }
@@ -620,7 +620,7 @@ function skinCategory(record: PlayerCompletion, data: CompletionData): Category 
     id, name, detail: paid ? 'paid DLC · not counted' : '', state: owned.has(id) ? 'done' : 'todo',
     group: '', coords: '', map: '', order: paid, no: null, counted: !paid,
   }));
-  return finish({ key: 'skins', title: 'Pal skins', items, groups: [], unknown: record.skins.filter((id) => !data.skins.some(([known]) => known === id)).sort() });
+  return finish({ key: 'skins', title: 'Pal Skins', items, groups: [], unknown: record.skins.filter((id) => !data.skins.some(([known]) => known === id)).sort() });
 }
 
 /* --------------------------------------------------------------- summary */
@@ -640,7 +640,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     towerHardCategory(record, data),
     raidCategory(record, data),
     bossCategory(record, data, ['alpha', 'boss'], 'alphas', 'Alpha Pals'),
-    bossCategory(record, data, ['bounty'], 'bounties', 'Bounty targets'),
+    bossCategory(record, data, ['bounty'], 'bounties', 'Bounty Targets'),
     questCategory(record, data, 'Main'),
     questCategory(record, data, 'Sub'),
     noteCategory(record, data),

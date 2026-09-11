@@ -47,7 +47,7 @@ export class CompletionComponent implements OnChanges {
   selectedCategory = '';
   search = '';
   groupFilter = '';
-  prioritizeNotCrafted = true;
+  prioritizeNotDone = true;
   headerPinned = false;
   mapOpen = false;
   mapVisited = false;
@@ -187,10 +187,17 @@ export class CompletionComponent implements OnChanges {
     const needle = this.search.trim().toLowerCase();
     const items = category.items.filter((item) =>
       (!this.groupFilter || item.group === this.groupFilter)
-      && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)));
-    return category.key === 'crafting' && this.prioritizeNotCrafted
-      ? [...items.filter(item => item.state !== 'done'), ...items.filter(item => item.state === 'done')]
-      : items;
+      && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)))
+      .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+    if (!this.prioritizeNotDone) return items;
+    if (category.key === 'mainQuests' || category.key === 'sideQuests') {
+      return [
+        ...items.filter(item => item.state === 'active'),
+        ...items.filter(item => item.state === 'todo'),
+        ...items.filter(item => item.state === 'done'),
+      ];
+    }
+    return [...items.filter(item => item.state !== 'done'), ...items.filter(item => item.state === 'done')];
   }
 
   get showFishing(): boolean {
@@ -266,10 +273,23 @@ export class CompletionComponent implements OnChanges {
     if (this.selectedCategory === 'crafting') return item.crafting?.count == null ? 'Unknown' : item.state === 'done' ? 'Crafted' : 'Not crafted';
     if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';
     if (this.selectedCategory === 'captureBonus') return item.state === 'done' ? 'Captured 5' : item.state === 'active' ? 'Progressing to 5' : 'Never Captured';
-    switch (item.state) {
-      case 'done': return 'Done';
-      case 'active': return 'In progress';
-      default: return 'Missing';
+    if (item.state === 'active') return 'In progress';
+    const done = item.state === 'done';
+    switch (this.selectedCategory) {
+      case 'technologies':
+      case 'fastTravel': return done ? 'Unlocked' : 'Locked';
+      case 'research': return done ? 'Researched' : 'Not Researched';
+      case 'skins':
+      case 'ruins':
+      case 'notes':
+      case 'relics': return done ? 'Obtained' : 'Missing';
+      case 'areas': return done ? 'Visited' : 'Not Visited';
+      case 'towers':
+      case 'towersHard':
+      case 'raids':
+      case 'alphas':
+      case 'bounties': return done ? 'Defeated' : 'Undefeated';
+      default: return done ? 'Done' : 'Missing';
     }
   }
 
