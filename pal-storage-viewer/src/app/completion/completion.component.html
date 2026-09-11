@@ -78,7 +78,7 @@
         >
           <span class="card-head">
             <span class="card-title">
-              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'bounties' || category.key === 'fastTravel' ? 'scale(1.2)' : null" alt="" decoding="async">
+              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'bounties' || category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' ? 'scale(1.2)' : null" alt="" decoding="async">
               <span>{{ category.title }}</span>
             </span>
             <span class="card-count">{{ category.done | number }}<span>/{{ category.total | number }}</span></span>
