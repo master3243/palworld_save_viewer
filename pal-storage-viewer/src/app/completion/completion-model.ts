@@ -63,6 +63,7 @@ export interface CraftingItem {
   baseValue: number;
   stackLimit: number;
   technologyLevels: number[];
+  inheritedTechnologyLevels: number[];
   stats: [string, number][];
   recipes: CraftingRecipe[];
 }
@@ -192,7 +193,8 @@ function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoor
   const counted = category.items.filter((item) => item.counted !== false);
   const done = counted.filter((item) => item.state === 'done').length;
   const total = counted.length;
-  const stateRank = ['captureBonus', 'relics', 'statue'].includes(category.key) ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
+  const stateRank = category.key === 'crafting' ? { active: 0, todo: 0, done: 0 }
+    : ['captureBonus', 'relics', 'statue'].includes(category.key) ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
   category.items.sort((a, b) => stateRank[a.state] - stateRank[b.state] || a.order - b.order || a.name.localeCompare(b.name));
   return {
     ...category, done, total, percent: percentOf(done, total),
@@ -330,8 +332,10 @@ function craftingCategory(record: PlayerCompletion, data: CompletionData): Categ
   const items: TrackedItem[] = catalog.map(item => {
     const count = record.crafted_item_counts == null ? null : counts.get(item.id.toLowerCase()) ?? 0;
     const sources = [...new Set(item.recipes.flatMap(recipe => recipe.sources))];
+    const levels = item.technologyLevels.length ? item.technologyLevels : item.inheritedTechnologyLevels;
     return {
-      id: item.id, name: item.name, group: item.group, no: null, coords: '', map: '', order: 0,
+      id: item.id, name: item.name, group: item.group, no: null, coords: '', map: '',
+      order: levels.length ? Math.min(...levels) : Number.MAX_SAFE_INTEGER,
       state: count !== null && count > 0 ? 'done' : 'todo',
       detail: [...sources, ...item.recipes.flatMap(recipe => recipe.ingredients.map(([, name]) => name))].join(' · '),
       crafting: { ...item, count, sources, sourceLabel: sources.map(source => craftingSourceLabel(item.name, source)).join(' · ') },

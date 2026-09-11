@@ -192,7 +192,7 @@
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
                 <td class="craft-number craft-weight">{{ craft.weight | number }}</td>
                 <td class="craft-number craft-value">{{ craft.baseValue | number }}</td>
-                <td class="craft-number craft-tech-level">{{ craft.technologyLevels.length ? craft.technologyLevels.join(', ') : '-' }}</td>
+                <td class="craft-number craft-tech-level">{{ craft.technologyLevels.length ? craft.technologyLevels.join(', ') : craft.inheritedTechnologyLevels.length ? '- (' + craft.inheritedTechnologyLevels.join(', ') + ')' : '-' }}</td>
                 <td class="craft-source"><span [attr.title]="craft.sources.length ? craft.sources.join(' · ') : null">{{ craft.sourceLabel || '-' }}</span></td>
                 <td class="crafted-col"><span class="card-count">{{ craft.count === null ? '-' : (craft.count | number) }}</span></td>
                 <td class="craft-ingredients">

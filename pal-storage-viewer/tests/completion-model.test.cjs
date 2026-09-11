@@ -53,7 +53,7 @@ test('crafting counts distinct outputs once, preserves rarity variants, and igno
   }
   assert.equal(c.groups.reduce((sum, group) => sum + group.done, 0), 3);
   assert.equal(c.groups.reduce((sum, group) => sum + group.total, 0), 1273);
-  assert.ok(c.items.slice(0, -3).every(item => item.state === 'todo'));
+  assert.equal(c.items.filter(item => item.state === 'todo').length, 1270);
 });
 
 test('crafting exposes recipe quantities, ingredients, and schematic sources', () => {
@@ -64,6 +64,29 @@ test('crafting exposes recipe quantities, ingredients, and schematic sources', (
   assert.deepEqual(rifle.crafting.recipes[0].ingredients.map(([id, , count]) => [id, count]),
     [['IronIngot', 80], ['Polymer', 20], ['CarbonFiber', 20], ['PalCrystal_Ex', 4]]);
   assert.equal(c.items.find(item => item.id === 'HotMilk').crafting.recipes[0].id, 'Hotmilk');
+});
+
+test('crafting sorts by direct or inherited tech level regardless of crafted status', () => {
+  const c = category('crafting', { crafted_item_counts: { AssaultRifle_Default1: 1 } });
+  const item = id => c.items.find(item => item.id === id);
+  assert.deepEqual(item('AssaultRifle_Default1').crafting.technologyLevels, [45]);
+  assert.deepEqual(item('AssaultRifle_Default1').crafting.inheritedTechnologyLevels, []);
+  for (const id of ['AssaultRifle_Default5', 'Blueprint_AssaultRifle_Default5']) {
+    assert.deepEqual(item(id).crafting.technologyLevels, []);
+    assert.deepEqual(item(id).crafting.inheritedTechnologyLevels, [45]);
+    assert.equal(item(id).order, 45);
+  }
+  assert.deepEqual(item('HotMilk').crafting.inheritedTechnologyLevels, []);
+  assert.equal(item('HotMilk').order, Number.MAX_SAFE_INTEGER);
+  assert.equal(c.items.filter(i => i.crafting.technologyLevels.length).length, 380);
+  assert.equal(c.items.filter(i => i.crafting.inheritedTechnologyLevels.length).length, 546);
+  for (let n = 1; n < c.items.length; n++) assert.ok(c.items[n - 1].order <= c.items[n].order);
+  const uncrafted = category('crafting', { crafted_item_counts: {} });
+  assert.deepEqual(c.items.map(i => i.id), uncrafted.items.map(i => i.id));
+  assert.deepEqual(c.items.filter(i => i.name === 'Assault Rifle').map(i => i.crafting.rarity), [0, 1, 2, 3, 4]);
+  const bait = c.items.find(i => i.name === 'Simple Bait');
+  assert.deepEqual(bait.crafting.technologyLevels, [15, 29, 45]);
+  assert.equal(bait.order, 15);
 });
 
 test('missing crafting history stays unknown and does not lower overall completion', () => {

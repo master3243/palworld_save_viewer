@@ -44,7 +44,7 @@ def build(cache: Path) -> list[dict]:
             'id': item_id, 'name': names[item_id.lower()], 'rarity': item['Rarity'],
             'group': groups.get(item['TypeA'], 'Other'),
             'weight': item['Weight'], 'baseValue': item['Price'], 'stackLimit': item['MaxStackCount'],
-            'technologyLevels': [],
+            'technologyLevels': [], 'inheritedTechnologyLevels': [],
             'stats': [[label, item[field]] for field, label in stat_fields if item[field] != 0],
             'icon': f'resources/completion/crafting-icons/{icon_key}.pog' if icon_key in icons else '',
             'recipes': [],
@@ -61,6 +61,26 @@ def build(cache: Path) -> list[dict]:
         entry['recipes'].append({'id': recipe_id, 'quantity': recipe['Product_Count'],
                                  'workAmount': recipe['WorkAmount'],
                                  'sources': sources, 'ingredients': ingredients})
+
+    families = {}
+    for entry in outputs.values():
+        if entry['technologyLevels']:
+            families.setdefault(entry['name'].casefold(), []).append(entry)
+    for entry in outputs.values():
+        if not entry['technologyLevels']:
+            entry['inheritedTechnologyLevels'] = sorted({
+                level for base in families.get(entry['name'].casefold(), [])
+                if base['rarity'] < entry['rarity'] for level in base['technologyLevels']
+            })
+
+    by_id = {key.lower(): entry for key, entry in outputs.items()}
+    item_levels = {key: entry['technologyLevels'] or entry['inheritedTechnologyLevels']
+                   for key, entry in by_id.items()}
+    for recipe in recipes.values():
+        schematic = by_id.get(recipe['UnlockItemID'].lower())
+        if schematic and schematic['group'] == 'Schematics' and not schematic['technologyLevels']:
+            schematic['inheritedTechnologyLevels'] = sorted(set(
+                schematic['inheritedTechnologyLevels'] + item_levels.get(recipe['Product_Id'].lower(), [])))
     return sorted(outputs.values(), key=lambda entry: (entry['name'].lower(), entry['rarity'], entry['id']))
 
 
