@@ -229,6 +229,8 @@ export class CompletionComponent implements OnChanges {
   }
 
   stateLabel(item: TrackedItem): string {
+    if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';
+    if (this.selectedCategory === 'captureBonus') return item.state === 'done' ? 'Captured 5' : item.state === 'active' ? 'Progressing to 5' : 'Never Captured';
     switch (item.state) {
       case 'done': return 'Done';
       case 'active': return 'In progress';
