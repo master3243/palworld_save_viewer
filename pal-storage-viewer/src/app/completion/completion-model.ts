@@ -284,7 +284,7 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
 function technologyCategory(record: PlayerCompletion, data: CompletionData): Category {
   const unlocked = new Set(record.technologies.map(id => id.toLowerCase()));
   const items: TrackedItem[] = data.technologies.map(([id, name, level, ancient, cost]) => ({
-    id, name, detail: `${cost} ${ancient ? 'ancient technology' : 'technology'} ${cost === 1 ? 'point' : 'points'}`, state: unlocked.has(id.toLowerCase()) ? 'done' : 'todo', group: ancient ? 'ancient' : 'regular', coords: '', map: '', order: level, no: level,
+    id, name, detail: String(cost), state: unlocked.has(id.toLowerCase()) ? 'done' : 'todo', group: ancient ? 'ancient' : 'regular', coords: '', map: '', order: level, no: level,
   }));
   const technologyPoints = [0, 1].map(ancient => {
     const remaining = data.technologies.reduce((sum, [id, , , type, cost]) =>

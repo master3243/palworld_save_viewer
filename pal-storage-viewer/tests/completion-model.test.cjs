@@ -305,8 +305,8 @@ test('remaining technology costs exclude unlocked aliases and subtract each poin
     { key: 'regular', name: 'Technology points', remaining: 9, available: 2, needed: 7 },
     { key: 'ancient', name: 'Ancient technology points', remaining: 7, available: 10, needed: 0 },
   ]);
-  assert.equal(c.items.find(i => i.id === 'Free').detail, '0 technology points');
-  assert.equal(c.items.find(i => i.id === 'Ancient').detail, '7 ancient technology points');
+  assert.equal(c.items.find(i => i.id === 'Free').detail, '0');
+  assert.equal(c.items.find(i => i.id === 'Ancient').detail, '7');
   assert.deepEqual(c.unknown, ['Unknown']);
 });
 
