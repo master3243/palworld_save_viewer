@@ -264,6 +264,7 @@
 }
 
 .upload-guide figcaption {
+  container-type: inline-size;
   flex: 1;
   padding: 12px 14px;
   text-align: center;
@@ -452,13 +453,8 @@
   vertical-align: middle;
 }
 
-.steam-upload-guide figcaption {
-  container-type: inline-size;
-}
-
 .gamepass-location-path {
-  container-type: inline-size;
-  flex: 1;
+  flex: 0 1 auto;
 }
 
 .steam-location-paths {
@@ -497,12 +493,11 @@
 
 .upload-guide .gamepass-save-path {
   box-sizing: border-box;
-  /* Allow about 46em for this 74-character monospace path, plus its padding and border. */
-  font-size: min(0.7rem, calc((100cqw - 14px) / 46));
+  /* Reserve space for the label, gap, and path padding. */
+  font-size: min(0.7rem, calc((100cqw - 5rem - 22px) / 46));
   overflow-wrap: normal;
   text-align: center;
   white-space: nowrap;
-  width: 100%;
 }
 
 @media (max-width: 900px) {
