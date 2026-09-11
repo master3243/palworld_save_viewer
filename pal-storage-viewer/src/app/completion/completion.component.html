@@ -78,7 +78,7 @@
         >
           <span class="card-head">
             <span class="card-title">
-              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'research' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
+              <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' || category.key === 'research' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
               <span>{{ category.title }}</span>
             </span>
             <span class="card-count">{{ category.done | number }}<span>/{{ category.total | number }}</span></span>
@@ -116,7 +116,7 @@
             [class.complete]="group.done === group.total"
             (click)="setGroup(group.key)"
           >
-            <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" [style.transform]="open.key === 'relics' ? 'scale(1.1)' : open.key === 'fastTravel' && group.key === 'statue' ? 'scale(1.2)' : null" alt="" decoding="async">
+            <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" [style.transform]="open.key === 'relics' ? 'scale(1.1)' : open.key === 'research' || (open.key === 'fastTravel' && group.key === 'statue') ? 'scale(1.2)' : null" alt="" decoding="async">
             <span>{{ group.name }}</span>
             <b>{{ group.done }}<span>/{{ group.total }}</span></b>
           </button>
