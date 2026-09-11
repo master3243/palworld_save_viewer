@@ -324,7 +324,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
 }
 
@@ -456,21 +456,21 @@
   container-type: inline-size;
 }
 
-.steam-location-paths,
 .gamepass-location-path {
   container-type: inline-size;
   flex: 1;
 }
 
 .steam-location-paths {
+  flex: 0 1 auto;
   flex-wrap: nowrap;
 }
 
 .steam-location-paths > code,
 .steam-location-paths .save-path-placeholder {
   box-sizing: border-box;
-  /* Fit both path chunks while preserving the gap and their separate highlights. */
-  font-size: min(0.7rem, calc((100cqw - 36px) / 33));
+  /* Reserve space for the label, padding, and gaps. */
+  font-size: min(0.7rem, calc((100cqw - 5rem - 36px) / 33));
   white-space: nowrap;
 }
 
