@@ -181,18 +181,20 @@
               </td>
               <td class="portrait-col" *ngIf="isPalList"><img *ngIf="palIcon(item) | async as src" [src]="src" [alt]="item.name" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
-              <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><ng-container *ngIf="item.crafting"><img *ngIf="craftingIcon(item) | async as icon" [src]="icon" alt="" decoding="async" loading="lazy"></ng-container><span>{{ item.name }}</span></td>
+              <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <ng-container *ngIf="item.crafting as craft">
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
                 <td class="craft-source"><span>{{ craft.sources.length ? craft.sources.join(' · ') : '—' }}</span></td>
                 <td class="crafted-col"><span class="card-count">{{ craft.count === null ? '—' : (craft.count | number) }}</span></td>
                 <td class="craft-ingredients">
-                  <details>
+                  <details #recipeDetails (toggle)="onRecipeToggle()">
                     <summary [attr.aria-label]="'Ingredients for ' + item.name">{{ craft.recipes.length === 1 ? 'Recipe' : craft.recipes.length + ' recipes' }}</summary>
-                    <div class="craft-recipe" *ngFor="let recipe of craft.recipes">
-                      <b>Makes {{ recipe.quantity | number }}</b>
-                      <span *ngFor="let ingredient of recipe.ingredients">{{ ingredient[2] | number }} × {{ ingredient[1] }}</span>
-                    </div>
+                    <ng-container *ngIf="recipeDetails.open">
+                      <div class="craft-recipe" *ngFor="let recipe of craft.recipes">
+                        <b>Makes {{ recipe.quantity | number }}</b>
+                        <span *ngFor="let ingredient of recipe.ingredients">{{ ingredient[2] | number }} × {{ ingredient[1] }}</span>
+                      </div>
+                    </ng-container>
                   </details>
                 </td>
               </ng-container>

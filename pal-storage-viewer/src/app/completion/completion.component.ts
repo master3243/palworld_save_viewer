@@ -9,6 +9,7 @@ import { loadCompletionData } from './completion-data';
 import { TabDiscovery } from '../tab-discovery';
 import { workIcon } from '../trait-icons';
 import { OfflineImageService } from '../offline-image.service';
+import { OfflineImageDirective } from '../offline-image.directive';
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
 import { palWikiLinks, PalWikiLink } from '../pal-wiki-links';
@@ -30,7 +31,7 @@ const RING_RADIUS = 52;
 @Component({
   selector: 'app-completion',
   standalone: true,
-  imports: [CommonModule, TrackerMapComponent],
+  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective],
   templateUrl: './completion.component.html',
   styleUrls: ['../pal-wiki-links.css', './completion.component.css']
 })
@@ -141,8 +142,8 @@ export class CompletionComponent implements OnChanges {
     return name ? this.mapIcons[name] : undefined;
   }
 
-  craftingIcon(item: TrackedItem): Promise<string> {
-    return this.images.load(item.crafting?.icon ?? '');
+  onRecipeToggle(): void {
+    this.changeDetector.markForCheck();
   }
 
   ngOnChanges(): void {
