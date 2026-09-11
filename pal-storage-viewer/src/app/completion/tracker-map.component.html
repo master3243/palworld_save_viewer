@@ -41,7 +41,7 @@
           <p class="location-note" *ngIf="point.category === 'areas'">Region reference point</p>
           <div class="marker-actions">
             <button type="button" [class.active]="routeIndex(point) >= 0" (click)="toggleRoute(point)">{{ routeIndex(point) >= 0 ? '− Stop' : '+ Trip' }}</button>
-            <button type="button" (click)="openCategory.emit(point.category)">List ↗</button>
+            <button type="button" (click)="openCategory.emit({ category: point.category, itemId: point.item.id })">List ↗</button>
           </div>
           <div class="nearest-travel" *ngIf="travel as station">
             <span>Nearest fast travel</span>
@@ -131,7 +131,7 @@
       <details class="unmapped" *ngIf="unmapped.length">
         <summary>Without a fixed location</summary>
         <p>These lists include unfinished objectives without a known map point. Quest markers show the quest giver, and region markers show a reference point.</p>
-        <button type="button" *ngFor="let category of unmapped" (click)="openCategory.emit(category.key)">{{ category.title }} ↗</button>
+        <button type="button" *ngFor="let category of unmapped" (click)="openCategory.emit({ category: category.key })">{{ category.title }} ↗</button>
       </details>
     </aside>
   </div>

@@ -254,11 +254,31 @@ export class CompletionComponent implements OnChanges {
     });
   }
 
-  showMapCategory(key: string): void {
+  showMapCategory(key: string, itemId?: string): void {
     this.mapOpen = false;
+    this.headerPinned = false;
     this.selectedCategory = key;
     this.groupFilter = ''; this.search = '';
-    requestAnimationFrame(() => document.querySelector('.category-detail')?.scrollIntoView({ block: 'nearest' }));
+    requestAnimationFrame(() => {
+      if (this.mapOpen || this.selectedCategory !== key) return;
+      const section = this.categoryDetail?.nativeElement;
+      const container = this.trackerScroll?.nativeElement;
+      if (!section || !container) return;
+      const row = itemId === undefined ? undefined : Array.from(section.querySelectorAll<HTMLElement>('tbody tr[data-item-id]'))
+        .find(row => row.dataset['itemId'] === itemId);
+      if (!row) {
+        section.scrollIntoView({ block: 'nearest' });
+        return;
+      }
+      container.scrollTo({
+        top: container.scrollTop + row.getBoundingClientRect().top - container.getBoundingClientRect().top
+          - (container.clientHeight - row.offsetHeight) / 2,
+        left: 0, behavior: 'instant',
+      });
+      row.focus({ preventScroll: true });
+      row.classList.add('map-highlight');
+      row.addEventListener('animationend', () => row.classList.remove('map-highlight'), { once: true });
+    });
   }
 
   setGroup(key: string): void {

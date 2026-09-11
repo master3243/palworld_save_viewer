@@ -12,7 +12,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   @Input() playerKey = '';
   @Input() focusKey = '';
   @Input() visible = true;
-  @Output() openCategory = new EventEmitter<string>();
+  @Output() openCategory = new EventEmitter<{ category: string; itemId?: string }>();
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
 
   readonly colors = CATEGORY_COLORS;

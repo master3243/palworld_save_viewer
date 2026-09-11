@@ -61,7 +61,7 @@
         </div>
       </header>
 
-      <app-tracker-map *ngIf="mapVisited" [hidden]="!mapOpen" [visible]="mapOpen" [categories]="progress.categories" [playerKey]="selectedPlayer" [focusKey]="mapFocus" (openCategory)="showMapCategory($event)"></app-tracker-map>
+      <app-tracker-map *ngIf="mapVisited" [hidden]="!mapOpen" [visible]="mapOpen" [categories]="progress.categories" [playerKey]="selectedPlayer" [focusKey]="mapFocus" (openCategory)="showMapCategory($event.category, $event.itemId)"></app-tracker-map>
 
       <ng-container *ngIf="!mapOpen">
       <div class="category-grid" role="group" aria-label="Categories">
@@ -174,7 +174,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-state]="item.crafting && item.crafting.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : null">
+            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-item-id]="item.id" [attr.data-state]="item.crafting && item.crafting.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
               <td class="state-col">
                 <span class="item-status"><span class="state-dot" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
               </td>

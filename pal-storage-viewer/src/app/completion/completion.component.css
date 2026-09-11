@@ -578,6 +578,13 @@
   --status-accent: #ff7b7b;
   --status-tint: rgba(255, 123, 123, .09);
 }
+.item-table tbody tr.map-highlight { animation: map-row-highlight 3.5s ease-out; }
+@keyframes map-row-highlight {
+  0%, 55% { outline-color: #8ed8ec; box-shadow: inset 3px 0 var(--status-accent), 0 0 9px #63ccec66; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .item-table tbody tr.map-highlight { animation-timing-function: step-end; }
+}
 .pal-list tbody tr:not(.empty-row):focus {
   outline: 2px solid #bfe8f4;
   outline-offset: -2px;
