@@ -498,7 +498,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     ctx.strokeStyle='#7a9cac';ctx.lineWidth=.75;ctx.stroke();
     ctx.save();ctx.shadowColor='#001018';ctx.shadowBlur=2;
     if(icon?.complete && icon.naturalWidth) {
-      const scale=Math.min(18/Math.max(icon.naturalWidth,icon.naturalHeight),20/Math.hypot(icon.naturalWidth,icon.naturalHeight))*(point.category === 'bounties' || point.category === 'towers' || point.category === 'towersHard' ? 1.2 : 1), w=icon.naturalWidth*scale,h=icon.naturalHeight*scale;
+      const scale=Math.min(18/Math.max(icon.naturalWidth,icon.naturalHeight),20/Math.hypot(icon.naturalWidth,icon.naturalHeight))*(point.category === 'bounties' || point.category === 'towers' || point.category === 'towersHard' || point.category === 'areas' || point.category === 'notes' ? 1.2 : 1), w=icon.naturalWidth*scale,h=icon.naturalHeight*scale;
       ctx.drawImage(icon,p.x-w/2,p.y-h/2,w,h);
     }
     else { ctx.fillStyle=this.colors[point.category]??'#d0e7ee';ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fill(); }
