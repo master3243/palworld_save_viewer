@@ -11,7 +11,7 @@ function tracker() {
   const context = {
     exports: {},
     require: name => {
-      if (name === '@angular/core') return { Component: decorator, Input: decorator, ViewChild: decorator };
+      if (name === '@angular/core') return { Component: decorator, Input: decorator, ViewChild: decorator, ChangeDetectionStrategy: { OnPush: 0 } };
       if (name === '../tab-discovery') return { TabDiscovery: class {} };
       if (name === './completion-data') return { loadCompletionData: () => catalog };
       if (name === './completion-model') return {

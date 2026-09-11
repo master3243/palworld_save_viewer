@@ -141,8 +141,8 @@
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
-        <ng-container *ngIf="{ fishing: showFishing } as columns">
-        <table class="item-table" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile">
+        <ng-container *ngIf="{ fishing: showFishing, count: tableColumnCount } as columns">
+        <table class="item-table" [attr.aria-rowcount]="visibleItems.length + 1" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile">
           <caption class="table-start" aria-hidden="true"></caption>
           <thead>
             <tr>
@@ -174,7 +174,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; trackBy: trackItem" [attr.data-item-id]="item.id" [attr.data-state]="item.crafting && item.crafting.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
+            <tr *ngFor="let item of visibleItems; let rowIndex = index; trackBy: trackItem" [attr.aria-rowindex]="rowIndex + 2" [attr.data-item-id]="item.id" [attr.data-state]="item.crafting && item.crafting.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
+              <ng-container *tableRowViewport="trackerScroll; columns: columns.count; height: isPalList ? 36 : open.key === 'crafting' ? 38 : 30">
               <td class="state-col">
                 <span class="item-status"><span class="state-dot" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
               </td>
@@ -235,9 +236,10 @@
               <td class="coords-col" *ngIf="open.hasCoords">
                 <button type="button" class="coordinate-link" *ngIf="item.coords" [attr.aria-label]="'Show ' + item.name + ' on map'" (click)="showMap(item)">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small> ↗</button>
               </td>
+              </ng-container>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="3 + (open.key === 'crafting' ? 8 : 0) + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (columns.fishing ? 3 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="columns.count">Nothing matches.</td>
             </tr>
           </tbody>
         </table>

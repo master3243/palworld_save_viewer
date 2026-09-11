@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
 
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
 import { Category, CompletionData, CompletionSummary, TrackedGroup, TrackedItem, WorldProgress, summarize } from './completion-model';
@@ -10,6 +10,7 @@ import { TabDiscovery } from '../tab-discovery';
 import { workIcon } from '../trait-icons';
 import { OfflineImageDirective } from '../offline-image.directive';
 import { StickyTableHeaderDirective } from './sticky-table-header.directive';
+import { TableRowViewport, TableRowViewportDirective } from './table-row-viewport.directive';
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
 import { palWikiLinks, PalWikiLink } from '../pal-wiki-links';
@@ -31,7 +32,8 @@ const RING_RADIUS = 52;
 @Component({
   selector: 'app-completion',
   standalone: true,
-  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective],
+  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective, TableRowViewportDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './completion.component.html',
   styleUrls: ['../pal-wiki-links.css', './completion.component.css']
 })
@@ -57,6 +59,8 @@ export class CompletionComponent implements OnChanges {
   private readonly tabDiscovery = new TabDiscovery();
   private readonly palNumberSuffixes = new Map<string, Promise<string>>();
   private readonly palLinks = new Map<string, PalWikiLink[]>();
+  private readonly orderedRows = new WeakMap<Category, { normal: TrackedItem[]; prioritized: TrackedItem[] }>();
+  private filteredRows?: { category: Category; needle: string; group: string; priority: boolean; items: TrackedItem[] };
   get isPalList(): boolean {
     return this.selectedCategory === 'paldeck' || this.selectedCategory === 'captureBonus';
   }
@@ -102,7 +106,7 @@ export class CompletionComponent implements OnChanges {
   mapFocus = '';
   readonly ringCircumference = 2 * Math.PI * RING_RADIUS;
 
-  constructor(private readonly changeDetector: ChangeDetectorRef, private readonly palLookup: Game8LookupService) {
+  constructor(private readonly changeDetector: ChangeDetectorRef, private readonly palLookup: Game8LookupService, private readonly rowViewport: TableRowViewport) {
     void this.loadData();
     void this.loadCategoryIcons();
   }
@@ -185,19 +189,29 @@ export class CompletionComponent implements OnChanges {
     const category = this.category;
     if (!category) return [];
     const needle = this.search.trim().toLowerCase();
-    const items = category.items.filter((item) =>
-      (!this.groupFilter || item.group === this.groupFilter)
-      && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)))
-      .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-    if (!this.prioritizeNotDone) return items;
-    if (category.key === 'mainQuests' || category.key === 'sideQuests') {
-      return [
-        ...items.filter(item => item.state === 'active'),
-        ...items.filter(item => item.state === 'todo'),
-        ...items.filter(item => item.state === 'done'),
-      ];
+    const previous = this.filteredRows;
+    if (previous?.category === category && previous.needle === needle && previous.group === this.groupFilter && previous.priority === this.prioritizeNotDone) return previous.items;
+    let ordered = this.orderedRows.get(category);
+    if (!ordered) {
+      const normal = [...category.items].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+      const prioritized = category.key === 'mainQuests' || category.key === 'sideQuests'
+        ? [...normal.filter(item => item.state === 'active'), ...normal.filter(item => item.state === 'todo'), ...normal.filter(item => item.state === 'done')]
+        : [...normal.filter(item => item.state !== 'done'), ...normal.filter(item => item.state === 'done')];
+      ordered = { normal, prioritized };
+      this.orderedRows.set(category, ordered);
     }
-    return [...items.filter(item => item.state !== 'done'), ...items.filter(item => item.state === 'done')];
+    const items = (this.prioritizeNotDone ? ordered.prioritized : ordered.normal).filter((item) =>
+      (!this.groupFilter || item.group === this.groupFilter)
+      && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)));
+    this.filteredRows = { category, needle, group: this.groupFilter, priority: this.prioritizeNotDone, items };
+    return items;
+  }
+
+  get tableColumnCount(): number {
+    const category = this.category;
+    return 3 + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
+      + (category?.key === 'captureBonus' ? 1 : 0) + (this.showFishing ? 3 : 0)
+      + (category?.hasCoords ? 1 : 0) + (category?.hasNumbers ? 1 : 0) + (category?.hasTags ? 1 : 0);
   }
 
   get showFishing(): boolean {
@@ -270,6 +284,7 @@ export class CompletionComponent implements OnChanges {
         section.scrollIntoView({ block: 'nearest' });
         return;
       }
+      this.rowViewport.reveal(row);
       container.scrollTo({
         top: container.scrollTop + row.getBoundingClientRect().top - container.getBoundingClientRect().top
           - (container.clientHeight - row.offsetHeight) / 2,
