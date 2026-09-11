@@ -74,6 +74,7 @@ export interface TrackedItem {
   noMax?: number;
   /** Lifetime catches shown against the capture bonus target, without capping. */
   captureProgress?: { done: number; total: number };
+  fishing?: { common: number; whopper: number; lunker: number };
   /** False for rows shown for information only (paid DLC); they do not count. */
   counted?: boolean;
   /** Short label shown as a chip in its own column (Normal / Ultra). */
@@ -219,6 +220,27 @@ function paldeckCategory(record: PlayerCompletion, data: CompletionData): Catego
 function captureBonusCategory(record: PlayerCompletion, data: CompletionData): Category {
   const caughtBy = lowerKeys(record.capture_counts);
   const bonusBy = lowerKeys(record.capture_bonus_counts);
+  const known = new Set(data.paldeck.map(([tribe]) => tribe.toLowerCase()));
+  const fishingBy = new Map<string, NonNullable<TrackedItem['fishing']>>();
+  const unknown: string[] = [];
+  const fishingCounts = new Map<string, number>();
+  for (const [id, count] of Object.entries(record.fishing_counts ?? {})) {
+    if (Number.isFinite(count) && count > 0) {
+      const key = id.toLowerCase();
+      fishingCounts.set(key, Math.max(fishingCounts.get(key) ?? 0, count));
+    }
+  }
+  for (const [id, count] of fishingCounts) {
+    const match = /^fishshadow_(.+)_(common|boss|nushi)$/.exec(id);
+    if (!match || !known.has(match[1])) {
+      unknown.push(id);
+      continue;
+    }
+    const fishing = fishingBy.get(match[1]) ?? { common: 0, whopper: 0, lunker: 0 };
+    const kind = match[2] === 'common' ? 'common' : match[2] === 'boss' ? 'whopper' : 'lunker';
+    fishing[kind] += count;
+    fishingBy.set(match[1], fishing);
+  }
   const items: TrackedItem[] = data.paldeck.map(([tribe, index, name]) => {
     const key = tribe.toLowerCase();
     const bonus = Math.min(CAPTURE_BONUS_MAX, bonusBy.get(key) ?? 0);
@@ -227,9 +249,9 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
     if (bonus >= CAPTURE_BONUS_MAX) state = 'done';
     else if (bonus > 0) state = 'active';
     return { id: tribe, name, detail: '', state, group: '', coords: '', map: '', order: index, no: index,
-      captureProgress: { done: caught, total: CAPTURE_BONUS_MAX } };
+      captureProgress: { done: caught, total: CAPTURE_BONUS_MAX }, fishing: fishingBy.get(key) };
   });
-  return finish({ key: 'captureBonus', title: 'Capture bonus', items, groups: [], unknown: [] });
+  return finish({ key: 'captureBonus', title: 'Capture bonus', items, groups: [], unknown: unknown.sort() });
 }
 
 function technologyCategory(record: PlayerCompletion, data: CompletionData): Category {

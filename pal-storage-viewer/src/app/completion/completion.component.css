@@ -607,6 +607,8 @@
 .item-table th:first-child,
 .item-table td:first-child { padding-left: 10cqw; }
 .item-table .detail-col span { display: block; width: max-content; max-width: 60ch; white-space: normal; overflow-wrap: anywhere; }
+.item-table .fishing-col { padding-right: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+.fishing-col small { display: block; font-size: .6rem; font-weight: 400; }
 
 .item-table tr[data-state="done"] td {
   color: rgba(232, 248, 255, 0.55);

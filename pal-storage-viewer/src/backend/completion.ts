@@ -38,6 +38,8 @@ export interface PlayerCompletion {
   paldeck: string[];
   capture_counts: Record<string, number>;
   capture_bonus_counts: Record<string, number>;
+  crafted_item_counts: Record<string, number> | null;
+  fishing_counts: Record<string, number> | null;
   /** EPalRelicType short name -> obtained level-object ids (32 hex chars, upper case). */
   relics: Record<string, string[]>;
   relics_unspent: Record<string, number>;
@@ -278,6 +280,8 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
     paldeck: trueKeys(readScalarMap(buf, 'PaldeckUnlockFlag')),
     capture_counts: numbers(readScalarMap(buf, 'PalCaptureCount')),
     capture_bonus_counts: numbers(readScalarMap(buf, 'PalCaptureBonusCount')),
+    crafted_item_counts: findPropertyStart(buf, 'CraftItemCount') === -1 ? null : numbers(readScalarMap(buf, 'CraftItemCount')),
+    fishing_counts: findPropertyStart(buf, 'FishingCountMap') === -1 ? null : numbers(readScalarMap(buf, 'FishingCountMap')),
     relics,
     relics_unspent: relicsUnspent,
     notes: trueKeys(readScalarMap(buf, 'NoteObtainForInstanceFlag')),

@@ -22,6 +22,41 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('capture bonus shows fishing tiers for matching species without changing capture progress', () => {
+  const progress = {
+    capture_counts: { Penguin: 21, Penguin_Electric: 8 },
+    capture_bonus_counts: { Penguin: 5, Penguin_Electric: 2 },
+  };
+  const before = category('captureBonus', progress);
+  const after = category('captureBonus', {
+    ...progress,
+    fishing_counts: {
+      FishShadow_Penguin_Common: 3, FISHSHADOW_PENGUIN_COMMON: 3,
+      FishShadow_Penguin_Boss: 2, FishShadow_Penguin_Nushi: 1,
+      FishShadow_Penguin_Electric_Common: 4,
+      FishShadow_BlueDragon_Common: 0,
+    },
+  });
+  assert.deepEqual(after.items.find(item => item.id === 'Penguin').fishing, { common: 3, whopper: 2, lunker: 1 });
+  assert.deepEqual(after.items.find(item => item.id === 'Penguin_Electric').fishing, { common: 4, whopper: 0, lunker: 0 });
+  assert.equal(after.items.filter(item => item.fishing).length, 2);
+  assert.deepEqual(after.items.map(({ fishing, ...item }) => item), before.items.map(({ fishing, ...item }) => item));
+  assert.equal(after.done, before.done);
+  assert.equal(after.percent, before.percent);
+});
+
+test('missing fishing data stays hidden and unknown variants are not assigned to the wrong species', () => {
+  for (const fishing_counts of [undefined, null, {}]) {
+    assert.ok(category('captureBonus', { fishing_counts }).items.every(item => item.fishing === undefined));
+  }
+  const c = category('captureBonus', { fishing_counts: {
+    FishShadow_IceSeal_Ground_Fire_Boss: 2, FishShadow_Unknown_Common: 1,
+    FishShadow_Penguin_Common: -1, FishShadow_Penguin_Boss: NaN,
+  } });
+  assert.ok(c.items.every(item => item.fishing === undefined));
+  assert.deepEqual(c.unknown, ['fishshadow_iceseal_ground_fire_boss', 'fishshadow_unknown_common']);
+});
+
 test('Pal Effigies includes each species capture reward in its total and Mimog group', () => {
   const c = category('relics', {});
   const rewards = c.items.filter(item => item.group === 'move_speed');

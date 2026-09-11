@@ -136,6 +136,7 @@
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
+        <ng-container *ngIf="{ fishing: showFishing } as columns">
         <table class="item-table" [class.pal-list]="isPalList" *ngIf="!open.needsFile">
           <thead>
             <tr>
@@ -145,6 +146,11 @@
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
+              <ng-container *ngIf="columns.fishing">
+                <th class="fishing-col" scope="col" title="Common fishing catches"><small>Fishing</small>Common</th>
+                <th class="fishing-col" scope="col" title="Whopper fishing catches"><small>Fishing</small>Whopper</th>
+                <th class="fishing-col" scope="col" title="Lunker fishing catches"><small>Fishing</small>Lunker</th>
+              </ng-container>
               <th *ngIf="isPalList" aria-label="Pal links"></th>
               <th *ngIf="!isPalList">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
@@ -170,7 +176,14 @@
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
-              <td *ngIf="isPalList" class="pal-links-col">
+              <ng-container *ngIf="columns.fishing">
+                <ng-container *ngIf="item.fishing as fishing">
+                  <td class="fishing-col">{{ fishing.common | number }}</td>
+                  <td class="fishing-col">{{ fishing.whopper | number }}</td>
+                  <td class="fishing-col">{{ fishing.lunker | number }}</td>
+                </ng-container>
+              </ng-container>
+              <td *ngIf="isPalList" class="pal-links-col" [attr.colspan]="columns.fishing && !item.fishing ? 4 : 1">
                 <span class="wiki-links" role="group" [attr.aria-label]="item.name + ' links'">
                   <a *ngFor="let link of wikiLinks(item); trackBy: trackWikiLink" class="wiki-link" [ngClass]="link.className" [href]="link.url"
                     target="_blank" rel="noopener noreferrer" [attr.aria-label]="'Open ' + item.name + ' on ' + link.site" [title]="link.domain">
@@ -185,10 +198,11 @@
               </td>
             </tr>
             <tr class="empty-row" *ngIf="!visibleItems.length">
-              <td [attr.colspan]="3 + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
+              <td [attr.colspan]="3 + (isPalList ? 1 : 0) + (open.key === 'captureBonus' ? 1 : 0) + (columns.fishing ? 3 : 0) + (open.hasCoords ? 1 : 0) + (open.hasNumbers ? 1 : 0) + (open.hasTags ? 1 : 0)">Nothing matches.</td>
             </tr>
           </tbody>
         </table>
+        </ng-container>
       </section>
       </ng-container>
         </ng-container>

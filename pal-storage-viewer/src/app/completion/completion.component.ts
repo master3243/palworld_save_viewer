@@ -179,6 +179,10 @@ export class CompletionComponent implements OnChanges {
       && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)));
   }
 
+  get showFishing(): boolean {
+    return this.selectedCategory === 'captureBonus' && this.visibleItems.some(item => item.fishing !== undefined);
+  }
+
   get isMaxLevel(): boolean {
     const level = this.player?.level;
     return level !== null && level !== undefined && this.data !== null && level >= this.data.maxLevel;
