@@ -166,7 +166,7 @@ function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoor
   const counted = category.items.filter((item) => item.counted !== false);
   const done = counted.filter((item) => item.state === 'done').length;
   const total = counted.length;
-  const stateRank = category.key === 'captureBonus' || category.key === 'relics' ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
+  const stateRank = ['captureBonus', 'relics', 'statue'].includes(category.key) ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
   category.items.sort((a, b) => stateRank[a.state] - stateRank[b.state] || a.order - b.order || a.name.localeCompare(b.name));
   return {
     ...category, done, total, percent: percentOf(done, total),
@@ -291,7 +291,7 @@ function statueCategory(record: PlayerCompletion, data: CompletionData): Categor
   const items: TrackedItem[] = [];
   const captureEffigies = new Set(Object.entries(record.capture_bonus_counts)
     .filter(([, count]) => count >= CAPTURE_BONUS_MAX).map(([id]) => id.toLowerCase())).size;
-  for (const type of data.relicTypes) {
+  for (const [typeIndex, type] of data.relicTypes.entries()) {
     const perRank = data.statueRanks[type.enum];
     if (!perRank?.length) continue;
     const collected = type.enum === 'MoveSpeed' ? captureEffigies : record.relics[type.enum]?.length ?? 0;
@@ -311,7 +311,7 @@ function statueCategory(record: PlayerCompletion, data: CompletionData): Categor
     if (toNext) parts.push(`${toNext} more for next rank`);
     items.push({
       id: type.enum, name: type.name, detail: parts.join(' · '), state: rank >= max ? 'done' : rank > 0 ? 'active' : 'todo',
-      group: '', coords: '', map: '', order: 0, no: rank, noMax: max,
+      group: '', coords: '', map: '', order: typeIndex, no: rank, noMax: max,
     });
   }
   return finish({ key: 'statue', title: 'Statue of Power', items, groups: [], unknown: [] }, 'Rank');

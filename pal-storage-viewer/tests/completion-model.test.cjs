@@ -80,6 +80,19 @@ test('Movement Speed is a Statue of Power upgrade even though Mimog Effigies hav
   assert.ok(!pickups.some(point => point.item.name === 'Mimog Effigy' || point.item.id === 'MoveSpeed'));
 });
 
+test('Statue of Power follows effigy filter order with missing and active ranks together', () => {
+  const filterOrder = category('relics', {}).groups.map(group => data.relicTypes.find(type => type.key === group.key).enum);
+  const progress = { relics: { HungerReduction: ['one'], ClimbSpeed: ['two'] } };
+  const c = category('statue', progress);
+  assert.deepEqual(c.items.map(item => item.id), filterOrder);
+  assert.equal(c.items[0].state, 'todo');
+  assert.equal(c.items[1].state, 'active');
+  const maxRank = data.statueRanks.HungerReduction.reduce((sum, cost) => sum + cost, 0);
+  const completed = category('statue', { relics: { HungerReduction: Array.from({ length: maxRank }, (_, i) => String(i)) } });
+  assert.deepEqual(completed.items.map(item => item.id), [...filterOrder.filter(id => id !== 'HungerReduction'), 'HungerReduction']);
+  assert.equal(completed.items.at(-1).state, 'done');
+});
+
 test('Movement Speed uses completed capture bonuses, subtracts held effigies, and counts species aliases once', () => {
   const c = category('statue', {
     capture_bonus_counts: { A: 5, a: 5, B: 9, C: 5, D: 5, E: 5, F: 5, Almost: 4 },
