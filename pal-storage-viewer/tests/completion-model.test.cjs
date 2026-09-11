@@ -22,6 +22,88 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('Pal Effigies includes each species capture reward in its total and Mimog group', () => {
+  const c = category('relics', {});
+  const rewards = c.items.filter(item => item.group === 'move_speed');
+  assert.equal(c.total, 695);
+  assert.equal(c.done, 0);
+  assert.equal(rewards.length, 288);
+  assert.equal(new Set(c.items.map(item => item.id)).size, c.total);
+  assert.deepEqual(c.groups.find(group => group.key === 'move_speed'),
+    { key: 'move_speed', name: 'Mimog Effigy', done: 0, total: 288 });
+  for (const [tribe, , name] of data.paldeck) {
+    const reward = rewards.find(item => item.id === `capture-bonus:${tribe}`);
+    assert.equal(reward.name, 'Mimog Effigy');
+    assert.equal(reward.detail, `Capture 5 ${name} · 0/5`);
+    assert.equal(reward.state, 'todo');
+    assert.equal(reward.coords, '');
+    assert.notEqual(reward.counted, false);
+  }
+});
+
+test('Mimog reward progress follows capture bonuses and stays complete after spending the effigy', () => {
+  const [[first], [second], [third], [fourth]] = data.paldeck;
+  const pickup = Object.keys(data.relics)[0];
+  const c = category('relics', {
+    capture_bonus_counts: { [first.toUpperCase()]: 5, [second.toLowerCase()]: 3, [third]: 8, UnknownSpecies: 5 },
+    capture_counts: { [fourth]: 100 },
+    relics_unspent: { MoveSpeed: 0 }, relics: { CapturePower: [pickup] },
+  });
+  assert.equal(c.total, 695);
+  assert.equal(c.done, 3);
+  assert.equal(c.groups.find(group => group.key === 'move_speed').done, 2);
+  assert.equal(c.items.find(item => item.id === pickup).state, 'done');
+  assert.ok(c.items.slice(0, 406).every(item => item.group !== 'move_speed' && item.state === 'todo'));
+  assert.ok(c.items.slice(406, 692).every(item => item.group === 'move_speed' && item.state !== 'done'));
+  assert.equal(c.items[692].id, pickup);
+  assert.ok(c.items.slice(693).every(item => item.group === 'move_speed' && item.state === 'done'));
+  assert.equal(c.groups.at(-1).key, 'move_speed');
+  for (const [tribe, state, count] of [[first, 'done', 5], [second, 'active', 3], [third, 'done', 5], [fourth, 'todo', 0]]) {
+    const reward = c.items.find(item => item.id === `capture-bonus:${tribe}`);
+    assert.equal(reward.state, state);
+    assert.ok(reward.detail.endsWith(`${count}/5`));
+  }
+});
+
+test('Movement Speed is a Statue of Power upgrade even though Mimog Effigies have no map pickups', () => {
+  const c = category('statue', {});
+  const speed = c.items.find(item => item.id === 'MoveSpeed');
+  assert.equal(c.total, 13);
+  assert.equal(speed.name, 'Movement Speed');
+  assert.equal(speed.no, 0);
+  assert.equal(speed.noMax, 92);
+  assert.equal(speed.state, 'todo');
+  assert.equal(data.relicTypes.find(type => type.enum === 'MoveSpeed').item, 'Mimog Effigy');
+  const { mapObjectives } = require('../src/app/completion/tracker-map-model.ts');
+  const pickups = mapObjectives([category('relics', {}), c]);
+  assert.equal(pickups.length, 407);
+  assert.ok(!pickups.some(point => point.item.name === 'Mimog Effigy' || point.item.id === 'MoveSpeed'));
+});
+
+test('Movement Speed uses completed capture bonuses, subtracts held effigies, and counts species aliases once', () => {
+  const c = category('statue', {
+    capture_bonus_counts: { A: 5, a: 5, B: 9, C: 5, D: 5, E: 5, F: 5, Almost: 4 },
+    capture_counts: { Almost: 100 },
+    relics_unspent: { MoveSpeed: 2, CapturePower: 4 },
+  });
+  const speed = c.items.find(item => item.id === 'MoveSpeed');
+  assert.equal(speed.no, 2);
+  assert.equal(speed.state, 'active');
+  assert.equal(speed.detail, '2 held · 3 more for next rank');
+  assert.match(c.items.find(item => item.id === 'CapturePower').detail, /^4 held/);
+});
+
+test('Movement Speed handles maximum rank and unspent reward balances', () => {
+  const capture_bonus_counts = Object.fromEntries(Array.from({ length: 288 }, (_, i) => [`Species${i}`, 5]));
+  const speed = category('statue', { capture_bonus_counts, relics_unspent: { MoveSpeed: 1 } }).items.find(item => item.id === 'MoveSpeed');
+  assert.equal(speed.no, 92);
+  assert.equal(speed.state, 'done');
+  assert.equal(speed.detail, '1 held');
+  const unspent = category('statue', { capture_bonus_counts: { A: 5 }, relics_unspent: { MoveSpeed: 1 } }).items.find(item => item.id === 'MoveSpeed');
+  assert.equal(unspent.no, 0);
+  assert.equal(unspent.detail, '1 held · 1 more for next rank');
+});
+
 test('side missions have distinct start locations without changing completion', () => {
   const c = category('sideQuests', { quests_completed: ['Sub_Zoe03'] });
   assert.equal(c.total, 58);

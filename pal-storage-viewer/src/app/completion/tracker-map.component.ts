@@ -177,7 +177,8 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     this.layers = this.categories.filter(c => c.hasCoords).map(c => ({ key: c.key, name: c.title,
       palpagos: this.objectives.filter(p => p.category === c.key && p.map === 'palpagos' && matchesState(p)).length,
       tree: this.objectives.filter(p => p.category === c.key && p.map === 'tree' && matchesState(p)).length }));
-    this.groupOptions = this.enabled.size === 1 ? this.categories.find(c => this.enabled.has(c.key))?.groups ?? [] : [];
+    this.groupOptions = this.enabled.size === 1 ? this.categories.find(c => this.enabled.has(c.key))?.groups
+      .filter(group => this.objectives.some(point => this.enabled.has(point.category) && point.item.group === group.key)) ?? [] : [];
     if (!this.groupOptions.some(g => g.key === this.group)) this.group = '';
     const needle = this.search.trim().toLowerCase();
     this.filtered = points.filter(p => this.enabled.has(p.category) && matchesState(p) && (!this.group || p.item.group === this.group)

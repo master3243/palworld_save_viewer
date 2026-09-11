@@ -249,11 +249,12 @@ def build(cache: Path) -> dict:
     # Effigies: one entry per level object, typed.
     relics_raw = load(cache, "psp/relics.json")
     relic_l10n = load(cache, "psp/l10n/relics.json")
-    type_order = [key for key in relic_l10n if any(v["relic_type"] == key for v in relics_raw.values())]
     class_pal = {}
     for value in relics_raw.values():
         match = re.match(r"BP_LevelObject_Relic_?([A-Za-z0-9]*)_C$", value["class"])
         class_pal.setdefault(value["relic_type"], match.group(1) if match and match.group(1) else "Carbunclo")
+    class_pal["move_speed"] = "MimicDog"
+    type_order = [key for key in relic_l10n if key in class_pal]
     relic_types = []
     for key in type_order:
         pal = class_pal[key]

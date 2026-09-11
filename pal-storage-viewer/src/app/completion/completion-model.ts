@@ -166,7 +166,7 @@ function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoor
   const counted = category.items.filter((item) => item.counted !== false);
   const done = counted.filter((item) => item.state === 'done').length;
   const total = counted.length;
-  const stateRank = category.key === 'captureBonus' ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
+  const stateRank = category.key === 'captureBonus' || category.key === 'relics' ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
   category.items.sort((a, b) => stateRank[a.state] - stateRank[b.state] || a.order - b.order || a.name.localeCompare(b.name));
   return {
     ...category, done, total, percent: percentOf(done, total),
@@ -266,22 +266,35 @@ function relicCategory(record: PlayerCompletion, data: CompletionData): Category
       group: type?.key ?? '', ...place(x, y), order: typeIndex, no: null,
     };
   });
+  const mimogIndex = data.relicTypes.findIndex(type => type.enum === 'MoveSpeed');
+  const mimog = data.relicTypes[mimogIndex];
+  if (mimog) {
+    const bonusBy = lowerKeys(record.capture_bonus_counts);
+    for (const [index, [tribe, , palName]] of data.paldeck.entries()) {
+      const bonus = Math.min(CAPTURE_BONUS_MAX, bonusBy.get(tribe.toLowerCase()) ?? 0);
+      items.push({
+        id: `capture-bonus:${tribe}`, name: mimog.item,
+        detail: `Capture ${CAPTURE_BONUS_MAX} ${palName} · ${bonus}/${CAPTURE_BONUS_MAX}`,
+        state: bonus >= CAPTURE_BONUS_MAX ? 'done' : bonus > 0 ? 'active' : 'todo',
+        group: mimog.key, coords: '', map: '', order: mimogIndex + index / (data.paldeck.length + 1), no: null,
+      });
+    }
+  }
   return finish({
     key: 'relics', title: 'Pal Effigies', items,
     groups: groupsOf(items, names), unknown: unknownIds(obtained, new Set(Object.keys(data.relics))),
   });
 }
 
-/**
- * Statue of Power ranks. The save keeps effigies collected and effigies still held; the
- * difference is what was offered, and the rank table turns that into a rank.
- */
+/** Derive Statue of Power ranks from effigies earned minus those still held. */
 function statueCategory(record: PlayerCompletion, data: CompletionData): Category {
   const items: TrackedItem[] = [];
+  const captureEffigies = new Set(Object.entries(record.capture_bonus_counts)
+    .filter(([, count]) => count >= CAPTURE_BONUS_MAX).map(([id]) => id.toLowerCase())).size;
   for (const type of data.relicTypes) {
     const perRank = data.statueRanks[type.enum];
     if (!perRank?.length) continue;
-    const collected = record.relics[type.enum]?.length ?? 0;
+    const collected = type.enum === 'MoveSpeed' ? captureEffigies : record.relics[type.enum]?.length ?? 0;
     const held = record.relics_unspent[type.enum] ?? 0;
     const spent = Math.max(0, collected - held);
     let rank = 0;

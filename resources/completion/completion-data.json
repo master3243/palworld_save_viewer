@@ -13,7 +13,8 @@
 {"key":"stamina_reduction","enum":"StaminaReduction","name":"Endurance","item":"Cattiva Effigy","pal":"PinkCat"},
 {"key":"sphere_homing","enum":"SphereHoming","name":"Sphere Tracking","item":"Lunaris Effigy","pal":"Mutant"},
 {"key":"exp_bonus","enum":"ExpBonus","name":"EXP Gain","item":"Relaxaurus Effigy","pal":"LazyDragon"},
-{"key":"rainbow_passive_rate","enum":"RainbowPassiveRate","name":"Rainbow Fortune","item":"Yakumo Effigy","pal":"GuardianDog"}
+{"key":"rainbow_passive_rate","enum":"RainbowPassiveRate","name":"Rainbow Fortune","item":"Yakumo Effigy","pal":"GuardianDog"},
+{"key":"move_speed","enum":"MoveSpeed","name":"Movement Speed","item":"Mimog Effigy","pal":"MimicDog"}
 ],
 "relics":{
 "002C8A3349443E442D477BBCCCDC0B16":[4,138070,98190,48525],
