@@ -29,39 +29,45 @@
       <div class="map-count">{{ filtered.length | number }}</div>
       <div class="north" aria-hidden="true">↑<b>N</b></div>
       <p class="terrain-error" *ngIf="imageError">{{ imageError }}</p>
-      <div #popup class="map-popup" *ngIf="popupPoint || popupCluster.length" [class.preview]="!popupPinned">
-        <article class="marker-card" *ngIf="popupPoint as point" [attr.aria-label]="popupPinned ? 'Pinned objective' : 'Objective preview'">
-          <button *ngIf="popupPinned" type="button" class="close" aria-label="Close objective" (click)="clearSelection()">×</button>
+      <div #popup class="map-popup" *ngIf="popupPinned">
+        <article class="marker-card" *ngIf="selected as point" aria-label="Pinned objective">
+          <button type="button" class="close" aria-label="Close objective" (click)="clearSelection()">×</button>
           <span class="eyebrow" [style.color]="colors[point.category]">{{ point.categoryName }} · {{ states[point.item.state] }}</span>
           <h3>{{ point.item.name }}</h3>
-          <small *ngIf="!popupPinned">{{ point.item.coords }}</small>
-          <ng-container *ngIf="popupPinned">
-            <p *ngIf="point.item.detail">{{ point.item.detail }}</p>
-            <p *ngIf="point.item.no !== null && (point.category === 'alphas' || point.category === 'bounties')">Lv. {{ point.item.no }}</p>
-            <p class="location-note" *ngIf="point.category === 'mainQuests' || point.category === 'sideQuests'">{{ point.category === 'sideQuests' ? 'Quest start' : 'Quest giver' }}</p>
-            <p class="location-note" *ngIf="point.category === 'areas'">Region reference point</p>
-            <div class="marker-actions">
-              <button type="button" [attr.aria-label]="'Copy coordinates ' + point.item.coords" (click)="copyCoordinates(point)">{{ point.item.coords }}</button>
-              <button type="button" [class.active]="routeIndex(point) >= 0" (click)="toggleRoute(point)">{{ routeIndex(point) >= 0 ? '− Stop' : '+ Trip' }}</button>
-              <button type="button" (click)="openCategory.emit(point.category)">List ↗</button>
-            </div>
-            <div class="nearest-travel" *ngIf="travel as station">
-              <span>Nearest fast travel</span>
-              <button type="button" (click)="select(station, true)">{{ station.item.name }} <small>{{ station.item.coords }}</small></button>
-            </div>
-          </ng-container>
+          <p *ngIf="point.item.detail">{{ point.item.detail }}</p>
+          <p *ngIf="point.item.no !== null && (point.category === 'alphas' || point.category === 'bounties')">Lv. {{ point.item.no }}</p>
+          <p class="location-note" *ngIf="point.category === 'mainQuests' || point.category === 'sideQuests'">{{ point.category === 'sideQuests' ? 'Quest start' : 'Quest giver' }}</p>
+          <p class="location-note" *ngIf="point.category === 'areas'">Region reference point</p>
+          <div class="marker-actions">
+            <button type="button" [attr.aria-label]="'Copy coordinates ' + point.item.coords" (click)="copyCoordinates(point)">{{ point.item.coords }}</button>
+            <button type="button" [class.active]="routeIndex(point) >= 0" (click)="toggleRoute(point)">{{ routeIndex(point) >= 0 ? '− Stop' : '+ Trip' }}</button>
+            <button type="button" (click)="openCategory.emit(point.category)">List ↗</button>
+          </div>
+          <div class="nearest-travel" *ngIf="travel as station">
+            <span>Nearest fast travel</span>
+            <button type="button" (click)="select(station, true)">{{ station.item.name }} <small>{{ station.item.coords }}</small></button>
+          </div>
         </article>
-        <article class="marker-card cluster-card" *ngIf="!popupPoint && popupCluster.length" aria-label="Objectives at this marker">
-          <button *ngIf="popupPinned" type="button" class="close" aria-label="Close marker group" (click)="clearSelection()">×</button>
-          <h3>{{ popupCluster.length }} objectives</h3>
-          <ng-container *ngIf="popupPinned; else clusterPreview">
-            <button type="button" class="objective" *ngFor="let point of clusterItems; trackBy: trackPoint" (click)="select(point, true)">
-              <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" [style.transform]="point.category === 'fastTravel' ? 'scale(1.5)' : point.category === 'relics' ? 'scale(1.1)' : point.category === 'bounties' ? 'scale(1.44)' : point.category === 'towers' || point.category === 'towersHard' ? 'scale(1.44)' : point.category === 'areas' || point.category === 'notes' || point.category === 'alphas' || point.category === 'mainQuests' || point.category === 'sideQuests' ? 'scale(1.2)' : null" alt="">
-              <span><strong>{{ point.item.name }}</strong><small>{{ point.item.coords }} · {{ states[point.item.state] }}</small></span>
-            </button>
-            <button type="button" (click)="zoomToGroup()">Zoom to group</button>
-          </ng-container>
-          <ng-template #clusterPreview><p *ngFor="let point of popupCluster.slice(0, 4)">{{ point.item.name }}</p><small *ngIf="popupCluster.length > 4">+ {{ popupCluster.length - 4 }} more</small></ng-template>
+        <article class="marker-card cluster-card" *ngIf="!selected && clusterItems.length" aria-label="Objectives at this marker">
+          <button type="button" class="close" aria-label="Close marker group" (click)="clearSelection()">×</button>
+          <h3>{{ clusterItems.length }} objectives</h3>
+          <button type="button" class="objective" *ngFor="let point of clusterItems; trackBy: trackPoint" (click)="select(point, true)">
+            <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" [style.transform]="point.category === 'fastTravel' ? 'scale(1.5)' : point.category === 'relics' ? 'scale(1.1)' : point.category === 'bounties' ? 'scale(1.44)' : point.category === 'towers' || point.category === 'towersHard' ? 'scale(1.44)' : point.category === 'areas' || point.category === 'notes' || point.category === 'alphas' || point.category === 'mainQuests' || point.category === 'sideQuests' ? 'scale(1.2)' : null" alt="">
+            <span><strong>{{ point.item.name }}</strong><small>{{ point.item.coords }} · {{ states[point.item.state] }}</small></span>
+          </button>
+          <button type="button" (click)="zoomToGroup()">Zoom to group</button>
+        </article>
+      </div>
+      <div #hoverPopup class="map-popup preview" *ngIf="hovered || hoverCluster">
+        <article class="marker-card" *ngIf="hovered as point" aria-label="Objective preview">
+          <span class="eyebrow" [style.color]="colors[point.category]">{{ point.categoryName }} · {{ states[point.item.state] }}</span>
+          <h3>{{ point.item.name }}</h3>
+          <small>{{ point.item.coords }}</small>
+        </article>
+        <article class="marker-card cluster-card" *ngIf="hoverCluster as cluster" aria-label="Marker group preview">
+          <h3>{{ cluster.items.length }} objectives</h3>
+          <p *ngFor="let point of cluster.items.slice(0, 4)">{{ point.item.name }}</p>
+          <small *ngIf="cluster.items.length > 4">+ {{ cluster.items.length - 4 }} more</small>
         </article>
       </div>
       <div class="cursor-coordinates" *ngIf="cursorCoords">{{ cursorCoords }}</div>

@@ -22,6 +22,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   hoverCluster: MarkerCluster | null = null;
   clusterAnchor: MapPoint | null = null;
   @ViewChild('popup') popup?: ElementRef<HTMLElement>;
+  @ViewChild('hoverPopup') hoverPopup?: ElementRef<HTMLElement>;
   readonly states = STATE_LABELS;
   maps: MapDefinition[] = [];
   mapKey = 'palpagos';
@@ -349,7 +350,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       if (event.pointerType === 'mouse') {
         const cluster = this.markerAt(this.local(event), 15);
         this.hovered = cluster?.items.length === 1 && cluster.items[0].key !== this.selected?.key ? cluster.items[0] : null;
-        const pinned = cluster?.items.length === this.clusterItems.length && cluster.items.every((p,i) => p.key === this.clusterItems[i].key);
+        const pinned = cluster?.items.length === this.clusterItems.length && cluster.items.every((p, i) => p.key === this.clusterItems[i].key);
         this.hoverCluster = cluster && cluster.items.length > 1 && !pinned ? cluster : null;
         this.queueDraw();
       }
@@ -413,24 +414,37 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     }
   }
 
-  get popupPoint(): MapObjective | null { return this.hoverCluster ? null : this.hovered ?? this.selected; }
-  get popupPinned(): boolean { return !this.hovered && !this.hoverCluster && (!!this.selected || !!this.clusterItems.length); }
-  get popupCluster(): MapObjective[] { return this.hoverCluster?.items ?? this.clusterItems; }
+  get popupPinned(): boolean { return !!this.selected || !!this.clusterItems.length; }
 
   private positionPopup(): void {
-    const el = this.popup?.nativeElement;
-    if (!el || !this.map) return;
-    const anchor = this.popupPoint ?? (this.hoverCluster ? null : this.clusterAnchor);
-    const point = anchor ? this.screen(anchor) : this.hoverCluster;
-    if (!point) return;
+    if (!this.map) return;
+    const pinned = this.popup?.nativeElement;
+    const anchor = this.selected ?? this.clusterAnchor;
+    if (pinned && anchor) this.positionPopupElement(pinned, this.screen(anchor));
+    const preview = this.hoverPopup?.nativeElement;
+    const hovered = this.hovered ? this.screen(this.hovered) : this.hoverCluster;
+    if (preview && hovered) this.positionPopupElement(preview, hovered, pinned);
+  }
+
+  private positionPopupElement(el: HTMLElement, point: MapPoint, pinned?: HTMLElement): void {
     const onMap = point.x >= 0 && point.x <= this.width && point.y >= 0 && point.y <= this.height;
     el.style.visibility = onMap ? 'visible' : 'hidden';
     el.style.setProperty('--popup-height', `${Math.max(80,Math.min(240,Math.max(point.y-20,this.height-point.y-20)))}px`);
     const w = el.offsetWidth, h = el.offsetHeight;
     const left = Math.max(6,Math.min(this.width-w-6,point.x-w/2));
-    const below = point.y < h + 20;
+    let below = point.y < h + 20;
+    let top = below ? point.y + 14 : point.y - h - 14;
+    if (pinned?.style.visibility === 'visible') {
+      const overlaps = (y: number) => left < pinned.offsetLeft + pinned.offsetWidth && left + w > pinned.offsetLeft
+        && y < pinned.offsetTop + pinned.offsetHeight && y + h > pinned.offsetTop;
+      const alternate = below ? point.y - h - 14 : point.y + 14;
+      if (overlaps(top) && alternate >= 6 && alternate + h <= this.height - 6 && !overlaps(alternate)) {
+        below = !below;
+        top = alternate;
+      }
+    }
     el.style.left = `${left}px`;
-    el.style.top = `${below ? point.y+14 : point.y-h-14}px`;
+    el.style.top = `${top}px`;
     el.style.setProperty('--arrow-left', `${point.x-left}px`);
     el.classList.toggle('below',below);
   }

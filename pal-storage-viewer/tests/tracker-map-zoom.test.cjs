@@ -103,3 +103,65 @@ test('destroying the map cancels its pending animation frame', () => {
   assert.equal(frames.size, 0);
   flush(); assert.deepEqual(layouts, [400]);
 });
+
+function popupHarness() {
+  const { component } = mapHarness();
+  component.canvas.nativeElement.getBoundingClientRect = () => ({ left: 0, top: 0 });
+  const [first, second, ...group] = component.filtered;
+  component.clusters = [
+    { x: 50, y: 200, items: [first] },
+    { x: 150, y: 200, items: [second] },
+    { x: 250, y: 200, items: group },
+  ];
+  const move = x => component.pointerMove({ pointerId: 1, pointerType: 'mouse', clientX: x, clientY: 200 });
+  const click = x => component.canvasClick({ clientX: x, clientY: 200 });
+  return { component, first, second, group, move, click };
+}
+
+test('a clicked objective stays pinned while other objectives and groups have independent previews', () => {
+  const { component, first, second, group, move, click } = popupHarness();
+  click(50);
+  for (const x of [150, 250, 350, 150, 50]) {
+    move(x);
+    assert.strictEqual(component.selected, first);
+    assert.equal(component.popupPinned, true);
+    assert.equal(component.clusterItems.length, 0);
+    assert.strictEqual(component.hovered, x === 150 ? second : null);
+    assert.strictEqual(component.hoverCluster?.items ?? null, x === 250 ? group : null);
+  }
+  component.leaveMap();
+  assert.strictEqual(component.selected, first);
+  assert.equal(component.hovered, null);
+  assert.equal(component.hoverCluster, null);
+  click(150);
+  assert.strictEqual(component.selected, second);
+  assert.equal(component.popupPinned, true);
+  component.clearSelection();
+  move(50);
+  assert.strictEqual(component.hovered, first);
+  assert.equal(component.popupPinned, false);
+});
+
+test('a clicked marker group stays pinned alongside hover previews without previewing itself', () => {
+  const { component, first, second, group, move, click } = popupHarness();
+  click(250);
+  const anchor = component.clusterAnchor;
+  for (const x of [50, 150, 350, 250]) {
+    move(x);
+    assert.equal(component.selected, null);
+    assert.strictEqual(component.clusterItems, group);
+    assert.strictEqual(component.clusterAnchor, anchor);
+    assert.equal(component.popupPinned, true);
+    assert.strictEqual(component.hovered, x === 50 ? first : x === 150 ? second : null);
+    assert.equal(component.hoverCluster, null);
+  }
+  click(350);
+  assert.equal(component.popupPinned, false);
+  assert.equal(component.clusterItems.length, 0);
+  move(250);
+  assert.strictEqual(component.hoverCluster.items, group);
+  assert.equal(component.popupPinned, false);
+  move(50);
+  assert.strictEqual(component.hovered, first);
+  assert.equal(component.hoverCluster, null);
+});
