@@ -56,7 +56,7 @@
           <h3>{{ popupCluster.length }} objectives</h3>
           <ng-container *ngIf="popupPinned; else clusterPreview">
             <button type="button" class="objective" *ngFor="let point of clusterItems; trackBy: trackPoint" (click)="select(point, true)">
-              <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" [style.transform]="point.category === 'bounties' || point.category === 'towers' || point.category === 'towersHard' || point.category === 'areas' || point.category === 'notes' ? 'scale(1.2)' : null" alt="">
+              <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" [style.transform]="point.category === 'fastTravel' ? 'scale(1.5)' : point.category === 'relics' ? 'scale(1.1)' : point.category === 'bounties' ? 'scale(1.44)' : point.category === 'towers' || point.category === 'towersHard' ? 'scale(1.44)' : point.category === 'areas' || point.category === 'notes' || point.category === 'alphas' || point.category === 'mainQuests' || point.category === 'sideQuests' ? 'scale(1.2)' : null" alt="">
               <span><strong>{{ point.item.name }}</strong><small>{{ point.item.coords }} · {{ states[point.item.state] }}</small></span>
             </button>
             <button type="button" (click)="zoomToGroup()">Zoom to group</button>
@@ -73,7 +73,7 @@
         <div class="layer-actions"><button type="button" (click)="allLayers(true)">All</button><button type="button" (click)="allLayers(false)">None</button><span class="layer-counts headings"><span>Palpagos</span><span>Tree</span></span></div>
         <label class="layer" *ngFor="let layer of layers">
           <input type="checkbox" [checked]="enabled.has(layer.key)" (change)="toggleLayer(layer.key)">
-          <img class="layer-glyph" *ngIf="iconUrls[iconNames[layer.key]]" [src]="iconUrls[iconNames[layer.key]]" [style.transform]="layer.key === 'bounties' || layer.key === 'towers' || layer.key === 'towersHard' || layer.key === 'areas' || layer.key === 'notes' ? 'scale(1.2)' : null" alt="">
+          <img class="layer-glyph" *ngIf="iconUrls[iconNames[layer.key]]" [src]="iconUrls[iconNames[layer.key]]" [style.transform]="layer.key === 'fastTravel' ? 'scale(1.5)' : layer.key === 'relics' ? 'scale(1.1)' : layer.key === 'bounties' ? 'scale(1.44)' : layer.key === 'towers' || layer.key === 'towersHard' ? 'scale(1.44)' : layer.key === 'areas' || layer.key === 'notes' || layer.key === 'alphas' || layer.key === 'mainQuests' || layer.key === 'sideQuests' ? 'scale(1.2)' : null" alt="">
           <span class="layer-name">{{ layer.name }}</span><span class="layer-counts"><b [class.current-map]="mapKey === 'palpagos'" [title]="'Palpagos Islands: ' + layer.palpagos">{{ layer.palpagos | number }}</b><b [class.current-map]="mapKey === 'tree'" [title]="'World Tree: ' + layer.tree">{{ layer.tree | number }}</b></span>
         </label>
         <select *ngIf="groupOptions.length" aria-label="Objective type" [value]="group" (change)="setGroup($any($event.target).value)">
@@ -114,7 +114,7 @@
         <div class="nearby-list">
           <button type="button" *ngFor="let point of nearby.slice(0, limit); trackBy: trackPoint"
             class="objective" [class.selected]="point.key === selected?.key" (click)="select(point, true)">
-            <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" [style.transform]="point.category === 'bounties' || point.category === 'towers' || point.category === 'towersHard' || point.category === 'areas' || point.category === 'notes' ? 'scale(1.2)' : null" alt="">
+            <img class="objective-glyph" *ngIf="iconUrls[iconName(point)]" [src]="iconUrls[iconName(point)]" [style.transform]="point.category === 'fastTravel' ? 'scale(1.5)' : point.category === 'relics' ? 'scale(1.1)' : point.category === 'bounties' ? 'scale(1.44)' : point.category === 'towers' || point.category === 'towersHard' ? 'scale(1.44)' : point.category === 'areas' || point.category === 'notes' || point.category === 'alphas' || point.category === 'mainQuests' || point.category === 'sideQuests' ? 'scale(1.2)' : null" alt="">
             <span><strong>{{ point.item.name }}</strong><small>{{ point.categoryName }} · {{ point.item.coords }}</small></span>
             <span class="status-dot" [attr.data-state]="point.item.state" [attr.aria-label]="states[point.item.state]" [title]="states[point.item.state]"></span>
           </button>
