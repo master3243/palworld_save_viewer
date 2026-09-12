@@ -74,6 +74,8 @@ export interface WorldProgress {
   /** Lab research work done per research id, one map per guild in the world. */
   labs: Record<string, number>[];
   ownedCondensation?: Record<string, CondensationCounts> | null;
+  bases?: number | null;
+  pals?: number | null;
 }
 
 export type ItemState = 'done' | 'active' | 'todo';
@@ -145,6 +147,7 @@ export interface StatEntry {
   label: string;
   value: string;
   title: string;
+  missing?: boolean;
   tooltip?: { title: string; rows: [string, string][]; width?: number };
 }
 
@@ -635,14 +638,26 @@ function skinCategory(record: PlayerCompletion, data: CompletionData): Category 
 
 /* --------------------------------------------------------------- summary */
 
-function stat(label: string, value: number | null | undefined, title: string): StatEntry | null {
-  if (value === null || value === undefined) return null;
-  return { label, value: value.toLocaleString(), title };
+function stat(label: string, value: number | null | undefined, title: string,
+  unavailable = 'This counter was not recorded in the loaded save.'): StatEntry {
+  const missing = value === null || value === undefined;
+  return { label, value: missing ? '?' : value.toLocaleString(), title: missing ? unavailable : title, missing };
 }
 
-function condensationStat(record: PlayerCompletion): StatEntry | null {
-  const entry = stat('4-star pals', record.rankup_counts['5'] ?? null, 'Pals condensed to the maximum star rank');
-  if (entry) entry.tooltip = {
+function countTotal(counts: Record<string, number> | null | undefined): number | null {
+  if (counts == null) return null;
+  const normalized = new Map<string, number>();
+  for (const [id, count] of Object.entries(counts)) {
+    if (!Number.isFinite(count) || count < 0) continue;
+    const key = id.toLowerCase();
+    normalized.set(key, Math.max(normalized.get(key) ?? 0, count));
+  }
+  return [...normalized.values()].reduce((sum, count) => sum + count, 0);
+}
+
+function condensationStat(record: PlayerCompletion): StatEntry {
+  const entry = stat('4-star pals', record.rankup_counts['5'] ?? 0, 'Pals condensed to the maximum star rank');
+  entry.tooltip = {
     title: 'Lifetime Pals Condensed',
     width: 110,
     rows: [1, 2, 3, 4].map(stars => [`${stars} ★`, (record.rankup_counts[String(stars + 1)] ?? 0).toLocaleString()]),
@@ -678,15 +693,22 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
   const total = categories.reduce((sum, category) => sum + category.total, 0);
   const counters = record.counters;
   const stats = [
+    stat('Bases', world?.bases, 'Total bases across all guilds in this world', 'Add Level.sav with "+ Files" to see the base count.'),
+    stat('Pals', world?.pals, 'Pals in the loaded world and dimensional storage files, across all players', 'Add Level.sav or a dimensional storage save with "+ Files" to see the Pal count.'),
+    stat('Caught species', counters.tribe_captures, 'Distinct species captured, as recorded by the save'),
+    stat('Total Pals captured', countTotal(record.capture_counts), 'Lifetime captures, including repeats and every entry recorded by the save'),
+    stat('Fishing catches', countTotal(record.fishing_counts), 'Lifetime fishing catches across all species and sizes'),
+    stat('Mutations', counters.mutations, 'Mutated pals bred'),
+    condensationStat(record),
+    stat('Items crafted', countTotal(record.crafted_item_counts), 'Lifetime items crafted, including repeated crafts and items outside the crafting catalog'),
+    stat('Tower clears', countTotal(record.tower_boss_counts), 'Total tower boss victories, including repeat clears and hard mode'),
+    stat('Raid boss clears', countTotal(record.raid_boss_counts), 'Total raid boss victories, including repeat clears'),
     stat('Dungeons', counters.normal_dungeon_clears, 'Random dungeons cleared'),
     stat('Fixed dungeons', counters.fixed_dungeon_clears, 'Fixed (story) dungeons cleared'),
     stat('Oil rigs', counters.oilrig_clears, 'Oil rig raids cleared'),
     stat('Camps', counters.camps_conquered, 'Syndicate camps conquered'),
-    stat('Treasures', counters.treasures_found, 'Treasure map spots dug up'),
     stat('Predators', counters.predator_defeats, 'Predator pals defeated'),
-    stat('Mutations', counters.mutations, 'Mutated pals bred'),
-    condensationStat(record),
-    stat('Unspent effigies', counters.relics_unspent, 'Effigies not yet offered at a Statue of Power'),
-  ].filter((entry): entry is StatEntry => entry !== null);
+    stat('Treasures', counters.treasures_found, 'Treasure map spots dug up'),
+  ];
   return { categories, percent, done, total, stats };
 }

@@ -31,6 +31,52 @@ test('condensation tooltip uses lifetime rank counts with one-based save ranks',
   assert.equal(entry.tooltip.note, undefined);
 });
 
+test('summary totals include repeated events and IDs outside the tracker catalog', () => {
+  const save = record({
+    counters: { tribe_captures: 22 },
+    paldeck: ['Penguin'],
+    capture_counts: { Penguin: 12, PENGUIN: 15, Human: 3, WorldTreeDragon: 2 },
+    tower_boss_counts: { Tower: 3, Tower_Hard: 2 },
+    raid_boss_counts: { Raid: 7, RAID: 6 },
+    fishing_counts: { UnknownFish: 4, Penguin: 2, Invalid: -1 },
+    crafted_item_counts: { UnknownItem: 100, UNKNOWNITEM: 90, AnotherItem: 8, Invalid: NaN },
+  });
+  const result = summarize(save, data, { labs: [], bases: 5, pals: 1234 });
+  const values = Object.fromEntries(result.stats.map(entry => [entry.label, entry.value]));
+  assert.equal(values['Bases'], '5');
+  assert.equal(values['Pals'], (1234).toLocaleString());
+  assert.equal(values['Caught species'], '22');
+  assert.equal(values['Total Pals captured'], '20');
+  assert.equal(values['Tower clears'], '5');
+  assert.equal(values['Raid boss clears'], '7');
+  assert.equal(values['Fishing catches'], '6');
+  assert.equal(values['Items crafted'], '108');
+  const withoutCounts = summarize(save, data, { labs: [] });
+  assert.equal(result.percent, withoutCounts.percent);
+  assert.equal(result.done, withoutCounts.done);
+  assert.equal(result.total, withoutCounts.total);
+});
+
+test('summary distinguishes unavailable data from recorded zeroes and keeps lower-star condensation visible', () => {
+  const missing = summarize(record({ crafted_item_counts: null, fishing_counts: null, rankup_counts: { '2': 9 } }), data);
+  for (const label of ['Bases', 'Pals', 'Caught species', 'Items crafted', 'Fishing catches']) {
+    const entry = missing.stats.find(entry => entry.label === label);
+    assert.equal(entry.value, '?', label);
+    assert.equal(entry.missing, true, label);
+    assert.ok(entry.title);
+  }
+  assert.match(missing.stats.find(entry => entry.label === 'Bases').title, /Level.sav.*\+ Files/);
+  const stars = missing.stats.find(entry => entry.label === '4-star pals');
+  assert.equal(stars.value, '0');
+  assert.deepEqual(stars.tooltip.rows[0], ['1 ★', '9']);
+  const empty = summarize(record({ crafted_item_counts: {}, fishing_counts: {}, counters: { tribe_captures: 0 } }), data, { labs: [], bases: 0, pals: 0 });
+  for (const label of ['Bases', 'Pals', 'Caught species', 'Items crafted', 'Fishing catches', 'Tower clears', 'Raid boss clears', 'Total Pals captured']) {
+    const entry = empty.stats.find(entry => entry.label === label);
+    assert.equal(entry.value, '0', label);
+    assert.equal(entry.missing, false, label);
+  }
+});
+
 test('capture rows distinguish absent inventory data from zero owned and preserve completion', () => {
   const progress = record({ capture_bonus_counts: { Penguin: 5 } });
   const capture = world => summarize(progress, data, world).categories.find(c => c.key === 'captureBonus');

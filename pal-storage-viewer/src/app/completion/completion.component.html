@@ -49,7 +49,7 @@
             <ng-template #missingLevel>
               <span class="stat level-stat missing-data" tabindex="0" title="Player level unavailable. Add Level.sav with &quot;+ Files&quot;." aria-label="Player level unavailable. Add Level.sav with &quot;+ Files&quot;."><b>?</b><span>Lvl</span></span>
             </ng-template>
-            <span class="stat" *ngFor="let entry of progress.stats" [attr.title]="entry.tooltip ? null : entry.title" [appTooltip]="entry.tooltip ?? null" [attr.tabindex]="entry.tooltip ? 0 : null">
+            <span class="stat" *ngFor="let entry of progress.stats" [class.missing-data]="entry.missing" [attr.title]="entry.tooltip ? null : entry.title" [appTooltip]="entry.tooltip ?? null" [attr.tabindex]="entry.tooltip || entry.missing ? 0 : null">
               <b>{{ entry.value }}</b>
               <span>{{ entry.label }}</span>
             </span>

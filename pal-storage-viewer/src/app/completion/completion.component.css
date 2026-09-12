@@ -144,8 +144,9 @@
   background: rgba(5, 15, 25, 0.55);
   border: 1px solid rgba(134, 220, 255, 0.14);
   border-radius: 10px;
-  display: flex;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px 20px;
   padding: 14px 18px;
 }
 
@@ -235,11 +236,13 @@
   font-size: 0.74rem;
   gap: 5px;
   padding: 3px 9px;
+  white-space: nowrap;
 }
 
 .stat b {
   color: #e8f8ff;
   font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat.missing-data,
@@ -745,6 +748,13 @@
 }
 
 @media (max-width: 720px) {
+  .overall-text { display: contents; }
+  .overall-text h2 { grid-column: 2; grid-row: 1; align-self: end; }
+  .overall-text p { grid-column: 2; grid-row: 2; align-self: start; }
+  .stats { grid-column: 1 / -1; }
+  .ring-wrap { grid-row: 1 / 3; }
+  .ring-wrap { width: 88px; height: 88px; }
+  .ring-text strong { font-size: 1.3rem; }
   .item-table.pal-list { --column-gap: 8px; }
   .item-status { font-size: .7rem; }
   .pal-list .portrait-col img { width: 28px; height: 28px; }
@@ -760,12 +770,13 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .tracker-views { width:100%; }
+  .tracker-views { width:100%; grid-column: 1 / -1; }
   .tracker-views button { flex:1; justify-content:center; }
-  .overall.map-overall { flex-direction:row; align-items:center; flex-wrap:wrap; gap:10px; }
+  .overall.map-overall { gap:10px; }
   .overall {
-    align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
   }
 
   .coords-col {

@@ -172,6 +172,8 @@ export class CompletionComponent implements OnChanges {
           world: {
             labs: set.labs ?? [],
             ownedCondensation: set.has_level ? ownedCondensation(this.rows, set.letter, player.uid) : null,
+            bases: set.has_level ? set.bases.length : null,
+            pals: set.has_level || set.has_dimensional_storage ? set.pals : null,
           },
           level: player.level ?? null,
           percent: null,
@@ -365,6 +367,7 @@ export class CompletionComponent implements OnChanges {
     }
     const player = this.player;
     this.summary = player && this.data ? summarize(player.completion, this.data, player.world) : null;
+
     if (this.summary && !this.summary.categories.some((category) => category.key === this.selectedCategory)) this.selectedCategory = '';
   }
 
