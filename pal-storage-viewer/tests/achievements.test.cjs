@@ -180,8 +180,8 @@ test('omitted Arena Points default to zero only with Level loaded; omitted awake
     assert.equal(summary.stats.find(s => s.label === 'Awakenings').value, '0');
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.current, 0);
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.unknown, true);
-    assert.match(get('Hidden Potential', { counters: { awakenings: null } }, world).detail, /not recorded; assuming 0/);
-    if (hasLevel) assert.match(get('Silver Champ', {}, world).detail, /not recorded; assuming 0/);
+    assert.match(get('Hidden Potential', { counters: { awakenings: null } }, world).detail, /not recorded in the loaded save\. Assuming 0\./);
+    if (hasLevel) assert.match(get('Silver Champ', {}, world).detail, /not recorded in the loaded save\. Assuming 0\./);
   }
   assert.equal(get('Hidden Potential', { counters: { awakenings: 0 } }).achievement.unknown, false);
   assert.equal(get('Hidden Potential', { counters: { awakenings: 0 } }).state, 'todo');

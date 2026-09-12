@@ -51,7 +51,7 @@ test('progress uses tracker category weighting and the matching world research',
   const noRecord = { ...player, completion: null };
   assert.equal(pendingFileDetails([noRecord], catalog)[0].text, '');
   assert.equal(pendingFileDetails([noRecord], catalog)[0].stat, '-');
-  assert.equal(pendingFileDetails([noRecord], catalog)[0].statTitle, 'Progress unavailable');
+  assert.equal(pendingFileDetails([noRecord], catalog)[0].statTitle, 'Progress was not recorded in the loaded save.');
 });
 
 test('append previews can resolve players and progress from the already loaded world', () => {

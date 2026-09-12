@@ -47,7 +47,7 @@
               <span>{{ isMaxLevel ? 'max' : 'not max' }}</span>
             </span>
             <ng-template #missingLevel>
-              <span class="stat level-stat missing-data" tabindex="0" title="Player level unavailable. Add Level.sav with &quot;+ Files&quot;." aria-label="Player level unavailable. Add Level.sav with &quot;+ Files&quot;."><b>?</b><span>Lvl</span></span>
+              <span class="stat level-stat missing-data" tabindex="0" title="Player level was not recorded in the loaded save. Add Level.sav with &quot;+ Files&quot;." aria-label="Player level was not recorded in the loaded save."><b>?</b><span>Lvl</span></span>
             </ng-template>
             <span class="stat" *ngFor="let entry of progress.stats" [class.missing-data]="entry.missing" [attr.title]="entry.tooltip ? null : entry.title" [appTooltip]="entry.tooltip ?? null" [attr.tabindex]="entry.tooltip || entry.missing ? 0 : null">
               <b *ngIf="entry.value">{{ entry.value }}</b>
@@ -94,7 +94,7 @@
           </span>
           <span class="card-foot">
             <span class="achievement-unknown" *ngIf="category.unknownCount">{{ category.unknownCount }} unconfirmed</span>
-            <span class="card-needs" *ngIf="category.needsFile">{{ category.needsFile }} needed</span>
+            <span class="card-needs" *ngIf="category.needsFile">Not recorded in the loaded save.</span>
             <span class="card-pct" *ngIf="!category.needsFile" [class.card-needs]="category.key === 'arena' && !!category.unavailable">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
           </span>
         </button>
@@ -159,7 +159,7 @@
             </ng-container>
           </button>
         </div>
-        <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" above.</p>
+        <p class="tracker-note error" *ngIf="open.needsFile">{{ open.title }} data was not recorded in the loaded save.</p>
         <ng-template #achievementWarning>
           <svg class="achievement-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18.1A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></svg>
         </ng-template>
@@ -270,7 +270,7 @@
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
               <td class="butchered-col" *ngIf="open.key === 'captureBonus'" [class.missing-data]="item.butchered == null" [attr.title]="item.butchered == null ? 'Butchering was not recorded in the loaded save.' : null">{{ item.butchered == null ? '?' : (item.butchered | number) }}</td>
               <ng-container *ngIf="open.key === 'captureBonus'">
-                <td class="condensed-col" *ngFor="let stars of condensationStars" [class.missing-data]="item.condensed == null" [attr.title]="item.condensed == null ? 'Add Level.sav with &quot;+ Files&quot; to see owned star ranks.' : null">{{ item.condensed ? (item.condensed[stars] ? (item.condensed[stars] | number) : '') : '?' }}</td>
+                <td class="condensed-col" *ngFor="let stars of condensationStars" [class.missing-data]="item.condensed == null" [attr.title]="item.condensed == null ? 'Owned star ranks were not recorded in the loaded save.' : null">{{ item.condensed ? (item.condensed[stars] ? (item.condensed[stars] | number) : '') : '?' }}</td>
               </ng-container>
               <ng-container *ngIf="columns.fishing">
                 <ng-container *ngIf="item.fishing as fishing">

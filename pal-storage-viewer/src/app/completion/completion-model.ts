@@ -247,8 +247,8 @@ function arenaCategory(record: PlayerCompletion, world?: WorldProgress): Categor
     unknown: Object.keys(clears ?? {}).filter(id => !known.has(id.toLowerCase())).sort(),
     unavailable: clears == null ? 'Solo arena progress was not recorded in the loaded save.' : undefined,
     arenaPoints: stat('Arena Points', world?.arenaPoints ?? (world?.hasLevel ? 0 : null),
-      world?.arenaPoints == null ? 'Arena Points were not recorded in the loaded save; assuming 0.' : 'Arena points recorded for this player',
-      world?.arenaPointsUnavailable ?? 'Add Level.sav with "+ Files" to see Arena Points.'),
+      world?.arenaPoints == null ? 'Arena Points were not recorded in the loaded save. Assuming 0.' : 'Arena points recorded for this player',
+      world?.arenaPointsUnavailable ?? 'Arena Points were not recorded in the loaded save.'),
     items: tiers.map((name, order) => ({
       id: name, name, order, state: (recorded.get(name.toLowerCase()) ?? 0) > 0 ? 'done' : 'todo',
       detail: '', group: '', coords: '', map: '', no: null,
@@ -715,7 +715,7 @@ const ATTRIBUTE_NAMES: Record<string, string> = {
 };
 
 function attributeStat(world?: WorldProgress): StatEntry {
-  if (!world?.attributes) return stat('Attributes', null, '', world?.attributesUnavailable ?? 'Add Level.sav with "+ Files" to see player attributes.');
+  if (!world?.attributes) return stat('Attributes', null, '', world?.attributesUnavailable ?? 'Player attributes were not recorded in the loaded save. Add Level.sav with "+ Files".');
   const { allocated, extra } = world.attributes;
   const names = Object.keys(ATTRIBUTE_NAMES).filter(id => id in allocated || id in extra);
   return { label: 'Attributes', value: '', title: 'Player attribute points', tooltip: {
@@ -772,20 +772,20 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
   const total = categories.reduce((sum, category) => sum + category.total, 0);
   const counters = record.counters;
   const stats = [
-    stat('Day', world?.inGameDay, 'Current in-game day', 'Add LevelMeta.sav with "+ Files" to see the in-game day.'),
+    stat('Day', world?.inGameDay, 'Current in-game day', 'The in-game day was not recorded in the loaded save. Add LevelMeta.sav with "+ Files".'),
     attributeStat(world),
-    stat('Bases', world?.bases, 'Total bases across all guilds in this world', 'Add Level.sav with "+ Files" to see the base count.'),
-    stat('Pals', world?.pals, 'Pals in the loaded world and dimensional storage files, across all players', 'Add Level.sav or a dimensional storage save with "+ Files" to see the Pal count.'),
+    stat('Bases', world?.bases, 'Total bases across all guilds in this world', 'Base count was not recorded in the loaded save. Add Level.sav with "+ Files".'),
+    stat('Pals', world?.pals, 'Pals in the loaded world and dimensional storage files, across all players', 'Pal count was not recorded in the loaded save. Add Level.sav with "+ Files".'),
     stat('Caught species', counters.tribe_captures, 'Distinct species captured, as recorded by the save'),
     stat('Total Pals captured', countTotal(record.capture_counts), 'Lifetime captures, including repeats and every entry recorded by the save'),
     stat('Fishing catches', countTotal(record.fishing_counts), 'Lifetime fishing catches across all species and sizes'),
     stat('Butchered', countTotal(record.butcher_counts), 'Total butchering count across all entries recorded by the save'),
     stat('Awakenings', counters.awakenings ?? 0,
-      counters.awakenings == null ? 'Awakening count was not recorded in the loaded save; assuming 0.' : 'Total awakenings recorded by the save'),
+      counters.awakenings == null ? 'Awakening count was not recorded in the loaded save. Assuming 0.' : 'Total awakenings recorded by the save'),
     stat('Mutations', counters.mutations, 'Mutated pals bred'),
     condensationStat(record),
     stat('Items crafted', countTotal(record.crafted_item_counts), 'Lifetime items crafted, including repeated crafts and items outside the crafting catalog'),
-    stat('Key items', world?.keyItems, 'Distinct key items currently owned', 'Add the matching player file and Level.sav with "+ Files" to read key items.'),
+    stat('Key items', world?.keyItems, 'Distinct key items currently owned', 'Key items were not recorded in the loaded save. Add Level.sav with "+ Files".'),
     stat('Tower clears', countTotal(record.tower_boss_counts), 'Total tower boss victories, including repeat clears and hard mode'),
     stat('Raid boss clears', countTotal(record.raid_boss_counts), 'Total raid boss victories, including repeat clears'),
     stat('Dungeons', counters.normal_dungeon_clears, 'Random dungeons cleared'),

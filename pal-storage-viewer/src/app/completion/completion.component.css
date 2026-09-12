@@ -376,7 +376,8 @@
   color: #ffa3a3;
   font-size: 0.74rem;
   font-weight: 600;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: right;
 }
 
 .level-stat.max b {

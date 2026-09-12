@@ -46,9 +46,9 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
   const quests = unique(record.quests_completed), maps = unique(record.world_maps);
   const tower = (id: string): boolean => towerFlags.has(keyOf('BOSS_BATTLE_NAME_' + id)) || (towerCounts.get(keyOf(id + '_Normal')) ?? 0) > 0;
   const worldMissing = world?.hasLevel === false || !world
-    ? 'Add Level.sav with "+ Files".' : 'Required data was not recorded for this player in Level.sav.';
+    ? 'Add Level.sav with "+ Files".' : 'Required data was not recorded in the loaded save.';
   const guild = world?.guildAchievements;
-  const guildMissing = world?.hasLevel === false || !world ? worldMissing : 'Guild progress or player membership could not be read from Level.sav.';
+  const guildMissing = world?.hasLevel === false || !world ? worldMissing : 'Guild progress or player membership was not recorded in the loaded save.';
 
   function evaluate(a: AchievementDefinition): { current: number | null; note?: string; uncertain?: boolean } {
     switch (a.kind) {
@@ -68,7 +68,7 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
       case 'counter': {
         const current = finite(record.counters[a.key as keyof CompletionCounters]);
         if (a.key === 'awakenings') return { current: current ?? 0, uncertain: current === null,
-          note: current === null ? 'Awakening count was not recorded in the loaded save; assuming 0.' : 'Uses the recorded lifetime awakening count.' };
+          note: current === null ? 'Awakening count was not recorded in the loaded save. Assuming 0.' : 'Uses the recorded lifetime awakening count.' };
         return { current,
           note: a.key === 'normal_dungeon_clears' ? 'Ordinary dungeon clears.' : a.key === 'predator_defeats' ? 'Uses the recorded predator-defeat total.' : undefined };
       }
@@ -93,7 +93,7 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
         const current = recorded ?? (world?.hasLevel ? 0 : null);
         return { current, uncertain: current != null && current < a.target,
           note: current == null ? world?.arenaPointsUnavailable ?? worldMissing
-            : recorded === null ? 'Arena Points were not recorded in the loaded save; assuming 0.'
+            : recorded === null ? 'Arena Points were not recorded in the loaded save. Assuming 0.'
             : current < a.target ? 'Recorded RP does not establish whether this rank was reached before.' : 'Current RP threshold reached.' };
       }
       case 'tree': {

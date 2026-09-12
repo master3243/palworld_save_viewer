@@ -103,7 +103,7 @@ test('summary distinguishes unavailable data from recorded zeroes and keeps lowe
     assert.equal(entry.missing, true, label);
     assert.ok(entry.title);
   }
-  assert.match(missing.stats.find(entry => entry.label === 'Bases').title, /Level.sav.*\+ Files/);
+  assert.match(missing.stats.find(entry => entry.label === 'Bases').title, /not recorded in the loaded save\./);
   const stars = missing.stats.find(entry => entry.label === '4-star pals');
   assert.equal(stars.value, '0');
   assert.deepEqual(stars.tooltip.rows[0], ['1 ★', '9']);
@@ -549,6 +549,6 @@ test('arena counts seven tiers toward completion and keeps points independent', 
   const unknown = baseline.categories.find(c => c.key === 'arena');
   assert.ok(unknown.unavailable);
   assert.equal(unknown.arenaPoints.value, '?');
-  assert.match(unknown.arenaPoints.title, /Level.sav/);
+  assert.match(unknown.arenaPoints.title, /not recorded in the loaded save\./);
   assert.equal(category('arena', { arena_solo_clears: {} }).unavailable, undefined);
 });
