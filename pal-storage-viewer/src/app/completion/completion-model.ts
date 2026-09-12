@@ -235,7 +235,7 @@ function arenaCategory(record: PlayerCompletion, world?: WorldProgress): Categor
   return finish({
     key: 'arena', title: 'Arena', groups: [],
     unknown: Object.keys(clears ?? {}).filter(id => !known.has(id.toLowerCase())).sort(),
-    unavailable: clears == null ? 'Solo arena progress was not recorded in this player save.' : undefined,
+    unavailable: clears == null ? 'Solo arena progress was not recorded in the loaded save.' : undefined,
     arenaPoints: stat('Arena Points', world?.arenaPoints, 'Arena points recorded for this player',
       world?.arenaPointsUnavailable ?? 'Add Level.sav with "+ Files" to see Arena Points.'),
     items: tiers.map((name, order) => ({
