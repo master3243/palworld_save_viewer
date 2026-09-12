@@ -108,11 +108,13 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
   }
 
   return ACHIEVEMENTS.map((definition, order) => {
-    const { current, note, uncertain } = evaluate(definition);
-    const unknown = current === null || !!uncertain;
-    const state = !unknown && current >= definition.target ? 'done' : current !== null && current > 0 ? 'active' : 'todo';
+    const { current: recorded, note, uncertain } = evaluate(definition);
+    const current = recorded ?? 0;
+    const unknown = recorded === null || !!uncertain;
+    const state = !unknown && current >= definition.target ? 'done' : current > 0 ? 'active' : 'todo';
+    const detail = note ?? (recorded === null ? 'Required progress was not recorded in the loaded save.' : '');
     return { id: definition.id, name: definition.name, order, state, no: null, coords: '', map: '', group: definition.group,
-      detail: note ?? (current === null ? 'Required progress was not recorded in the loaded save.' : ''),
+      detail: recorded === null ? `${detail} Assuming 0.` : detail,
       achievement: { description: definition.description, current, target: definition.target, unknown },
     };
   });

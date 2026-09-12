@@ -32,6 +32,10 @@ test('75 unique rows preserve confidence split and unknown data never counts as 
   assert.deepEqual([1,2,3].map(b => ACHIEVEMENTS.filter(a => a.bucket === b).length), [72,0,3]);
   const c = summarize(empty({ recorded_fields: [] }), data).categories.find(c => c.key === 'achievements');
   assert.equal(c.total, 75); assert.equal(c.done, 0); assert.equal(c.unknownCount, 75);
+  for (const item of c.items) {
+    assert.equal(item.achievement.current, 0, item.name);
+    assert.match(item.detail, /Assuming 0\./, item.name);
+  }
 });
 
 test('capture history deduplicates case, excludes humans/None, and retains off-catalog species', () => {
@@ -79,7 +83,7 @@ test('lifetime collection and condensation are independent of held items and jou
 
 test('guild checks require membership', () => {
   const research = Object.fromEntries(data.research.map(([id, , , work]) => [id, work]));
-  assert.equal(get('Pal Labor Student', {}, { labs: [research] }).achievement.current, null);
+  assert.equal(get('Pal Labor Student', {}, { labs: [research] }).achievement.current, 0);
   assert.equal(get('Pal Labor Professor', {}, { labs: [], guildAchievements: { research, expeditions: 20 } }).state, 'done');
   assert.equal(get('Elite Pal Dispatcher', {}, { labs: [], guildAchievements: { research: {}, expeditions: 19 } }).state, 'active');
   assert.equal(get('Elite Pal Dispatcher', {}, { labs: [], guildAchievements: { research: {}, expeditions: 20 } }).state, 'done');
@@ -115,7 +119,7 @@ test('arena uses RP, not seven solo clears; lower RP cannot disprove a past rank
   assert.equal(get('Arena Legend', { arena_solo_clears }, world).achievement.unknown, true);
   assert.equal(get('Arena Legend', {}, { labs: [], arenaPoints: 6000 }).state, 'done');
   assert.equal(get('Arena Champion', {}, { labs: [], arenaPoints: 3800 }).state, 'done');
-  assert.equal(get('Arena Legend', {}).achievement.current, null);
+  assert.equal(get('Arena Legend', {}).achievement.current, 0);
 });
 
 test('Tree uses interior milestones; friendship uses associated LocalData history', () => {
@@ -154,7 +158,7 @@ test('player parser exports chopper counter and records which history fields wer
   assert.deepEqual(record.specific_boss_counts, { SecurityDrone: 2 });
   assert.equal(record.counters.awakenings, null);
   assert.ok(record.recorded_fields.includes('PalCaptureCount'));
-  assert.equal(get('All for One', record).achievement.current, null);
+  assert.equal(get('All for One', record).achievement.current, 0);
   assert.equal(get('Beginning of the Legend', record).achievement.current, 0);
 });
 
@@ -187,14 +191,14 @@ test('guild research decoder accepts both selected-project tails and rejects tru
   assert.equal(researchWork(body.subarray(0, body.length - 1)), null);
 });
 
-test('omitted Arena Points default to zero only with Level loaded; omitted awakenings default to zero only in achievements', () => {
+test('achievement zero defaults preserve missing-data handling in the Arena card and Awakening stat', () => {
   for (const hasLevel of [false, true]) {
     const world = { labs: [], hasLevel, arenaPoints: null };
     const summary = summarize(empty({ counters: { awakenings: null } }), data, world);
     const arena = summary.categories.find(c => c.key === 'arena');
     assert.equal(arena.arenaPoints.value, hasLevel ? '0' : '?');
     assert.equal(arena.arenaPoints.missing, !hasLevel);
-    assert.equal(get('Silver Champ', {}, world).achievement.current, hasLevel ? 0 : null);
+    assert.equal(get('Silver Champ', {}, world).achievement.current, 0);
     assert.equal(get('Silver Champ', {}, world).achievement.unknown, true);
     const awakenings = summary.stats.find(s => s.label === 'Awakenings');
     assert.equal(awakenings.value, '?');
