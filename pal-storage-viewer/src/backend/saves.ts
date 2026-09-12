@@ -3,7 +3,7 @@
  */
 import {
   PropertyDict, SaveBuffer, ZERO_GUID, asDict, findPropertyStart, formatGuid, guidOrNull, mapEntryCount,
-  readBool, readByte, readDateTime, readFString, readMapEntries, readStr, readStructProperty
+  readBool, readByte, readDateTime, readFString, readInt, readMapEntries, readStr, readStructProperty
 } from './gvas';
 import { Lookups } from './lookups';
 import { PalRecord, buildRecord } from './record';
@@ -91,7 +91,7 @@ export interface BaseCamp {
 
 export interface LevelPayload {
   records: PalRecord[];
-  players: { player_uid: string | null; instance_id: string | null; name: string; level: number | null; attributes: PlayerAttributes | null }[];
+  players: { player_uid: string | null; instance_id: string | null; name: string; level: number | null; attributes: PlayerAttributes | null; arena_points: number | null }[];
   item_counts: Record<string, number | null>;
   bases: BaseCamp[];
   containers: Record<string, { slots: number; occupied: number }>;
@@ -163,6 +163,7 @@ export function extractLevel(buf: SaveBuffer, lookups: Lookups, progress?: Parse
         name: readStr(block, findPropertyStart(block, 'NickName')),
         level: readByte(block, findPropertyStart(block, 'Level')),
         attributes: extractPlayerAttributes(block),
+        arena_points: readInt(block, findPropertyStart(block, 'ArenaRankPoint')),
       });
       skipped.players += 1;
       continue;

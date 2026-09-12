@@ -36,6 +36,7 @@ export interface PlayerCompletion {
   tower_boss_counts: Record<string, number>;
   bosses: string[];
   raid_boss_counts: Record<string, number>;
+  arena_solo_clears: Record<string, number> | null;
   paldeck: string[];
   capture_counts: Record<string, number>;
   capture_bonus_counts: Record<string, number>;
@@ -290,6 +291,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
     tower_boss_counts: numbers(readScalarMap(buf, 'TowerBossDefeatCount')),
     bosses: trueKeys(readScalarMap(buf, 'NormalBossDefeatFlag')),
     raid_boss_counts: numbers(readScalarMap(buf, 'RaidBossDefeatCount')),
+    arena_solo_clears: findPropertyStart(buf, 'ArenaSoloClearCount') === -1 ? null : numbers(readScalarMap(buf, 'ArenaSoloClearCount')),
     paldeck: trueKeys(readScalarMap(buf, 'PaldeckUnlockFlag')),
     capture_counts: numbers(readScalarMap(buf, 'PalCaptureCount')),
     capture_bonus_counts: numbers(readScalarMap(buf, 'PalCaptureBonusCount')),

@@ -179,6 +179,8 @@ export class CompletionComponent implements OnChanges {
             pals: set.has_level || set.has_dimensional_storage ? set.pals : null,
             keyItems: player.key_items,
             attributes: player.attributes,
+            arenaPoints: player.arena_points,
+            arenaPointsUnavailable: set.has_level ? 'Arena Points were not recorded for this player in the loaded world save.' : 'Add Level.sav with "+ Files" to see Arena Points.',
             attributesUnavailable: set.has_level ? 'Player attributes were not recorded in the loaded world save.' : 'Add Level.sav with "+ Files" to see player attributes.',
             seenSpecies: this.localDataOwner(set) === player.uid ? set.seen_species : null,
             checkedNotes: this.localDataOwner(set) === player.uid ? set.checked_notes : null,
@@ -232,7 +234,7 @@ export class CompletionComponent implements OnChanges {
 
   get tableColumnCount(): number {
     const category = this.category;
-    return 3 + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
+    return 3 - (category?.key === 'arena' ? 1 : 0) + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
       + (category?.key === 'paldeck' || category?.key === 'notes' ? 1 : 0)
       + (category?.key === 'captureBonus' ? 2 + this.condensationStars.length : 0) + (this.showFishing ? 3 : 0)
       + (category?.hasCoords ? 1 : 0) + (category?.hasNumbers ? 1 : 0) + (category?.hasTags ? 1 : 0);
@@ -343,6 +345,7 @@ export class CompletionComponent implements OnChanges {
   }
 
   stateLabel(item: TrackedItem): string {
+    if (this.selectedCategory === 'arena') return this.category?.unavailable ? '?' : item.state === 'done' ? 'Cleared' : 'Uncleared';
     if (this.selectedCategory === 'crafting') return item.crafting?.count == null ? 'Unknown' : item.state === 'done' ? 'Crafted' : 'Not crafted';
     if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';
     if (this.selectedCategory === 'captureBonus') return item.state === 'done' ? 'Captured 5' : item.state === 'active' ? 'Progressing to 5' : 'Never Captured';

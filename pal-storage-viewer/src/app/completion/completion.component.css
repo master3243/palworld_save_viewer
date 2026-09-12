@@ -269,6 +269,7 @@
 }
 
 .category-card {
+  align-items: stretch;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(134, 220, 255, 0.18);
   border-radius: 10px;
@@ -361,11 +362,13 @@
   color: #8ef0c2;
 }
 
-.category-card.needs-file {
+.category-card.needs-file,
+.category-card.missing-data {
   border-color: rgba(255, 123, 123, 0.55);
 }
 
-.category-card.needs-file .bar {
+.category-card.needs-file .bar,
+.bar.unavailable-bar {
   background: rgba(255, 123, 123, 0.18);
 }
 
@@ -807,3 +810,17 @@
 .seen-owner select { background: #0a202d; border: 1px solid #31576a; border-radius: 6px; color: #e8f8ff; padding: 5px 8px; font: inherit; max-width: 100%; }
 .stat[tabindex] { cursor: help; }
 .stat[tabindex]:focus-visible { outline: 2px solid #62cbef; outline-offset: 2px; }
+
+.arena-icon {
+  color: #68c9ee;
+}
+
+.card-count.missing-data,
+.card-count.missing-data span {
+  color: #ff8e8e;
+}
+
+.arena-points { cursor: default; }
+.arena-points.missing-data { border-color: rgba(255, 123, 123, 0.55); }
+.arena-points.missing-data,
+.arena-points.missing-data b { color: #ff8e8e; }

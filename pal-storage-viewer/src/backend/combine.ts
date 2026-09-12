@@ -55,7 +55,7 @@ export interface SaveSetSummary {
   pals: number;
   bases: { index: number; location: { x: number; y: number; z: number } | null; workers: number }[];
   players: { uid: string; name: string; level: number | null; completion: PlayerCompletion | null;
-    attributes: PlayerAttributes | null; key_items: number | null }[];
+    attributes: PlayerAttributes | null; key_items: number | null; arena_points: number | null }[];
   seen_species: string[] | null;
   checked_notes: string[] | null;
   has_local_data: boolean;
@@ -94,6 +94,7 @@ interface SaveSet {
   player_names: Map<string, string>;
   player_levels: Map<string, number | null>;
   player_attributes: Map<string, PlayerAttributes | null>;
+  player_arena_points: Map<string, number | null>;
   key_item_containers: Map<string, string>;
   item_counts: Record<string, number | null>;
   seen_species: string[] | null;
@@ -227,6 +228,7 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
         set.player_names.set(player.player_uid, player.name ?? '');
         set.player_levels.set(player.player_uid, player.level);
         set.player_attributes.set(player.player_uid, player.attributes ?? null);
+        set.player_arena_points.set(player.player_uid, player.arena_points ?? null);
       }
     }
     source.pals = parsed.payload.records.length;
@@ -269,7 +271,7 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
         label, letter: '', world_name: '', host_player_name: '', in_game_day: null, saved_at: '',
         players: new Set(), player_names: new Map(), player_levels: new Map(), completions: new Map(), labs: [], party_containers: new Set(), pal_box_containers: new Set(),
         base_containers: new Map(), bases: [], containers: {}, dps_records: [], level_records: [],
-        player_attributes: new Map(), key_item_containers: new Map(), item_counts: {}, seen_species: null, checked_notes: null, local_files: 0,
+        player_attributes: new Map(), player_arena_points: new Map(), key_item_containers: new Map(), item_counts: {}, seen_species: null, checked_notes: null, local_files: 0,
       };
       sets.set(label, set);
     }
@@ -345,7 +347,8 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
         workers: set.level_records.filter((record) => record.pal_box.container_id === base.worker_container_id).length,
       })),
       players: [...playerIds].sort().map((uid) => ({ uid, name: set.player_names.get(uid) ?? '', level: set.player_levels.get(uid) ?? null, completion: set.completions.get(uid) ?? null,
-        attributes: set.player_attributes.get(uid) ?? null, key_items: set.item_counts[set.key_item_containers.get(uid) ?? ''] ?? null })),
+        attributes: set.player_attributes.get(uid) ?? null, key_items: set.item_counts[set.key_item_containers.get(uid) ?? ''] ?? null,
+        arena_points: set.player_arena_points.get(uid) ?? null })),
       seen_species: set.seen_species,
       checked_notes: set.checked_notes,
       has_local_data: set.local_files > 0,

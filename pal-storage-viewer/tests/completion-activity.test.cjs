@@ -55,3 +55,10 @@ test('local encounter and journal flags preserve false entries and missing-file 
   assert.deepEqual(extractCheckedNotes(seen([], 'Local_NoteCheckedFlag')), []);
   assert.deepEqual(extractCheckedNotes(seen([['Day0', true], ['GrassBoss3', false]], 'Local_NoteCheckedFlag')), ['Day0']);
 });
+
+test('arena solo records distinguish missing progress, no clears, and recorded tier values', () => {
+  const read = entries => extractPlayerCompletion(new SaveBuffer(Buffer.concat([record, countMap('ArenaSoloClearCount', entries)]))).arena_solo_clears;
+  assert.equal(extractPlayerCompletion(new SaveBuffer(record)).arena_solo_clears, null);
+  assert.deepEqual(read([]), {});
+  assert.deepEqual(read([['Bronze', 1], ['Silver', 1], ['Gold', 0]]), { Bronze: 1, Silver: 1, Gold: 0 });
+});

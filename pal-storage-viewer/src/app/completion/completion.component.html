@@ -73,8 +73,9 @@
           type="button"
           class="category-card"
           [class.active]="category.key === selectedCategory"
-          [class.complete]="category.total > 0 && category.done === category.total && !category.needsFile"
+          [class.complete]="category.total > 0 && category.done === category.total && !category.needsFile && !category.unavailable"
           [class.needs-file]="!!category.needsFile"
+          [class.missing-data]="category.key === 'arena' && !!category.unavailable"
           [attr.aria-expanded]="category.key === selectedCategory"
           [attr.aria-controls]="category.key === selectedCategory ? 'category-detail-' + category.key : null"
           (click)="selectCategory(category.key)"
@@ -82,25 +83,26 @@
           <span class="card-head">
             <span class="card-title">
               <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'crafting' ? 'scale(1.3)' : category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' || category.key === 'research' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
+              <svg *ngIf="category.key === 'arena'" class="card-map-icon arena-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 4 6-1-1 6L6 22l-4-4L15 5M3 3l6 1 11 11-5 5L4 9 3 3m11 11 8 8M2 14l8 8"/></svg>
               <span>{{ category.title }}</span>
             </span>
-            <span class="card-count">{{ category.needsFile ? '?' : category.unavailable ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
+            <span class="card-count" [class.missing-data]="category.key === 'arena' && !!category.unavailable" [attr.title]="category.unavailable || null">{{ category.needsFile || (category.key === 'arena' && category.unavailable) ? '?' : category.unavailable ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
           </span>
-          <span class="bar" aria-hidden="true">
-            <span class="bar-fill" [style.width.%]="category.percent"></span>
+          <span class="bar" [class.unavailable-bar]="category.key === 'arena' && !!category.unavailable" aria-hidden="true">
+            <span class="bar-fill" [style.width.%]="category.unavailable ? 0 : category.percent"></span>
           </span>
           <span class="card-foot">
             <span class="card-needs" *ngIf="category.needsFile">{{ category.needsFile }} needed</span>
-            <span class="card-pct" *ngIf="!category.needsFile">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
+            <span class="card-pct" *ngIf="!category.needsFile" [class.card-needs]="category.key === 'arena' && !!category.unavailable">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
           </span>
         </button>
 
       <ng-container *ngIf="category.key === selectedCategory">
       <section class="category-detail" #categoryDetail tabindex="-1" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
         <div class="detail-head">
-          <h3>{{ open.title }} <span class="detail-count" [class.missing-data]="!!open.needsFile">{{ open.needsFile ? '?' : open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
+          <h3>{{ open.title }} <span class="detail-count" [class.missing-data]="!!open.needsFile || (open.key === 'arena' && !!open.unavailable)">{{ open.needsFile || (open.key === 'arena' && open.unavailable) ? '?' : open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
-            <label class="status-priority" *ngIf="!open.needsFile">
+            <label class="status-priority" *ngIf="!open.needsFile && !(open.key === 'arena' && open.unavailable)">
               <input #statusPriority type="checkbox" [checked]="prioritizeNotDone" (change)="prioritizeNotDone = statusPriority.checked">
               Prioritize Not Done
             </label>
@@ -112,6 +114,11 @@
               (input)="onSearch($event)"
               aria-label="Search this category"
             >
+          </div>
+        </div>
+        <div class="group-chips technology-points" *ngIf="open.arenaPoints as entry">
+          <div class="group-chip point-summary arena-points" [class.missing-data]="entry.missing" [attr.title]="entry.title" [attr.tabindex]="entry.missing ? 0 : null">
+            <span class="group-chip-head"><span>{{ entry.label }}</span><b>{{ entry.value }}</b></span>
           </div>
         </div>
         <ng-container *ngIf="open.key === 'paldeck' || open.key === 'notes'">
@@ -151,12 +158,12 @@
           </button>
         </div>
         <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" above.</p>
-        <p class="tracker-note" *ngIf="open.unavailable">{{ open.unavailable }}</p>
+        <p class="tracker-note" [class.error]="open.key === 'arena'" *ngIf="open.unavailable">{{ open.unavailable }}</p>
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
         <ng-container *ngIf="{ fishing: showFishing, count: tableColumnCount } as columns">
-        <table class="item-table" [attr.aria-rowcount]="visibleItems.length + 1" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile">
+        <table class="item-table" [attr.aria-rowcount]="visibleItems.length + 1" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile && !(open.key === 'arena' && open.unavailable)">
           <caption class="table-start" aria-hidden="true"></caption>
           <thead>
             <tr>
@@ -164,7 +171,7 @@
               <th class="no-col" *ngIf="open.hasNumbers">{{ open.numberLabel }}</th>
               <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
-              <th>Name</th>
+              <th>{{ open.key === 'arena' ? 'Solo Tier' : 'Name' }}</th>
               <th class="checked-col" *ngIf="open.key === 'notes'" title="Journal checked flag recorded in LocalData.sav">Checked</th>
               <th class="seen-col" *ngIf="open.key === 'paldeck'" title="Encountered species recorded in LocalData.sav">Seen</th>
               <ng-container *ngIf="open.key === 'crafting'">
@@ -189,14 +196,14 @@
                 <th class="fishing-col" scope="col" title="Lunker fishing catches"><small>Fishing</small>Lunker</th>
               </ng-container>
               <th *ngIf="isPalList" aria-label="Pal links"></th>
-              <th *ngIf="!isPalList && open.key !== 'crafting'">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
+              <th *ngIf="!isPalList && open.key !== 'crafting' && open.key !== 'arena'">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of visibleItems; let rowIndex = index; trackBy: trackItem" [attr.aria-rowindex]="rowIndex + 2" [attr.data-item-id]="item.id" [attr.data-state]="item.crafting && item.crafting.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
               <ng-container *tableRowViewport="trackerScroll; columns: columns.count; height: isPalList ? 36 : open.key === 'crafting' ? 38 : 30">
-              <td class="state-col">
+              <td class="state-col" [class.missing-data]="open.key === 'arena' && !!open.unavailable" [attr.title]="open.key === 'arena' ? open.unavailable : null">
                 <span class="item-status"><span class="state-dot" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
               </td>
               <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">
@@ -258,7 +265,7 @@
                   </a>
                 </span>
               </td>
-              <td class="detail-col" *ngIf="!isPalList && open.key !== 'crafting'"><span>{{ item.detail }}</span></td>
+              <td class="detail-col" *ngIf="!isPalList && open.key !== 'crafting' && open.key !== 'arena'"><span>{{ item.detail }}</span></td>
               <td class="coords-col" *ngIf="open.hasCoords">
                 <button type="button" class="coordinate-link" *ngIf="item.coords" [attr.aria-label]="'Show ' + item.name + ' on map'" (click)="showMap(item)">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small> ↗</button>
               </td>

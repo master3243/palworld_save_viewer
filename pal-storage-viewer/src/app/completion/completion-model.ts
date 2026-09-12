@@ -79,6 +79,8 @@ export interface WorldProgress {
   keyItems?: number | null;
   attributes?: PlayerAttributes | null;
   attributesUnavailable?: string;
+  arenaPoints?: number | null;
+  arenaPointsUnavailable?: string;
   seenSpecies?: string[] | null;
   seenUnavailable?: string;
   checkedNotes?: string[] | null;
@@ -149,6 +151,7 @@ export interface Category {
   /** Set when the category cannot be computed because this save file was not loaded. */
   needsFile?: string;
   unavailable?: string;
+  arenaPoints?: StatEntry;
   /** Costs of all remaining technologies, independent of the visible list filters. */
   technologyPoints?: { key: string; name: string; remaining: number; available: number | null; needed: number | null }[];
 }
@@ -220,6 +223,25 @@ function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoor
     numberLabel,
     hasTags: category.items.some((item) => !!item.tag),
   };
+}
+
+function arenaCategory(record: PlayerCompletion, world?: WorldProgress): Category {
+  // Solo tier catalog: https://paldat.net/en/arena
+  const tiers = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Master', 'Legend'];
+  const clears = record.arena_solo_clears;
+  const recorded = new Map(Object.entries(clears ?? {}).map(([id, value]) => [id.toLowerCase(), value]));
+  const known = new Set(tiers.map(tier => tier.toLowerCase()));
+  return finish({
+    key: 'arena', title: 'Arena', groups: [],
+    unknown: Object.keys(clears ?? {}).filter(id => !known.has(id.toLowerCase())).sort(),
+    unavailable: clears == null ? 'Solo arena progress was not recorded in this player save.' : undefined,
+    arenaPoints: stat('Arena Points', world?.arenaPoints, 'Arena points recorded for this player',
+      world?.arenaPointsUnavailable ?? 'Add Level.sav with "+ Files" to see Arena Points.'),
+    items: tiers.map((name, order) => ({
+      id: name, name, order, state: (recorded.get(name.toLowerCase()) ?? 0) > 0 ? 'done' : 'todo',
+      detail: '', group: '', coords: '', map: '', no: null,
+    })),
+  });
 }
 
 function groupsOf(items: TrackedItem[], names: Map<string, string>): TrackedGroup[] {
@@ -709,6 +731,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     towerCategory(record, data),
     towerHardCategory(record, data),
     raidCategory(record, data),
+    arenaCategory(record, world),
     bossCategory(record, data, ['alpha', 'boss'], 'alphas', 'Alpha Pals'),
     bossCategory(record, data, ['bounty'], 'bounties', 'Bounty Targets'),
     questCategory(record, data, 'Main'),

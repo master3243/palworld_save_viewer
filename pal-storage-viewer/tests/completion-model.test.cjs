@@ -519,3 +519,36 @@ test('ordinary and repeatable missions retain explicit completion and active cou
   assert.match(foodie.detail, /total delivered count 3/);
   assert.equal(mission('Sub_FoodReward', { quests_completed: ['Sub_FoodReward'] }).state, 'done');
 });
+
+test('arena counts seven tiers toward completion and keeps points independent', () => {
+  const baseline = summarize(record(), data);
+  const summary = summarize(record({ arena_solo_clears: { bronze: 1, Silver: 2, Gold: 0, FutureTier: 1 } }), data,
+    { labs: [], arenaPoints: 0 });
+  const arena = summary.categories.find(c => c.key === 'arena');
+  assert.equal(arena.total, 7);
+  assert.equal(arena.done, 2);
+  assert.equal(arena.percent, 28.6);
+  assert.equal(arena.items.find(i => i.id === 'Bronze').state, 'done');
+  assert.equal(arena.items.find(i => i.id === 'Gold').state, 'todo');
+  assert.equal(arena.items.find(i => i.id === 'Legend').state, 'todo');
+  assert.deepEqual(arena.unknown, ['FutureTier']);
+  assert.equal(arena.items.length, 7);
+  assert.equal(arena.arenaPoints.value, '0');
+  assert.equal(arena.arenaPoints.missing, false);
+  assert.equal(arena.hasCoords, false);
+  assert.equal(arena.hasNumbers, false);
+  assert.equal(summary.done, baseline.done + 2);
+  assert.equal(summary.total, baseline.total);
+  const counted = summary.categories.filter(c => c.total > 0 && !c.needsFile && !c.unavailable);
+  assert.equal(summary.percent, Math.round(counted.reduce((sum, c) => sum + c.percent, 0) / counted.length * 10) / 10);
+  const all = category('arena', { arena_solo_clears: Object.fromEntries(arena.items.map(i => [i.id, 1])) });
+  assert.equal(all.done, 7);
+  assert.equal(all.total, 7);
+  assert.equal(all.percent, 100);
+  assert.equal(all.arenaPoints.missing, true);
+  const unknown = baseline.categories.find(c => c.key === 'arena');
+  assert.ok(unknown.unavailable);
+  assert.equal(unknown.arenaPoints.value, '?');
+  assert.match(unknown.arenaPoints.title, /Level.sav/);
+  assert.equal(category('arena', { arena_solo_clears: {} }).unavailable, undefined);
+});
