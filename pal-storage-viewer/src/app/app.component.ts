@@ -179,6 +179,19 @@ export class AppComponent implements OnDestroy {
   locationCounts: LocationCount[] = [];
   /** Live progress while parsing; the worker reports real per-record counts. */
   progress: ParseProgress | null = null;
+  private activeLoad: { cancelled: boolean; cancellable: boolean } | null = null;
+
+  get canCancelLoad(): boolean { return this.activeLoad?.cancellable === true; }
+
+  cancelLoading(): void {
+    const load = this.activeLoad;
+    if (!load?.cancellable) return;
+    load.cancelled = true;
+    this.activeLoad = null;
+    this.parser.cancelParsing();
+    this.isParsing = false;
+    this.progress = null;
+  }
   /** Save letters by set label. Assigned once and never reused, so B stays B after A is removed. */
   private readonly saveLetters = new Map<string, string>();
   private nextLetterIndex = 0;
@@ -992,21 +1005,28 @@ export class AppComponent implements OnDestroy {
     }
 
     this.error = '';
+    const load = { cancelled: false, cancellable: append && this.hasData && !removing };
+    this.activeLoad = load;
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Initializing...', detail: '' };
     this.assignSaveLetters(merged);
     try {
       // The worker owns 0..95% of the bar; the table build takes the rest.
       const result = await this.parser.parseMany(merged, (update) => {
+        if (load.cancelled) return;
         this.progress = {
           ...update,
           fraction: update.fraction === null ? null : update.fraction * PARSE_SHARE
         };
         this.changeDetector.markForCheck();
       }, this.saveLetters);
+      if (load.cancelled) return;
       const rows: PalStorageRow[] = [];
       for (const [index, row] of result.rows.entries()) {
-        rows.push({ ...row, paldeck_no: await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name')) });
+        if (load.cancelled) return;
+        const paldeckNumber = await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name'));
+        if (load.cancelled) return;
+        rows.push({ ...row, paldeck_no: paldeckNumber });
         if (index % 500 === 0) {
           this.progress = {
             fraction: PARSE_SHARE + ((index + 1) / result.rows.length) * (1 - PARSE_SHARE),
@@ -1016,6 +1036,7 @@ export class AppComponent implements OnDestroy {
           await new Promise<void>((resolve) => setTimeout(resolve, 0));
         }
       }
+      if (load.cancelled) return;
       const locationCounts = this.countLocations(rows);
       const originalRows = this.defaultOrder(rows);
       const columns = this.buildColumns(rows);
@@ -1038,11 +1059,15 @@ export class AppComponent implements OnDestroy {
       this.tabDiscovery.visit(this.view, this.hasData);
       this.scheduleMeasure();
     } catch (error) {
+      if (load.cancelled) return;
       if (removing && error instanceof UnidentifiedSavesError) this.clearLoadedData();
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';
     } finally {
-      this.isParsing = false;
-      this.progress = null;
+      if (this.activeLoad === load) {
+        this.activeLoad = null;
+        this.isParsing = false;
+        this.progress = null;
+      }
     }
   }
 

@@ -73,6 +73,16 @@ export class SaveParserService {
     }
   }
 
+  cancelParsing(): void {
+    if (!this.pending.size) return;
+    this.worker?.terminate();
+    this.worker = undefined;
+    for (const request of this.pending.values()) request.reject(new Error('Loading cancelled'));
+    this.pending.clear();
+    for (const request of this.pendingCounts.values()) request.resolve();
+    this.pendingCounts.clear();
+  }
+
   /**
    * Decode every given save file and merge them into one pal list. Files that
    * share a top-level folder are treated as one save (so Level.sav, the
@@ -134,6 +144,7 @@ export class SaveParserService {
     }
     const worker = new Worker(new URL('./save-parser.worker', import.meta.url), { type: 'module' });
     worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+      if (this.worker !== worker) return;
       const message = event.data;
       if (message.type === 'count' || message.type === 'count-done') {
         const counting = this.pendingCounts.get(message.id);
@@ -159,6 +170,7 @@ export class SaveParserService {
       }
     };
     worker.onerror = (event) => {
+      if (this.worker !== worker) return;
       const error = new Error(event.message || 'The save parser worker crashed.');
       for (const request of this.pending.values()) request.reject(error);
       this.pending.clear();

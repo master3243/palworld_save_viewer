@@ -76,7 +76,20 @@
     </span>
   </ng-template>
   <aside class="load-progress" *ngIf="hasData && isParsing" aria-label="Loading save files">
-    <ng-container *ngTemplateOutlet="loadProgress"></ng-container>
+    <div class="load-progress-heading">
+      <span>{{ progress?.label || 'Loading saves' }}</span>
+      <button class="cancel-load" type="button" *ngIf="canCancelLoad" (click)="cancelLoading()">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg>
+        Cancel
+      </button>
+    </div>
+    <div class="load-progress-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress?.fraction == null ? null : progressPercent" [attr.aria-label]="progress?.label || 'Loading saves'">
+      <span class="progress-track" [class.indeterminate]="progress?.fraction == null">
+        <span class="progress-fill" [style.width.%]="progress?.fraction == null ? 100 : progressPercent"></span>
+      </span>
+      <span class="load-progress-percent" *ngIf="progress?.fraction != null">{{ progressPercent }}%</span>
+    </div>
+    <p class="load-progress-detail" *ngIf="progress?.detail">{{ progress?.detail }}</p>
   </aside>
 
   <section

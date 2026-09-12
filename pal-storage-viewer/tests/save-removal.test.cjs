@@ -142,3 +142,75 @@ test('failed additions preserve the current view and owner without reparsing it'
   assert.equal(app.error, 'Bad new save');
   assert.equal(app.isParsing, false);
 });
+
+test('cancelled additions cannot replace the view or clear a subsequent load', async () => {
+  const { app, parser } = harness([player, local]);
+  const oldRows = [{ pal_name: 'Existing Pal' }];
+  app.rows = app.originalRows = app.filteredRows = oldRows;
+  app.localDataOwners.set('world', 'player.sav');
+  const oldSets = app.saveSets, oldSources = app.sources, oldInputs = app.loadedInputs;
+  const requests = [];
+  parser.parseMany = (_inputs, progress) => new Promise(resolve => requests.push({ resolve, progress }));
+  const first = app.parseInputs([input('cancelled.sav')], true);
+  assert.equal(app.canCancelLoad, true);
+  app.cancelLoading();
+  assert.equal(app.canCancelLoad, false);
+  assert.equal(app.isParsing, false);
+  assert.equal(app.progress, null);
+  assert.equal(app.rows, oldRows);
+  assert.equal(app.loadedInputs, oldInputs);
+  assert.equal(app.localDataOwners.get('world'), 'player.sav');
+  const second = app.parseInputs([input('next.sav')], true);
+  requests[0].progress({ fraction: 1, label: 'Stale progress', detail: '' });
+  requests[0].resolve({ rows: [], sets: [], sources: [] });
+  await first;
+  assert.equal(app.isParsing, true);
+  assert.notEqual(app.progress.label, 'Stale progress');
+  assert.equal(app.saveSets, oldSets);
+  assert.equal(app.sources, oldSources);
+  const nextSets = [{ folder: 'world', has_local_data: true, players: [{ uid: 'player.sav', completion: {} }] }];
+  requests[1].resolve({ rows: [], sets: nextSets, sources: [{ file: 'next.sav' }] });
+  await second;
+  assert.equal(app.saveSets, nextSets);
+  assert.equal(app.isParsing, false);
+  assert.equal(app.error, '');
+});
+
+test('cancelling during table preparation discards prepared rows', async () => {
+  const { app, parser } = harness([player]);
+  const oldSets = app.saveSets;
+  let enterLookup, finishLookup;
+  const entered = new Promise(resolve => { enterLookup = resolve; });
+  app.game8Lookup = { numberFor: () => { enterLookup(); return new Promise(resolve => { finishLookup = resolve; }); } };
+  parser.parseMany = async () => ({ rows: [{ pal_name: 'New Pal' }], sources: [], sets: [] });
+  const loading = app.parseInputs([input('extra.sav')], true);
+  await entered;
+  app.cancelLoading();
+  finishLookup('123');
+  await loading;
+  assert.equal(app.saveSets, oldSets);
+  assert.equal(app.loadedInputs.length, 1);
+  assert.equal(app.error, '');
+  assert.equal(app.isParsing, false);
+});
+
+test('parser cancellation terminates active work and settles pending previews', async () => {
+  const parser = new service.SaveParserService();
+  let terminated = 0;
+  const worker = { postMessage() {}, terminate() { terminated++; } };
+  parser.worker = worker;
+  parser.getWorker = () => worker;
+  const parsing = parser.parseMany([player]);
+  const rejected = assert.rejects(parsing, /Loading cancelled/);
+  let previewCalled = false;
+  const preview = parser.previewFiles([meta], () => { previewCalled = true; });
+  parser.cancelParsing();
+  await Promise.all([rejected, preview]);
+  assert.equal(terminated, 1);
+  assert.equal(parser.worker, undefined);
+  assert.equal(parser.pending.size, 0);
+  assert.equal(parser.pendingCounts.size, 0);
+  assert.equal(previewCalled, false);
+  parser.cancelParsing();
+  assert.equal(terminated, 1);
+});

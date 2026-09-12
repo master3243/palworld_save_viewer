@@ -1223,11 +1223,21 @@
   right: 24px;
   z-index: 1100;
   width: min(360px, calc(100vw - 48px));
-  padding: 14px 18px;
+  padding: 12px 14px;
   box-sizing: border-box;
-  border: 1px solid #31576a;
-  border-radius: 10px;
-  background: #0a202d;
-  box-shadow: 0 8px 28px #0008;
+  border: 1px solid #315365;
+  border-radius: 14px;
+  background: #0d202c;
+  box-shadow: 0 8px 28px #0006;
 }
-.load-progress .progress-block { width: 100%; }
+.load-progress-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #e8f8ff; font-size: .85rem; font-weight: 600; }
+.load-progress-heading > span { min-width: 0; }
+.load-progress-meter { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.load-progress .progress-track { flex: 1; height: 6px; border-radius: 999px; background: #203947; }
+.load-progress .progress-fill { height: 100%; border-radius: inherit; background: #63c9e9; }
+.load-progress-percent { color: #ffe66b; font-size: .78rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.load-progress-detail { margin: 8px 0 0; color: #a4bbc6; font-size: .75rem; line-height: 1.4; overflow-wrap: anywhere; }
+.cancel-load { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; padding: 5px 10px; border: 1px solid #365b6f; border-radius: 999px; background: #143346; color: #c8e8f5; font: inherit; font-size: .75rem; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s; }
+.cancel-load svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.cancel-load:hover { background: #204b63; border-color: #64bddb; }
+.cancel-load:focus-visible { outline: 2px solid #61cae8; outline-offset: 3px; }
