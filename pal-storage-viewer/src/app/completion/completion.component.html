@@ -136,7 +136,7 @@
             </ng-container>
           </button>
         </div>
-        <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" or "+ Folder" above.</p>
+        <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" above.</p>
         <p class="tracker-note" *ngIf="open.unavailable">{{ open.unavailable }}</p>
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
