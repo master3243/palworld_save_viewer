@@ -88,7 +88,6 @@
           [class.active]="category.key === selectedCategory"
           [class.complete]="category.total > 0 && category.done === category.total && !category.needsFile && !category.unavailable"
           [class.needs-file]="!!category.needsFile"
-          [class.missing-data]="category.key === 'arena' && !!category.unavailable"
           [attr.aria-expanded]="category.key === selectedCategory"
           [attr.aria-controls]="category.key === selectedCategory ? 'category-detail-' + category.key : null"
           (click)="selectCategory(category.key)"
@@ -100,15 +99,16 @@
               <svg *ngIf="category.key === 'arena'" class="card-map-icon arena-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 19 6-6"/><path d="M14.5 17.5 3.586 6.586A2 2 0 013 5.172V3h2.172a2 2 0 011.414.586L17.5 14.5"/><path d="m14.828 6.172 2.586-2.586A2 2 0 0118.828 3H21v2.172a2 2 0 01-.586 1.414l-2.586 2.586"/><path d="M16 16l4 4M19 21l2-2M5 14l4 4M5 21l-2-2M7.5 16.5 4 20"/></svg>
               <span>{{ category.title }}</span>
             </span>
-            <span class="card-count" [class.missing-data]="category.key === 'arena' && !!category.unavailable" [attr.title]="category.unavailable || null">{{ category.needsFile || (category.key === 'arena' && category.unavailable) ? '?' : category.unavailable ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
+            <span class="card-count" [attr.title]="category.unavailable || null">{{ category.needsFile ? '?' : category.unavailable && category.key !== 'arena' ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
           </span>
-          <span class="bar" [class.unavailable-bar]="category.key === 'arena' && !!category.unavailable" aria-hidden="true">
+          <span class="bar" aria-hidden="true">
             <span class="bar-fill" [style.width.%]="category.unavailable ? 0 : category.percent"></span>
           </span>
           <span class="card-foot">
             <span class="achievement-unknown" *ngIf="category.unknownCount">{{ category.unknownCount }} unconfirmed</span>
+            <span class="achievement-unknown" *ngIf="category.key === 'arena' && category.unavailable">unconfirmed</span>
             <span class="card-needs" *ngIf="category.needsFile">Not recorded in the loaded save.</span>
-            <span class="card-pct" *ngIf="!category.needsFile" [class.card-needs]="category.key === 'arena' && !!category.unavailable">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
+            <span class="card-pct" *ngIf="!category.needsFile && !(category.key === 'arena' && category.unavailable)">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
           </span>
         </button>
 
