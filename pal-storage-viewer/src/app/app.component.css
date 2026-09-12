@@ -1216,3 +1216,18 @@
   padding: 0;
   text-decoration: underline;
 }
+
+.load-progress {
+  position: fixed;
+  top: 58px;
+  right: 24px;
+  z-index: 1100;
+  width: min(360px, calc(100vw - 48px));
+  padding: 14px 18px;
+  box-sizing: border-box;
+  border: 1px solid #31576a;
+  border-radius: 10px;
+  background: #0a202d;
+  box-shadow: 0 8px 28px #0008;
+}
+.load-progress .progress-block { width: 100%; }

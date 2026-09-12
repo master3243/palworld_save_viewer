@@ -991,7 +991,7 @@ export class AppComponent implements OnDestroy {
       if (!duplicate) merged.push(input);
     }
 
-    this.resetData();
+    this.error = '';
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Initializing...', detail: '' };
     this.assignSaveLetters(merged);
@@ -1016,6 +1016,10 @@ export class AppComponent implements OnDestroy {
           await new Promise<void>((resolve) => setTimeout(resolve, 0));
         }
       }
+      const locationCounts = this.countLocations(rows);
+      const originalRows = this.defaultOrder(rows);
+      const columns = this.buildColumns(rows);
+      this.resetData();
       this.progress = { fraction: 1, label: 'Done', detail: '' };
       this.loadedInputs = merged;
       this.sources = result.sources;
@@ -1026,20 +1030,16 @@ export class AppComponent implements OnDestroy {
           this.localDataOwners.delete(folder);
         }
       }
-      this.locationCounts = this.countLocations(rows);
-      this.originalRows = this.defaultOrder(rows);
+      this.locationCounts = locationCounts;
+      this.originalRows = originalRows;
       this.filteredRows = this.originalRows;
       this.rows = [...this.originalRows];
-      this.columns = this.buildColumns(rows);
+      this.columns = columns;
       this.tabDiscovery.visit(this.view, this.hasData);
       this.scheduleMeasure();
     } catch (error) {
       if (removing && error instanceof UnidentifiedSavesError) this.clearLoadedData();
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';
-      if (append && previous.length) {
-        // Keep the table that was already there.
-        await this.parseInputs(previous, false);
-      }
     } finally {
       this.isParsing = false;
       this.progress = null;

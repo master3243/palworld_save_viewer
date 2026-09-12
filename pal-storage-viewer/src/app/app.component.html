@@ -55,18 +55,7 @@
     <div class="error-clip"><p class="error">{{ error }}</p></div>
   </div>
 
-  <section
-    *ngIf="!hasData"
-    class="dropzone"
-    [class.dragging]="isDragging"
-    [class.busy]="isParsing"
-    aria-label="Drag and drop save files or folders"
-    (drop)="onDrop($event)"
-    (dragover)="onDragOver($event)"
-    (dragleave)="onDragLeave($event)"
-  >
-    <span class="drop-title" *ngIf="!isParsing">Drag and drop save here</span>
-
+  <ng-template #loadProgress>
     <span
       class="progress-block"
       *ngIf="isParsing"
@@ -85,6 +74,24 @@
       </span>
       <span class="progress-detail">{{ progress?.detail || '\u00a0' }}</span>
     </span>
+  </ng-template>
+  <aside class="load-progress" *ngIf="hasData && isParsing" aria-label="Loading save files">
+    <ng-container *ngTemplateOutlet="loadProgress"></ng-container>
+  </aside>
+
+  <section
+    *ngIf="!hasData"
+    class="dropzone"
+    [class.dragging]="isDragging"
+    [class.busy]="isParsing"
+    aria-label="Drag and drop save files or folders"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+  >
+    <span class="drop-title" *ngIf="!isParsing">Drag and drop save here</span>
+
+    <ng-container *ngTemplateOutlet="loadProgress"></ng-container>
 
     <span class="drop-actions" *ngIf="!isParsing">
       <button

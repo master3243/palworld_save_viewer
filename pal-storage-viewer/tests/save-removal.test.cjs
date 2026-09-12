@@ -92,3 +92,53 @@ test('removal waits until parsing finishes so overlapping removals cannot restor
   await app.removeSaveGroup({ sources: [{ index: 0 }] });
   assert.equal(app.loadedInputs.length, 2);
 });
+
+test('adding a save preserves the displayed data until the new result is ready', async () => {
+  const { app, parser } = harness([player]);
+  const oldRows = [{ pal_name: 'Existing Pal' }];
+  app.rows = app.originalRows = app.filteredRows = oldRows;
+  app.columns = [{ key: 'pal_name' }];
+  app.sorts = [{ key: 'pal_name', direction: 'asc' }];
+  app.scrollTop = 400;
+  const oldSets = app.saveSets, oldSources = app.sources, oldColumns = app.columns;
+  let complete;
+  parser.parseMany = () => new Promise(resolve => { complete = resolve; });
+  const loading = app.parseInputs([input('player2.sav')], true);
+  assert.equal(app.isParsing, true);
+  assert.equal(app.rows, oldRows);
+  assert.equal(app.originalRows, oldRows);
+  assert.equal(app.saveSets, oldSets);
+  assert.equal(app.sources, oldSources);
+  assert.equal(app.columns, oldColumns);
+  assert.equal(app.scrollTop, 400);
+  assert.equal(app.hasData, true);
+  const sets = [{ folder: 'new', players: [{ uid: 'new', completion: {} }] }];
+  complete({ rows: [], sets, sources: [{ file: 'player2.sav' }] });
+  await loading;
+  assert.equal(app.saveSets, sets);
+  assert.equal(app.rows.length, 0);
+  assert.equal(app.isParsing, false);
+  assert.equal(app.progress, null);
+});
+
+test('failed additions preserve the current view and owner without reparsing it', async () => {
+  const { app, parser } = harness([player, local]);
+  const oldRows = [{ pal_name: 'Existing Pal' }];
+  app.rows = app.originalRows = app.filteredRows = oldRows;
+  app.columns = [{ key: 'pal_name' }];
+  app.scrollTop = 400;
+  app.localDataOwners.set('world', 'player.sav');
+  const oldSets = app.saveSets, oldSources = app.sources, oldInputs = app.loadedInputs;
+  let calls = 0;
+  parser.parseMany = async () => { calls++; throw new Error('Bad new save'); };
+  await app.parseInputs([input('bad.sav')], true);
+  assert.equal(calls, 1);
+  assert.equal(app.rows, oldRows);
+  assert.equal(app.saveSets, oldSets);
+  assert.equal(app.sources, oldSources);
+  assert.equal(app.loadedInputs, oldInputs);
+  assert.equal(app.scrollTop, 400);
+  assert.equal(app.localDataOwners.get('world'), 'player.sav');
+  assert.equal(app.error, 'Bad new save');
+  assert.equal(app.isParsing, false);
+});
