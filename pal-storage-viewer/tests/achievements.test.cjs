@@ -168,7 +168,7 @@ test('guild research decoder accepts both selected-project tails and rejects tru
   assert.equal(researchWork(body.subarray(0, body.length - 1)), null);
 });
 
-test('omitted Arena Points default to zero only with Level loaded; omitted awakenings default to zero', () => {
+test('omitted Arena Points default to zero only with Level loaded; omitted awakenings default to zero only in achievements', () => {
   for (const hasLevel of [false, true]) {
     const world = { labs: [], hasLevel, arenaPoints: null };
     const summary = summarize(empty({ counters: { awakenings: null } }), data, world);
@@ -177,7 +177,10 @@ test('omitted Arena Points default to zero only with Level loaded; omitted awake
     assert.equal(arena.arenaPoints.missing, !hasLevel);
     assert.equal(get('Silver Champ', {}, world).achievement.current, hasLevel ? 0 : null);
     assert.equal(get('Silver Champ', {}, world).achievement.unknown, true);
-    assert.equal(summary.stats.find(s => s.label === 'Awakenings').value, '0');
+    const awakenings = summary.stats.find(s => s.label === 'Awakenings');
+    assert.equal(awakenings.value, '?');
+    assert.equal(awakenings.missing, true);
+    assert.equal(awakenings.title, 'Awakening count was not recorded in the loaded save.');
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.current, 0);
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.unknown, true);
     assert.match(get('Hidden Potential', { counters: { awakenings: null } }, world).detail, /not recorded in the loaded save\. Assuming 0\./);
