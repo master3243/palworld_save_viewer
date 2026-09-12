@@ -29,7 +29,7 @@ const map = (name, keyType, valueType, entries, count) => {
 test('75 unique rows preserve confidence split and unknown data never counts as completion', () => {
   assert.equal(ACHIEVEMENTS.length, 75);
   assert.equal(new Set(ACHIEVEMENTS.map(a => a.name)).size, 75);
-  assert.deepEqual([1,2,3].map(b => ACHIEVEMENTS.filter(a => a.bucket === b).length), [65,7,3]);
+  assert.deepEqual([1,2,3].map(b => ACHIEVEMENTS.filter(a => a.bucket === b).length), [66,6,3]);
   const c = summarize(empty({ recorded_fields: [] }), data).categories.find(c => c.key === 'achievements');
   assert.equal(c.total, 75); assert.equal(c.done, 0); assert.equal(c.unknownCount, 75);
 });

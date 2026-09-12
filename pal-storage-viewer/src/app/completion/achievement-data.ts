@@ -33,7 +33,7 @@ export const ACHIEVEMENTS: readonly AchievementDefinition[] = [
   {"id": "achievement-20", "name": "Voice of Resentment", "description": "Maximized the rank of 5 Pals", "kind": "condensation", "target": 5, "key": "", "group": "Pal Development", "bucket": 1},
   {"id": "achievement-21", "name": "Senior Adventurer", "description": "Cleared 20 dungeons", "kind": "counter", "target": 20, "key": "normal_dungeon_clears", "group": "Exploration", "bucket": 2},
   {"id": "achievement-22", "name": "Conqueror of the Sea", "description": "Seized the Oil Rig", "kind": "counter", "target": 1, "key": "oilrig_clears", "group": "Combat", "bucket": 1},
-  {"id": "achievement-23", "name": "Sphere Craftsman", "description": "Crafted 2,000 spheres", "kind": "craft", "target": 2000, "key": "SPWeaponCaptureBall", "group": "Crafting", "bucket": 2},
+  {"id": "achievement-23", "name": "Sphere Craftsman", "description": "Crafted 2,000 spheres", "kind": "craft", "target": 2000, "key": "SPWeaponCaptureBall", "group": "Crafting", "bucket": 1},
   {"id": "achievement-24", "name": "Iron Heart", "description": "Crafted 10,000 ingots", "kind": "craft", "target": 10000, "key": "MaterialIngot", "group": "Crafting", "bucket": 2},
   {"id": "achievement-25", "name": "Blood and Iron", "description": "Crafted 20,000 ammo", "kind": "craft", "target": 20000, "key": "ConsumeBullet", "group": "Crafting", "bucket": 2},
   {"id": "achievement-26", "name": "Incarnation of the Eternal Flame", "description": "Defeated a summoned Blazamut Ryu", "kind": "raid", "target": 1, "key": "PalSummon_KingBahamut_Dragon", "group": "Combat", "bucket": 1},
