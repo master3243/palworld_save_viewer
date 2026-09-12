@@ -761,7 +761,7 @@
 
 .item-table .condensed-col {
   min-width: 42px;
-  padding-right: 16px;
+  padding-right: 6px;
   text-align: center;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
