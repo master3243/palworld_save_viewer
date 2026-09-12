@@ -824,3 +824,19 @@
 .arena-points.missing-data { border-color: rgba(255, 123, 123, 0.55); }
 .arena-points.missing-data,
 .arena-points.missing-data b { color: #ff8e8e; }
+
+.achievement-icon { color: #ffdb72; }
+.achievement-unknown { color: #ff8e8e; font-size: 12px; }
+.achievement-progress { text-align: right; white-space: nowrap; }
+.achievement-requirement { min-width: 190px; }
+.achievement-estimate { display: flex; flex-wrap: wrap; gap: 4px 12px; color: #ffd37a; font-size: 11px; }
+.achievement-estimate .achievement-warning-icon { width: 12px; height: 12px; flex-basis: 12px; margin-top: 1px; }
+.achievement-progress.missing-data .card-count,
+.achievement-progress.missing-data .card-count span { color: #ff8e8e; }
+.achievement-notice { display: flex; flex-direction: column; gap: 6px; }
+.achievement-warning { display: flex; align-items: baseline; gap: 6px; margin: 0; }
+.achievement-warning-icon { width: 15px; height: 15px; flex: 0 0 15px; align-self: flex-start; margin-top: 2px; color: #ffd37a; }
+.achievement-info-icon { color: #63ccec; }
+.achievement-unconfirmed,
+.achievement-unconfirmed .achievement-warning-icon { color: #ff8e8e; }
+.achievement-warning-counts { display: flex; flex-direction: column; gap: 6px; color: #ffd37a; }

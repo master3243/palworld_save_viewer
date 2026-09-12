@@ -174,6 +174,13 @@ export class CompletionComponent implements OnChanges {
           completion: player.completion,
           world: {
             labs: set.labs ?? [],
+            hasLevel: set.has_level,
+            guildAchievements: player.guild_achievements,
+            keyItemIds: player.key_item_ids,
+            maxFriendship: this.localDataOwner(set) === player.uid ? set.max_friendship : null,
+            friendshipUnavailable: !set.has_local_data ? 'Add LocalData.sav with "+ Files" to see friendship history.'
+              : this.localDataOwner(set) !== player.uid ? 'Select the player who owns LocalData.sav.'
+              : 'Maximum friendship was not recorded in the loaded save.',
             inGameDay: set.in_game_day,
             ownedCondensation: set.has_level ? ownedCondensation(this.rows, set.letter, player.uid) : null,
             bases: set.has_level ? set.bases.length : null,
@@ -181,15 +188,15 @@ export class CompletionComponent implements OnChanges {
             keyItems: player.key_items,
             attributes: player.attributes,
             arenaPoints: player.arena_points,
-            arenaPointsUnavailable: set.has_level ? 'Arena Points were not recorded for this player in the loaded world save.' : 'Add Level.sav with "+ Files" to see Arena Points.',
-            attributesUnavailable: set.has_level ? 'Player attributes were not recorded in the loaded world save.' : 'Add Level.sav with "+ Files" to see player attributes.',
+            arenaPointsUnavailable: set.has_level ? 'Arena Points were not recorded in the loaded save.' : 'Add Level.sav with "+ Files" to see Arena Points.',
+            attributesUnavailable: set.has_level ? 'Player attributes were not recorded in the loaded save.' : 'Add Level.sav with "+ Files" to see player attributes.',
             seenSpecies: this.localDataOwner(set) === player.uid ? set.seen_species : null,
             checkedNotes: this.localDataOwner(set) === player.uid ? set.checked_notes : null,
             checkedUnavailable: !set.has_local_data ? 'Add LocalData.sav with "+ Files" to see checked journals.'
-              : set.checked_notes == null ? 'Journal check data unavailable. Load one matching LocalData.sav with recorded journal checks.'
+              : set.checked_notes == null ? 'Journal checks were not recorded in the loaded save.'
               : 'Select the player who owns LocalData.sav. Checked journals are only available for that player.',
             seenUnavailable: !set.has_local_data ? 'Add LocalData.sav with "+ Files" to see encountered species.'
-              : set.seen_species == null ? 'Encounter data unavailable. Load one matching LocalData.sav.'
+              : set.seen_species == null ? 'Encounter data was not recorded in the loaded save.'
               : 'Select the player who owns LocalData.sav. Seen data is only available for that player.',
           },
           level: player.level ?? null,
@@ -228,14 +235,14 @@ export class CompletionComponent implements OnChanges {
     }
     const items = (this.prioritizeNotDone ? ordered.prioritized : ordered.normal).filter((item) =>
       (!this.groupFilter || item.group === this.groupFilter)
-      && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.coords.includes(needle)));
+      && (!needle || item.name.toLowerCase().includes(needle) || item.detail.toLowerCase().includes(needle) || item.achievement?.description.toLowerCase().includes(needle) || item.coords.includes(needle)));
     this.filteredRows = { category, needle, group: this.groupFilter, priority: this.prioritizeNotDone, items };
     return items;
   }
 
   get tableColumnCount(): number {
     const category = this.category;
-    return 3 - (category?.key === 'arena' ? 1 : 0) + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
+    return 3 + (category?.key === 'achievements' ? 2 : 0) - (category?.key === 'arena' ? 1 : 0) + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
       + (category?.key === 'paldeck' || category?.key === 'notes' ? 1 : 0)
       + (category?.key === 'captureBonus' ? 2 + this.condensationStars.length : 0) + (this.showFishing ? 3 : 0)
       + (category?.hasCoords ? 1 : 0) + (category?.hasNumbers ? 1 : 0) + (category?.hasTags ? 1 : 0);
@@ -346,6 +353,8 @@ export class CompletionComponent implements OnChanges {
   }
 
   stateLabel(item: TrackedItem): string {
+    if (item.achievement) return item.achievement.unknown ? (item.achievement.current === null ? 'Unknown' : 'Unconfirmed')
+      : item.state === 'done' ? 'Achieved' : item.state === 'active' ? 'In progress' : 'Not Achieved';
     if (this.selectedCategory === 'arena') return this.category?.unavailable ? '?' : item.state === 'done' ? 'Cleared' : 'Uncleared';
     if (this.selectedCategory === 'crafting') return item.crafting?.count == null ? 'Unknown' : item.state === 'done' ? 'Crafted' : 'Not crafted';
     if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';

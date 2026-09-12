@@ -17,7 +17,7 @@ export function extractPlayerAttributes(buf: SaveBuffer): PlayerAttributes | nul
 }
 
 /** Slots start with index, quantity, and static item ID; retain only distinct positive stacks. */
-export function countDistinctItems(slots: unknown): number | null {
+export function distinctItemIds(slots: unknown): string[] | null {
   if (!Array.isArray(slots)) return null;
   const ids = new Set<string>();
   for (const slot of slots) {
@@ -32,16 +32,24 @@ export function countDistinctItems(slots: unknown): number | null {
       if (quantity > 0 && id && id.toLowerCase() !== 'none') ids.add(id.toLowerCase());
     } catch { return null; }
   }
-  return ids.size;
+  return [...ids];
 }
 
-export function extractItemCounts(buf: SaveBuffer): Record<string, number | null> {
-  const counts: Record<string, number | null> = {};
+export function countDistinctItems(slots: unknown): number | null {
+  return distinctItemIds(slots)?.length ?? null;
+}
+
+export function extractItemIds(buf: SaveBuffer): Record<string, string[] | null> {
+  const counts: Record<string, string[] | null> = {};
   try {
     for (const [key, value] of readMapEntries(buf, 'ItemContainerSaveData')) {
       const id = asDict(key)['ID'];
-      if (typeof id === 'string') counts[id] = countDistinctItems(value['Slots']);
+      if (typeof id === 'string') counts[id] = distinctItemIds(value['Slots']);
     }
   } catch { /* Unreadable containers remain unknown without discarding the rest of the world. */ }
   return counts;
+}
+
+export function extractItemCounts(buf: SaveBuffer): Record<string, number | null> {
+  return Object.fromEntries(Object.entries(extractItemIds(buf)).map(([id, items]) => [id, items?.length ?? null]));
 }

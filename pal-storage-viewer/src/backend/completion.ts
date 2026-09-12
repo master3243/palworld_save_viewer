@@ -32,6 +32,8 @@ export interface CompletionCounters {
 }
 
 export interface PlayerCompletion {
+  recorded_fields?: string[];
+  specific_boss_counts?: Record<string, number> | null;
   tower_bosses: string[];
   tower_boss_counts: Record<string, number>;
   bosses: string[];
@@ -287,6 +289,11 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
   const relicsUnspent = numbers(readScalarMap(buf, 'RelicPossessNumMap'), 'EPalRelicType::');
   const technologies = readNameList(buf, 'UnlockedRecipeTechnologyNames');
   return {
+    recorded_fields: ['TowerBossDefeatFlag', 'TowerBossDefeatCount', 'RaidBossDefeatCount', 'PalCaptureCount',
+      'PalRankupCount', 'NoteObtainForInstanceFlag', 'FindAreaFlagMap', 'RelicObtainForInstanceFlagByType',
+      'RelicObtainForInstanceFlag', 'CompletedQuestArray_FullRelease', 'UnlockedWorldMapFlags']
+      .filter(label => findPropertyStart(buf, label) !== -1),
+    specific_boss_counts: findPropertyStart(buf, 'SpecificBossDefeatFlag') === -1 ? null : numbers(readScalarMap(buf, 'SpecificBossDefeatFlag')),
     tower_bosses: trueKeys(readScalarMap(buf, 'TowerBossDefeatFlag')),
     tower_boss_counts: numbers(readScalarMap(buf, 'TowerBossDefeatCount')),
     bosses: trueKeys(readScalarMap(buf, 'NormalBossDefeatFlag')),

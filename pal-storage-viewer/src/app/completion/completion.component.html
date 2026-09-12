@@ -83,6 +83,7 @@
           <span class="card-head">
             <span class="card-title">
               <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'crafting' ? 'scale(1.3)' : category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' || category.key === 'research' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
+              <svg *ngIf="category.key === 'achievements'" class="card-map-icon achievement-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H4v2a4 4 0 0 0 4 4m8-6h4v2a4 4 0 0 1-4 4M12 12v6m-4 3h8m-7 0v-3h6v3"/></svg>
               <svg *ngIf="category.key === 'arena'" class="card-map-icon arena-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 19 6-6"/><path d="M14.5 17.5 3.586 6.586A2 2 0 013 5.172V3h2.172a2 2 0 011.414.586L17.5 14.5"/><path d="m14.828 6.172 2.586-2.586A2 2 0 0118.828 3H21v2.172a2 2 0 01-.586 1.414l-2.586 2.586"/><path d="M16 16l4 4M19 21l2-2M5 14l4 4M5 21l-2-2M7.5 16.5 4 20"/></svg>
               <span>{{ category.title }}</span>
             </span>
@@ -92,6 +93,7 @@
             <span class="bar-fill" [style.width.%]="category.unavailable ? 0 : category.percent"></span>
           </span>
           <span class="card-foot">
+            <span class="achievement-unknown" *ngIf="category.unknownCount">{{ category.unknownCount }} unconfirmed</span>
             <span class="card-needs" *ngIf="category.needsFile">{{ category.needsFile }} needed</span>
             <span class="card-pct" *ngIf="!category.needsFile" [class.card-needs]="category.key === 'arena' && !!category.unavailable">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
           </span>
@@ -121,9 +123,9 @@
             <span class="group-chip-head"><span>{{ entry.label }}</span><b>{{ entry.value }}</b></span>
           </div>
         </div>
-        <ng-container *ngIf="open.key === 'paldeck' || open.key === 'notes'">
+        <ng-container *ngIf="open.key === 'paldeck' || open.key === 'notes' || open.key === 'achievements'">
           <label class="seen-owner" *ngIf="localDataSave as set">
-            <ng-container *ngIf="(open.key === 'paldeck' ? set.seen_species != null : set.checked_notes != null) && set.players.length > 1">
+            <ng-container *ngIf="(open.key === 'paldeck' ? set.seen_species != null : open.key === 'notes' ? set.checked_notes != null : set.max_friendship != null) && set.players.length > 1">
               LocalData belongs to
               <select [value]="localDataOwner(set)" (change)="selectLocalDataOwner($event)" aria-label="Player who owns LocalData.sav">
                 <option value="">Select player</option>
@@ -158,6 +160,16 @@
           </button>
         </div>
         <p class="tracker-note error" *ngIf="open.needsFile">This needs {{ open.needsFile }} from the save folder. Add it with "+ Files" above.</p>
+        <ng-template #achievementWarning>
+          <svg class="achievement-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18.1A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></svg>
+        </ng-template>
+        <div class="achievement-notice tracker-note" *ngIf="open.key === 'achievements'">
+          <p class="achievement-warning"><svg class="achievement-warning-icon achievement-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><span>Progress inferred from the loaded saves. Many achievements are merely approximated or unconfirmed.</span></p>
+          <div class="achievement-warning-counts">
+            <span class="achievement-warning" *ngIf="open.approximateCount"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>{{ open.approximateCount }} approximated</span>
+            <span class="achievement-warning achievement-unconfirmed" *ngIf="open.unknownCount"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>{{ open.unknownCount }} unconfirmed</span>
+          </div>
+        </div>
         <p class="tracker-note" [class.error]="open.key === 'arena'" *ngIf="open.unavailable">{{ open.unavailable }}</p>
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
@@ -172,6 +184,8 @@
               <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>{{ open.key === 'arena' ? 'Solo Tier' : 'Name' }}</th>
+              <th *ngIf="open.key === 'achievements'">Requirement</th>
+              <th class="achievement-progress" *ngIf="open.key === 'achievements'">Progress</th>
               <th class="checked-col" *ngIf="open.key === 'notes'" title="Journal checked flag recorded in LocalData.sav">Checked</th>
               <th class="seen-col" *ngIf="open.key === 'paldeck'" title="Encountered species recorded in LocalData.sav">Seen</th>
               <ng-container *ngIf="open.key === 'crafting'">
@@ -201,9 +215,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; let rowIndex = index; trackBy: trackItem" [attr.aria-rowindex]="rowIndex + 2" [attr.data-item-id]="item.id" [attr.data-state]="item.crafting && item.crafting.count === null ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
+            <tr *ngFor="let item of visibleItems; let rowIndex = index; trackBy: trackItem" [attr.aria-rowindex]="rowIndex + 2" [attr.data-item-id]="item.id" [attr.data-state]="item.achievement?.unknown || (item.crafting && item.crafting.count === null) ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
               <ng-container *tableRowViewport="trackerScroll; columns: columns.count; height: isPalList ? 36 : open.key === 'crafting' ? 38 : 30">
-              <td class="state-col" [class.missing-data]="open.key === 'arena' && !!open.unavailable" [attr.title]="open.key === 'arena' ? open.unavailable : null">
+              <td class="state-col" [class.missing-data]="!!item.achievement?.unknown || (open.key === 'arena' && !!open.unavailable)" [attr.title]="item.achievement?.unknown ? item.detail : open.key === 'arena' ? open.unavailable : null">
                 <span class="item-status"><span class="state-dot" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
               </td>
               <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">
@@ -219,6 +233,15 @@
               <td class="portrait-col" *ngIf="isPalList"><img [offlineSrc]="palIconPath(item)" [alt]="item.name" decoding="async" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
+              <ng-container *ngIf="item.achievement as achievement">
+                <td class="achievement-requirement">{{ achievement.description }}
+                  <small class="achievement-estimate" *ngIf="achievement.approximate || achievement.unknown">
+                    <span class="achievement-warning" *ngIf="achievement.approximate" title="Uses an approximate achievement criterion."><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>Approximated</span>
+                    <span class="achievement-warning achievement-unconfirmed" *ngIf="achievement.unknown" [attr.title]="item.detail"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>Unconfirmed</span>
+                  </small>
+                </td>
+                <td class="achievement-progress" [class.missing-data]="achievement.unknown"><span class="card-count">{{ achievement.current === null ? '?' : (achievement.current | number) }}<span>/{{ achievement.target | number }}</span></span></td>
+              </ng-container>
               <td class="checked-col" *ngIf="open.key === 'notes'" [class.missing-data]="item.checked == null" [class.checked]="item.checked === true" [class.not-checked]="item.checked === false" [attr.title]="item.checked == null ? player?.world?.checkedUnavailable : item.checked ? 'Checked' : 'Not checked'" [attr.aria-label]="item.checked == null ? 'Checked status unknown' : item.checked ? 'Checked' : 'Not checked'">{{ item.checked == null ? '?' : item.checked ? '✔' : '✘' }}</td>
               <td class="seen-col" *ngIf="open.key === 'paldeck'" [class.missing-data]="item.seen == null" [class.seen]="item.seen === true" [class.not-seen]="item.seen === false" [attr.title]="item.seen == null ? player?.world?.seenUnavailable : item.seen ? 'Seen' : 'Not seen'" [attr.aria-label]="item.seen == null ? 'Seen status unknown' : item.seen ? 'Seen' : 'Not seen'">{{ item.seen == null ? '?' : item.seen ? '✔' : '✘' }}</td>
               <ng-container *ngIf="item.crafting as craft">

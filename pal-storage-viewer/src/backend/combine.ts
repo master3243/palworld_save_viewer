@@ -1,3 +1,4 @@
+import type { GuildAchievementProgress } from './achievement-progress';
 /**
  * Merge parsed save files into one pal table with a location per pal.
  */
@@ -55,9 +56,11 @@ export interface SaveSetSummary {
   pals: number;
   bases: { index: number; location: { x: number; y: number; z: number } | null; workers: number }[];
   players: { uid: string; name: string; level: number | null; completion: PlayerCompletion | null;
-    attributes: PlayerAttributes | null; key_items: number | null; arena_points: number | null }[];
+    attributes: PlayerAttributes | null; key_items: number | null; arena_points: number | null;
+    key_item_ids?: string[] | null; guild_achievements?: GuildAchievementProgress | null }[];
   seen_species: string[] | null;
   checked_notes: string[] | null;
+  max_friendship?: number | null;
   has_local_data: boolean;
   /** Guild lab research progress from Level.sav, one map per guild. */
   labs: Record<string, number>[];
@@ -97,8 +100,11 @@ interface SaveSet {
   player_arena_points: Map<string, number | null>;
   key_item_containers: Map<string, string>;
   item_counts: Record<string, number | null>;
+  item_ids: Record<string, string[] | null>;
+  guild_achievements: Record<string, GuildAchievementProgress | null>;
   seen_species: string[] | null;
   checked_notes: string[] | null;
+  max_friendship?: number | null;
   local_files: number;
   completions: Map<string, PlayerCompletion>;
   labs: Record<string, number>[];
@@ -220,6 +226,8 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
     set.labs.push(...parsed.payload.labs);
     Object.assign(set.containers, parsed.payload.containers);
     Object.assign(set.item_counts, parsed.payload.item_counts ?? {});
+    Object.assign(set.item_ids, parsed.payload.item_ids ?? {});
+    Object.assign(set.guild_achievements, parsed.payload.guild_achievements ?? {});
     for (const base of parsed.payload.bases) {
       if (base.worker_container_id) set.base_containers.set(base.worker_container_id, base);
     }
@@ -247,7 +255,8 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
     set.local_files++;
     set.seen_species = set.local_files === 1 ? parsed.payload.seen_species : null;
     set.checked_notes = set.local_files === 1 ? parsed.payload.checked_notes ?? null : null;
-    source.note = 'Encountered species and checked journals for the local player';
+    set.max_friendship = set.local_files === 1 ? parsed.payload.max_friendship ?? null : null;
+    source.note = 'Encountered species, checked journals and friendship history for the local player';
   } else if (parsed.kind === 'level_meta') {
     set.world_name = parsed.payload.world_name || '';
     set.host_player_name = parsed.payload.host_player_name || '';
@@ -271,7 +280,7 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
         label, letter: '', world_name: '', host_player_name: '', in_game_day: null, saved_at: '',
         players: new Set(), player_names: new Map(), player_levels: new Map(), completions: new Map(), labs: [], party_containers: new Set(), pal_box_containers: new Set(),
         base_containers: new Map(), bases: [], containers: {}, dps_records: [], level_records: [],
-        player_attributes: new Map(), player_arena_points: new Map(), key_item_containers: new Map(), item_counts: {}, seen_species: null, checked_notes: null, local_files: 0,
+        player_attributes: new Map(), player_arena_points: new Map(), key_item_containers: new Map(), item_counts: {}, item_ids: {}, guild_achievements: {}, seen_species: null, checked_notes: null, local_files: 0,
       };
       sets.set(label, set);
     }
@@ -348,9 +357,12 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
       })),
       players: [...playerIds].sort().map((uid) => ({ uid, name: set.player_names.get(uid) ?? '', level: set.player_levels.get(uid) ?? null, completion: set.completions.get(uid) ?? null,
         attributes: set.player_attributes.get(uid) ?? null, key_items: set.item_counts[set.key_item_containers.get(uid) ?? ''] ?? null,
-        arena_points: set.player_arena_points.get(uid) ?? null })),
+        arena_points: set.player_arena_points.get(uid) ?? null,
+        key_item_ids: set.item_ids[set.key_item_containers.get(uid) ?? ''] ?? null,
+        guild_achievements: set.guild_achievements[uid] ?? null })),
       seen_species: set.seen_species,
       checked_notes: set.checked_notes,
+      max_friendship: set.max_friendship ?? null,
       has_local_data: set.local_files > 0,
       labs: set.labs,
       has_level: set.level_records.length > 0 || sources.some((source) => source.kind === 'level' && source.set === label),

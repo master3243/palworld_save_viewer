@@ -1,3 +1,5 @@
+import { achievementItems, AchievementProgress } from './achievement-model';
+import type { GuildAchievementProgress } from '../../backend/achievement-progress';
 /**
  * Turns one player's completion record plus the bundled master lists into per-category
  * progress. Pure functions, no Angular, so they can be checked under Node.
@@ -71,6 +73,11 @@ export interface CraftingItem {
 
 /** World-level (guild) progress that lives in Level.sav rather than the player save. */
 export interface WorldProgress {
+  hasLevel?: boolean;
+  guildAchievements?: GuildAchievementProgress | null;
+  keyItemIds?: string[] | null;
+  maxFriendship?: number | null;
+  friendshipUnavailable?: string;
   /** Lab research work done per research id, one map per guild in the world. */
   labs: Record<string, number>[];
   inGameDay?: number | null;
@@ -91,6 +98,7 @@ export interface WorldProgress {
 export type ItemState = 'done' | 'active' | 'todo';
 
 export interface TrackedItem {
+  achievement?: AchievementProgress;
   id: string;
   name: string;
   /** Secondary text: level, step, capture count... */
@@ -153,6 +161,8 @@ export interface Category {
   needsFile?: string;
   unavailable?: string;
   arenaPoints?: StatEntry;
+  unknownCount?: number;
+  approximateCount?: number;
   /** Costs of all remaining technologies, independent of the visible list filters. */
   technologyPoints?: { key: string; name: string; remaining: number; available: number | null; needed: number | null }[];
 }
@@ -236,7 +246,8 @@ function arenaCategory(record: PlayerCompletion, world?: WorldProgress): Categor
     key: 'arena', title: 'Arena', groups: [],
     unknown: Object.keys(clears ?? {}).filter(id => !known.has(id.toLowerCase())).sort(),
     unavailable: clears == null ? 'Solo arena progress was not recorded in the loaded save.' : undefined,
-    arenaPoints: stat('Arena Points', world?.arenaPoints, 'Arena points recorded for this player',
+    arenaPoints: stat('Arena Points', world?.arenaPoints ?? (world?.hasLevel ? 0 : null),
+      world?.arenaPoints == null ? 'Arena Points were not recorded in the loaded save; assuming 0.' : 'Arena points recorded for this player',
       world?.arenaPointsUnavailable ?? 'Add Level.sav with "+ Files" to see Arena Points.'),
     items: tiers.map((name, order) => ({
       id: name, name, order, state: (recorded.get(name.toLowerCase()) ?? 0) > 0 ? 'done' : 'todo',
@@ -393,7 +404,7 @@ function craftingCategory(record: PlayerCompletion, data: CompletionData): Categ
   const groups = new Map([...new Set(catalog.map(item => item.group))].sort().map(name => [name, name]));
   return finish({ key: 'crafting', title: 'Crafting', items, groups: groupsOf(items, groups),
     unknown: [...counts].filter(([id, count]) => count > 0 && !known.has(id)).map(([id]) => id).sort(),
-    unavailable: record.crafted_item_counts == null ? 'This save does not record crafting history.' : undefined,
+    unavailable: record.crafted_item_counts == null ? 'Crafting history was not recorded in the loaded save.' : undefined,
   });
 }
 
@@ -723,6 +734,14 @@ function condensationStat(record: PlayerCompletion): StatEntry {
   return entry;
 }
 
+function achievementCategory(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): Category {
+  const items = achievementItems(record, data, world);
+  const names = new Map(items.map(item => [item.group, item.group]));
+  return finish({ key: 'achievements', title: 'Achievements', items, groups: groupsOf(items, names), unknown: [],
+    unknownCount: items.filter(item => item.achievement?.unknown).length,
+    approximateCount: items.filter(item => item.achievement?.approximate).length });
+}
+
 export function summarize(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): CompletionSummary {
   const categories = [
     paldeckCategory(record, data, world),
@@ -745,6 +764,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     researchCategory(world, data),
     arenaCategory(record, world),
     skinCategory(record, data),
+    achievementCategory(record, data, world),
   ];
   const counted = categories.filter((category) => category.total > 0 && !category.needsFile && !category.unavailable);
   const percent = counted.length ? Math.round((counted.reduce((sum, category) => sum + category.percent, 0) / counted.length) * 10) / 10 : 0;
@@ -760,7 +780,8 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     stat('Total Pals captured', countTotal(record.capture_counts), 'Lifetime captures, including repeats and every entry recorded by the save'),
     stat('Fishing catches', countTotal(record.fishing_counts), 'Lifetime fishing catches across all species and sizes'),
     stat('Butchered', countTotal(record.butcher_counts), 'Total butchering count across all entries recorded by the save'),
-    stat('Awakenings', counters.awakenings, 'Total awakenings recorded by the save'),
+    stat('Awakenings', counters.awakenings ?? 0,
+      counters.awakenings == null ? 'Awakening count was not recorded in the loaded save; assuming 0.' : 'Total awakenings recorded by the save'),
     stat('Mutations', counters.mutations, 'Mutated pals bred'),
     condensationStat(record),
     stat('Items crafted', countTotal(record.crafted_item_counts), 'Lifetime items crafted, including repeated crafts and items outside the crafting catalog'),
