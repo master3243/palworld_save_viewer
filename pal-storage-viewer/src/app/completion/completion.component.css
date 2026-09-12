@@ -840,3 +840,6 @@
 .achievement-unconfirmed,
 .achievement-unconfirmed .achievement-warning-icon { color: #ff8e8e; }
 .achievement-warning-counts { display: flex; flex-direction: column; gap: 6px; color: #ffd37a; }
+
+.local-owner-warning { display: inline-flex; color: #ffd16c; cursor: help; }
+.local-owner-warning:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }

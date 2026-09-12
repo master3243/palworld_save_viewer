@@ -74,13 +74,13 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
       }
       case 'craft': return { current: record.crafted_item_counts == null ? null
         : sum(new Map([...crafts].filter(([id]) => itemTypes.get(a.key)!.has(id)))),
-        note: a.key === 'MaterialIngot' ? 'Includes charcoal and other materials in the game’s ingot category.'
+        note: a.key === 'MaterialIngot' ? 'Includes charcoal and other materials in the game\'s ingot category.'
           : a.key === 'ConsumeBullet' ? 'Includes arrows; counts quantities, not distinct items.' : 'Counts sphere quantities, not distinct recipes.' };
       case 'hard': return { current: has('TowerBossDefeatCount') ? hardTowers.filter(id => (towerCounts.get(keyOf(id + '_Hard')) ?? 0) > 0).length : null,
         note: 'Zoe, Lily, Axel, Marcus, Victor and Saya in Hard Mode.' };
       case 'research': return { current: guild?.research == null ? null : data.research.filter(([id, , , work]) => work > 0 && (guild.research![id] ?? 0) >= work - 0.5).length,
-        note: guild?.research == null ? guildMissing : 'Completed projects in this player’s guild.' };
-      case 'expedition': return { current: finite(guild?.expeditions), note: guild?.expeditions == null ? guildMissing : 'Expedition total recorded for this player’s guild.' };
+        note: guild?.research == null ? guildMissing : 'Completed projects in this player\'s guild.' };
+      case 'expedition': return { current: finite(guild?.expeditions), note: guild?.expeditions == null ? guildMissing : 'Expedition total recorded for this player\'s guild.' };
       case 'chopper': return { current: record.specific_boss_counts == null ? null : Math.min(counts(record.specific_boss_counts).get('securitydrone') ?? 0, 1) };
       case 'fishing': return { current: record.fishing_counts == null ? null : sum(fishing) };
       case 'lunker': return { current: record.fishing_counts == null ? null : Math.min(sum(new Map([...fishing].filter(([id]) => id.endsWith('_nushi')))), 1) };

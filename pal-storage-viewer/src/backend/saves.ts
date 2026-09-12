@@ -1,3 +1,4 @@
+import { LocalOwnerEvidence, extractLocalOwnerEvidence, extractOwnerQuests } from './local-data-owner';
 /**
  * Per-file extraction: which kind of save a file is, and what it contributes.
  */
@@ -215,6 +216,7 @@ export function extractLevel(buf: SaveBuffer, lookups: Lookups, progress?: Parse
 }
 
 export interface PlayerPayload {
+  owner_quests?: string[] | null;
   player_uid: string | null;
   instance_id: string | null;
   party_container_id: string | null;
@@ -239,6 +241,7 @@ export function extractPlayer(buf: SaveBuffer): PlayerPayload {
   }
   return {
     player_uid: guidAt('PlayerUId'),
+    owner_quests: extractOwnerQuests(buf),
     instance_id: guidOrNull(individual['InstanceId']),
     party_container_id: guidAt('OtomoCharacterContainerId'),
     pal_box_container_id: guidAt('PalStorageContainerId'),
@@ -272,7 +275,7 @@ export type ParsedFile =
   | { kind: 'level'; class_name: string; saved_at: string; payload: LevelPayload }
   | { kind: 'player'; class_name: string; saved_at: string; payload: PlayerPayload }
   | { kind: 'level_meta'; class_name: string; saved_at: string; payload: LevelMetaPayload }
-  | { kind: 'local_data'; class_name: string; saved_at: string; payload: { seen_species: string[] | null; checked_notes: string[] | null; max_friendship?: number | null } }
+  | { kind: 'local_data'; class_name: string; saved_at: string; payload: { seen_species: string[] | null; checked_notes: string[] | null; max_friendship?: number | null; owner_evidence?: LocalOwnerEvidence } }
   | { kind: 'world_option' | 'unknown'; class_name: string; saved_at: string; payload: null };
 
 /** Decode one save file (already decompressed GVAS bytes) into its parsed payload. */
@@ -296,7 +299,7 @@ export function parseSaveFile(
     case 'level_meta':
       return { kind, class_name: className, saved_at: savedAt, payload: extractLevelMeta(buf) };
     case 'local_data':
-      return { kind, class_name: className, saved_at: savedAt, payload: { seen_species: extractSeenSpecies(buf), checked_notes: extractCheckedNotes(buf), max_friendship: extractMaxFriendship(buf) } };
+      return { kind, class_name: className, saved_at: savedAt, payload: { seen_species: extractSeenSpecies(buf), checked_notes: extractCheckedNotes(buf), max_friendship: extractMaxFriendship(buf), owner_evidence: extractLocalOwnerEvidence(buf) } };
     default:
       return { kind, class_name: className, saved_at: savedAt, payload: null };
   }

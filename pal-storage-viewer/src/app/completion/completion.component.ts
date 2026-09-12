@@ -15,7 +15,7 @@ import { TableRowViewport, TableRowViewportDirective } from './table-row-viewpor
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
 import { palWikiLinks, PalWikiLink } from '../pal-wiki-links';
-import { TooltipDirective } from '../game-tooltip.component';
+import { TooltipData, TooltipDirective, TooltipText } from '../game-tooltip.component';
 import { ownedCondensation } from './owned-condensation';
 
 interface PlayerOption {
@@ -45,6 +45,7 @@ export class CompletionComponent implements OnChanges {
   @Input() sets: SaveSetSummary[] = [];
   @Input() rows: Record<string, unknown>[] = [];
   @Input() localDataOwners = new Map<string, string>();
+  private ownerWarnings = new WeakMap<SaveSetSummary, Map<string, TooltipData>>();
   readonly condensationStars = [0, 1, 2, 3, 4];
 
   /** Master lists; loaded once from resources/completion/completion-data.json. */
@@ -253,7 +254,52 @@ export class CompletionComponent implements OnChanges {
 
   localDataOwner(set: SaveSetSummary): string {
     const selected = this.localDataOwners.get(set.folder);
-    return selected && set.players.some(player => player.uid === selected) ? selected : set.players.length === 1 ? set.players[0].uid : '';
+    if (selected !== undefined && (selected === '' || set.players.some(player => player.uid === selected))) return selected;
+    const possible = set.players.filter(player => !this.localDataOwnerReasons(set, player.uid).length);
+    return possible.length === 1 ? possible[0].uid : '';
+  }
+
+  localDataOwnerReasons(set: SaveSetSummary, uid: string): string[] {
+    return set.local_owner_filters?.[uid] ?? [];
+  }
+
+  localDataOwnerWarning(set: SaveSetSummary): TooltipData | null {
+    const uid = this.localDataOwner(set), reasons = this.localDataOwnerReasons(set, uid);
+    if (!reasons.length) return null;
+    let warnings = this.ownerWarnings.get(set);
+    if (!warnings) { warnings = new Map(); this.ownerWarnings.set(set, warnings); }
+    let warning = warnings.get(uid);
+    if (!warning) {
+      const name = set.players.find(player => player.uid === uid)?.name?.trim() || `Player ${uid}`;
+      const identified = set.local_owner_id;
+      const ownerName = identified ? set.players.find(player => player.uid === identified)?.name?.trim() || `Player ${identified}` : null;
+      const names = [name, ...(ownerName && ownerName !== name ? [ownerName] : [])].sort((a, b) => b.length - a.length);
+      const highlight = (text: string): TooltipText[] => {
+        const segments: TooltipText[] = [];
+        let start = 0;
+        while (start < text.length) {
+          const match = names.map(value => ({ value, at: text.indexOf(value, start) }))
+            .filter(match => match.at >= 0).sort((a, b) => a.at - b.at)[0];
+          if (!match) { segments.push({ text: text.slice(start) }); break; }
+          if (match.at > start) segments.push({ text: text.slice(start, match.at) });
+          segments.push({ text: match.value, tone: match.value === name ? 'warning' : 'success' });
+          start = match.at + match.value.length;
+        }
+        return segments;
+      };
+      const title = `Player "${name}" is the unlikely owner of ${set.local_data_file || 'LocalData.sav'} due to:`;
+      const lines = reasons.map(reason => `• ${reason}`);
+      const lineSegments = lines.map(highlight);
+      if (ownerName) {
+        lines.unshift(`✓ Owner identified by ID: ${ownerName}`);
+        lineSegments.unshift([{ text: '✓ Owner identified by ID: ' }, { text: ownerName, tone: 'success' }]);
+      }
+      warning = { title, titleSegments: [{ text: 'Player "' }, { text: name, tone: 'warning' },
+        { text: `" is the unlikely owner of ${set.local_data_file || 'LocalData.sav'} due to:` }],
+        lines, lineSegments, width: 380 };
+      warnings.set(uid, warning);
+    }
+    return warning;
   }
 
   selectLocalDataOwner(uid: string): void {

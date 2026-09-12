@@ -1,3 +1,4 @@
+import { LocalOwnerEvidence, OwnerCandidate, identifiedLocalOwner, localOwnerFilters } from './local-data-owner';
 import type { GuildAchievementProgress } from './achievement-progress';
 /**
  * Merge parsed save files into one pal table with a location per pal.
@@ -46,6 +47,9 @@ export interface SaveSource {
 }
 
 export interface SaveSetSummary {
+  local_data_file?: string;
+  local_owner_id?: string | null;
+  local_owner_filters?: Record<string, string[]>;
   label: string;
   letter: string;
   folder: string;
@@ -87,6 +91,9 @@ export const SOURCE_KIND_LABELS: Record<SaveKind, string> = {
 };
 
 interface SaveSet {
+  owner_evidence: LocalOwnerEvidence | null;
+  local_data_file: string;
+  owner_candidates: Map<string, OwnerCandidate>;
   label: string;
   letter: string;
   world_name: string;
@@ -246,13 +253,20 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
   } else if (parsed.kind === 'player') {
     if (parsed.payload.party_container_id) set.party_containers.add(parsed.payload.party_container_id);
     if (parsed.payload.pal_box_container_id) set.pal_box_containers.add(parsed.payload.pal_box_container_id);
-    if (parsed.payload.player_uid) set.players.add(parsed.payload.player_uid);
+    if (parsed.payload.player_uid) {
+      set.players.add(parsed.payload.player_uid);
+      set.owner_candidates.set(parsed.payload.player_uid, { uid: parsed.payload.player_uid,
+        containers: [parsed.payload.party_container_id, parsed.payload.pal_box_container_id].filter((id): id is string => !!id),
+        quests: parsed.payload.owner_quests ?? null, notes: parsed.payload.completion?.notes ?? null });
+    }
     if (parsed.payload.player_uid && parsed.payload.key_item_container_id) set.key_item_containers.set(parsed.payload.player_uid, parsed.payload.key_item_container_id);
     if (parsed.payload.player_uid && parsed.payload.completion) set.completions.set(parsed.payload.player_uid, parsed.payload.completion);
     source.player_uid = parsed.payload.player_uid;
     source.has_completion = parsed.payload.completion !== null;
   } else if (parsed.kind === 'local_data') {
     set.local_files++;
+    set.owner_evidence = set.local_files === 1 ? parsed.payload.owner_evidence ?? null : null;
+    set.local_data_file = source.file.split(/[\\/]/).pop() || 'LocalData.sav';
     set.seen_species = set.local_files === 1 ? parsed.payload.seen_species : null;
     set.checked_notes = set.local_files === 1 ? parsed.payload.checked_notes ?? null : null;
     set.max_friendship = set.local_files === 1 ? parsed.payload.max_friendship ?? null : null;
@@ -277,6 +291,7 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
     let set = sets.get(label);
     if (!set) {
       set = {
+        owner_evidence: null, local_data_file: '', owner_candidates: new Map(),
         label, letter: '', world_name: '', host_player_name: '', in_game_day: null, saved_at: '',
         players: new Set(), player_names: new Map(), player_levels: new Map(), completions: new Map(), labs: [], party_containers: new Set(), pal_box_containers: new Set(),
         base_containers: new Map(), bases: [], containers: {}, dps_records: [], level_records: [],
@@ -341,10 +356,14 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
       }
     }
     const playerIds = new Set<string>([...set.players, ...set.player_names.keys()]);
+    const ownerCandidates = [...playerIds].map(uid => ({ ...(set.owner_candidates.get(uid) ?? { uid }), name: set.player_names.get(uid) }));
     summaries.push({
       label: display,
       letter,
       folder: label,
+      local_data_file: set.local_data_file,
+      local_owner_id: identifiedLocalOwner(set.owner_evidence, ownerCandidates, set.level_records),
+      local_owner_filters: localOwnerFilters(set.owner_evidence, set.checked_notes, ownerCandidates, set.level_records),
       world_name: set.world_name,
       host_player_name: set.host_player_name,
       in_game_day: set.in_game_day,

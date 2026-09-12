@@ -459,21 +459,25 @@ test('every bundled technology retains its source point cost', () => {
 test('legacy tutorial flags do not inflate story completion or become unknown IDs', () => {
   const c = category('mainQuests', { quests_completed: ['Main_PickupWood', 'Main_BuildWorkBench_Old',
     'Main_CaptureSheepBall_Old', 'main_buildworkbench'] });
-  assert.equal(c.total, 32);
+  assert.equal(c.total, 31);
   assert.equal(c.done, 1);
   assert.deepEqual(c.unknown, []);
   assert.ok(!c.items.some(i => i.id === 'Main_PickupWood'));
-  assert.equal(c.items.find(i => i.id === 'Main_DefeatWorldTreeMiddleBoss').state, 'todo');
+  assert.ok(!c.items.some(i => i.id === 'Main_DefeatWorldTreeMiddleBoss'));
 });
 
-test('finishing the dragon does not invent a Path to the Abyss completion flag', () => {
+test('Path to the Abyss is excluded without inventing completion or discarding its raw flag', () => {
   const current = category('mainQuests', {}).items.map(i => i.id);
-  const completed = current.filter(id => id !== 'Main_DefeatWorldTreeMiddleBoss');
-  const c = category('mainQuests', { quests_completed: completed });
+  assert.ok(!current.includes('Main_DefeatWorldTreeMiddleBoss'));
+  const c = category('mainQuests', { quests_completed: current });
   assert.equal(c.done, 31);
-  assert.equal(c.total, 32);
-  assert.equal(c.percent, 96.9);
-  assert.equal(category('mainQuests', { quests_completed: current }).done, 32);
+  assert.equal(c.total, 31);
+  assert.equal(c.percent, 100);
+  const saved = record({ quests_completed: [...current, 'MAIN_DEFEATWORLDTREEMIDDLEBOSS'] });
+  const summary = summarize(saved, data);
+  assert.deepEqual(summary.categories.find(c => c.key === 'mainQuests'), c);
+  assert.equal(summary.percent, summarize(record({ quests_completed: current }), data).percent);
+  assert.ok(saved.quests_completed.includes('MAIN_DEFEATWORLDTREEMIDDLEBOSS'));
 });
 
 test('finite NPC rewards require all stages, rather than a completed request introduction', () => {

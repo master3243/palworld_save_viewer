@@ -60,3 +60,41 @@ test('selects highest completion when saves arrive later and preserves manual se
   assert.equal(component.selectedPlayer, '');
   assert.equal(component.summary, null);
 });
+
+test('local owner auto-selects only a sole possible player and preserves manual overrides', () => {
+  const { component } = tracker();
+  const world = set(20, 80)[0];
+  world.local_owner_filters = { '0': ['Checked journals do not match.'], '1': [] };
+  component.sets = [world];
+  assert.equal(component.localDataOwner(world), '1');
+  component.localDataOwners.set('world', '0');
+  assert.equal(component.localDataOwner(world), '0');
+  const warning = component.localDataOwnerWarning(world);
+  assert.match(warning.title, /Player "Player 0" is the unlikely owner of LocalData.sav due to:/);
+  assert.equal(warning.lines[0], '• Checked journals do not match.');
+  assert.equal(component.localDataOwnerWarning(world), warning);
+  component.localDataOwners.set('world', '');
+  assert.equal(component.localDataOwner(world), '');
+  assert.equal(component.localDataOwnerWarning(world), null);
+  component.localDataOwners.clear();
+  world.local_owner_filters['1'] = ['Tracked quest does not match.'];
+  assert.equal(component.localDataOwner(world), '');
+  world.players.pop();
+  assert.equal(component.localDataOwner(world), '', 'a sole unlikely player is not auto-selected');
+  world.local_owner_filters['0'] = [];
+  assert.equal(component.localDataOwner(world), '0');
+});
+
+test('owner warning highlights selected and ID-identified names with a leading owner line', () => {
+  const { component } = tracker();
+  const world = set(20, 80)[0];
+  world.local_owner_id = '1';
+  world.local_owner_filters = { '0': ['Player 0 does not own these Pals. Player 1 owns them.'], '1': [] };
+  component.localDataOwners.set('world', '0');
+  const warning = component.localDataOwnerWarning(world);
+  assert.equal(warning.lines[0], '✓ Owner identified by ID: Player 1');
+  assert.ok(warning.titleSegments.some(s => s.text === 'Player 0' && s.tone === 'warning'));
+  assert.ok(warning.lineSegments[0].some(s => s.text === 'Player 1' && s.tone === 'success'));
+  assert.ok(warning.lineSegments[1].some(s => s.text === 'Player 0' && s.tone === 'warning'));
+  assert.ok(warning.lineSegments[1].some(s => s.text === 'Player 1' && s.tone === 'success'));
+});
