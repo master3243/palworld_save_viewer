@@ -16,7 +16,7 @@ import { Game8LookupService } from './game8-lookup.service';
 import { GameDataService } from './game-data.service';
 import { OfflineImageService } from './offline-image.service';
 import { palImagePath } from './pal-image';
-import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource } from './save-parser.service';
+import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource, UnidentifiedSavesError } from './save-parser.service';
 import { elementIcons, workTable } from './trait-icons';
 import { activeSkillTooltip, passiveSkillTooltip, workSuitabilityTooltip } from './pal-tooltips';
 import { PASSIVE_ICON_KEYS, passiveChips } from './passive-chips';
@@ -167,6 +167,7 @@ export class AppComponent implements OnDestroy {
     this.detailResizeObserver?.disconnect();
     window.clearInterval(this.screenshotModeTimer);
     window.clearTimeout(this.copyStatusTimer);
+    clearTimeout(this.errorTimer);
   }
 
   originalRows: PalStorageRow[] = [];
@@ -221,6 +222,11 @@ export class AppComponent implements OnDestroy {
       entry.files.push(file);
     }
     this.pendingFolders = Array.from(folders.values());
+    const order: Record<string, number> = { player: 0, dimensional_storage: 0, level: 1, level_meta: 2, local_data: 3 };
+    for (const folder of this.pendingFolders) {
+      folder.files.sort((a, b) => (order[a.kind] ?? 4) - (order[b.kind] ?? 4)
+        || a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+    }
   }
 
   get pendingFileCount(): number {
@@ -258,13 +264,14 @@ export class AppComponent implements OnDestroy {
 
   /** Drop every file of one save at once. */
   async removeSaveGroup(group: SourceGroup): Promise<void> {
+    if (this.isParsing) return;
     const drop = new Set(group.sources.map((entry) => entry.index));
     const remaining = this.loadedInputs.filter((_, index) => !drop.has(index));
     if (!remaining.length) {
       await this.removeSource(-1);
       return;
     }
-    await this.parseInputs(remaining, false);
+    await this.parseInputs(remaining, false, true);
   }
 
   get progressPercent(): number {
@@ -276,7 +283,21 @@ export class AppComponent implements OnDestroy {
   private filteredRows: PalStorageRow[] = [];
   rows: PalStorageRow[] = [];
   columns: TableColumn[] = [];
-  error = '';
+  private errorMessage = '';
+  private errorTimer?: ReturnType<typeof setTimeout>;
+  errorDismissing = false;
+
+  get error(): string { return this.errorMessage; }
+
+  set error(message: string) {
+    clearTimeout(this.errorTimer);
+    this.errorMessage = message;
+    this.errorDismissing = false;
+    this.errorTimer = message ? setTimeout(() => {
+      this.errorDismissing = true;
+      this.errorTimer = setTimeout(() => { this.error = ''; }, 350);
+    }, 5000) : undefined;
+  }
   isParsing = false;
   isDragging = false;
   isColumnMenuOpen = false;
@@ -745,7 +766,7 @@ export class AppComponent implements OnDestroy {
   }
 
   async confirmPending(): Promise<void> {
-    const inputs = this.pendingFiles?.map((file) => file.input) ?? null;
+    const inputs = this.pendingFolders.flatMap(folder => folder.files.map(file => file.input));
     const append = this.pendingAppend;
     this.cancelPending();
     if (inputs?.length) await this.parseInputs(inputs, append);
@@ -780,16 +801,22 @@ export class AppComponent implements OnDestroy {
   }
 
   async removeSource(index: number): Promise<void> {
+    if (this.isParsing) return;
     const remaining = index < 0 ? [] : this.loadedInputs.filter((_, position) => position !== index);
     if (!remaining.length) {
-      this.resetData();
-      this.loadedInputs = [];
-      this.sources = [];
-      this.saveSets = [];
-      this.locationCounts = [];
+      this.clearLoadedData();
       return;
     }
-    await this.parseInputs(remaining, false);
+    await this.parseInputs(remaining, false, true);
+  }
+
+  private clearLoadedData(): void {
+    this.resetData();
+    this.loadedInputs = [];
+    this.sources = [];
+    this.saveSets = [];
+    this.locationCounts = [];
+    this.isSourcesOpen = false;
   }
 
   /**
@@ -947,10 +974,11 @@ export class AppComponent implements OnDestroy {
   }
 
   /** Merge `inputs` (optionally on top of what is already loaded) and rebuild the table. */
-  private async parseInputs(inputs: SaveInput[], append: boolean): Promise<void> {
+  private async parseInputs(inputs: SaveInput[], append: boolean, removing = false): Promise<void> {
     const candidates = inputs.filter((input) => this.parser.isCandidate(input));
     if (!candidates.length) {
-      this.error = 'No Palworld save files found. Drop a world save folder, an Xbox wgs folder, or Level.sav / Player .sav files.';
+      if (removing) this.clearLoadedData();
+      this.error = new UnidentifiedSavesError().message;
       return;
     }
     const previous = this.loadedInputs;
@@ -998,6 +1026,7 @@ export class AppComponent implements OnDestroy {
       this.tabDiscovery.visit(this.view, this.hasData);
       this.scheduleMeasure();
     } catch (error) {
+      if (removing && error instanceof UnidentifiedSavesError) this.clearLoadedData();
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';
       if (append && previous.length) {
         // Keep the table that was already there.

@@ -12,6 +12,12 @@ import type { SavePreview } from '../backend/save-preview';
 /** World settings do not contribute to the Pal table or tracker. */
 const IGNORED_FILE_NAMES = new Set(['worldoption.sav']);
 
+export class UnidentifiedSavesError extends Error {
+  constructor() {
+    super('Provided files were not identified as Palworld saves');
+  }
+}
+
 export interface ParseProgress {
   /** 0..1, or null while something with no progress events runs (runtime download). */
   fraction: number | null;
@@ -83,7 +89,7 @@ export class SaveParserService {
   ): Promise<CombinedSaves> {
     const usable = inputs.filter((input) => this.isCandidate(input));
     if (!usable.length) {
-      throw new Error('No Palworld save files found. Drop a world save folder, an Xbox wgs folder, or Level.sav / Player .sav files.');
+      throw new UnidentifiedSavesError();
     }
     const files = usable.map((input) => {
       const set = this.setLabel(input);
@@ -97,8 +103,7 @@ export class SaveParserService {
     }
     const hasCompletion = result.sets.some((set) => set.players.some((player) => player.completion !== null));
     if (!result.rows.length && !hasCompletion) {
-      const notes = result.sources.map((source) => source.note).filter(Boolean);
-      throw new Error(notes[0] || this.wrongSaveMessage());
+      throw new UnidentifiedSavesError();
     }
     return result;
   }
@@ -180,7 +185,4 @@ export class SaveParserService {
     return message.split('\n')[0] || 'Could not load this save file.';
   }
 
-  private wrongSaveMessage(): string {
-    return 'No pals found in these files. Use Level.sav and the Players folder from your save, or the _dps.sav dimensional storage file.';
-  }
 }

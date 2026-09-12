@@ -51,6 +51,10 @@
     </div>
   </section>
 
+  <div class="error-notice" *ngIf="error" [class.dismissing]="errorDismissing">
+    <div class="error-clip"><p class="error">{{ error }}</p></div>
+  </div>
+
   <section
     *ngIf="!hasData"
     class="dropzone"
@@ -187,8 +191,6 @@
     (confirm)="confirmPending()"
   ></app-pending-files-modal>
 
-  <p class="error" *ngIf="error">{{ error }}</p>
-
   <section class="table-shell" *ngIf="hasData" [style.max-width.px]="isFullscreen ? null : tableWidth">
     <div
       *ngIf="!isFullscreen"
@@ -215,6 +217,7 @@
       [summary]="sourcesSummary"
       [locationCounts]="locationCounts"
       [open]="isSourcesOpen"
+      [busy]="isParsing"
       (toggle)="toggleSources()"
       (addFiles)="openAddFilesPicker()"
       (removeSource)="removeSource($event)"

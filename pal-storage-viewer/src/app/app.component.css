@@ -588,12 +588,29 @@
   /* text-shadow: 0 1px 8px rgba(41, 173, 215, 0.45); */
 }
 
+.error-notice {
+  display: grid;
+  grid-template-rows: 1fr;
+  margin: 0 auto 18px;
+  max-width: var(--content-width);
+  width: 100%;
+  transition: opacity 350ms ease, grid-template-rows 350ms ease, margin-bottom 350ms ease;
+}
+
+.error-notice.dismissing {
+  opacity: 0;
+  grid-template-rows: 0fr;
+  margin-bottom: 0;
+}
+
+.error-clip { min-height: 0; overflow: hidden; }
+
 .error {
   background: rgba(82, 19, 32, 0.88);
   border: 1px solid rgba(255, 156, 156, 0.35);
   border-radius: 8px;
   color: #ffe9e9;
-  margin: 0 auto 18px;
+  margin: 0;
   max-width: var(--content-width);
   padding: 10px 12px;
   width: 100%;

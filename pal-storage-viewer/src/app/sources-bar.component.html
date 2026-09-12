@@ -31,6 +31,7 @@
         </span>
         <button
           class="group-remove"
+          [disabled]="busy"
           type="button"
           [attr.aria-label]="'Remove save ' + (group.set?.letter || group.set?.label || '')"
           [title]="'Remove save file ' + (group.set?.letter || '')"
@@ -54,6 +55,7 @@
           >{{ blurb }}</span>
           <button
             class="source-remove"
+            [disabled]="busy"
             type="button"
             [attr.aria-label]="'Remove ' + item.source.file"
             (click)="removeSource.emit(item.index)"
