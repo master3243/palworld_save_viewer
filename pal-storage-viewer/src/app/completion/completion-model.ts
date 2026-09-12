@@ -717,12 +717,14 @@ function attributeStat(world?: WorldProgress): StatEntry {
   if (!world?.attributes) return stat('Attributes', null, '', world?.attributesUnavailable ?? 'Player attributes were not recorded in the loaded save. Add Level.sav with "+ Files".');
   const { allocated, extra } = world.attributes;
   const names = Object.keys(ATTRIBUTE_NAMES).filter(id => id in allocated || id in extra);
-  return { label: 'Attributes', value: '', title: 'Player attribute points', tooltip: {
+  const allocatedTotal = names.reduce((sum, id) => sum + (allocated[id] ?? 0), 0);
+  const potionTotal = names.reduce((sum, id) => sum + (extra[id] ?? 0), 0);
+  return { label: 'Attributes', value: (allocatedTotal + potionTotal).toLocaleString(), title: 'Player attribute points', tooltip: {
     title: 'Player Attribute Points', width: 260, rich: [
       { text: 'Allocated (', value: false },
-      { text: names.reduce((sum, id) => sum + (allocated[id] ?? 0), 0).toLocaleString(), value: true },
+      { text: allocatedTotal.toLocaleString(), value: true },
       { text: ') + Potions (', value: false },
-      { text: names.reduce((sum, id) => sum + (extra[id] ?? 0), 0).toLocaleString(), value: true },
+      { text: potionTotal.toLocaleString(), value: true },
       { text: ')', value: false },
     ],
     rows: names.map(id => [ATTRIBUTE_NAMES[id], `${(allocated[id] ?? 0).toLocaleString()} + ${(extra[id] ?? 0).toLocaleString()}`]),
