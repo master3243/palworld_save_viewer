@@ -24,16 +24,19 @@ test('world data joins attributes and key items to the correct player in either 
     players: [{ player_uid: 'a', name: 'A', level: 80, attributes: attrs }, { player_uid: 'b', name: 'B', level: 1, attributes: null }], skipped: {} });
   const a = entry('player', { player_uid: 'a', key_item_container_id: 'bagA', completion: {} });
   const b = entry('player', { player_uid: 'b', key_item_container_id: 'bagB', completion: {} });
-  const local = entry('local_data', { seen_species: ['Penguin'] });
+  const local = entry('local_data', { seen_species: ['Penguin'], checked_notes: ['Day0'] });
   for (const files of [[world, a, b, local], [local, b, a, world]]) {
     const set = combineSaves(files).sets[0];
     assert.equal(set.players.find(p => p.uid === 'a').key_items, 87);
     assert.equal(set.players.find(p => p.uid === 'b').key_items, 0);
     assert.deepEqual(set.players.find(p => p.uid === 'a').attributes, attrs);
     assert.deepEqual(set.seen_species, ['Penguin']);
+    assert.deepEqual(set.checked_notes, ['Day0']);
     assert.equal(set.has_local_data, true);
   }
   assert.equal(combineSaves([a]).sets[0].players[0].key_items, null);
   assert.equal(combineSaves([world, a, entry('local_data', { seen_species: ['Penguin'] }, 'other')]).sets[0].seen_species, null);
   assert.equal(combineSaves([a, local, local]).sets[0].seen_species, null);
+  assert.equal(combineSaves([a, local, local]).sets[0].checked_notes, null);
+  assert.equal(combineSaves([a]).sets[0].checked_notes, null);
 });

@@ -6,7 +6,7 @@ require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileMo
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText, filename);
 const { SaveBuffer } = require('../src/backend/gvas.ts');
-const { extractPlayerCompletion, extractSeenSpecies } = require('../src/backend/completion.ts');
+const { extractPlayerCompletion, extractSeenSpecies, extractCheckedNotes } = require('../src/backend/completion.ts');
 const int = value => { const bytes = Buffer.alloc(4); bytes.writeInt32LE(value); return bytes; };
 const str = value => Buffer.concat([int(value.length + 1), Buffer.from(value + '\0')]);
 const tag = (name, type, size) => Buffer.concat([str(name), str(type), int(size), int(0)]);
@@ -43,12 +43,15 @@ test('awakening and butchering counters retain recorded zeroes and per-species t
   assert.deepEqual(read(9).butcher_counts, { Penguin: 12, Human: 2, SheepBall: 0 });
 });
 
-test('local encounter flags preserve false entries and missing-file distinction', () => {
-  const seen = entries => {
+test('local encounter and journal flags preserve false entries and missing-file distinction', () => {
+  const seen = (entries, name = 'Local_PalEncountFlag') => {
     const body = Buffer.concat([int(0), int(entries.length), ...entries.flatMap(([id, value]) => [str(id), Buffer.from([value ? 1 : 0])])]);
-    return new SaveBuffer(Buffer.concat([tag('Local_PalEncountFlag', 'MapProperty', body.length), str('EnumProperty'), str('BoolProperty'), Buffer.from([0]), body]));
+    return new SaveBuffer(Buffer.concat([tag(name, 'MapProperty', body.length), str('EnumProperty'), str('BoolProperty'), Buffer.from([0]), body]));
   };
   assert.equal(extractSeenSpecies(new SaveBuffer(record)), null);
   assert.deepEqual(extractSeenSpecies(seen([])), []);
   assert.deepEqual(extractSeenSpecies(seen([['EPalTribeID::Penguin', true], ['EPalTribeID::SheepBall', false], ['EPalTribeID::None', true]])), ['Penguin']);
+  assert.equal(extractCheckedNotes(new SaveBuffer(record)), null);
+  assert.deepEqual(extractCheckedNotes(seen([], 'Local_NoteCheckedFlag')), []);
+  assert.deepEqual(extractCheckedNotes(seen([['Day0', true], ['GrassBoss3', false]], 'Local_NoteCheckedFlag')), ['Day0']);
 });

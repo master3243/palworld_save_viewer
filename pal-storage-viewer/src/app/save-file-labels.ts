@@ -11,6 +11,7 @@ export function kindTag(kind: string): string {
     case 'level': return 'World';
     case 'player': return 'Player';
     case 'level_meta': return 'Info';
+    case 'local_data': return 'Info';
     default: return 'Skip';
   }
 }
@@ -22,6 +23,7 @@ export function kindTitle(kind: string): string {
     case 'dimensional_storage': return 'Dimensional Pal Storage.';
     case 'player': return 'A map of containers to the player\'s party or Pal Box, plus the player\'s progress record (bosses, effigies, journals, quests) for the 100% tracker.';
     case 'level_meta': return 'Metadata used to label the save.';
+    case 'local_data': return 'Small details related to progress';
     default: return 'Not a pal save; ignored.';
   }
 }
@@ -33,6 +35,7 @@ export function kindBlurb(kind: string): string {
     case 'dimensional_storage': return 'dimensional storage';
     case 'player': return 'party / box ids · progress';
     case 'level_meta': return 'world name · day';
+    case 'local_data': return 'progress';
     default: return 'no pals';
   }
 }

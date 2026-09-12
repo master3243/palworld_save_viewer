@@ -19,7 +19,6 @@ import { ownedCondensation } from './owned-condensation';
 
 interface PlayerOption {
   key: string;
-  uid: string;
   folder: string;
   label: string;
   letter: string;
@@ -65,7 +64,7 @@ export class CompletionComponent implements OnChanges {
   private readonly tabDiscovery = new TabDiscovery();
   private readonly palNumberSuffixes = new Map<string, Promise<string>>();
   private readonly palLinks = new Map<string, PalWikiLink[]>();
-  private readonly localSeenOwners = new Map<string, string>();
+  private readonly localDataOwners = new Map<string, string>();
   private readonly orderedRows = new WeakMap<Category, { normal: TrackedItem[]; prioritized: TrackedItem[] }>();
   private filteredRows?: { category: Category; needle: string; group: string; priority: boolean; items: TrackedItem[] };
   get isPalList(): boolean {
@@ -168,7 +167,6 @@ export class CompletionComponent implements OnChanges {
         if (!player.completion) continue;
         players.push({
           key: `${set.folder}|${player.uid}`,
-          uid: player.uid,
           folder: set.folder,
           label: player.name || `Player ...${player.uid.replace(/-/g, '').slice(-4)}`,
           letter: set.letter,
@@ -182,7 +180,11 @@ export class CompletionComponent implements OnChanges {
             keyItems: player.key_items,
             attributes: player.attributes,
             attributesUnavailable: set.has_level ? 'Player attributes were not recorded in the loaded world save.' : 'Add Level.sav with "+ Files" to see player attributes.',
-            seenSpecies: this.seenOwner(set) === player.uid ? set.seen_species : null,
+            seenSpecies: this.localDataOwner(set) === player.uid ? set.seen_species : null,
+            checkedNotes: this.localDataOwner(set) === player.uid ? set.checked_notes : null,
+            checkedUnavailable: !set.has_local_data ? 'Add LocalData.sav with "+ Files" to see checked journals.'
+              : set.checked_notes == null ? 'Journal check data unavailable. Load one matching LocalData.sav with recorded journal checks.'
+              : 'Select the player who owns LocalData.sav. Checked journals are only available for that player.',
             seenUnavailable: !set.has_local_data ? 'Add LocalData.sav with "+ Files" to see encountered species.'
               : set.seen_species == null ? 'Encounter data unavailable. Load one matching LocalData.sav.'
               : 'Select the player who owns LocalData.sav. Seen data is only available for that player.',
@@ -231,22 +233,22 @@ export class CompletionComponent implements OnChanges {
   get tableColumnCount(): number {
     const category = this.category;
     return 3 + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
-      + (category?.key === 'paldeck' ? 1 : 0)
+      + (category?.key === 'paldeck' || category?.key === 'notes' ? 1 : 0)
       + (category?.key === 'captureBonus' ? 2 + this.condensationStars.length : 0) + (this.showFishing ? 3 : 0)
       + (category?.hasCoords ? 1 : 0) + (category?.hasNumbers ? 1 : 0) + (category?.hasTags ? 1 : 0);
   }
 
-  get seenSave(): SaveSetSummary | undefined { return this.sets.find(set => set.folder === this.player?.folder); }
+  get localDataSave(): SaveSetSummary | undefined { return this.sets.find(set => set.folder === this.player?.folder); }
 
-  seenOwner(set: SaveSetSummary): string {
-    const selected = this.localSeenOwners.get(set.folder);
+  localDataOwner(set: SaveSetSummary): string {
+    const selected = this.localDataOwners.get(set.folder);
     return selected && set.players.some(player => player.uid === selected) ? selected : set.players.length === 1 ? set.players[0].uid : '';
   }
 
-  selectSeenOwner(event: Event): void {
-    const set = this.seenSave;
+  selectLocalDataOwner(event: Event): void {
+    const set = this.localDataSave;
     if (!set) return;
-    this.localSeenOwners.set(set.folder, (event.target as HTMLSelectElement).value);
+    this.localDataOwners.set(set.folder, (event.target as HTMLSelectElement).value);
     this.ngOnChanges();
   }
 
@@ -344,6 +346,7 @@ export class CompletionComponent implements OnChanges {
     if (this.selectedCategory === 'crafting') return item.crafting?.count == null ? 'Unknown' : item.state === 'done' ? 'Crafted' : 'Not crafted';
     if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';
     if (this.selectedCategory === 'captureBonus') return item.state === 'done' ? 'Captured 5' : item.state === 'active' ? 'Progressing to 5' : 'Never Captured';
+    if (this.selectedCategory === 'notes') return item.state === 'done' ? 'Read' : item.state === 'active' ? 'Not Read' : 'Missing';
     if (item.state === 'active') return 'In progress';
     const done = item.state === 'done';
     switch (this.selectedCategory) {
@@ -352,7 +355,6 @@ export class CompletionComponent implements OnChanges {
       case 'research': return done ? 'Researched' : 'Not Researched';
       case 'skins':
       case 'ruins':
-      case 'notes':
       case 'relics': return done ? 'Obtained' : 'Missing';
       case 'areas': return done ? 'Visited' : 'Not Visited';
       case 'towers':

@@ -7,7 +7,7 @@ import {
 } from './gvas';
 import { Lookups } from './lookups';
 import { PalRecord, buildRecord } from './record';
-import { PlayerCompletion, extractLabResearch, extractPlayerCompletion, extractSeenSpecies } from './completion';
+import { PlayerCompletion, extractLabResearch, extractPlayerCompletion, extractSeenSpecies, extractCheckedNotes } from './completion';
 import { PlayerAttributes, extractPlayerAttributes, extractItemCounts } from './player-progress';
 
 export type SaveKind = 'dimensional_storage' | 'level' | 'player' | 'level_meta' | 'world_option' | 'local_data' | 'unknown';
@@ -265,7 +265,7 @@ export type ParsedFile =
   | { kind: 'level'; class_name: string; saved_at: string; payload: LevelPayload }
   | { kind: 'player'; class_name: string; saved_at: string; payload: PlayerPayload }
   | { kind: 'level_meta'; class_name: string; saved_at: string; payload: LevelMetaPayload }
-  | { kind: 'local_data'; class_name: string; saved_at: string; payload: { seen_species: string[] | null } }
+  | { kind: 'local_data'; class_name: string; saved_at: string; payload: { seen_species: string[] | null; checked_notes: string[] | null } }
   | { kind: 'world_option' | 'unknown'; class_name: string; saved_at: string; payload: null };
 
 /** Decode one save file (already decompressed GVAS bytes) into its parsed payload. */
@@ -289,7 +289,7 @@ export function parseSaveFile(
     case 'level_meta':
       return { kind, class_name: className, saved_at: savedAt, payload: extractLevelMeta(buf) };
     case 'local_data':
-      return { kind, class_name: className, saved_at: savedAt, payload: { seen_species: extractSeenSpecies(buf) } };
+      return { kind, class_name: className, saved_at: savedAt, payload: { seen_species: extractSeenSpecies(buf), checked_notes: extractCheckedNotes(buf) } };
     default:
       return { kind, class_name: className, saved_at: savedAt, payload: null };
   }

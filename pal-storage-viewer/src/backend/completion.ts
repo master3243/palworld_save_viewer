@@ -133,6 +133,11 @@ export function extractSeenSpecies(buf: SaveBuffer): string[] | null {
     .map(id => id.replace(/^EPalTribeID::/, '')).filter(id => id && id !== 'None');
 }
 
+export function extractCheckedNotes(buf: SaveBuffer): string[] | null {
+  if (findPropertyStart(buf, 'Local_NoteCheckedFlag') === -1) return null;
+  return trueKeys(readScalarMap(buf, 'Local_NoteCheckedFlag'));
+}
+
 /** Keys whose value is true. */
 function trueKeys(entries: [string, Scalar][]): string[] {
   return entries.filter(([, value]) => value === true).map(([key]) => key);

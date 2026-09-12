@@ -114,11 +114,11 @@
             >
           </div>
         </div>
-        <ng-container *ngIf="open.key === 'paldeck'">
-          <label class="seen-owner" *ngIf="seenSave as set">
-            <ng-container *ngIf="set.seen_species != null && set.players.length > 1">
+        <ng-container *ngIf="open.key === 'paldeck' || open.key === 'notes'">
+          <label class="seen-owner" *ngIf="localDataSave as set">
+            <ng-container *ngIf="(open.key === 'paldeck' ? set.seen_species != null : set.checked_notes != null) && set.players.length > 1">
               LocalData belongs to
-              <select [value]="seenOwner(set)" (change)="selectSeenOwner($event)" aria-label="Player who owns LocalData.sav">
+              <select [value]="localDataOwner(set)" (change)="selectLocalDataOwner($event)" aria-label="Player who owns LocalData.sav">
                 <option value="">Select player</option>
                 <option *ngFor="let owner of set.players" [value]="owner.uid">{{ owner.name || owner.uid }}</option>
               </select>
@@ -165,6 +165,7 @@
               <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
+              <th class="checked-col" *ngIf="open.key === 'notes'" title="Journal checked flag recorded in LocalData.sav">Checked</th>
               <th class="seen-col" *ngIf="open.key === 'paldeck'" title="Encountered species recorded in LocalData.sav">Seen</th>
               <ng-container *ngIf="open.key === 'crafting'">
                 <th>Category</th>
@@ -211,7 +212,8 @@
               <td class="portrait-col" *ngIf="isPalList"><img [offlineSrc]="palIconPath(item)" [alt]="item.name" decoding="async" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
-              <td class="seen-col" *ngIf="open.key === 'paldeck'" [class.missing-data]="item.seen == null" [class.seen]="item.seen === true" [class.not-seen]="item.seen === false" [attr.title]="item.seen == null ? player?.world?.seenUnavailable : item.seen ? 'Seen' : 'Not seen'" [attr.aria-label]="item.seen == null ? 'Seen status unknown' : item.seen ? 'Seen' : 'Not seen'">{{ item.seen == null ? '?' : item.seen ? '✓' : '—' }}</td>
+              <td class="checked-col" *ngIf="open.key === 'notes'" [class.missing-data]="item.checked == null" [class.checked]="item.checked === true" [class.not-checked]="item.checked === false" [attr.title]="item.checked == null ? player?.world?.checkedUnavailable : item.checked ? 'Checked' : 'Not checked'" [attr.aria-label]="item.checked == null ? 'Checked status unknown' : item.checked ? 'Checked' : 'Not checked'">{{ item.checked == null ? '?' : item.checked ? '✔' : '✘' }}</td>
+              <td class="seen-col" *ngIf="open.key === 'paldeck'" [class.missing-data]="item.seen == null" [class.seen]="item.seen === true" [class.not-seen]="item.seen === false" [attr.title]="item.seen == null ? player?.world?.seenUnavailable : item.seen ? 'Seen' : 'Not seen'" [attr.aria-label]="item.seen == null ? 'Seen status unknown' : item.seen ? 'Seen' : 'Not seen'">{{ item.seen == null ? '?' : item.seen ? '✔' : '✘' }}</td>
               <ng-container *ngIf="item.crafting as craft">
                 <td>{{ craft.group }}</td>
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>

@@ -57,6 +57,7 @@ export interface SaveSetSummary {
   players: { uid: string; name: string; level: number | null; completion: PlayerCompletion | null;
     attributes: PlayerAttributes | null; key_items: number | null }[];
   seen_species: string[] | null;
+  checked_notes: string[] | null;
   has_local_data: boolean;
   /** Guild lab research progress from Level.sav, one map per guild. */
   labs: Record<string, number>[];
@@ -96,6 +97,7 @@ interface SaveSet {
   key_item_containers: Map<string, string>;
   item_counts: Record<string, number | null>;
   seen_species: string[] | null;
+  checked_notes: string[] | null;
   local_files: number;
   completions: Map<string, PlayerCompletion>;
   labs: Record<string, number>[];
@@ -242,7 +244,8 @@ function applyParsedFile(parsed: ParsedFile, source: SaveSource, set: SaveSet): 
   } else if (parsed.kind === 'local_data') {
     set.local_files++;
     set.seen_species = set.local_files === 1 ? parsed.payload.seen_species : null;
-    source.note = 'Encountered species for the local player';
+    set.checked_notes = set.local_files === 1 ? parsed.payload.checked_notes ?? null : null;
+    source.note = 'Encountered species and checked journals for the local player';
   } else if (parsed.kind === 'level_meta') {
     set.world_name = parsed.payload.world_name || '';
     set.host_player_name = parsed.payload.host_player_name || '';
@@ -266,7 +269,7 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
         label, letter: '', world_name: '', host_player_name: '', in_game_day: null, saved_at: '',
         players: new Set(), player_names: new Map(), player_levels: new Map(), completions: new Map(), labs: [], party_containers: new Set(), pal_box_containers: new Set(),
         base_containers: new Map(), bases: [], containers: {}, dps_records: [], level_records: [],
-        player_attributes: new Map(), key_item_containers: new Map(), item_counts: {}, seen_species: null, local_files: 0,
+        player_attributes: new Map(), key_item_containers: new Map(), item_counts: {}, seen_species: null, checked_notes: null, local_files: 0,
       };
       sets.set(label, set);
     }
@@ -344,6 +347,7 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
       players: [...playerIds].sort().map((uid) => ({ uid, name: set.player_names.get(uid) ?? '', level: set.player_levels.get(uid) ?? null, completion: set.completions.get(uid) ?? null,
         attributes: set.player_attributes.get(uid) ?? null, key_items: set.item_counts[set.key_item_containers.get(uid) ?? ''] ?? null })),
       seen_species: set.seen_species,
+      checked_notes: set.checked_notes,
       has_local_data: set.local_files > 0,
       labs: set.labs,
       has_level: set.level_records.length > 0 || sources.some((source) => source.kind === 'level' && source.set === label),

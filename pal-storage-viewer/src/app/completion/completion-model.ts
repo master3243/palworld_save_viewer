@@ -81,6 +81,8 @@ export interface WorldProgress {
   attributesUnavailable?: string;
   seenSpecies?: string[] | null;
   seenUnavailable?: string;
+  checkedNotes?: string[] | null;
+  checkedUnavailable?: string;
 }
 
 export type ItemState = 'done' | 'active' | 'todo';
@@ -110,6 +112,7 @@ export interface TrackedItem {
   fishing?: { common: number; whopper: number; lunker: number };
   condensed?: CondensationCounts | null;
   seen?: boolean | null;
+  checked?: boolean | null;
   butchered?: number | null;
   crafting?: CraftingItem & { count: number | null; sources: string[]; sourceLabel: string };
   /** False for rows shown for information only (paid DLC); they do not count. */
@@ -446,11 +449,15 @@ function fastTravelCategory(record: PlayerCompletion, data: CompletionData): Cat
   });
 }
 
-function noteCategory(record: PlayerCompletion, data: CompletionData): Category {
+function noteCategory(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): Category {
   const found = new Set(record.notes);
-  const items: TrackedItem[] = Object.entries(data.notes).map(([id, [name, x, y]]) => ({
-    id, name, detail: '', state: found.has(id) ? 'done' : 'todo', group: '', ...place(x, y), order: 0, no: null,
-  }));
+  const checked = world?.checkedNotes == null ? null : new Set(world.checkedNotes.map(id => id.toLowerCase()));
+  const items: TrackedItem[] = Object.entries(data.notes).map(([id, [name, x, y]]) => {
+    const isChecked = checked ? checked.has(id.toLowerCase()) : null;
+    // Obtained but unread journals do not count until LocalData.sav records them as checked; without that file, obtained is the best we know.
+    const state: ItemState = !found.has(id) ? 'todo' : isChecked === false ? 'active' : 'done';
+    return { id, name, detail: '', state, group: '', ...place(x, y), order: 0, no: null, checked: isChecked };
+  });
   return finish({
     key: 'notes', title: 'Journals', items, groups: [],
     unknown: unknownIds(record.notes, new Set(Object.keys(data.notes))),
@@ -706,7 +713,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     bossCategory(record, data, ['bounty'], 'bounties', 'Bounty Targets'),
     questCategory(record, data, 'Main'),
     questCategory(record, data, 'Sub'),
-    noteCategory(record, data),
+    noteCategory(record, data, world),
     fastTravelCategory(record, data),
     areaCategory(record, data),
     ruinCategory(record, data),

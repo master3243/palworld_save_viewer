@@ -22,6 +22,24 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('obtained but unread journals count as not read until LocalData marks them checked', () => {
+  const save = record({ notes: ['Day0', 'GrassBoss3'] });
+  const notes = checkedNotes => summarize(save, data, { labs: [], checkedNotes }).categories.find(c => c.key === 'notes');
+  const missing = notes(null), empty = notes([]), checked = notes(['day0']);
+  assert.equal(missing.items.find(i => i.id === 'Day0').checked, null);
+  assert.equal(empty.items.find(i => i.id === 'Day0').checked, false);
+  assert.equal(checked.items.find(i => i.id === 'Day0').checked, true);
+  assert.equal(checked.items.find(i => i.id === 'GrassBoss3').checked, false);
+  assert.equal(missing.items.find(i => i.id === 'Day0').state, 'done');
+  assert.equal(checked.items.find(i => i.id === 'Day0').state, 'done');
+  assert.equal(checked.items.find(i => i.id === 'GrassBoss3').state, 'active');
+  assert.equal(empty.items.find(i => i.id === 'GrassBoss3').state, 'active');
+  assert.equal(missing.done, 2);
+  assert.equal(checked.done, 1);
+  assert.equal(empty.done, 0);
+  assert.equal(checked.total, missing.total);
+});
+
 test('seen and butchered columns preserve completion and distinguish unknown from zero', () => {
   const save = record({ butcher_counts: { Penguin: 2, PENGUIN: 3, Human: 4 }, counters: { awakenings: 7 } });
   const original = summarize(save, data);
