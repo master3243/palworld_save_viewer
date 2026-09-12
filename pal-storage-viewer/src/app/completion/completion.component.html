@@ -175,8 +175,8 @@
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
-        <ng-container *ngIf="{ fishing: showFishing, count: tableColumnCount } as columns">
-        <table class="item-table" [attr.aria-rowcount]="visibleItems.length + 1" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile && !(open.key === 'arena' && open.unavailable)">
+        <ng-container *ngIf="{ fishing: showFishing, count: tableColumnCount, details: showDetails } as columns">
+        <table class="item-table" [contentSizedTable]="tableSizingColumns" [attr.aria-rowcount]="visibleItems.length + 1" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile && !(open.key === 'arena' && open.unavailable)">
           <caption class="table-start" aria-hidden="true"></caption>
           <thead>
             <tr>
@@ -184,8 +184,8 @@
               <th class="no-col" *ngIf="open.hasNumbers">{{ open.numberLabel }}</th>
               <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
-              <th>{{ open.key === 'arena' ? 'Solo Tier' : 'Name' }}</th>
-              <th *ngIf="open.key === 'achievements'">Requirement</th>
+              <th class="name-col">{{ open.key === 'arena' ? 'Solo Tier' : 'Name' }}</th>
+              <th class="achievement-requirement" *ngIf="open.key === 'achievements'">Requirement</th>
               <th class="achievement-progress" *ngIf="open.key === 'achievements'">Progress</th>
               <th class="checked-col" *ngIf="open.key === 'notes'" title="Journal checked flag recorded in LocalData.sav">Checked</th>
               <th class="seen-col" *ngIf="open.key === 'paldeck'" title="Encountered species recorded in LocalData.sav">Seen</th>
@@ -195,10 +195,10 @@
                 <th class="craft-number">Weight</th>
                 <th class="craft-number" title="Stored item value">Base value</th>
                 <th class="craft-number">Tech level</th>
-                <th>Unlock source</th>
+                <th class="craft-source">Unlock source</th>
                 <th class="crafted-col">Crafted</th>
-                <th>Ingredients</th>
-                <th>Item stats</th>
+                <th class="craft-ingredients">Ingredients</th>
+                <th class="craft-stats">Item stats</th>
               </ng-container>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
               <th class="butchered-col" *ngIf="open.key === 'captureBonus'">Butchered</th>
@@ -210,8 +210,8 @@
                 <th class="fishing-col" scope="col" title="Whopper fishing catches"><small>Fishing</small>Whopper</th>
                 <th class="fishing-col" scope="col" title="Lunker fishing catches"><small>Fishing</small>Lunker</th>
               </ng-container>
-              <th *ngIf="isPalList" aria-label="Pal links"></th>
-              <th *ngIf="!isPalList && open.key !== 'crafting' && open.key !== 'arena'">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
+              <th class="pal-links-col" *ngIf="isPalList" aria-label="Pal links"></th>
+              <th class="detail-col" *ngIf="columns.details">{{ open.key === 'technologies' ? 'Point cost' : 'Details' }}</th>
               <th class="coords-col" *ngIf="open.hasCoords">Map coordinates</th>
             </tr>
           </thead>
@@ -288,7 +288,7 @@
                   </a>
                 </span>
               </td>
-              <td class="detail-col" *ngIf="!isPalList && open.key !== 'crafting' && open.key !== 'arena'"><span>{{ item.detail }}</span></td>
+              <td class="detail-col" *ngIf="columns.details"><span>{{ item.detail }}</span></td>
               <td class="coords-col" *ngIf="open.hasCoords">
                 <button type="button" class="coordinate-link" *ngIf="item.coords" [attr.aria-label]="'Show ' + item.name + ' on map'" (click)="showMap(item)">{{ item.coords }}<small *ngIf="item.map"> · {{ item.map }}</small> ↗</button>
               </td>

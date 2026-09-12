@@ -566,20 +566,22 @@
 }
 
 .item-table {
-  --column-gap: clamp(20px, calc(20cqw - 140px), 60px);
   --status-accent: #8097a4;
   --status-tint: rgba(128, 151, 164, .07);
   border-collapse: separate;
   border-spacing: 0 3px;
+  table-layout: fixed;
   font-size: 0.82rem;
+  /* Shrink both side gaps equally while preserving measured column widths. */
+  --table-side-inset: clamp(0px, calc((100% - var(--table-content-width, 100%)) / 2), 10cqw);
   width: 100%;
+  padding-inline: var(--table-side-inset);
 }
 
 .item-table .table-start { height: 1px; padding: 0; }
 .item-table thead { position: sticky; top: calc(-1 * var(--tracker-top-padding)); z-index: 2; background: #07141e; box-shadow: 0 1px rgba(134, 220, 255, .18); }
 .item-table thead th, .item-table thead tr::after { background: #07141e; }
-
-.item-table tr::after { content: ''; display: table-cell; width: 100%; border-bottom: 1px solid rgba(134, 220, 255, 0.07); }
+.item-table tr::after { content: ''; display: table-cell; border-bottom: 1px solid rgba(134, 220, 255, 0.07); }
 .item-table thead tr::after { border-bottom-color: rgba(134, 220, 255, 0.18); }
 .item-table tbody tr[data-state] {
   background: linear-gradient(100deg, var(--status-tint), rgba(225, 237, 241, .025));
@@ -612,8 +614,8 @@
 }
 .item-table.pal-list td { padding-top: 2px; padding-bottom: 2px; vertical-align: middle; }
 .item-table.pal-list .state-col + .no-col { text-align: left; }
-.pal-list .name-col { font-size: .95rem; white-space: nowrap; }
-.pal-list .name-col span { display: block; max-width: 30ch; overflow: hidden; text-overflow: ellipsis; }
+.pal-list td.name-col { font-size: .95rem; white-space: nowrap; }
+.pal-list .name-col span { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .pal-links-col .wiki-links { display: inline-flex; gap: 5px; opacity: 0; pointer-events: none; vertical-align: middle; }
 .pal-links-col .wiki-link { box-sizing: border-box; height: 30px; min-width: 49px; padding: 0 6px; }
 .pal-list tbody tr:hover .wiki-links,
@@ -632,41 +634,40 @@
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  padding: 4px var(--column-gap) 4px 0;
+  padding: 4px 10px;
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
-  width: 1%;
 }
+
+/* Measure native max-content widths once, independently of the available space. */
+.item-table.sizing-table { position: fixed; left: -100000px; top: 0; visibility: hidden; pointer-events: none; width: max-content; table-layout: auto; padding: 0; }
+.item-table.sizing-table thead { position: static; }
+.item-table.sizing-table tr::after { display: none; }
+.item-table.sizing-table th, .item-table.sizing-table td { width: auto; }
+.item-table.sizing-table .sizing-value { display: block; width: max-content; white-space: nowrap; }
 
 .item-table td {
   border-bottom: 1px solid rgba(134, 220, 255, 0.07);
   color: rgba(232, 248, 255, 0.88);
-  padding: 5px var(--column-gap) 5px 0;
+  padding: 5px 10px;
   vertical-align: top;
-  white-space: nowrap;
-  width: 1%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
-.item-table th:first-child,
-.item-table td:first-child { padding-left: 10cqw; }
-.item-table .detail-col span { display: block; width: max-content; max-width: 60ch; white-space: normal; overflow-wrap: anywhere; }
-.item-table .fishing-col { padding-right: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+.item-table .detail-col span { display: block; white-space: normal; overflow-wrap: anywhere; }
+.item-table .fishing-col { text-align: right; font-variant-numeric: tabular-nums; }
 .fishing-col small { display: block; font-size: .6rem; font-weight: 400; }
-.crafting-list { --column-gap: 24px; }
-.item-table.crafting-list th:first-child,
-.item-table.crafting-list td:first-child { padding-left: 8px; }
-.crafting-list .name-col { min-width: 280px; }
-.crafting-list .name-col span { display: inline-block; max-width: 28ch; white-space: normal; vertical-align: middle; }
+.crafting-list .name-col span { display: inline-block; white-space: normal; vertical-align: middle; }
 .crafting-list .name-col img { width: 28px; height: 28px; object-fit: contain; }
 .crafting-list td { vertical-align: middle; }
-.crafting-list .craft-source span { display: block; min-width: 180px; max-width: 32ch; white-space: normal; }
+.crafting-list .craft-source span { display: block; white-space: normal; }
 .crafting-list .crafted-col { text-align: right; font-variant-numeric: tabular-nums; }
-.crafting-list .craft-number { min-width: 110px; text-align: right; font-variant-numeric: tabular-nums; }
-.crafting-list .craft-value { min-width: 132px; }
+.crafting-list .craft-number { text-align: right; font-variant-numeric: tabular-nums; }
 .craft-weight img, .craft-value img { width: 14px; height: 14px; margin-left: 4px; vertical-align: middle; object-fit: contain; }
 .craft-weight img { transform: translateY(-3px); }
-.craft-stats div { display: flex; flex-wrap: wrap; gap: 4px 12px; min-width: 240px; max-width: 340px; }
+.craft-stats div { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 .craft-rarity { color: #becbd2; }
 .craft-rarity[data-rarity="1"] { color: #8ef0c2; }
 .craft-rarity[data-rarity="2"] { color: #70c8f2; }
@@ -674,13 +675,12 @@
 .craft-rarity[data-rarity="4"] { color: #ffd37a; }
 .craft-ingredients summary { cursor: pointer; color: #91d8ee; }
 .craft-ingredients summary:focus-visible { outline: 2px solid #91d8ee; outline-offset: 3px; }
-.craft-recipe { display: flex; flex-direction: column; gap: 3px; padding-top: 10px; white-space: normal; min-width: 200px; }
+.craft-recipe { display: flex; flex-direction: column; gap: 3px; padding-top: 10px; white-space: normal; }
 .craft-recipe b { color: #becbd2; font-size: .75rem; }
 .craft-work { margin-top: 7px; }
 .craft-stack { margin-top: 3px; color: #becbd2; }
 .state-col {
   white-space: nowrap;
-  width: 110px;
 }
 
 .state-dot {
@@ -698,7 +698,6 @@
   font-variant-numeric: tabular-nums;
   text-align: right;
   white-space: nowrap;
-  width: 56px;
 }
 
 .name-col {
@@ -726,7 +725,6 @@
 .coords-col {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  width: 190px;
 }
 
 .coords-col small {
@@ -759,16 +757,12 @@
   .ring-wrap { grid-row: 1 / 3; }
   .ring-wrap { width: 88px; height: 88px; }
   .ring-text strong { font-size: 1.3rem; }
-  .item-table.pal-list { --column-gap: 8px; }
   .item-status { font-size: .7rem; }
   .pal-list .portrait-col img { width: 28px; height: 28px; }
   .paldeck-number-label { font-size: .7rem; }
   .paldeck-number-digits { font-size: 1rem; letter-spacing: .04em; }
-  .pal-list .name-col { font-size: .82rem; }
-  .pal-list .name-col span { max-width: min(30ch, calc(100cqw - 240px)); }
+  .pal-list td.name-col { font-size: .82rem; }
 
-  .item-table th:first-child,
-  .item-table td:first-child { padding-left: 8px; }
 
   .category-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -789,8 +783,6 @@
 }
 
 .item-table .condensed-col {
-  min-width: 42px;
-  padding-right: 6px;
   text-align: center;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -829,7 +821,6 @@
 .achievement-icon { color: #ffdb72; }
 .achievement-unknown { color: #ff8e8e; font-size: 12px; }
 .achievement-progress { text-align: right; white-space: nowrap; }
-.achievement-requirement { min-width: 190px; }
 .achievement-estimate { display: flex; flex-wrap: wrap; gap: 4px 12px; color: #ffd37a; font-size: 11px; }
 .achievement-estimate .achievement-warning-icon { width: 12px; height: 12px; flex-basis: 12px; margin-top: 1px; }
 .achievement-progress.missing-data .card-count,

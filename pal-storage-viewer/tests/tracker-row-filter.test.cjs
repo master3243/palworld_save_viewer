@@ -14,11 +14,43 @@ function tracker(key = 'crafting') {
     id: String(order), name: 'Item ' + order, detail: order === 3 ? 'Schematic' : '', coords: '', state, order, group: order % 2 ? 'odd' : 'even',
   }));
   return Object.assign(Object.create(context.exports.CompletionComponent.prototype), {
-    selectedCategory: key, summary: { categories: [{ key, items }] }, orderedRows: new WeakMap(),
+    selectedCategory: key, summary: { categories: [{ key, items }] }, orderedRows: new WeakMap(), detailColumns: new WeakMap(), sizingColumns: new WeakMap(),
     search: '', groupFilter: '', prioritizeNotDone: true,
   });
 }
 const ids = component => Array.from(component.visibleItems, item => item.id);
+
+test('empty details disappear and column visibility stays stable across filtering', () => {
+  const component = tracker('notes');
+  component.category.hasCoords = true;
+  component.category.items = component.category.items.map(item => ({ ...item, detail: ' ' }));
+  assert.equal(component.showDetails, false);
+  assert.equal(component.tableColumnCount, 4); // Status, name, checked, coordinates.
+
+  component.summary = { categories: [{ ...component.category, items: [
+    { ...component.category.items[0], detail: 'defeated 2×' },
+    { ...component.category.items[1], detail: '' },
+  ] }] };
+  assert.equal(component.showDetails, true);
+  assert.equal(component.tableColumnCount, 5);
+  component.search = 'Item 1';
+  assert.equal(component.visibleItems[0].detail, '');
+  assert.equal(component.showDetails, true);
+  assert.equal(component.tableColumnCount, 5);
+});
+
+test('details remain present when their populated rows are filtered out', () => {
+  const component = tracker('sideQuests');
+  component.category.items[3].detail = 'A long mission description. '.repeat(30);
+  assert.equal(component.showDetails, true);
+  component.search = 'Item 0';
+  assert.equal(component.visibleItems.length, 1);
+  assert.equal(component.showDetails, true);
+  for (const key of ['paldeck', 'captureBonus', 'crafting', 'arena']) {
+    const specialized = tracker(key);
+    assert.equal(specialized.showDetails, false);
+  }
+});
 
 test('row filtering reuses results until the category, search, group, or priority changes', () => {
   const component = tracker();

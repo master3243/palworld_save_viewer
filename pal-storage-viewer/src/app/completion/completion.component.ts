@@ -12,6 +12,8 @@ import { workIcon } from '../trait-icons';
 import { OfflineImageDirective } from '../offline-image.directive';
 import { StickyTableHeaderDirective } from './sticky-table-header.directive';
 import { TableRowViewport, TableRowViewportDirective } from './table-row-viewport.directive';
+import { ContentSizedTableDirective } from './content-sized-table.directive';
+import { SizingColumn, trackerSizingColumns } from './table-sizing-model';
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
 import { palWikiLinks, PalWikiLink } from '../pal-wiki-links';
@@ -36,7 +38,7 @@ const RING_RADIUS = 52;
 @Component({
   selector: 'app-completion',
   standalone: true,
-  imports: [CommonModule, FormsModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective, TableRowViewportDirective, TooltipDirective],
+  imports: [CommonModule, FormsModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective, TableRowViewportDirective, ContentSizedTableDirective, TooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './completion.component.html',
   styleUrls: ['../pal-wiki-links.css', './completion.component.css']
@@ -68,6 +70,8 @@ export class CompletionComponent implements OnChanges {
   private readonly palNumberSuffixes = new Map<string, Promise<string>>();
   private readonly palLinks = new Map<string, PalWikiLink[]>();
   private readonly orderedRows = new WeakMap<Category, { normal: TrackedItem[]; prioritized: TrackedItem[] }>();
+  private readonly detailColumns = new WeakMap<Category, boolean>();
+  private sizingColumns = new WeakMap<Category, Promise<SizingColumn[]>>();
   private filteredRows?: { category: Category; needle: string; group: string; priority: boolean; items: TrackedItem[] };
   get isPalList(): boolean {
     return this.selectedCategory === 'paldeck' || this.selectedCategory === 'captureBonus';
@@ -133,6 +137,7 @@ export class CompletionComponent implements OnChanges {
       this.categoryIcons = Object.fromEntries(Object.entries(CATEGORY_ICONS)
         .filter(([, name]) => sources.has(name)).map(([category, name]) => [category, sources.get(name)!]));
       this.categoryIcons['crafting'] = workIcon('Handcraft');
+      this.sizingColumns = new WeakMap();
       this.changeDetector.markForCheck();
     } catch { /* Decorative icons must not prevent the tracker from loading. */ }
   }
@@ -242,9 +247,33 @@ export class CompletionComponent implements OnChanges {
     return items;
   }
 
+  get showDetails(): boolean {
+    const category = this.category;
+    if (!category || this.isPalList || category.key === 'crafting' || category.key === 'arena') return false;
+    if (!this.detailColumns.has(category)) this.detailColumns.set(category, category.items.some(item => !!item.detail.trim()));
+    return this.detailColumns.get(category)!;
+  }
+
+  get tableSizingColumns(): Promise<SizingColumn[]> {
+    const category = this.category!;
+    let columns = this.sizingColumns.get(category);
+    if (!columns) {
+      const pal = this.isPalList, fishing = this.showFishing, details = this.showDetails;
+      // Resolve the shared number lookup once, including suffixes on off-screen pals.
+      const suffixes = pal ? Promise.all(category.items.map(item => this.palNumberSuffix(item))) : Promise.resolve([]);
+      const labels = new Map(category.items.map(item => [item, this.stateLabel(item)]));
+      const icons = new Set(category.items.filter(item => !!this.itemIcon(category.key, item)));
+      columns = suffixes.then(suffixes => trackerSizingColumns(category, {
+        pal, fishing, details, suffixes, stateLabel: item => labels.get(item)!, itemIcon: item => icons.has(item),
+      }));
+      this.sizingColumns.set(category, columns);
+    }
+    return columns;
+  }
+
   get tableColumnCount(): number {
     const category = this.category;
-    return 3 + (category?.key === 'achievements' ? 2 : 0) - (category?.key === 'arena' ? 1 : 0) + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
+    return 2 + (this.showDetails ? 1 : 0) + (category?.key === 'achievements' ? 2 : 0) + (category?.key === 'crafting' ? 9 : 0) + (this.isPalList ? 2 : 0)
       + (category?.key === 'paldeck' || category?.key === 'notes' ? 1 : 0)
       + (category?.key === 'captureBonus' ? 2 + this.condensationStars.length : 0) + (this.showFishing ? 3 : 0)
       + (category?.hasCoords ? 1 : 0) + (category?.hasNumbers ? 1 : 0) + (category?.hasTags ? 1 : 0);
@@ -310,7 +339,7 @@ export class CompletionComponent implements OnChanges {
   }
 
   get showFishing(): boolean {
-    return this.selectedCategory === 'captureBonus' && this.visibleItems.some(item => item.fishing !== undefined);
+    return this.selectedCategory === 'captureBonus' && !!this.category?.items.some(item => item.fishing !== undefined);
   }
 
   get isMaxLevel(): boolean {
