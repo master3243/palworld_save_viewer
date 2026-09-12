@@ -397,7 +397,7 @@ function craftingCategory(record: PlayerCompletion, data: CompletionData): Categ
       order: levels.length ? Math.min(...levels) : Number.MAX_SAFE_INTEGER,
       state: count !== null && count > 0 ? 'done' : 'todo',
       detail: [...sources, ...item.recipes.flatMap(recipe => recipe.ingredients.map(([, name]) => name))].join(' · '),
-      crafting: { ...item, count, sources, sourceLabel: sources.map(source => craftingSourceLabel(item.name, source)).join(' · ') },
+      crafting: { ...item, count, sources, sourceLabel: sources.map(source => craftingSourceLabel(item.name, source)).join('\n') },
     };
   });
   const groups = new Map([...new Set(catalog.map(item => item.group))].sort().map(name => [name, name]));

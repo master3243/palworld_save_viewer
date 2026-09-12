@@ -656,13 +656,13 @@
   overflow-wrap: anywhere;
 }
 
-.item-table .detail-col span { display: block; white-space: normal; overflow-wrap: anywhere; }
+.item-table .detail-col span { display: block; white-space: pre-line; overflow-wrap: anywhere; }
 .item-table .fishing-col { text-align: right; font-variant-numeric: tabular-nums; }
 .fishing-col small { display: block; font-size: .6rem; font-weight: 400; }
 .crafting-list .name-col span { display: inline-block; white-space: normal; vertical-align: middle; }
 .crafting-list .name-col img { width: 28px; height: 28px; object-fit: contain; }
 .crafting-list td { vertical-align: middle; }
-.crafting-list .craft-source span { display: block; white-space: normal; }
+.crafting-list .craft-source span { display: block; white-space: pre-line; }
 .crafting-list .crafted-col { text-align: right; font-variant-numeric: tabular-nums; }
 .crafting-list .craft-number { text-align: right; font-variant-numeric: tabular-nums; }
 .craft-weight img, .craft-value img { width: 14px; height: 14px; margin-left: 4px; vertical-align: middle; object-fit: contain; }

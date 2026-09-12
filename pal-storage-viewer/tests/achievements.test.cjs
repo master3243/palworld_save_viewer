@@ -34,7 +34,7 @@ test('75 unique rows preserve confidence split and unknown data never counts as 
   assert.equal(c.total, 75); assert.equal(c.done, 0); assert.equal(c.unknownCount, 75);
   for (const item of c.items) {
     assert.equal(item.achievement.current, 0, item.name);
-    assert.match(item.detail, /Assuming 0\./, item.name);
+    assert.match(item.detail, /\nAssuming 0\./, item.name);
   }
 });
 
@@ -206,8 +206,8 @@ test('achievement zero defaults preserve missing-data handling in the Arena card
     assert.match(awakenings.title, /not recorded in the loaded save\./);
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.current, 0);
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.unknown, true);
-    assert.match(get('Hidden Potential', { counters: { awakenings: null } }, world).detail, /not recorded in the loaded save\. Assuming 0\./);
-    if (hasLevel) assert.match(get('Silver Champ', {}, world).detail, /not recorded in the loaded save\. Assuming 0\./);
+    assert.match(get('Hidden Potential', { counters: { awakenings: null } }, world).detail, /not recorded in the loaded save\.\nAssuming 0\./);
+    if (hasLevel) assert.match(get('Silver Champ', {}, world).detail, /not recorded in the loaded save\.\nAssuming 0\./);
   }
   assert.equal(get('Hidden Potential', { counters: { awakenings: 0 } }).achievement.unknown, false);
   assert.equal(get('Hidden Potential', { counters: { awakenings: 0 } }).state, 'todo');

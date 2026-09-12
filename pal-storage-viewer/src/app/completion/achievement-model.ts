@@ -68,14 +68,14 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
       case 'counter': {
         const current = finite(record.counters[a.key as keyof CompletionCounters]);
         if (a.key === 'awakenings') return { current: current ?? 0, uncertain: current === null,
-          note: current === null ? 'Awakening count was not recorded in the loaded save. Assuming 0.' : 'Uses the recorded lifetime awakening count.' };
+          note: current === null ? 'Awakening count was not recorded in the loaded save.\nAssuming 0.' : 'Uses the recorded lifetime awakening count.' };
         return { current,
           note: a.key === 'normal_dungeon_clears' ? 'Ordinary dungeon clears.' : a.key === 'predator_defeats' ? 'Uses the recorded predator-defeat total.' : undefined };
       }
       case 'craft': return { current: record.crafted_item_counts == null ? null
         : sum(new Map([...crafts].filter(([id]) => itemTypes.get(a.key)!.has(id)))),
-        note: a.key === 'MaterialIngot' ? 'Includes charcoal and other materials in the game\'s ingot category.'
-          : a.key === 'ConsumeBullet' ? 'Includes arrows; counts quantities, not distinct items.' : 'Counts sphere quantities, not distinct recipes.' };
+        note: a.key === 'MaterialIngot' ? 'Charcoal counted as Ingot'
+          : a.key === 'ConsumeBullet' ? undefined : 'Counts sphere quantities, not distinct recipes.' };
       case 'hard': return { current: has('TowerBossDefeatCount') ? hardTowers.filter(id => (towerCounts.get(keyOf(id + '_Hard')) ?? 0) > 0).length : null,
         note: 'Zoe, Lily, Axel, Marcus, Victor and Saya in Hard Mode.' };
       case 'research': return { current: guild?.research == null ? null : data.research.filter(([id, , , work]) => work > 0 && (guild.research![id] ?? 0) >= work - 0.5).length,
@@ -96,13 +96,13 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
         const current = recorded ?? (world?.hasLevel ? 0 : null);
         return { current, uncertain: current != null && current < a.target,
           note: current == null ? world?.arenaPointsUnavailable ?? worldMissing
-            : recorded === null ? 'Arena Points were not recorded in the loaded save. Assuming 0.'
+            : recorded === null ? 'Arena Points were not recorded in the loaded save.\nAssuming 0.'
             : current < a.target ? 'Recorded RP does not establish whether this rank was reached before.' : 'Current RP threshold reached.' };
       }
       case 'tree': {
         const entered = treeQuests.some(id => quests.has(keyOf(id))) || tower('WorldTreeBoss') || maps.has('tree');
         return { current: entered ? 1 : has('CompletedQuestArray_FullRelease', 'UnlockedWorldMapFlags') ? 0 : null,
-          note: 'Accepts the entry quest, World Tree map unlock or later interior story completion.' };
+          note: 'Checks World Tree entry.' };
       }
     }
   }
@@ -114,7 +114,7 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
     const state = !unknown && current >= definition.target ? 'done' : current > 0 ? 'active' : 'todo';
     const detail = note ?? (recorded === null ? 'Required progress was not recorded in the loaded save.' : '');
     return { id: definition.id, name: definition.name, order, state, no: null, coords: '', map: '', group: definition.group,
-      detail: recorded === null ? `${detail} Assuming 0.` : detail,
+      detail: recorded === null ? `${detail}\nAssuming 0.` : detail,
       achievement: { description: definition.description, current, target: definition.target, unknown },
     };
   });
