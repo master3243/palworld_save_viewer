@@ -42,10 +42,13 @@
           <h2>{{ player?.label }}</h2>
           <p>{{ progress.done | number }}<span>/{{ progress.total | number }}</span></p>
           <div class="stats" aria-label="Counters">
-            <span class="stat level-stat" *ngIf="player?.level !== null && player?.level !== undefined" [class.max]="isMaxLevel" title="Player level">
+            <span class="stat level-stat" *ngIf="player?.level !== null && player?.level !== undefined; else missingLevel" [class.max]="isMaxLevel" title="Player level">
               <b>Lv. {{ player?.level }}</b>
               <span>{{ isMaxLevel ? 'max' : 'not max' }}</span>
             </span>
+            <ng-template #missingLevel>
+              <span class="stat level-stat missing-data" tabindex="0" title="Player level unavailable. Add Level.sav with &quot;+ Files&quot;." aria-label="Player level unavailable. Add Level.sav with &quot;+ Files&quot;."><b>?</b><span>Lvl</span></span>
+            </ng-template>
             <span class="stat" *ngFor="let entry of progress.stats" [attr.title]="entry.tooltip ? null : entry.title" [appTooltip]="entry.tooltip ?? null" [attr.tabindex]="entry.tooltip ? 0 : null">
               <b>{{ entry.value }}</b>
               <span>{{ entry.label }}</span>
@@ -81,7 +84,7 @@
               <img class="card-map-icon" *ngIf="categoryIcons[category.key] as icon" [src]="icon" [style.transform]="category.key === 'crafting' ? 'scale(1.3)' : category.key === 'statue' || category.key === 'relics' || category.key === 'captureBonus' || category.key === 'paldeck' ? 'scale(1.1)' : category.key === 'bounties' || category.key === 'research' ? 'scale(1.44)' : category.key === 'fastTravel' || category.key === 'towers' || category.key === 'towersHard' || category.key === 'areas' || category.key === 'notes' || category.key === 'alphas' || category.key === 'raids' || category.key === 'mainQuests' || category.key === 'sideQuests' ? 'scale(1.2)' : null" alt="" decoding="async">
               <span>{{ category.title }}</span>
             </span>
-            <span class="card-count">{{ category.unavailable ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
+            <span class="card-count">{{ category.needsFile ? '?' : category.unavailable ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
           </span>
           <span class="bar" aria-hidden="true">
             <span class="bar-fill" [style.width.%]="category.percent"></span>
@@ -95,7 +98,7 @@
       <ng-container *ngIf="category.key === selectedCategory">
       <section class="category-detail" #categoryDetail tabindex="-1" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
         <div class="detail-head">
-          <h3>{{ open.title }} <span class="detail-count">{{ open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
+          <h3>{{ open.title }} <span class="detail-count" [class.missing-data]="!!open.needsFile">{{ open.needsFile ? '?' : open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
             <label class="status-priority" *ngIf="!open.needsFile">
               <input #statusPriority type="checkbox" [checked]="prioritizeNotDone" (change)="prioritizeNotDone = statusPriority.checked">
@@ -220,7 +223,7 @@
               </ng-container>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
               <ng-container *ngIf="open.key === 'captureBonus'">
-                <td class="condensed-col" *ngFor="let stars of condensationStars" [attr.title]="item.condensed === null ? 'Load Level.sav to see owned star ranks' : null">{{ item.condensed ? (item.condensed[stars] ? (item.condensed[stars] | number) : '') : '—' }}</td>
+                <td class="condensed-col" *ngFor="let stars of condensationStars" [class.missing-data]="item.condensed == null" [attr.title]="item.condensed == null ? 'Add Level.sav with &quot;+ Files&quot; to see owned star ranks.' : null">{{ item.condensed ? (item.condensed[stars] ? (item.condensed[stars] | number) : '') : '?' }}</td>
               </ng-container>
               <ng-container *ngIf="columns.fishing">
                 <ng-container *ngIf="item.fishing as fishing">
