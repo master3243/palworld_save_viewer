@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
 
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
@@ -35,7 +36,7 @@ const RING_RADIUS = 52;
 @Component({
   selector: 'app-completion',
   standalone: true,
-  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective, TableRowViewportDirective, TooltipDirective],
+  imports: [CommonModule, FormsModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective, TableRowViewportDirective, TooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './completion.component.html',
   styleUrls: ['../pal-wiki-links.css', './completion.component.css']
@@ -43,6 +44,7 @@ const RING_RADIUS = 52;
 export class CompletionComponent implements OnChanges {
   @Input() sets: SaveSetSummary[] = [];
   @Input() rows: Record<string, unknown>[] = [];
+  @Input() localDataOwners = new Map<string, string>();
   readonly condensationStars = [0, 1, 2, 3, 4];
 
   /** Master lists; loaded once from resources/completion/completion-data.json. */
@@ -64,7 +66,6 @@ export class CompletionComponent implements OnChanges {
   private readonly tabDiscovery = new TabDiscovery();
   private readonly palNumberSuffixes = new Map<string, Promise<string>>();
   private readonly palLinks = new Map<string, PalWikiLink[]>();
-  private readonly localDataOwners = new Map<string, string>();
   private readonly orderedRows = new WeakMap<Category, { normal: TrackedItem[]; prioritized: TrackedItem[] }>();
   private filteredRows?: { category: Category; needle: string; group: string; priority: boolean; items: TrackedItem[] };
   get isPalList(): boolean {
@@ -255,10 +256,10 @@ export class CompletionComponent implements OnChanges {
     return selected && set.players.some(player => player.uid === selected) ? selected : set.players.length === 1 ? set.players[0].uid : '';
   }
 
-  selectLocalDataOwner(event: Event): void {
+  selectLocalDataOwner(uid: string): void {
     const set = this.localDataSave;
     if (!set) return;
-    this.localDataOwners.set(set.folder, (event.target as HTMLSelectElement).value);
+    this.localDataOwners.set(set.folder, uid);
     this.ngOnChanges();
   }
 

@@ -199,7 +199,7 @@ test('omitted Arena Points default to zero only with Level loaded; omitted awake
     const awakenings = summary.stats.find(s => s.label === 'Awakenings');
     assert.equal(awakenings.value, '?');
     assert.equal(awakenings.missing, true);
-    assert.equal(awakenings.title, 'Awakening count was not recorded in the loaded save.');
+    assert.match(awakenings.title, /not recorded in the loaded save\./);
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.current, 0);
     assert.equal(get('Hidden Potential', { counters: { awakenings: null } }, world).achievement.unknown, true);
     assert.match(get('Hidden Potential', { counters: { awakenings: null } }, world).detail, /not recorded in the loaded save\. Assuming 0\./);

@@ -54,6 +54,15 @@
               <span>{{ entry.label }}</span>
             </span>
           </div>
+          <ng-container *ngIf="localDataSave as set">
+            <label class="local-data-owner" *ngIf="set.has_local_data && set.players.length > 1">
+              LocalData belongs to
+              <select [ngModel]="localDataOwner(set)" (ngModelChange)="selectLocalDataOwner($event)" aria-label="Player who owns LocalData.sav">
+                <option value="">Select player</option>
+                <option *ngFor="let owner of set.players" [value]="owner.uid">{{ owner.name || owner.uid }}</option>
+              </select>
+            </label>
+          </ng-container>
         </div>
         <div class="tracker-views" role="group" aria-label="Tracker view">
           <button type="button" [class.active]="!mapOpen" [attr.aria-pressed]="!mapOpen" (click)="mapOpen = false">Overview</button>
@@ -123,17 +132,6 @@
             <span class="group-chip-head"><span>{{ entry.label }}</span><b>{{ entry.value }}</b></span>
           </div>
         </div>
-        <ng-container *ngIf="open.key === 'paldeck' || open.key === 'notes' || open.key === 'achievements'">
-          <label class="seen-owner" *ngIf="localDataSave as set">
-            <ng-container *ngIf="(open.key === 'paldeck' ? set.seen_species != null : open.key === 'notes' ? set.checked_notes != null : set.max_friendship != null) && set.players.length > 1">
-              LocalData belongs to
-              <select [value]="localDataOwner(set)" (change)="selectLocalDataOwner($event)" aria-label="Player who owns LocalData.sav">
-                <option value="">Select player</option>
-                <option *ngFor="let owner of set.players" [value]="owner.uid">{{ owner.name || owner.uid }}</option>
-              </select>
-            </ng-container>
-          </label>
-        </ng-container>
         <div class="group-chips" [class.technology-points]="open.key === 'technologies'" [class.progress-groups]="open.key === 'research' || open.key === 'relics' || open.key === 'technologies' || open.key === 'fastTravel'" *ngIf="open.groups.length" role="group" aria-label="Type">
           <button
             *ngFor="let group of open.groups"

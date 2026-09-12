@@ -175,6 +175,7 @@ export class AppComponent implements OnDestroy {
   private loadedInputs: SaveInput[] = [];
   sources: SaveSource[] = [];
   saveSets: SaveSetSummary[] = [];
+  readonly localDataOwners = new Map<string, string>();
   locationCounts: LocationCount[] = [];
   /** Live progress while parsing; the worker reports real per-record counts. */
   progress: ParseProgress | null = null;
@@ -815,6 +816,7 @@ export class AppComponent implements OnDestroy {
     this.loadedInputs = [];
     this.sources = [];
     this.saveSets = [];
+    this.localDataOwners.clear();
     this.locationCounts = [];
     this.isSourcesOpen = false;
   }
@@ -1018,6 +1020,12 @@ export class AppComponent implements OnDestroy {
       this.loadedInputs = merged;
       this.sources = result.sources;
       this.saveSets = result.sets;
+      if (!append && !removing) this.localDataOwners.clear();
+      for (const [folder, uid] of this.localDataOwners) {
+        if (!result.sets.some(set => set.folder === folder && set.has_local_data && set.players.some(player => player.uid === uid))) {
+          this.localDataOwners.delete(folder);
+        }
+      }
       this.locationCounts = this.countLocations(rows);
       this.originalRows = this.defaultOrder(rows);
       this.filteredRows = this.originalRows;

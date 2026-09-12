@@ -21,11 +21,11 @@ const player = input('player.sav'), meta = input('LevelMeta.sav'), local = input
 function harness(inputs) {
   const parser = new service.SaveParserService();
   parser.runInWorker = async files => ({ rows: [], sources: files.map(f => ({ file: f.name, note: 'World metadata' })),
-    sets: [{ players: files.filter(f => f.name.startsWith('player')).map(f => ({ completion: {}, uid: f.name })) }] });
+    sets: [{ folder: 'world', has_local_data: files.some(f => f.name === 'LocalData.sav'), players: files.filter(f => f.name.startsWith('player')).map(f => ({ completion: {}, uid: f.name })) }] });
   const app = Object.assign(Object.create(AppComponent.prototype), {
     parser, loadedInputs: inputs, sources: inputs.map(i => ({ file: i.file.name })),
     saveSets: [{ players: [{ completion: {} }] }], originalRows: [], rows: [],
-    locationCounts: [], isSourcesOpen: true, isParsing: false, saveLetters: new Map(),
+    locationCounts: [], isSourcesOpen: true, isParsing: false, saveLetters: new Map(), localDataOwners: new Map(),
     changeDetector: { markForCheck() {} }, tabDiscovery: { visit() {} },
     assignSaveLetters() {}, scheduleMeasure() {}, defaultOrder: rows => rows, buildColumns: () => [],
   });
@@ -34,6 +34,7 @@ function harness(inputs) {
 
 test('removing the last player with supporting files left clears stale data and returns to the menu', async () => {
   const { app } = harness([meta, player, local]);
+  app.localDataOwners.set('world', 'player.sav');
   await app.removeSource(1);
   assert.equal(app.hasData, false);
   for (const key of ['loadedInputs', 'sources', 'saveSets', 'rows', 'locationCounts']) assert.equal(app[key].length, 0);
@@ -41,6 +42,17 @@ test('removing the last player with supporting files left clears stale data and 
   assert.equal(app.isSourcesOpen, false);
   assert.equal(app.isParsing, false);
   assert.equal(app.progress, null);
+  assert.equal(app.localDataOwners.size, 0);
+});
+
+test('LocalData ownership survives unrelated removal and is cleared when its owner is removed', async () => {
+  const { app } = harness([player, input('player2.sav'), input('player3.sav'), local]);
+  app.localDataOwners.set('world', 'player.sav');
+  await app.removeSource(1);
+  assert.equal(app.localDataOwners.get('world'), 'player.sav');
+  await app.removeSource(0);
+  assert.equal(app.hasData, true);
+  assert.equal(app.localDataOwners.size, 0);
 });
 
 test('removing a save group also clears the view when only supporting files remain', async () => {

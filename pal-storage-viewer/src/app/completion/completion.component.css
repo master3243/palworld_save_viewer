@@ -806,9 +806,8 @@
 .seen-col, .checked-col, .butchered-col { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .seen-col.seen, .checked-col.checked { color: #8ef0c2; }
 .seen-col.not-seen, .checked-col.not-checked { color: #ff8e8e; }
-.seen-owner { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: .78rem; color: #b2c9d3; }
-.seen-owner:empty { display: none; }
-.seen-owner select { background: #0a202d; border: 1px solid #31576a; border-radius: 6px; color: #e8f8ff; padding: 5px 8px; font: inherit; max-width: 100%; }
+.local-data-owner { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; grid-column: 1 / -1; font-size: .78rem; color: #b2c9d3; }
+.local-data-owner select { background: #0a202d; border: 1px solid #31576a; border-radius: 6px; color: #e8f8ff; padding: 5px 8px; font: inherit; max-width: 100%; }
 .stat[tabindex] { cursor: help; }
 .stat[tabindex]:focus-visible { outline: 2px solid #62cbef; outline-offset: 2px; }
 
