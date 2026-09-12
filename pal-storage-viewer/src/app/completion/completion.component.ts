@@ -406,7 +406,10 @@ export class CompletionComponent implements OnChanges {
     if (this.selectedCategory === 'crafting') return item.crafting?.count == null ? 'Unknown' : item.state === 'done' ? 'Crafted' : 'Not crafted';
     if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';
     if (this.selectedCategory === 'captureBonus') return item.state === 'done' ? 'Captured 5' : item.state === 'active' ? 'Progressing to 5' : 'Never Captured';
-    if (this.selectedCategory === 'notes') return item.state === 'done' ? 'Read' : item.state === 'active' ? 'Not Read' : 'Missing';
+    if (this.selectedCategory === 'notes') {
+      if (item.state === 'todo') return 'Missing';
+      return item.checked == null ? 'Obtained' : item.checked ? 'Obtained & Read' : 'Obtained But Not Read';
+    }
     if (item.state === 'active') return 'In progress';
     const done = item.state === 'done';
     switch (this.selectedCategory) {
