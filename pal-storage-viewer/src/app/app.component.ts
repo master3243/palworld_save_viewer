@@ -769,6 +769,7 @@ export class AppComponent implements OnDestroy {
     const lower = name.toLowerCase();
     if (lower === 'level.sav') return 'level';
     if (lower === 'levelmeta.sav') return 'level_meta';
+    if (lower === 'localdata.sav') return 'local_data';
     if (lower.endsWith('_dps.sav')) return 'dimensional_storage';
     if (/^[0-9a-f]{32}\.sav$/.test(lower)) return 'player';
     return 'unknown';

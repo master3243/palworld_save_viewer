@@ -7,7 +7,8 @@ import {
 } from './gvas';
 import { Lookups } from './lookups';
 import { PalRecord, buildRecord } from './record';
-import { PlayerCompletion, extractLabResearch, extractPlayerCompletion } from './completion';
+import { PlayerCompletion, extractLabResearch, extractPlayerCompletion, extractSeenSpecies } from './completion';
+import { PlayerAttributes, extractPlayerAttributes, extractItemCounts } from './player-progress';
 
 export type SaveKind = 'dimensional_storage' | 'level' | 'player' | 'level_meta' | 'world_option' | 'local_data' | 'unknown';
 
@@ -90,7 +91,8 @@ export interface BaseCamp {
 
 export interface LevelPayload {
   records: PalRecord[];
-  players: { player_uid: string | null; instance_id: string | null; name: string; level: number | null }[];
+  players: { player_uid: string | null; instance_id: string | null; name: string; level: number | null; attributes: PlayerAttributes | null }[];
+  item_counts: Record<string, number | null>;
   bases: BaseCamp[];
   containers: Record<string, { slots: number; occupied: number }>;
   skipped: { players: number; wild_or_npc: number; unreadable: number };
@@ -160,6 +162,7 @@ export function extractLevel(buf: SaveBuffer, lookups: Lookups, progress?: Parse
         instance_id: identity.instance_id,
         name: readStr(block, findPropertyStart(block, 'NickName')),
         level: readByte(block, findPropertyStart(block, 'Level')),
+        attributes: extractPlayerAttributes(block),
       });
       skipped.players += 1;
       continue;
@@ -201,7 +204,7 @@ export function extractLevel(buf: SaveBuffer, lookups: Lookups, progress?: Parse
   } catch {
     labs = [];
   }
-  return { records, players, bases, containers, skipped, labs };
+  return { records, players, bases, containers, skipped, labs, item_counts: extractItemCounts(buf) };
 }
 
 export interface PlayerPayload {
@@ -209,6 +212,7 @@ export interface PlayerPayload {
   instance_id: string | null;
   party_container_id: string | null;
   pal_box_container_id: string | null;
+  key_item_container_id: string | null;
   /** Bosses, effigies, journals, fast travel, Paldeck and quests; null if the file has no record. */
   completion: PlayerCompletion | null;
 }
@@ -231,6 +235,7 @@ export function extractPlayer(buf: SaveBuffer): PlayerPayload {
     instance_id: guidOrNull(individual['InstanceId']),
     party_container_id: guidAt('OtomoCharacterContainerId'),
     pal_box_container_id: guidAt('PalStorageContainerId'),
+    key_item_container_id: guidAt('EssentialContainerId'),
     completion,
   };
 }
@@ -260,7 +265,8 @@ export type ParsedFile =
   | { kind: 'level'; class_name: string; saved_at: string; payload: LevelPayload }
   | { kind: 'player'; class_name: string; saved_at: string; payload: PlayerPayload }
   | { kind: 'level_meta'; class_name: string; saved_at: string; payload: LevelMetaPayload }
-  | { kind: 'world_option' | 'local_data' | 'unknown'; class_name: string; saved_at: string; payload: null };
+  | { kind: 'local_data'; class_name: string; saved_at: string; payload: { seen_species: string[] | null } }
+  | { kind: 'world_option' | 'unknown'; class_name: string; saved_at: string; payload: null };
 
 /** Decode one save file (already decompressed GVAS bytes) into its parsed payload. */
 export function parseSaveFile(
@@ -282,6 +288,8 @@ export function parseSaveFile(
       return { kind, class_name: className, saved_at: savedAt, payload: extractPlayer(buf) };
     case 'level_meta':
       return { kind, class_name: className, saved_at: savedAt, payload: extractLevelMeta(buf) };
+    case 'local_data':
+      return { kind, class_name: className, saved_at: savedAt, payload: { seen_species: extractSeenSpecies(buf) } };
     default:
       return { kind, class_name: className, saved_at: savedAt, payload: null };
   }

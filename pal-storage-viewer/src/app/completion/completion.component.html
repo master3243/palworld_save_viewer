@@ -50,7 +50,7 @@
               <span class="stat level-stat missing-data" tabindex="0" title="Player level unavailable. Add Level.sav with &quot;+ Files&quot;." aria-label="Player level unavailable. Add Level.sav with &quot;+ Files&quot;."><b>?</b><span>Lvl</span></span>
             </ng-template>
             <span class="stat" *ngFor="let entry of progress.stats" [class.missing-data]="entry.missing" [attr.title]="entry.tooltip ? null : entry.title" [appTooltip]="entry.tooltip ?? null" [attr.tabindex]="entry.tooltip || entry.missing ? 0 : null">
-              <b>{{ entry.value }}</b>
+              <b *ngIf="entry.value">{{ entry.value }}</b>
               <span>{{ entry.label }}</span>
             </span>
           </div>
@@ -114,6 +114,17 @@
             >
           </div>
         </div>
+        <ng-container *ngIf="open.key === 'paldeck'">
+          <label class="seen-owner" *ngIf="seenSave as set">
+            <ng-container *ngIf="set.seen_species != null && set.players.length > 1">
+              LocalData belongs to
+              <select [value]="seenOwner(set)" (change)="selectSeenOwner($event)" aria-label="Player who owns LocalData.sav">
+                <option value="">Select player</option>
+                <option *ngFor="let owner of set.players" [value]="owner.uid">{{ owner.name || owner.uid }}</option>
+              </select>
+            </ng-container>
+          </label>
+        </ng-container>
         <div class="group-chips" [class.technology-points]="open.key === 'technologies'" [class.progress-groups]="open.key === 'research' || open.key === 'relics' || open.key === 'technologies' || open.key === 'fastTravel'" *ngIf="open.groups.length" role="group" aria-label="Type">
           <button
             *ngFor="let group of open.groups"
@@ -154,6 +165,7 @@
               <th class="portrait-col" *ngIf="isPalList" aria-label="Portrait"></th>
               <th class="tag-col" *ngIf="open.hasTags"></th>
               <th>Name</th>
+              <th class="seen-col" *ngIf="open.key === 'paldeck'" title="Encountered species recorded in LocalData.sav">Seen</th>
               <ng-container *ngIf="open.key === 'crafting'">
                 <th>Category</th>
                 <th>Rarity</th>
@@ -166,6 +178,7 @@
                 <th>Item stats</th>
               </ng-container>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
+              <th class="butchered-col" *ngIf="open.key === 'captureBonus'">Butchered</th>
               <ng-container *ngIf="open.key === 'captureBonus'">
                 <th class="condensed-col" *ngFor="let stars of condensationStars" scope="col" [title]="'Currently owned pals at exactly ' + stars + ' stars'"><small>Owned</small>{{ stars }} <span class="condensed-star">★</span></th>
               </ng-container>
@@ -198,6 +211,7 @@
               <td class="portrait-col" *ngIf="isPalList"><img [offlineSrc]="palIconPath(item)" [alt]="item.name" decoding="async" draggable="false"></td>
               <td class="tag-col" *ngIf="open.hasTags"><span class="tag-chip" *ngIf="item.tag" [attr.data-tag]="item.tag">{{ item.tag }}</span></td>
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
+              <td class="seen-col" *ngIf="open.key === 'paldeck'" [class.missing-data]="item.seen == null" [class.seen]="item.seen === true" [class.not-seen]="item.seen === false" [attr.title]="item.seen == null ? player?.world?.seenUnavailable : item.seen ? 'Seen' : 'Not seen'" [attr.aria-label]="item.seen == null ? 'Seen status unknown' : item.seen ? 'Seen' : 'Not seen'">{{ item.seen == null ? '?' : item.seen ? '✓' : '—' }}</td>
               <ng-container *ngIf="item.crafting as craft">
                 <td>{{ craft.group }}</td>
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
@@ -222,6 +236,7 @@
                 <td class="craft-stats"><div *ngIf="craft.stats.length; else noCraftStats"><span *ngFor="let stat of craft.stats">{{ stat[0] }}: {{ stat[1] | number }}</span></div><ng-template #noCraftStats>-</ng-template></td>
               </ng-container>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
+              <td class="butchered-col" *ngIf="open.key === 'captureBonus'" [class.missing-data]="item.butchered == null" [attr.title]="item.butchered == null ? 'Butchering was not recorded in this save.' : null">{{ item.butchered == null ? '?' : (item.butchered | number) }}</td>
               <ng-container *ngIf="open.key === 'captureBonus'">
                 <td class="condensed-col" *ngFor="let stars of condensationStars" [class.missing-data]="item.condensed == null" [attr.title]="item.condensed == null ? 'Add Level.sav with &quot;+ Files&quot; to see owned star ranks.' : null">{{ item.condensed ? (item.condensed[stars] ? (item.condensed[stars] | number) : '') : '?' }}</td>
               </ng-container>

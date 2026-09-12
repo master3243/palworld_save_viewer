@@ -9,8 +9,8 @@ export type { CombinedSaves, PlayerCompletion, SaveSetSummary, SaveSource } from
 import type { CombinedSaves } from '../backend';
 import type { SavePreview } from '../backend/save-preview';
 
-/** Files in a save folder that never contain pals; skipped before decoding. */
-const IGNORED_FILE_NAMES = new Set(['localdata.sav', 'worldoption.sav']);
+/** World settings do not contribute to the Pal table or tracker. */
+const IGNORED_FILE_NAMES = new Set(['worldoption.sav']);
 
 export interface ParseProgress {
   /** 0..1, or null while something with no progress events runs (runtime download). */
@@ -103,7 +103,7 @@ export class SaveParserService {
     return result;
   }
 
-  /** True for files worth decoding: any .sav/.gvas except the known pal-free ones. */
+  /** True for files that can contribute Pal records or tracker progress. */
   isCandidate(input: SaveInput): boolean {
     const name = input.file.name.toLowerCase();
     if (IGNORED_FILE_NAMES.has(name)) return false;

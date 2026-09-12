@@ -41,12 +41,12 @@ test('WGS maps both Level names and player files, preserving bytes and separate 
   assert.equal(await resolved[0].file.text(), 'GVAS'+names[0]);
   assert.equal(resolved[0].file.lastModified, 12345);
 });
-test('WGS skips backup slots/settings and unreferenced old container revisions', async () => {
+test('WGS includes LocalData and skips backup slots/settings and old container revisions', async () => {
   const files = wgs([`${world}-Level`,`${world}-Slot1-Level-01`,`${world}-LocalData`,'GDKBackupTimestamps','UserOption']);
   const current = files.find(f => f.file.name === 'container.7');
   files.push(input(current.path.replace('container.7','container.99'), Buffer.from('invalid old revision')));
   const resolved = await resolveWgsFiles(files);
-  assert.deepEqual(resolved.map(f=>f.file.name), ['Level.sav']);
+  assert.deepEqual(resolved.map(f=>f.file.name), ['Level.sav', 'LocalData.sav']);
 });
 test('Xbox account backup directories are not loaded as extra worlds', async () => {
   const resolved = await resolveWgsFiles([

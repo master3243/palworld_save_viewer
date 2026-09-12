@@ -71,6 +71,7 @@ function savePath(name: string): string | null {
   }
   if (part === 'Level' || part === 'Level-01') return `${world}/Level.sav`;
   if (part === 'LevelMeta') return `${world}/LevelMeta.sav`;
+  if (part === 'LocalData') return `${world}/LocalData.sav`;
   const player = /^Players-([0-9a-f]{32}(?:_dps)?)$/i.exec(part);
   return player ? `${world}/Players/${player[1]}.sav` : null;
 }

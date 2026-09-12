@@ -22,6 +22,26 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('seen and butchered columns preserve completion and distinguish unknown from zero', () => {
+  const save = record({ butcher_counts: { Penguin: 2, PENGUIN: 3, Human: 4 }, counters: { awakenings: 7 } });
+  const original = summarize(save, data);
+  const summary = summarize(save, data, { labs: [], seenSpecies: ['PENGUIN'], keyItems: 87,
+    attributes: { allocated: { '最大HP': 22 }, extra: { '最大HP': 13, '最大SP': 24 } } });
+  const pal = (s, key, id) => s.categories.find(c => c.key === key).items.find(i => i.id === id);
+  assert.equal(pal(original, 'paldeck', 'Penguin').seen, null);
+  assert.equal(pal(summary, 'paldeck', 'Penguin').seen, true);
+  assert.equal(pal(summary, 'paldeck', 'SheepBall').seen, false);
+  assert.equal(pal(summary, 'captureBonus', 'Penguin').butchered, 3);
+  assert.equal(pal(summary, 'captureBonus', 'SheepBall').butchered, 0);
+  assert.equal(summary.percent, original.percent);
+  const entry = label => summary.stats.find(e => e.label === label);
+  assert.equal(entry('Butchered').value, '7');
+  assert.equal(entry('Awakenings').value, '7');
+  assert.equal(entry('Key items').value, '87');
+  assert.deepEqual(entry('Attributes').tooltip.rows, [['HP', '22 + 13'], ['Stamina', '0 + 24']]);
+  assert.equal(original.stats.find(e => e.label === 'Key items').value, '?');
+});
+
 test('condensation tooltip uses lifetime rank counts with one-based save ranks', () => {
   const stats = summarize(record({ rankup_counts: { '2': 60, '3': 42, '5': 35 } }), data).stats;
   const entry = stats.find(stat => stat.label === '4-star pals');

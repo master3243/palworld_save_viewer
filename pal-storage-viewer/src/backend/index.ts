@@ -11,3 +11,4 @@ export type { CombineEntry, CombinedSaves, Row, SaveSetSummary, SaveSource } fro
 export { decodeSave } from './decode';
 export { extractPlayerCompletion } from './completion';
 export type { ActiveQuest, CompletionCounters, PlayerCompletion } from './completion';
+export type { PlayerAttributes } from './player-progress';

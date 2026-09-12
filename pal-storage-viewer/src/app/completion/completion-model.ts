@@ -2,7 +2,7 @@
  * Turns one player's completion record plus the bundled master lists into per-category
  * progress. Pure functions, no Angular, so they can be checked under Node.
  */
-import type { PlayerCompletion } from '../../backend';
+import type { PlayerAttributes, PlayerCompletion } from '../../backend';
 import { QUEST_REWARDS, UNTRACKED_MAIN_QUESTS } from './mission-rules';
 import type { CondensationCounts } from './owned-condensation';
 
@@ -76,6 +76,11 @@ export interface WorldProgress {
   ownedCondensation?: Record<string, CondensationCounts> | null;
   bases?: number | null;
   pals?: number | null;
+  keyItems?: number | null;
+  attributes?: PlayerAttributes | null;
+  attributesUnavailable?: string;
+  seenSpecies?: string[] | null;
+  seenUnavailable?: string;
 }
 
 export type ItemState = 'done' | 'active' | 'todo';
@@ -104,6 +109,8 @@ export interface TrackedItem {
   captureProgress?: { done: number; total: number };
   fishing?: { common: number; whopper: number; lunker: number };
   condensed?: CondensationCounts | null;
+  seen?: boolean | null;
+  butchered?: number | null;
   crafting?: CraftingItem & { count: number | null; sources: string[]; sourceLabel: string };
   /** False for rows shown for information only (paid DLC); they do not count. */
   counted?: boolean;
@@ -148,7 +155,7 @@ export interface StatEntry {
   value: string;
   title: string;
   missing?: boolean;
-  tooltip?: { title: string; rows: [string, string][]; width?: number };
+  tooltip?: { title: string; rows: [string, string][]; width?: number; intro?: string[] };
 }
 
 export interface CompletionSummary {
@@ -238,14 +245,15 @@ function lowerKeys<T>(entries: Record<string, T>): Map<string, T> {
   return new Map(Object.entries(entries).map(([key, value]) => [key.toLowerCase(), value]));
 }
 
-function paldeckCategory(record: PlayerCompletion, data: CompletionData): Category {
+function paldeckCategory(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): Category {
   const unlocked = new Set(record.paldeck.map((tribe) => tribe.toLowerCase()));
+  const seen = world?.seenSpecies == null ? null : new Set(world.seenSpecies.map(id => id.toLowerCase()));
   const caughtBy = lowerKeys(record.capture_counts);
   const items: TrackedItem[] = capturablePals(data).map(([tribe, index, name]) => {
     const key = tribe.toLowerCase();
     const done = unlocked.has(key);
     const caught = caughtBy.get(key) ?? 0;
-    return { id: tribe, name, detail: done ? `caught ${caught}` : '', state: done ? 'done' : 'todo', group: '', coords: '', map: '', order: index, no: index };
+    return { id: tribe, name, detail: done ? `caught ${caught}` : '', state: done ? 'done' : 'todo', group: '', coords: '', map: '', order: index, no: index, seen: seen ? seen.has(key) : null };
   });
   const known = new Set(data.paldeck.map(([tribe]) => tribe.toLowerCase()));
   return finish({
@@ -259,6 +267,7 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData, wo
   const caughtBy = lowerKeys(record.capture_counts);
   const bonusBy = lowerKeys(record.capture_bonus_counts);
   const condensedBy = world?.ownedCondensation ? lowerKeys(world.ownedCondensation) : null;
+  const butcheredBy = record.butcher_counts == null ? null : normalizedCounts(record.butcher_counts);
   const known = new Set(data.paldeck.map(([tribe]) => tribe.toLowerCase()));
   const fishingBy = new Map<string, NonNullable<TrackedItem['fishing']>>();
   const unknown: string[] = [];
@@ -289,6 +298,7 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData, wo
     else if (bonus > 0) state = 'active';
     return { id: tribe, name, detail: '', state, group: '', coords: '', map: '', order: index, no: index,
       captureProgress: { done: caught, total: CAPTURE_BONUS_MAX }, fishing: fishingBy.get(key),
+      butchered: butcheredBy ? butcheredBy.get(key) ?? 0 : null,
       condensed: condensedBy ? condensedBy.get(key) ?? [0, 0, 0, 0, 0] : null };
   });
   return finish({ key: 'captureBonus', title: 'Capture Bonus', items, groups: [], unknown: unknown.sort() });
@@ -644,15 +654,33 @@ function stat(label: string, value: number | null | undefined, title: string,
   return { label, value: missing ? '?' : value.toLocaleString(), title: missing ? unavailable : title, missing };
 }
 
-function countTotal(counts: Record<string, number> | null | undefined): number | null {
-  if (counts == null) return null;
+function normalizedCounts(counts: Record<string, number>): Map<string, number> {
   const normalized = new Map<string, number>();
   for (const [id, count] of Object.entries(counts)) {
     if (!Number.isFinite(count) || count < 0) continue;
     const key = id.toLowerCase();
     normalized.set(key, Math.max(normalized.get(key) ?? 0, count));
   }
-  return [...normalized.values()].reduce((sum, count) => sum + count, 0);
+  return normalized;
+}
+
+function countTotal(counts: Record<string, number> | null | undefined): number | null {
+  return counts == null ? null : [...normalizedCounts(counts).values()].reduce((sum, count) => sum + count, 0);
+}
+
+const ATTRIBUTE_NAMES: Record<string, string> = {
+  '最大HP': 'HP', '最大SP': 'Stamina', '攻撃力': 'Attack', '防御力': 'Defense',
+  '所持重量': 'Carry weight', '作業速度': 'Work speed',
+};
+
+function attributeStat(world?: WorldProgress): StatEntry {
+  if (!world?.attributes) return stat('Attributes', null, '', world?.attributesUnavailable ?? 'Add Level.sav with "+ Files" to see player attributes.');
+  const { allocated, extra } = world.attributes;
+  const names = Object.keys(ATTRIBUTE_NAMES).filter(id => id in allocated || id in extra);
+  return { label: 'Attributes', value: '', title: 'Player attribute points', tooltip: {
+    title: 'Player Attribute Points', width: 260, intro: ['Allocated + extra points'],
+    rows: names.map(id => [ATTRIBUTE_NAMES[id], `${(allocated[id] ?? 0).toLocaleString()} + ${(extra[id] ?? 0).toLocaleString()}`]),
+  } };
 }
 
 function condensationStat(record: PlayerCompletion): StatEntry {
@@ -667,7 +695,7 @@ function condensationStat(record: PlayerCompletion): StatEntry {
 
 export function summarize(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): CompletionSummary {
   const categories = [
-    paldeckCategory(record, data),
+    paldeckCategory(record, data, world),
     captureBonusCategory(record, data, world),
     relicCategory(record, data),
     statueCategory(record, data),
@@ -693,14 +721,18 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
   const total = categories.reduce((sum, category) => sum + category.total, 0);
   const counters = record.counters;
   const stats = [
+    attributeStat(world),
     stat('Bases', world?.bases, 'Total bases across all guilds in this world', 'Add Level.sav with "+ Files" to see the base count.'),
     stat('Pals', world?.pals, 'Pals in the loaded world and dimensional storage files, across all players', 'Add Level.sav or a dimensional storage save with "+ Files" to see the Pal count.'),
     stat('Caught species', counters.tribe_captures, 'Distinct species captured, as recorded by the save'),
     stat('Total Pals captured', countTotal(record.capture_counts), 'Lifetime captures, including repeats and every entry recorded by the save'),
     stat('Fishing catches', countTotal(record.fishing_counts), 'Lifetime fishing catches across all species and sizes'),
+    stat('Butchered', countTotal(record.butcher_counts), 'Total butchering count across all entries recorded by the save'),
+    stat('Awakenings', counters.awakenings, 'Total awakenings recorded by the save'),
     stat('Mutations', counters.mutations, 'Mutated pals bred'),
     condensationStat(record),
     stat('Items crafted', countTotal(record.crafted_item_counts), 'Lifetime items crafted, including repeated crafts and items outside the crafting catalog'),
+    stat('Key items', world?.keyItems, 'Distinct key items currently owned', 'Add the matching player file and Level.sav with "+ Files" to read key items.'),
     stat('Tower clears', countTotal(record.tower_boss_counts), 'Total tower boss victories, including repeat clears and hard mode'),
     stat('Raid boss clears', countTotal(record.raid_boss_counts), 'Total raid boss victories, including repeat clears'),
     stat('Dungeons', counters.normal_dungeon_clears, 'Random dungeons cleared'),

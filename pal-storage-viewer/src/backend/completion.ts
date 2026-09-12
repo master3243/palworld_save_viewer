@@ -24,6 +24,7 @@ export interface CompletionCounters {
   camps_conquered: number | null;
   treasures_found: number | null;
   mutations: number | null;
+  awakenings: number | null;
   relics_unspent: number | null;
   technology_points: number | null;
   boss_technology_points: number | null;
@@ -40,6 +41,7 @@ export interface PlayerCompletion {
   capture_bonus_counts: Record<string, number>;
   crafted_item_counts: Record<string, number> | null;
   fishing_counts: Record<string, number> | null;
+  butcher_counts: Record<string, number> | null;
   /** EPalRelicType short name -> obtained level-object ids (32 hex chars, upper case). */
   relics: Record<string, string[]>;
   relics_unspent: Record<string, number>;
@@ -123,6 +125,12 @@ function readScalarMapAt(buf: SaveBuffer, tagOffset: number): [string, Scalar][]
 
 function readScalarMap(buf: SaveBuffer, label: string): [string, Scalar][] {
   return readScalarMapAt(buf, findPropertyStart(buf, label));
+}
+
+export function extractSeenSpecies(buf: SaveBuffer): string[] | null {
+  if (findPropertyStart(buf, 'Local_PalEncountFlag') === -1) return null;
+  return trueKeys(readScalarMap(buf, 'Local_PalEncountFlag'))
+    .map(id => id.replace(/^EPalTribeID::/, '')).filter(id => id && id !== 'None');
 }
 
 /** Keys whose value is true. */
@@ -282,6 +290,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
     capture_bonus_counts: numbers(readScalarMap(buf, 'PalCaptureBonusCount')),
     crafted_item_counts: findPropertyStart(buf, 'CraftItemCount') === -1 ? null : numbers(readScalarMap(buf, 'CraftItemCount')),
     fishing_counts: findPropertyStart(buf, 'FishingCountMap') === -1 ? null : numbers(readScalarMap(buf, 'FishingCountMap')),
+    butcher_counts: findPropertyStart(buf, 'PalButcherCount') === -1 ? null : numbers(readScalarMap(buf, 'PalButcherCount')),
     relics,
     relics_unspent: relicsUnspent,
     notes: trueKeys(readScalarMap(buf, 'NoteObtainForInstanceFlag')),
@@ -308,6 +317,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
       camps_conquered: readIntAt(buf, 'CampConqueredCount'),
       treasures_found: readIntAt(buf, 'FoundTreasureCount'),
       mutations: readIntAt(buf, 'MutationCount'),
+      awakenings: readIntAt(buf, 'AwakeningCount'),
       relics_unspent: Object.values(relicsUnspent).reduce((sum, value) => sum + value, 0),
       technology_points: readIntAt(buf, 'TechnologyPoint'),
       boss_technology_points: readIntAt(buf, 'bossTechnologyPoint'),
