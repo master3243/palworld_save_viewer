@@ -224,7 +224,7 @@
               <ng-container *ngIf="item.crafting as craft">
                 <td>{{ craft.group }}</td>
                 <td><span class="craft-rarity" [attr.data-rarity]="craft.rarity">{{ rarityNames[craft.rarity] }}</span></td>
-                <td class="craft-number craft-weight">{{ craft.weight | number }}<img offlineSrc="resources/completion/weight.pog" alt="" decoding="async"></td>
+                <td class="craft-number craft-weight">{{ craft.weight | number }}<img offlineSrc="resources/completion/crafting-icons/weight.pog" alt="" decoding="async"></td>
                 <td class="craft-number craft-value">{{ craft.baseValue | number }}<img offlineSrc="resources/completion/crafting-icons/money.pog" alt="" decoding="async"></td>
                 <td class="craft-number craft-tech-level">{{ craft.technologyLevels.length ? craft.technologyLevels.join(', ') : craft.inheritedTechnologyLevels.length ? '(' + craft.inheritedTechnologyLevels.join(', ') + ')' : '-' }}</td>
                 <td class="craft-source"><span [attr.title]="craft.sources.length ? craft.sources.join(' · ') : null">{{ craft.sourceLabel || '-' }}</span></td>

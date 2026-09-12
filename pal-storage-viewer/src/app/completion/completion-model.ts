@@ -732,7 +732,6 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     towerCategory(record, data),
     towerHardCategory(record, data),
     raidCategory(record, data),
-    arenaCategory(record, world),
     bossCategory(record, data, ['alpha', 'boss'], 'alphas', 'Alpha Pals'),
     bossCategory(record, data, ['bounty'], 'bounties', 'Bounty Targets'),
     questCategory(record, data, 'Main'),
@@ -744,6 +743,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     technologyCategory(record, data),
     craftingCategory(record, data),
     researchCategory(world, data),
+    arenaCategory(record, world),
     skinCategory(record, data),
   ];
   const counted = categories.filter((category) => category.total > 0 && !category.needsFile && !category.unavailable);
