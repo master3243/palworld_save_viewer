@@ -1,9 +1,9 @@
 /**
- * Entries outside the tracked 1.0 main chain. Keep them in the raw catalog so
+ * Entries excluded from main-mission tracking. Keep them in the raw catalog so
  * older save flags remain recognized, but do not mix them into story completion.
  * Quest-manager extraction: https://www.palworld.tools/quests
- * Main_DefeatWorldTreeMiddleBoss remains counted: absence in our sample does not
- * establish that "Path to the Abyss" is obsolete or completed by another mission.
+ * Path to the Abyss is excluded by the tracking decision after the expanded
+ * save audit; it must not prevent the remaining story missions reaching 100%.
  */
 export const UNTRACKED_MAIN_QUESTS = new Set([
   'Main_BaseCampLevel', 'Main_BeginAdventure', 'Main_BuildHatchingMachine',
@@ -14,6 +14,7 @@ export const UNTRACKED_MAIN_QUESTS = new Set([
   'Main_DefeatGrassBoss', 'Main_DefeatWildBoss', 'Main_EquipClothArmor',
   'Main_GainStatus', 'Main_Meal', 'Main_PickupWood', 'Main_UnlockPalBox',
   'Main_UnlockPalSphere', 'Main_UseGlider', 'Main_WorkerPal',
+  'Main_DefeatWorldTreeMiddleBoss',
 ].map(id => id.toLowerCase()));
 
 /**
