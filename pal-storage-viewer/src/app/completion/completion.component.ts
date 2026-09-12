@@ -174,6 +174,7 @@ export class CompletionComponent implements OnChanges {
           completion: player.completion,
           world: {
             labs: set.labs ?? [],
+            inGameDay: set.in_game_day,
             ownedCondensation: set.has_level ? ownedCondensation(this.rows, set.letter, player.uid) : null,
             bases: set.has_level ? set.bases.length : null,
             pals: set.has_level || set.has_dimensional_storage ? set.pals : null,

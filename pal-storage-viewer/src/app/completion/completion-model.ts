@@ -73,6 +73,7 @@ export interface CraftingItem {
 export interface WorldProgress {
   /** Lab research work done per research id, one map per guild in the world. */
   labs: Record<string, number>[];
+  inGameDay?: number | null;
   ownedCondensation?: Record<string, CondensationCounts> | null;
   bases?: number | null;
   pals?: number | null;
@@ -751,6 +752,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
   const total = categories.reduce((sum, category) => sum + category.total, 0);
   const counters = record.counters;
   const stats = [
+    stat('Day', world?.inGameDay, 'Current in-game day', 'Add LevelMeta.sav with "+ Files" to see the in-game day.'),
     attributeStat(world),
     stat('Bases', world?.bases, 'Total bases across all guilds in this world', 'Add Level.sav with "+ Files" to see the base count.'),
     stat('Pals', world?.pals, 'Pals in the loaded world and dimensional storage files, across all players', 'Add Level.sav or a dimensional storage save with "+ Files" to see the Pal count.'),
