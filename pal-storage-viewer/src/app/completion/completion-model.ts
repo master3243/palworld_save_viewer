@@ -162,7 +162,6 @@ export interface Category {
   unavailable?: string;
   arenaPoints?: StatEntry;
   unknownCount?: number;
-  approximateCount?: number;
   /** Costs of all remaining technologies, independent of the visible list filters. */
   technologyPoints?: { key: string; name: string; remaining: number; available: number | null; needed: number | null }[];
 }
@@ -738,8 +737,7 @@ function achievementCategory(record: PlayerCompletion, data: CompletionData, wor
   const items = achievementItems(record, data, world);
   const names = new Map(items.map(item => [item.group, item.group]));
   return finish({ key: 'achievements', title: 'Achievements', items, groups: groupsOf(items, names), unknown: [],
-    unknownCount: items.filter(item => item.achievement?.unknown).length,
-    approximateCount: items.filter(item => item.achievement?.approximate).length });
+    unknownCount: items.filter(item => item.achievement?.unknown).length });
 }
 
 export function summarize(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): CompletionSummary {

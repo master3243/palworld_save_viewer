@@ -164,9 +164,8 @@
           <svg class="achievement-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18.1A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></svg>
         </ng-template>
         <div class="achievement-notice tracker-note" *ngIf="open.key === 'achievements'">
-          <p class="achievement-warning"><svg class="achievement-warning-icon achievement-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><span>Progress inferred from the loaded saves. Many achievements are merely approximated or unconfirmed.</span></p>
-          <div class="achievement-warning-counts">
-            <span class="achievement-warning" *ngIf="open.approximateCount"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>{{ open.approximateCount }} approximated</span>
+          <p class="achievement-warning"><svg class="achievement-warning-icon achievement-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><span>Progress inferred from the loaded saves.</span></p>
+          <div class="achievement-warning-counts" *ngIf="open.unknownCount">
             <span class="achievement-warning achievement-unconfirmed" *ngIf="open.unknownCount"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>{{ open.unknownCount }} unconfirmed</span>
           </div>
         </div>
@@ -235,8 +234,7 @@
               <td class="name-col" [attr.title]="isPalList ? item.name : null"><img *ngIf="itemIcon(open.key, item) as icon" [class.technology-icon]="open.key === 'technologies'" [src]="icon" alt="" decoding="async"><img *ngIf="item.crafting as craft" [offlineSrc]="craft.icon" alt="" decoding="async"><span>{{ item.name }}</span></td>
               <ng-container *ngIf="item.achievement as achievement">
                 <td class="achievement-requirement">{{ achievement.description }}
-                  <small class="achievement-estimate" *ngIf="achievement.approximate || achievement.unknown">
-                    <span class="achievement-warning" *ngIf="achievement.approximate" title="Uses an approximate achievement criterion."><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>Approximated</span>
+                  <small class="achievement-estimate" *ngIf="achievement.unknown">
                     <span class="achievement-warning achievement-unconfirmed" *ngIf="achievement.unknown" [attr.title]="item.detail"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>Unconfirmed</span>
                   </small>
                 </td>

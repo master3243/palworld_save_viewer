@@ -7,7 +7,6 @@ export interface AchievementProgress {
   current: number | null;
   target: number;
   unknown: boolean;
-  approximate: boolean;
 }
 
 const keyOf = (id: string): string => id.split('::').pop()!.toLowerCase();
@@ -114,7 +113,7 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
     const state = !unknown && current >= definition.target ? 'done' : current !== null && current > 0 ? 'active' : 'todo';
     return { id: definition.id, name: definition.name, order, state, no: null, coords: '', map: '', group: definition.group,
       detail: note ?? (current === null ? 'Required progress was not recorded in the loaded save.' : ''),
-      achievement: { description: definition.description, current, target: definition.target, unknown, approximate: definition.bucket === 2 },
+      achievement: { description: definition.description, current, target: definition.target, unknown },
     };
   });
 }
