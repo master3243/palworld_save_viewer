@@ -119,7 +119,7 @@
         <p class="save-location">
           <span class="save-location-label">Save Location:</span>
           <span class="save-location-paths steam-location-paths">
-            <button type="button" class="save-location-copy" [class.copied]="copiedSaveLocation === steamSaveLocation" aria-label="Copy Steam save location" [title]="copiedSaveLocation === steamSaveLocation ? 'Copied!' : 'Copy save location'" (click)="copySaveLocation(steamSaveLocation, $event)">
+            <button type="button" class="save-location-copy" [class.copied]="copiedSaveLocation === steamSaveLocation" aria-label="Copy Steam save location" (click)="copySaveLocation(steamSaveLocation, $event)">
               <code>{{ steamSaveLocation }}</code>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="copiedSaveLocation === steamSaveLocation ? 'M5 12l4 4L19 6' : 'M9 5H5v16h14V5h-4M9 3h6v4H9z'"/></svg>
             </button>
@@ -157,7 +157,7 @@
         <p class="save-location">
           <span class="save-location-label">Save Location:</span>
           <span class="save-location-paths gamepass-location-path">
-            <button type="button" class="save-location-copy gamepass-save-path" [class.copied]="copiedSaveLocation === gamepassSaveLocation" aria-label="Copy Gamepass save location" [title]="copiedSaveLocation === gamepassSaveLocation ? 'Copied!' : 'Copy save location'" (click)="copySaveLocation(gamepassSaveLocation, $event)">
+            <button type="button" class="save-location-copy gamepass-save-path" [class.copied]="copiedSaveLocation === gamepassSaveLocation" aria-label="Copy Gamepass save location" (click)="copySaveLocation(gamepassSaveLocation, $event)">
               <code>{{ gamepassSaveLocation }}</code>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="copiedSaveLocation === gamepassSaveLocation ? 'M5 12l4 4L19 6' : 'M9 5H5v16h14V5h-4M9 3h6v4H9z'"/></svg>
             </button>
