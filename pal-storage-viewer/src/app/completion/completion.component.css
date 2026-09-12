@@ -809,6 +809,7 @@
 .local-data-owner { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; grid-column: 1 / -1; font-size: .78rem; color: #b2c9d3; }
 .local-data-owner select { background: #0a202d; border: 1px solid #31576a; border-radius: 6px; color: #e8f8ff; padding: 5px 8px; font: inherit; max-width: 100%; }
 .stat[tabindex] { cursor: default; }
+.stat-info-icon { width: 11px; height: 11px; flex-shrink: 0; align-self: center; margin-left: -1px; color: #8bbac7; fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; }
 .stat[tabindex]:focus-visible { outline: 2px solid #62cbef; outline-offset: 2px; }
 
 .arena-icon {

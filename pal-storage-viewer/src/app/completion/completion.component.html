@@ -52,6 +52,7 @@
             <span class="stat" *ngFor="let entry of progress.stats" [class.missing-data]="entry.missing" [attr.title]="entry.tooltip ? null : entry.title" [appTooltip]="entry.tooltip ?? null" [attr.tabindex]="entry.tooltip || entry.missing ? 0 : null">
               <b *ngIf="entry.value">{{ entry.value }}</b>
               <span>{{ entry.label }}</span>
+              <svg *ngIf="entry.tooltip" class="stat-info-icon" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.8"/><path d="M6 5.5v3"/><circle cx="6" cy="3.5" r=".7" fill="currentColor" stroke="none"/></svg>
             </span>
           </div>
           <ng-container *ngIf="localDataSave as set">

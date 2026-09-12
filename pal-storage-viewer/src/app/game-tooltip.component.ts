@@ -92,7 +92,7 @@ export interface TooltipData {
         <div class="tip-effect" *ngIf="data.effect as effect"><span>{{ effect.label }}</span><b>{{ effect.value }}</b></div>
       </div>
       <div class="tip-rows" *ngIf="data.rows?.length">
-        <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'" [class.subtotal]="row[2] === 'subtotal'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-')">{{ row[1] }}</b></div>
+        <div class="tip-row" *ngFor="let row of data.rows" [class.total]="row[0] === 'Total'" [class.subtotal]="row[2] === 'subtotal'"><span>{{ row[0] }}</span><b [class.negative]="row[1].startsWith('-') || row[1] === '?'" [attr.title]="row[1] === '?' ? 'Not recorded in the loaded save.' : null">{{ row[1] }}</b></div>
       </div>
       <div class="tip-work" *ngIf="data.work?.length">
         <div class="tip-work-row" *ngFor="let row of data.work" [class.current]="row.current">
