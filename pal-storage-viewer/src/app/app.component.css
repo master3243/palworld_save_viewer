@@ -423,7 +423,7 @@
 }
 
 .save-path-placeholder {
-  cursor: help;
+  cursor: default;
   -webkit-user-select: none;
   user-select: none;
 }

@@ -256,7 +256,7 @@
 
 .stat.missing-data {
   background: rgba(255, 123, 123, 0.12);
-  cursor: help;
+  cursor: default;
 }
 
 /* -------------------------------------------------------- categories */
@@ -808,7 +808,7 @@
 .seen-col.not-seen, .checked-col.not-checked { color: #ff8e8e; }
 .local-data-owner { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; grid-column: 1 / -1; font-size: .78rem; color: #b2c9d3; }
 .local-data-owner select { background: #0a202d; border: 1px solid #31576a; border-radius: 6px; color: #e8f8ff; padding: 5px 8px; font: inherit; max-width: 100%; }
-.stat[tabindex] { cursor: help; }
+.stat[tabindex] { cursor: default; }
 .stat[tabindex]:focus-visible { outline: 2px solid #62cbef; outline-offset: 2px; }
 
 .arena-icon {
@@ -841,5 +841,5 @@
 .achievement-unconfirmed .achievement-warning-icon { color: #ff8e8e; }
 .achievement-warning-counts { display: flex; flex-direction: column; gap: 6px; color: #ffd37a; }
 
-.local-owner-warning { display: inline-flex; color: #ffd16c; cursor: help; }
+.local-owner-warning { display: inline-flex; color: #ffd16c; cursor: default; }
 .local-owner-warning:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }
