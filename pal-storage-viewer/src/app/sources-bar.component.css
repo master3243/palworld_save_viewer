@@ -129,10 +129,6 @@
   padding: 4px 4px 4px 6px;
 }
 
-.source-chip.muted {
-  opacity: 0.55;
-}
-
 .source-group-head {
   align-items: center;
 }

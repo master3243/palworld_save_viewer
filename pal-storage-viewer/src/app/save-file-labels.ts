@@ -80,6 +80,7 @@ export function sourceBlurb(source: SaveSource, set: SaveSetSummary | null): str
 
 /** Tooltip for a loaded file: what it is and what it contributed. */
 export function sourceTitle(source: SaveSource, set: SaveSetSummary | null = null, progress: number | null = null): string {
+  if (source.kind === 'local_data') return kindTitle(source.kind);
   const parts = [source.kind === 'level' ? 'World' : source.kind_label];
   if (source.set) parts.push(`folder: ${source.set}`);
   if (source.world_name) parts.push(`world: ${source.world_name}`);

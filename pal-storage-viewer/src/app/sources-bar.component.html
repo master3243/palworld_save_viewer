@@ -43,7 +43,6 @@
           *ngFor="let item of group.sources"
           class="source-chip"
           [attr.data-kind]="item.source.kind"
-          [class.muted]="!item.source.pals && item.source.kind !== 'player' && item.source.kind !== 'level_meta'"
           [title]="item.source.file + ' · ' + sourceTitle(item.source, group.set)"
         >
           <span class="source-kind" [attr.data-kind]="item.source.kind" [title]="kindTitle(item.source.kind)">{{ sourceKindTag(item.source) }}</span>

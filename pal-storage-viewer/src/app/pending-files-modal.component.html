@@ -23,7 +23,7 @@
           <li *ngFor="let file of folder.files; trackBy: trackFile">
             <span class="source-kind" [attr.data-kind]="file.kind" [title]="kindTitle(file.kind)">{{ kindTag(file.kind) }}</span>
             <span class="confirm-file-info">
-              <span class="confirm-file-name" [title]="file.name">{{ shortFileName(file.name) }}</span>
+              <span class="confirm-file-name" [title]="file.kind === 'local_data' ? file.name + ' · ' + kindTitle(file.kind) : file.name">{{ shortFileName(file.name) }}</span>
               <ng-container *ngIf="file.preview?.kind !== 'level_meta' && file.preview?.kind !== 'player' && file.preview?.kind !== 'level'">
                 <span class="confirm-file-detail" *ngIf="details.get(file)?.text as detail" [title]="detail" [class.failed]="file.preview?.error">{{ detail }}</span>
               </ng-container>
