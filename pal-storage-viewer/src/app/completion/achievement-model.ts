@@ -1,6 +1,6 @@
 import type { CompletionCounters, PlayerCompletion } from '../../backend';
 import type { CompletionData, TrackedItem, WorldProgress } from './completion-model';
-import { ACHIEVEMENTS, ACHIEVEMENT_ITEM_REDIRECTS, ACHIEVEMENT_ITEM_TYPES, AchievementDefinition } from './achievement-data';
+import { ACHIEVEMENTS, ACHIEVEMENT_BOUNTY_TOKEN_FLAGS, ACHIEVEMENT_ITEM_REDIRECTS, ACHIEVEMENT_ITEM_TYPES, AchievementDefinition } from './achievement-data';
 
 export interface AchievementProgress {
   description: string;
@@ -19,6 +19,7 @@ function itemKey(id: string): string {
   return key;
 }
 const itemTypes = new Map(Object.entries(ACHIEVEMENT_ITEM_TYPES).map(([type, ids]) => [type, new Set(ids.map(itemKey))]));
+const bountyTokens = Object.entries(ACHIEVEMENT_BOUNTY_TOKEN_FLAGS).map(([item, flag]) => [itemKey(item), keyOf(flag)]);
 const hardTowers = ['GrassBoss', 'ForestBoss', 'ElectricBoss', 'DesertBoss', 'SnowBoss', 'SakurajimaBoss'];
 const treeQuests = ['Main_ReachWorldTree', 'Main_TalkWorldTreeNPC', 'Main_DefeatWorldTreeMiddleBoss',
   'Main_WorldTreeAbyss', 'Main_DefeatWorldTreeDragon'];
@@ -84,8 +85,11 @@ export function achievementItems(record: PlayerCompletion, data: CompletionData,
       case 'chopper': return { current: record.specific_boss_counts == null ? null : Math.min(counts(record.specific_boss_counts).get('securitydrone') ?? 0, 1) };
       case 'fishing': return { current: record.fishing_counts == null ? null : sum(fishing) };
       case 'lunker': return { current: record.fishing_counts == null ? null : Math.min(sum(new Map([...fishing].filter(([id]) => id.endsWith('_nushi')))), 1) };
-      case 'tokens': return { current: world?.keyItemIds == null ? null : new Set(world.keyItemIds.map(itemKey).filter(id => itemTypes.get('Essential_BossReward')!.has(id))).size,
-        note: world?.keyItemIds == null ? worldMissing : 'Distinct Pal bounty tokens; excludes human bounty currency.' };
+      case 'tokens': {
+        const flags = unique(record.bosses);
+        return { current: has('NormalBossDefeatFlag') ? new Set(bountyTokens.filter(([, flag]) => flags.has(flag)).map(([item]) => item)).size : null,
+          note: has('NormalBossDefeatFlag') ? 'Distinct Pal bounty tokens recorded by boss-defeat flags.' : 'Pal bounty tokens were not recorded in the loaded save.' };
+      }
       case 'friendship': return { current: finite(world?.maxFriendship), note: world?.maxFriendship == null
         ? world?.friendshipUnavailable ?? 'Add the matching LocalData.sav with "+ Files" and select its owner.' : 'Highest friendship rank recorded for the LocalData owner.' };
       case 'arena': {

@@ -289,7 +289,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
   const relicsUnspent = numbers(readScalarMap(buf, 'RelicPossessNumMap'), 'EPalRelicType::');
   const technologies = readNameList(buf, 'UnlockedRecipeTechnologyNames');
   return {
-    recorded_fields: ['TowerBossDefeatFlag', 'TowerBossDefeatCount', 'RaidBossDefeatCount', 'PalCaptureCount',
+    recorded_fields: ['TowerBossDefeatFlag', 'TowerBossDefeatCount', 'NormalBossDefeatFlag', 'RaidBossDefeatCount', 'PalCaptureCount',
       'PalRankupCount', 'NoteObtainForInstanceFlag', 'FindAreaFlagMap', 'RelicObtainForInstanceFlagByType',
       'RelicObtainForInstanceFlag', 'CompletedQuestArray_FullRelease', 'UnlockedWorldMapFlags']
       .filter(label => findPropertyStart(buf, label) !== -1),

@@ -6,7 +6,7 @@ require.extensions['.ts'] = (m, f) => m._compile(ts.transpileModule(fs.readFileS
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText, f);
 const { achievementItems } = require('../src/app/completion/achievement-model.ts');
-const { ACHIEVEMENTS } = require('../src/app/completion/achievement-data.ts');
+const { ACHIEVEMENTS, ACHIEVEMENT_BOUNTY_TOKEN_FLAGS } = require('../src/app/completion/achievement-data.ts');
 const { summarize } = require('../src/app/completion/completion-model.ts');
 const { SaveBuffer } = require('../src/backend/gvas.ts');
 const { extractPlayerCompletion } = require('../src/backend/completion.ts');
@@ -77,16 +77,35 @@ test('lifetime collection and condensation are independent of held items and jou
   assert.equal(get('Lunker Hunter', { capture_counts: { Penguin: 100 } }).achievement.unknown, true);
 });
 
-test('guild checks require membership and token checks require actual distinct Pal tokens', () => {
+test('guild checks require membership', () => {
   const research = Object.fromEntries(data.research.map(([id, , , work]) => [id, work]));
   assert.equal(get('Pal Labor Student', {}, { labs: [research] }).achievement.current, null);
   assert.equal(get('Pal Labor Professor', {}, { labs: [], guildAchievements: { research, expeditions: 20 } }).state, 'done');
   assert.equal(get('Elite Pal Dispatcher', {}, { labs: [], guildAchievements: { research: {}, expeditions: 19 } }).state, 'active');
   assert.equal(get('Elite Pal Dispatcher', {}, { labs: [], guildAchievements: { research: {}, expeditions: 20 } }).state, 'done');
-  const keyItemIds = ['BossDefeatReward_Mothman','BOSSDEFEATREWARD_MOTHMAN','BossDefeatReward_BossRush','BossDefeatReward_FlowerPrince','BountyProof_1'];
-  assert.equal(get('Rookie Pal Slayer', {}, { labs: [], keyItemIds }).achievement.current, 3);
-  assert.equal(get('Rookie Pal Slayer', {}, { labs: [], keyItems: 100 }).achievement.current, null);
-  assert.equal(get('Rookie Pal Slayer', {}, { labs: [], keyItemIds: [] }).achievement.current, 0);
+});
+
+test('Pal bounty tokens come from mapped boss flags, not inventory-only rewards or arbitrary defeats', () => {
+  const keyItemIds = ['BossDefeatReward_Mothman', 'BossDefeatReward_BossRush', 'BossDefeatReward_FlowerPrince', 'BountyProof_1'];
+  const bosses = ['1_10_plain_F_Boss_FairyDragon', '1_10_PLAIN_F_BOSS_FAIRYDRAGON', '81_2_dessert_FBOSS_2', 'UnknownBoss'];
+  assert.equal(get('Rookie Pal Slayer', { bosses }, { labs: [], keyItemIds }).achievement.current, 2);
+  assert.equal(get('Rookie Pal Slayer', { bosses }).achievement.current, 2);
+  assert.equal(get('Rookie Pal Slayer', {}, { labs: [], keyItemIds }).achievement.current, 0);
+  assert.equal(get('Rookie Pal Slayer', { recorded_fields: [] }, { labs: [], keyItemIds }).achievement.unknown, true);
+  assert.equal(get('Rookie Pal Slayer', { recorded_fields: ['NormalBossDefeatFlag'] }).achievement.current, 0);
+  const flags = Object.values(ACHIEVEMENT_BOUNTY_TOKEN_FLAGS).slice(0, 20);
+  assert.equal(get('Rookie Pal Slayer', { bosses: flags.slice(0, 5) }).state, 'done');
+  assert.equal(get('Alpha Pal Slayer', { bosses: flags.slice(0, 19) }).state, 'active');
+  assert.equal(get('Alpha Pal Slayer', { bosses: flags }).state, 'done');
+});
+
+test('only true boss flags grant tokens and the parser records whether the map exists', () => {
+  const buf = new SaveBuffer(Buffer.concat([str('RecordData'), map('NormalBossDefeatFlag', 'NameProperty', 'BoolProperty', [
+    str('1_10_plain_F_Boss_FairyDragon'), Buffer.from([1]), str('81_2_dessert_FBOSS_2'), Buffer.from([0]),
+  ], 2)]));
+  const record = extractPlayerCompletion(buf);
+  assert.ok(record.recorded_fields.includes('NormalBossDefeatFlag'));
+  assert.equal(get('Rookie Pal Slayer', record).achievement.current, 1);
 });
 
 test('arena uses RP, not seven solo clears; lower RP cannot disprove a past rank', () => {
