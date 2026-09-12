@@ -4,6 +4,7 @@
  */
 import type { PlayerCompletion } from '../../backend';
 import { QUEST_REWARDS, UNTRACKED_MAIN_QUESTS } from './mission-rules';
+import type { CondensationCounts } from './owned-condensation';
 
 /** Shape of resources/completion/completion-data.json (built by Paltest/db/build_completion_data.py). */
 export interface CompletionData {
@@ -72,6 +73,7 @@ export interface CraftingItem {
 export interface WorldProgress {
   /** Lab research work done per research id, one map per guild in the world. */
   labs: Record<string, number>[];
+  ownedCondensation?: Record<string, CondensationCounts> | null;
 }
 
 export type ItemState = 'done' | 'active' | 'todo';
@@ -99,6 +101,7 @@ export interface TrackedItem {
   /** Lifetime catches shown against the capture bonus target, without capping. */
   captureProgress?: { done: number; total: number };
   fishing?: { common: number; whopper: number; lunker: number };
+  condensed?: CondensationCounts | null;
   crafting?: CraftingItem & { count: number | null; sources: string[]; sourceLabel: string };
   /** False for rows shown for information only (paid DLC); they do not count. */
   counted?: boolean;
@@ -142,6 +145,7 @@ export interface StatEntry {
   label: string;
   value: string;
   title: string;
+  tooltip?: { title: string; rows: [string, string][]; width?: number };
 }
 
 export interface CompletionSummary {
@@ -248,9 +252,10 @@ function paldeckCategory(record: PlayerCompletion, data: CompletionData): Catego
 }
 
 /** Catching several of each species fills the Paldeck capture bonus. */
-function captureBonusCategory(record: PlayerCompletion, data: CompletionData): Category {
+function captureBonusCategory(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): Category {
   const caughtBy = lowerKeys(record.capture_counts);
   const bonusBy = lowerKeys(record.capture_bonus_counts);
+  const condensedBy = world?.ownedCondensation ? lowerKeys(world.ownedCondensation) : null;
   const known = new Set(data.paldeck.map(([tribe]) => tribe.toLowerCase()));
   const fishingBy = new Map<string, NonNullable<TrackedItem['fishing']>>();
   const unknown: string[] = [];
@@ -280,7 +285,8 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
     if (bonus >= CAPTURE_BONUS_MAX) state = 'done';
     else if (bonus > 0) state = 'active';
     return { id: tribe, name, detail: '', state, group: '', coords: '', map: '', order: index, no: index,
-      captureProgress: { done: caught, total: CAPTURE_BONUS_MAX }, fishing: fishingBy.get(key) };
+      captureProgress: { done: caught, total: CAPTURE_BONUS_MAX }, fishing: fishingBy.get(key),
+      condensed: condensedBy ? condensedBy.get(key) ?? [0, 0, 0, 0, 0] : null };
   });
   return finish({ key: 'captureBonus', title: 'Capture Bonus', items, groups: [], unknown: unknown.sort() });
 }
@@ -634,10 +640,20 @@ function stat(label: string, value: number | null | undefined, title: string): S
   return { label, value: value.toLocaleString(), title };
 }
 
+function condensationStat(record: PlayerCompletion): StatEntry | null {
+  const entry = stat('4-star pals', record.rankup_counts['5'] ?? null, 'Pals condensed to the maximum star rank');
+  if (entry) entry.tooltip = {
+    title: 'Lifetime Pals Condensed',
+    width: 110,
+    rows: [1, 2, 3, 4].map(stars => [`${stars} ★`, (record.rankup_counts[String(stars + 1)] ?? 0).toLocaleString()]),
+  };
+  return entry;
+}
+
 export function summarize(record: PlayerCompletion, data: CompletionData, world?: WorldProgress): CompletionSummary {
   const categories = [
     paldeckCategory(record, data),
-    captureBonusCategory(record, data),
+    captureBonusCategory(record, data, world),
     relicCategory(record, data),
     statueCategory(record, data),
     towerCategory(record, data),
@@ -669,7 +685,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     stat('Treasures', counters.treasures_found, 'Treasure map spots dug up'),
     stat('Predators', counters.predator_defeats, 'Predator pals defeated'),
     stat('Mutations', counters.mutations, 'Mutated pals bred'),
-    stat('4-star pals', record.rankup_counts['5'] ?? null, 'Pals condensed to the maximum star rank'),
+    condensationStat(record),
     stat('Unspent effigies', counters.relics_unspent, 'Effigies not yet offered at a Statue of Power'),
   ].filter((entry): entry is StatEntry => entry !== null);
   return { categories, percent, done, total, stats };

@@ -758,3 +758,21 @@
     width: auto;
   }
 }
+
+.item-table .condensed-col {
+  min-width: 42px;
+  padding-right: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.condensed-col small {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 400;
+}
+
+.condensed-star { color: #ffdf74; }
+.stat[tabindex] { cursor: help; }
+.stat[tabindex]:focus-visible { outline: 2px solid #62cbef; outline-offset: 2px; }

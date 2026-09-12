@@ -57,7 +57,7 @@ export interface TooltipData {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [class.fitted]="width !== null" [class.ready]="ready" [class.interactive]="interactive">
+    <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [style.min-width.px]="data.width ?? null" [class.fitted]="width !== null" [class.ready]="ready" [class.interactive]="interactive">
       <div class="tip-title">
         <span>{{ data.title }}</span><b *ngIf="data.titleRight">{{ data.titleRight }}</b>
         <a *ngIf="interactive && data.wikiUrl" class="tip-wiki" [href]="data.wikiUrl" target="_blank" rel="noopener noreferrer" title="palworld.wiki.gg" [attr.aria-label]="'Open ' + data.title + ' on Palworld Wiki'">

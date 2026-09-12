@@ -14,6 +14,8 @@ import { TableRowViewport, TableRowViewportDirective } from './table-row-viewpor
 import { Game8LookupService } from '../game8-lookup.service';
 import { palImagePath } from '../pal-image';
 import { palWikiLinks, PalWikiLink } from '../pal-wiki-links';
+import { TooltipDirective } from '../game-tooltip.component';
+import { ownedCondensation } from './owned-condensation';
 
 interface PlayerOption {
   key: string;
@@ -32,13 +34,15 @@ const RING_RADIUS = 52;
 @Component({
   selector: 'app-completion',
   standalone: true,
-  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective, TableRowViewportDirective],
+  imports: [CommonModule, TrackerMapComponent, OfflineImageDirective, StickyTableHeaderDirective, TableRowViewportDirective, TooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './completion.component.html',
   styleUrls: ['../pal-wiki-links.css', './completion.component.css']
 })
 export class CompletionComponent implements OnChanges {
   @Input() sets: SaveSetSummary[] = [];
+  @Input() rows: Record<string, unknown>[] = [];
+  readonly condensationStars = [0, 1, 2, 3, 4];
 
   /** Master lists; loaded once from resources/completion/completion-data.json. */
   data: CompletionData | null = null;
@@ -165,7 +169,10 @@ export class CompletionComponent implements OnChanges {
           letter: set.letter,
           save: set.label,
           completion: player.completion,
-          world: { labs: set.labs ?? [] },
+          world: {
+            labs: set.labs ?? [],
+            ownedCondensation: set.has_level ? ownedCondensation(this.rows, set.letter, player.uid) : null,
+          },
           level: player.level ?? null,
           percent: null,
         });
@@ -210,7 +217,7 @@ export class CompletionComponent implements OnChanges {
   get tableColumnCount(): number {
     const category = this.category;
     return 3 + (category?.key === 'crafting' ? 8 : 0) + (this.isPalList ? 1 : 0)
-      + (category?.key === 'captureBonus' ? 1 : 0) + (this.showFishing ? 3 : 0)
+      + (category?.key === 'captureBonus' ? 1 + this.condensationStars.length : 0) + (this.showFishing ? 3 : 0)
       + (category?.hasCoords ? 1 : 0) + (category?.hasNumbers ? 1 : 0) + (category?.hasTags ? 1 : 0);
   }
 

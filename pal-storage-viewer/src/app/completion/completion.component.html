@@ -46,7 +46,7 @@
               <b>Lv. {{ player?.level }}</b>
               <span>{{ isMaxLevel ? 'max' : 'not max' }}</span>
             </span>
-            <span class="stat" *ngFor="let entry of progress.stats" [title]="entry.title">
+            <span class="stat" *ngFor="let entry of progress.stats" [attr.title]="entry.tooltip ? null : entry.title" [appTooltip]="entry.tooltip ?? null" [attr.tabindex]="entry.tooltip ? 0 : null">
               <b>{{ entry.value }}</b>
               <span>{{ entry.label }}</span>
             </span>
@@ -163,6 +163,9 @@
                 <th>Item stats</th>
               </ng-container>
               <th class="no-col" *ngIf="open.key === 'captureBonus'">Caught</th>
+              <ng-container *ngIf="open.key === 'captureBonus'">
+                <th class="condensed-col" *ngFor="let stars of condensationStars" scope="col" [title]="'Currently owned pals at exactly ' + stars + ' stars'"><small>Owned</small>{{ stars }} <span class="condensed-star">★</span></th>
+              </ng-container>
               <ng-container *ngIf="columns.fishing">
                 <th class="fishing-col" scope="col" title="Common fishing catches"><small>Fishing</small>Common</th>
                 <th class="fishing-col" scope="col" title="Whopper fishing catches"><small>Fishing</small>Whopper</th>
@@ -216,6 +219,9 @@
                 <td class="craft-stats"><div *ngIf="craft.stats.length; else noCraftStats"><span *ngFor="let stat of craft.stats">{{ stat[0] }}: {{ stat[1] | number }}</span></div><ng-template #noCraftStats>-</ng-template></td>
               </ng-container>
               <td class="no-col" *ngIf="open.key === 'captureBonus'"><span class="card-count">{{ item.captureProgress?.done | number }}<span>/{{ item.captureProgress?.total | number }}</span></span></td>
+              <ng-container *ngIf="open.key === 'captureBonus'">
+                <td class="condensed-col" *ngFor="let stars of condensationStars" [attr.title]="item.condensed === null ? 'Load Level.sav to see owned star ranks' : null">{{ item.condensed ? (item.condensed[stars] ? (item.condensed[stars] | number) : '') : '—' }}</td>
+              </ng-container>
               <ng-container *ngIf="columns.fishing">
                 <ng-container *ngIf="item.fishing as fishing">
                   <td class="fishing-col">{{ fishing.common | number }}</td>

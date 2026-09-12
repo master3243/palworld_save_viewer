@@ -22,6 +22,28 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('condensation tooltip uses lifetime rank counts with one-based save ranks', () => {
+  const stats = summarize(record({ rankup_counts: { '2': 60, '3': 42, '5': 35 } }), data).stats;
+  const entry = stats.find(stat => stat.label === '4-star pals');
+  assert.equal(entry.value, '35');
+  assert.deepEqual(entry.tooltip.rows, [['1 ★', '60'], ['2 ★', '42'], ['3 ★', '0'], ['4 ★', '35']]);
+  assert.equal(entry.tooltip.title, 'Lifetime Pals Condensed');
+  assert.equal(entry.tooltip.note, undefined);
+});
+
+test('capture rows distinguish absent inventory data from zero owned and preserve completion', () => {
+  const progress = record({ capture_bonus_counts: { Penguin: 5 } });
+  const capture = world => summarize(progress, data, world).categories.find(c => c.key === 'captureBonus');
+  const missing = capture({ labs: [] });
+  const populated = capture({ labs: [], ownedCondensation: { PENGUIN: [6, 4, 3, 2, 1] } });
+  assert.equal(missing.items.find(item => item.id === 'Penguin').condensed, null);
+  assert.deepEqual(populated.items.find(item => item.id === 'Penguin').condensed, [6, 4, 3, 2, 1]);
+  assert.deepEqual(populated.items.find(item => item.id === 'Penguin_Electric').condensed, [0, 0, 0, 0, 0]);
+  assert.equal(populated.done, missing.done);
+  assert.equal(populated.total, missing.total);
+  assert.equal(populated.percent, missing.percent);
+});
+
 test('crafting lists all available outputs regardless of player unlocks or crafting history', () => {
   const empty = category('crafting', { crafted_item_counts: {} });
   assert.equal(empty.total, 1273);
