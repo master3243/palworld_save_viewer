@@ -160,16 +160,38 @@ test('missing fishing data stays hidden and unknown variants are not assigned to
   assert.deepEqual(c.unknown, ['fishshadow_iceseal_ground_fire_boss', 'fishshadow_unknown_common']);
 });
 
-test('Pal Effigies includes each species capture reward in its total and Mimog group', () => {
+test('Astralym is excluded from capture objectives but remains a tracked boss', () => {
+  for (const progress of [{}, {
+    paldeck: ['WORLDTREEDRAGON'],
+    capture_counts: { WorldTreeDragon: 5 },
+    capture_bonus_counts: { WorldTreeDragon: 5 },
+  }]) {
+    for (const key of ['paldeck', 'captureBonus']) {
+      const c = category(key, progress);
+      assert.equal(c.total, 287);
+      assert.equal(c.done, 0);
+      assert.ok(!c.items.some(item => item.id === 'WorldTreeDragon'));
+      assert.deepEqual(c.unknown, []);
+    }
+    const effigies = category('relics', progress);
+    assert.equal(effigies.done, 0);
+    assert.ok(!effigies.items.some(item => item.id === 'capture-bonus:WorldTreeDragon'));
+  }
+  const bossId = 'BOSS_BATTLE_NAME_WorldTreeBoss';
+  assert.equal(category('towers', {}).items.find(item => item.id === bossId).state, 'todo');
+  assert.equal(category('towers', { tower_bosses: [bossId] }).items.find(item => item.id === bossId).state, 'done');
+});
+
+test('Pal Effigies includes each obtainable species capture reward in its total and Mimog group', () => {
   const c = category('relics', {});
   const rewards = c.items.filter(item => item.group === 'move_speed');
-  assert.equal(c.total, 695);
+  assert.equal(c.total, 694);
   assert.equal(c.done, 0);
-  assert.equal(rewards.length, 288);
+  assert.equal(rewards.length, 287);
   assert.equal(new Set(c.items.map(item => item.id)).size, c.total);
   assert.deepEqual(c.groups.find(group => group.key === 'move_speed'),
-    { key: 'move_speed', name: 'Mimog Effigy', done: 0, total: 288 });
-  for (const [tribe, , name] of data.paldeck) {
+    { key: 'move_speed', name: 'Mimog Effigy', done: 0, total: 287 });
+  for (const [tribe, , name] of data.paldeck.filter(([id]) => id !== 'WorldTreeDragon')) {
     const reward = rewards.find(item => item.id === `capture-bonus:${tribe}`);
     assert.equal(reward.name, 'Mimog Effigy');
     assert.equal(reward.detail, `Capture 5 ${name} · 0/5`);
@@ -187,14 +209,14 @@ test('Mimog reward progress follows capture bonuses and stays complete after spe
     capture_counts: { [fourth]: 100 },
     relics_unspent: { MoveSpeed: 0 }, relics: { CapturePower: [pickup] },
   });
-  assert.equal(c.total, 695);
+  assert.equal(c.total, 694);
   assert.equal(c.done, 3);
   assert.equal(c.groups.find(group => group.key === 'move_speed').done, 2);
   assert.equal(c.items.find(item => item.id === pickup).state, 'done');
   assert.ok(c.items.slice(0, 406).every(item => item.group !== 'move_speed' && item.state === 'todo'));
-  assert.ok(c.items.slice(406, 692).every(item => item.group === 'move_speed' && item.state !== 'done'));
-  assert.equal(c.items[692].id, pickup);
-  assert.ok(c.items.slice(693).every(item => item.group === 'move_speed' && item.state === 'done'));
+  assert.ok(c.items.slice(406, 691).every(item => item.group === 'move_speed' && item.state !== 'done'));
+  assert.equal(c.items[691].id, pickup);
+  assert.ok(c.items.slice(692).every(item => item.group === 'move_speed' && item.state === 'done'));
   assert.equal(c.groups.at(-1).key, 'move_speed');
   for (const [tribe, state, count] of [[first, 'done', 5], [second, 'active', 3], [third, 'done', 5], [fourth, 'todo', 0]]) {
     const reward = c.items.find(item => item.id === `capture-bonus:${tribe}`);

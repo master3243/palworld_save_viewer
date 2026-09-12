@@ -222,6 +222,10 @@ function unknownIds(saveIds: Iterable<string>, known: Set<string>): string[] {
 /** Captures of one species that count toward its Paldeck capture bonus. */
 const CAPTURE_BONUS_MAX = 5;
 
+function capturablePals(data: CompletionData): CompletionData['paldeck'] {
+  return data.paldeck.filter(([tribe]) => tribe.toLowerCase() !== 'worldtreedragon');  // Astralym is uncatchable
+}
+
 /** The save spells some ids differently from the game data (WereWolf vs Werewolf); match loosely. */
 function lowerKeys<T>(entries: Record<string, T>): Map<string, T> {
   return new Map(Object.entries(entries).map(([key, value]) => [key.toLowerCase(), value]));
@@ -230,7 +234,7 @@ function lowerKeys<T>(entries: Record<string, T>): Map<string, T> {
 function paldeckCategory(record: PlayerCompletion, data: CompletionData): Category {
   const unlocked = new Set(record.paldeck.map((tribe) => tribe.toLowerCase()));
   const caughtBy = lowerKeys(record.capture_counts);
-  const items: TrackedItem[] = data.paldeck.map(([tribe, index, name]) => {
+  const items: TrackedItem[] = capturablePals(data).map(([tribe, index, name]) => {
     const key = tribe.toLowerCase();
     const done = unlocked.has(key);
     const caught = caughtBy.get(key) ?? 0;
@@ -268,7 +272,7 @@ function captureBonusCategory(record: PlayerCompletion, data: CompletionData): C
     fishing[kind] += count;
     fishingBy.set(match[1], fishing);
   }
-  const items: TrackedItem[] = data.paldeck.map(([tribe, index, name]) => {
+  const items: TrackedItem[] = capturablePals(data).map(([tribe, index, name]) => {
     const key = tribe.toLowerCase();
     const bonus = Math.min(CAPTURE_BONUS_MAX, bonusBy.get(key) ?? 0);
     const caught = caughtBy.get(key) ?? 0;
@@ -363,7 +367,7 @@ function relicCategory(record: PlayerCompletion, data: CompletionData): Category
   const mimog = data.relicTypes[mimogIndex];
   if (mimog) {
     const bonusBy = lowerKeys(record.capture_bonus_counts);
-    for (const [index, [tribe, , palName]] of data.paldeck.entries()) {
+    for (const [index, [tribe, , palName]] of capturablePals(data).entries()) {
       const bonus = Math.min(CAPTURE_BONUS_MAX, bonusBy.get(tribe.toLowerCase()) ?? 0);
       items.push({
         id: `capture-bonus:${tribe}`, name: mimog.item,
