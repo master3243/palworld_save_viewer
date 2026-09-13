@@ -1,3 +1,4 @@
+import type { DemoSave } from './demo-catalog';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
@@ -34,6 +35,8 @@ export interface PendingFolder {
   styleUrl: './pending-files-modal.component.css'
 })
 export class PendingFilesModalComponent implements OnChanges {
+  @Input() demo: DemoSave | null = null;
+  @Output() readonly switchDemo = new EventEmitter<void>();
   @Input() folders: PendingFolder[] = [];
   @Input() loadedSets: SaveSetSummary[] = [];
   @Input() append = false;

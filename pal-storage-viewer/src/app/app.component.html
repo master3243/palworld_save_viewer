@@ -198,18 +198,22 @@
   <app-faq-modal *ngIf="isDropHelpOpen" [section]="faqSection" (closed)="closeDropHelp()"></app-faq-modal>
 
   <app-pending-files-modal
-    *ngIf="pendingFiles"
+    *ngIf="pendingFiles && !isDemoPickerOpen"
     [folders]="pendingFolders"
     [append]="pendingAppend"
     [loadedSets]="saveSets"
     [fileCount]="pendingFileCount"
     [palTotal]="pendingPalTotal"
     [ignored]="pendingIgnored"
+    [demo]="pendingDemo"
+    (switchDemo)="openDemoPicker()"
     (removeFile)="removePendingFile($event)"
     (removeFolder)="removePendingFolder($event)"
     (cancel)="cancelPending()"
     (confirm)="confirmPending()"
   ></app-pending-files-modal>
+
+  <app-demo-picker *ngIf="isDemoPickerOpen && pendingDemo" [current]="pendingDemo" [busy]="isParsing" [downloadError]="demoDownloadError" (cancel)="closeDemoPicker()" (choose)="loadDemoSave($event)"></app-demo-picker>
 
   <section class="table-shell" *ngIf="hasData" [style.max-width.px]="isFullscreen ? null : tableWidth">
     <div

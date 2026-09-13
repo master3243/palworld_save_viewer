@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
+require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+}).outputText, filename);
 
 function tracker() {
   let resolveData;
@@ -12,6 +15,7 @@ function tracker() {
     exports: {},
     require: name => {
       if (name === '@angular/core') return { Component: decorator, Input: decorator, Output: decorator, EventEmitter: class { emit() {} }, ViewChild: decorator, ChangeDetectionStrategy: { OnPush: 0 } };
+      if (name === './player-world-progress') return require('../src/app/completion/player-world-progress.ts');
       if (name === '../tab-discovery') return { TabDiscovery: class {} };
       if (name === './completion-data') return { loadCompletionData: () => catalog };
       if (name === './completion-model') return {

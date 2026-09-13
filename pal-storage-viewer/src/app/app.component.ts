@@ -5,6 +5,8 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnDestr
 
 import { PalDetailCardComponent } from './pal-detail-card.component';
 import { CompletionComponent } from './completion/completion.component';
+import { DemoPickerComponent } from './demo-picker.component';
+import { DEFAULT_DEMO, DemoSave } from './demo-catalog';
 import { FaqModalComponent } from './faq-modal.component';
 import { PendingFile, PendingFilesModalComponent, PendingFolder } from './pending-files-modal.component';
 import { LocationCount, SourceGroup, SourcesBarComponent } from './sources-bar.component';
@@ -65,7 +67,7 @@ interface DirectoryEntryLike {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent, PalRowComponent, FilterBarComponent, GithubIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent],
+  imports: [CommonModule, PalDetailCardComponent, PalRowComponent, FilterBarComponent, GithubIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent, DemoPickerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -164,6 +166,7 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.demoDownload?.abort();
     this.detailResizeObserver?.disconnect();
     window.clearInterval(this.screenshotModeTimer);
     window.clearTimeout(this.copyStatusTimer);
@@ -382,17 +385,10 @@ export class AppComponent implements OnDestroy {
   readonly appVersion = APP_VERSION;
   favoriteImageSrcs: Record<number, string> = {};
 
-  /** The demo is two snapshots of the same world, loaded as saves A and B. */
-  private readonly demoFiles = [
-    '2026-08-16-00-09/Level.sav',
-    '2026-08-16-00-09/LevelMeta.sav',
-    '2026-08-16-00-09/Players/00000000000000000000000000000001.sav',
-    '2026-09-01-21-50/Level.sav',
-    '2026-09-01-21-50/LevelMeta.sav',
-    '2026-09-01-21-50/Players/00000000000000000000000000000001.sav',
-    '2026-09-01-21-50/Players/00000000000000000000000000000001_dps.sav'
-  ];
-
+  pendingDemo: DemoSave | null = null;
+  isDemoPickerOpen = false;
+  demoDownloadError = '';
+  private demoDownload?: AbortController;
 
   // Measured from the DOM after render; 40 matches the CSS row height and is
   // only the value used before the first measurement lands.
@@ -708,7 +704,9 @@ export class AppComponent implements OnDestroy {
    * Single files load straight away; anything more is confirmed with a file list
    * first. Files dropped while that list is open are added to it.
    */
-  private async offerInputs(inputs: SaveInput[], append: boolean): Promise<void> {
+  private async offerInputs(inputs: SaveInput[], append: boolean, forcePreview = false): Promise<void> {
+    if (this.isDemoPickerOpen) return;
+    if (!forcePreview) this.pendingDemo = null;
     this.error = '';
     this.isParsing = true;
     this.progress = { fraction: null, label: 'Reading folder...', detail: '' };
@@ -722,7 +720,7 @@ export class AppComponent implements OnDestroy {
       this.progress = null;
     }
     const candidates = inputs.filter((input) => this.parser.isCandidate(input));
-    if (candidates.length <= 1 && !this.pendingFiles) {
+    if (!forcePreview && candidates.length <= 1 && !this.pendingFiles) {
       await this.parseInputs(inputs, append);
       return;
     }
@@ -788,6 +786,8 @@ export class AppComponent implements OnDestroy {
   }
 
   cancelPending(): void {
+    this.closeDemoPicker();
+    this.pendingDemo = null;
     this.pendingFiles = null;
     this.pendingFolders = [];
     this.pendingAppend = false;
@@ -944,6 +944,7 @@ export class AppComponent implements OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.isDemoPickerOpen) { this.closeDemoPicker(); return; }
     const hadOverlay = this.pendingFiles !== null || this.isExportMenuOpen || this.isColumnMenuOpen || this.isDropHelpOpen;
     this.cancelPending();
     this.isExportMenuOpen = false;
@@ -953,31 +954,64 @@ export class AppComponent implements OnDestroy {
     }
   }
 
-  async loadDemoSave(): Promise<void> {
-    this.error = '';
-    this.isParsing = true;
-    this.progress = { fraction: null, label: 'Downloading demo save', detail: '' };
+  openDemoPicker(): void {
+    if (!this.pendingDemo || this.isParsing) return;
+    this.demoDownloadError = '';
+    this.isDemoPickerOpen = true;
+  }
 
-    let inputs: SaveInput[];
-    try {
-      inputs = await Promise.all(this.demoFiles.map(async (path) => {
-        const response = await fetch(`resources/example_save/${path}`);
-        if (!response.ok) {
-          throw new Error(`Could not load the demo save (${path}: ${response.status}).`);
-        }
-        const name = path.split('/').pop() ?? path;
-        return { file: new File([await response.arrayBuffer()], name), path };
-      }));
-    } catch (error) {
-      this.error = error instanceof Error ? error.message : 'Could not load the demo save.';
-      return;
-    } finally {
+  closeDemoPicker(): void {
+    const wasOpen = this.isDemoPickerOpen;
+    this.isDemoPickerOpen = false;
+    if (this.demoDownload) {
+      this.demoDownload.abort();
+      this.demoDownload = undefined;
       this.isParsing = false;
       this.progress = null;
     }
+    this.demoDownloadError = '';
+    if (wasOpen) setTimeout(() => document.querySelector<HTMLButtonElement>('.switch-demo')?.focus());
+  }
 
-    // Same confirmation as a dropped folder, so the demo shows what it is about to load.
-    await this.offerInputs(inputs, this.hasData);
+  async loadDemoSave(demo: DemoSave = DEFAULT_DEMO): Promise<void> {
+    if (this.isParsing) return;
+    if (this.isDemoPickerOpen && demo.id === this.pendingDemo?.id) { this.closeDemoPicker(); return; }
+    this.error = '';
+    this.demoDownloadError = '';
+    this.isParsing = true;
+    this.progress = { fraction: null, label: 'Downloading demo save', detail: demo.name };
+    const download = new AbortController();
+    this.demoDownload = download;
+    const append = this.pendingDemo ? this.pendingAppend : this.hasData;
+    let inputs: SaveInput[];
+    try {
+      inputs = await Promise.all(demo.files.map(async ({ url, path }) => {
+        const response = await fetch(url, { signal: download.signal });
+        if (!response.ok) throw new Error(`Could not download ${demo.name} (${response.status}). Please try again.`);
+        const name = path.split('/').pop() ?? path;
+        return { file: new File([await response.arrayBuffer()], name), path };
+      }));
+      if (download.signal.aborted) return;
+    } catch (error) {
+      if (!download.signal.aborted) {
+        download.abort();
+        const message = error instanceof Error ? error.message : 'Could not load the demo save.';
+        if (this.isDemoPickerOpen) this.demoDownloadError = message;
+        else this.error = message;
+      }
+      return;
+    } finally {
+      if (this.demoDownload === download) {
+        this.demoDownload = undefined;
+        this.isParsing = false;
+        this.progress = null;
+      }
+    }
+    // Replace the preview only after every download succeeds; Cancel and errors retain it.
+    this.cancelPending();
+    this.pendingDemo = demo;
+    // Even a world-only demo must wait for the user to click Load.
+    await this.offerInputs(inputs, append, true);
   }
 
   private resetData(): void {

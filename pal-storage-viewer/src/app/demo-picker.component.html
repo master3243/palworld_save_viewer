@@ -1,0 +1,29 @@
+<div class="modal-backdrop" (click)="cancel.emit()">
+  <div class="modal demo-picker" role="dialog" aria-modal="true" aria-labelledby="demoPickerTitle" [attr.aria-busy]="busy || loading" (click)="$event.stopPropagation()">
+    <h2 id="demoPickerTitle" class="modal-title">Switch demo</h2>
+    <input #searchInput class="demo-search" type="search" placeholder="Search demos" aria-label="Search demos" [(ngModel)]="search" [disabled]="busy">
+    <p class="demo-message" *ngIf="loading" role="status">Loading demos…</p>
+    <p class="demo-error" *ngIf="error" role="alert">{{ error }} <button type="button" class="modal-ghost" (click)="load()">Retry</button></p>
+    <div class="demo-list" role="radiogroup" aria-label="Demo saves">
+      <div class="demo-row" *ngFor="let demo of visibleDemos; trackBy: trackDemo" [class.selected]="selectedId === demo.id">
+        <label class="demo-choice">
+          <input type="radio" name="demoSave" [value]="demo.id" [(ngModel)]="selectedId" [disabled]="busy">
+          <span class="demo-copy">
+            <strong>{{ demo.name }} <small *ngIf="demo.id === current.id">Current</small></strong>
+            <span class="demo-meta"><ng-container *ngIf="demo.author">{{ demo.author }} · </ng-container><ng-container *ngIf="demo.savedAt">{{ demo.savedAt }} · </ng-container>{{ formatSize(demo.bytes) }}</span>
+            <span class="demo-stats" *ngIf="demo.summary as stats" title="Highest player completion and level. Completion includes LocalData for each player not ruled out as its owner.">{{ stats.percent === null ? '?' : (stats.percent | number:'1.0-1') }}% Complete - LVL {{ stats.level ?? '?' }} - Day {{ stats.day ?? '?' }} - {{ stats.players }} {{ stats.players === 1 ? 'Player' : 'Players' }}</span>
+            <span class="demo-description" *ngIf="demo.description">{{ demo.description }}</span>
+          </span>
+        </label>
+        <a class="demo-source" [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'Source for ' + demo.name">Source ↗</a>
+      </div>
+    </div>
+    <p class="demo-message" *ngIf="!loading && !error && !visibleDemos.length">No matching demos.</p>
+    <p class="demo-error" *ngIf="downloadError" role="alert">{{ downloadError }}</p>
+    <p class="demo-message" *ngIf="busy" role="status">Downloading {{ selection?.name }}…</p>
+    <div class="modal-actions">
+      <button type="button" class="modal-ghost" (click)="cancel.emit()">Cancel</button>
+      <button type="button" class="modal-primary" [disabled]="!selection || busy || loading" (click)="confirm()">Use demo</button>
+    </div>
+  </div>
+</div>

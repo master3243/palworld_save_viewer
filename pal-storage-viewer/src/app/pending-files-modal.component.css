@@ -119,3 +119,10 @@
 .confirm-file-pals.pending {
   color: rgba(200, 236, 255, 0.5);
 }
+
+.switch-demo { margin-right: auto; }
+.demo-preview-name { color: #b7d1e0; font-size: .8rem; margin: -8px 0 12px; }
+.demo-preview-name a { color: #7bddff; margin-left: 8px; white-space: nowrap; }
+@media (max-width: 380px) {
+  .modal-actions { flex-wrap: wrap; gap: 8px; }
+}

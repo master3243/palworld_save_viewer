@@ -1,0 +1,1722 @@
+[
+  {
+    "id": "default",
+    "name": "Original demo",
+    "author": "master3243",
+    "savedAt": "2026-09-01",
+    "description": "Two snapshots of the same world, including dimensional storage.",
+    "sourceUrl": "https://github.com/master3243/palworld_save_viewer/tree/main/resources/example_save",
+    "bytes": 4127362,
+    "files": [
+      {
+        "url": "resources/example_save/2026-08-16-00-09/Level.sav",
+        "path": "2026-08-16-00-09/Level.sav",
+        "bytes": 1536857
+      },
+      {
+        "url": "resources/example_save/2026-08-16-00-09/LevelMeta.sav",
+        "path": "2026-08-16-00-09/LevelMeta.sav",
+        "bytes": 2018
+      },
+      {
+        "url": "resources/example_save/2026-08-16-00-09/Players/00000000000000000000000000000001.sav",
+        "path": "2026-08-16-00-09/Players/00000000000000000000000000000001.sav",
+        "bytes": 16063
+      },
+      {
+        "url": "resources/example_save/2026-09-01-21-50/Level.sav",
+        "path": "2026-09-01-21-50/Level.sav",
+        "bytes": 2350154
+      },
+      {
+        "url": "resources/example_save/2026-09-01-21-50/LevelMeta.sav",
+        "path": "2026-09-01-21-50/LevelMeta.sav",
+        "bytes": 2018
+      },
+      {
+        "url": "resources/example_save/2026-09-01-21-50/Players/00000000000000000000000000000001.sav",
+        "path": "2026-09-01-21-50/Players/00000000000000000000000000000001.sav",
+        "bytes": 24807
+      },
+      {
+        "url": "resources/example_save/2026-09-01-21-50/Players/00000000000000000000000000000001_dps.sav",
+        "path": "2026-09-01-21-50/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 195445
+      }
+    ],
+    "summary": {
+      "percent": 62.6,
+      "level": 80,
+      "day": 667,
+      "players": 1
+    }
+  },
+  {
+    "id": "happymaki",
+    "name": "HappyMaki",
+    "description": "",
+    "sourceUrl": "https://github.com/HappyMaki/Magnolia-Feeby-Palworld-Save",
+    "bytes": 3012985,
+    "files": [
+      {
+        "url": "resources/demo-saves/happymaki/Level.sav",
+        "path": "happymaki/Level.sav",
+        "bytes": 2751029
+      },
+      {
+        "url": "resources/demo-saves/happymaki/LevelMeta.sav",
+        "path": "happymaki/LevelMeta.sav",
+        "bytes": 1931
+      },
+      {
+        "url": "resources/demo-saves/happymaki/Players/18B9202A000000000000000000000000.sav",
+        "path": "happymaki/Players/18B9202A000000000000000000000000.sav",
+        "bytes": 21472
+      },
+      {
+        "url": "resources/demo-saves/happymaki/Players/18B9202A000000000000000000000000_dps.sav",
+        "path": "happymaki/Players/18B9202A000000000000000000000000_dps.sav",
+        "bytes": 33554
+      },
+      {
+        "url": "resources/demo-saves/happymaki/Players/2A62E107000000000000000000000000.sav",
+        "path": "happymaki/Players/2A62E107000000000000000000000000.sav",
+        "bytes": 8659
+      },
+      {
+        "url": "resources/demo-saves/happymaki/Players/B574989C000000000000000000000000.sav",
+        "path": "happymaki/Players/B574989C000000000000000000000000.sav",
+        "bytes": 7605
+      },
+      {
+        "url": "resources/demo-saves/happymaki/Players/DBF6AF4C000000000000000000000000.sav",
+        "path": "happymaki/Players/DBF6AF4C000000000000000000000000.sav",
+        "bytes": 19728
+      },
+      {
+        "url": "resources/demo-saves/happymaki/Players/DBF6AF4C000000000000000000000000_dps.sav",
+        "path": "happymaki/Players/DBF6AF4C000000000000000000000000_dps.sav",
+        "bytes": 169007
+      }
+    ],
+    "author": "HappyMaki",
+    "savedAt": "2026-09-07",
+    "summary": {
+      "percent": 48.3,
+      "level": 80,
+      "day": 1552,
+      "players": 4
+    }
+  },
+  {
+    "id": "2fling",
+    "name": "2FLing",
+    "description": "",
+    "sourceUrl": "https://github.com/2FLing/Palworld_Saves",
+    "bytes": 2288012,
+    "files": [
+      {
+        "url": "resources/demo-saves/2fling/Level.sav",
+        "path": "2fling/Level.sav",
+        "bytes": 2172783
+      },
+      {
+        "url": "resources/demo-saves/2fling/LevelMeta.sav",
+        "path": "2fling/LevelMeta.sav",
+        "bytes": 2022
+      },
+      {
+        "url": "resources/demo-saves/2fling/LocalData.sav",
+        "path": "2fling/LocalData.sav",
+        "bytes": 74806
+      },
+      {
+        "url": "resources/demo-saves/2fling/Players/00000000000000000000000000000001.sav",
+        "path": "2fling/Players/00000000000000000000000000000001.sav",
+        "bytes": 11857
+      },
+      {
+        "url": "resources/demo-saves/2fling/Players/2CF5CAB2000000000000000000000000.sav",
+        "path": "2fling/Players/2CF5CAB2000000000000000000000000.sav",
+        "bytes": 10784
+      },
+      {
+        "url": "resources/demo-saves/2fling/Players/7F230AE9000000000000000000000000.sav",
+        "path": "2fling/Players/7F230AE9000000000000000000000000.sav",
+        "bytes": 8541
+      },
+      {
+        "url": "resources/demo-saves/2fling/Players/B9068C27000000000000000000000000.sav",
+        "path": "2fling/Players/B9068C27000000000000000000000000.sav",
+        "bytes": 7219
+      }
+    ],
+    "author": "2FLing",
+    "savedAt": "2026-08-08",
+    "summary": {
+      "percent": 17.2,
+      "level": 54,
+      "day": 146,
+      "players": 4
+    }
+  },
+  {
+    "id": "basputtipong",
+    "name": "basputtipong",
+    "description": "",
+    "sourceUrl": "https://github.com/basputtipong/palworld-save",
+    "bytes": 1630636,
+    "files": [
+      {
+        "url": "resources/demo-saves/basputtipong/Level.sav",
+        "path": "basputtipong/Level.sav",
+        "bytes": 1477610
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/LevelMeta.sav",
+        "path": "basputtipong/LevelMeta.sav",
+        "bytes": 1928
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/LocalData.sav",
+        "path": "basputtipong/LocalData.sav",
+        "bytes": 91456
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/Players/5F5A6F5B000000000000000000000000.sav",
+        "path": "basputtipong/Players/5F5A6F5B000000000000000000000000.sav",
+        "bytes": 13771
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/Players/67E796A3000000000000000000000000.sav",
+        "path": "basputtipong/Players/67E796A3000000000000000000000000.sav",
+        "bytes": 4042
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/Players/76E9A5A6000000000000000000000000.sav",
+        "path": "basputtipong/Players/76E9A5A6000000000000000000000000.sav",
+        "bytes": 11876
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/Players/84D44AE6000000000000000000000000.sav",
+        "path": "basputtipong/Players/84D44AE6000000000000000000000000.sav",
+        "bytes": 5818
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/Players/96DCD435000000000000000000000000.sav",
+        "path": "basputtipong/Players/96DCD435000000000000000000000000.sav",
+        "bytes": 11312
+      },
+      {
+        "url": "resources/demo-saves/basputtipong/Players/C60EAF3A000000000000000000000000.sav",
+        "path": "basputtipong/Players/C60EAF3A000000000000000000000000.sav",
+        "bytes": 12823
+      }
+    ],
+    "author": "basputtipong",
+    "savedAt": "2026-07-16",
+    "summary": {
+      "percent": 25,
+      "level": 60,
+      "day": 74,
+      "players": 6
+    }
+  },
+  {
+    "id": "j-code-sigma",
+    "name": "J-Code-Sigma",
+    "description": "",
+    "sourceUrl": "https://github.com/J-Code-Sigma/Linux-Palworld-Saves",
+    "bytes": 4556834,
+    "files": [
+      {
+        "url": "resources/demo-saves/j-code-sigma/Level.sav",
+        "path": "j-code-sigma/Level.sav",
+        "bytes": 4397520
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/LevelMeta.sav",
+        "path": "j-code-sigma/LevelMeta.sav",
+        "bytes": 1893
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/036DD719000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/036DD719000000000000000000000000.sav",
+        "bytes": 22516
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/036DD719000000000000000000000000_dps.sav",
+        "path": "j-code-sigma/Players/036DD719000000000000000000000000_dps.sav",
+        "bytes": 52305
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/414DCC16000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/414DCC16000000000000000000000000.sav",
+        "bytes": 7978
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/4622700C000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/4622700C000000000000000000000000.sav",
+        "bytes": 10368
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/729071EE000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/729071EE000000000000000000000000.sav",
+        "bytes": 4123
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/730942AB000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/730942AB000000000000000000000000.sav",
+        "bytes": 5943
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/90C6AF7C000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/90C6AF7C000000000000000000000000.sav",
+        "bytes": 10198
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/CDC62C06000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/CDC62C06000000000000000000000000.sav",
+        "bytes": 21670
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/F154396B000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/F154396B000000000000000000000000.sav",
+        "bytes": 11493
+      },
+      {
+        "url": "resources/demo-saves/j-code-sigma/Players/F5988FD6000000000000000000000000.sav",
+        "path": "j-code-sigma/Players/F5988FD6000000000000000000000000.sav",
+        "bytes": 10827
+      }
+    ],
+    "author": "J-Code-Sigma",
+    "savedAt": "2026-01-13",
+    "summary": {
+      "percent": 43.1,
+      "level": 65,
+      "day": 12830,
+      "players": 9
+    }
+  },
+  {
+    "id": "tayaki71751-save-files",
+    "name": "TaYaKi71751-save-files",
+    "description": "",
+    "sourceUrl": "https://github.com/TaYaKi71751-save-files/Palworld_Dedicated_C8A34115A3414E9E8EE21C5D7BC7391E",
+    "bytes": 962838,
+    "files": [
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/Level.sav",
+        "path": "tayaki71751-save-files/Level.sav",
+        "bytes": 885545
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/LevelMeta.sav",
+        "path": "tayaki71751-save-files/LevelMeta.sav",
+        "bytes": 1892
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/LocalData.sav",
+        "path": "tayaki71751-save-files/LocalData.sav",
+        "bytes": 39251
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/Players/00000000000000000000000000000001.sav",
+        "path": "tayaki71751-save-files/Players/00000000000000000000000000000001.sav",
+        "bytes": 6943
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/Players/1106D9AB000000000000000000000000.sav",
+        "path": "tayaki71751-save-files/Players/1106D9AB000000000000000000000000.sav",
+        "bytes": 5419
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/Players/485124BB000000000000000000000000.sav",
+        "path": "tayaki71751-save-files/Players/485124BB000000000000000000000000.sav",
+        "bytes": 8358
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/Players/57761E56000000000000000000000000.sav",
+        "path": "tayaki71751-save-files/Players/57761E56000000000000000000000000.sav",
+        "bytes": 5768
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/Players/8A642048000000000000000000000000.sav",
+        "path": "tayaki71751-save-files/Players/8A642048000000000000000000000000.sav",
+        "bytes": 4188
+      },
+      {
+        "url": "resources/demo-saves/tayaki71751-save-files/Players/8F8EB39F000000000000000000000000.sav",
+        "path": "tayaki71751-save-files/Players/8F8EB39F000000000000000000000000.sav",
+        "bytes": 5474
+      }
+    ],
+    "author": "TaYaKi71751-save-files",
+    "savedAt": "2025-07-16",
+    "summary": {
+      "percent": 10.1,
+      "level": 29,
+      "day": 4908,
+      "players": 6
+    }
+  },
+  {
+    "id": "wolfexplode",
+    "name": "WolfExplode",
+    "description": "",
+    "sourceUrl": "https://github.com/WolfExplode/Palworld-Saved-Games",
+    "bytes": 1041982,
+    "files": [
+      {
+        "url": "resources/demo-saves/wolfexplode/Level.sav",
+        "path": "wolfexplode/Level.sav",
+        "bytes": 976231
+      },
+      {
+        "url": "resources/demo-saves/wolfexplode/LevelMeta.sav",
+        "path": "wolfexplode/LevelMeta.sav",
+        "bytes": 1978
+      },
+      {
+        "url": "resources/demo-saves/wolfexplode/LocalData.sav",
+        "path": "wolfexplode/LocalData.sav",
+        "bytes": 43205
+      },
+      {
+        "url": "resources/demo-saves/wolfexplode/Players/00000000000000000000000000000001.sav",
+        "path": "wolfexplode/Players/00000000000000000000000000000001.sav",
+        "bytes": 11247
+      },
+      {
+        "url": "resources/demo-saves/wolfexplode/Players/74E02BF7000000000000000000000000.sav",
+        "path": "wolfexplode/Players/74E02BF7000000000000000000000000.sav",
+        "bytes": 9321
+      }
+    ],
+    "author": "WolfExplode",
+    "savedAt": "2025-07-14",
+    "summary": {
+      "percent": 15.8,
+      "level": 40,
+      "day": 80,
+      "players": 2
+    }
+  },
+  {
+    "id": "matheusrgarcia",
+    "name": "matheusrgarcia",
+    "description": "",
+    "sourceUrl": "https://github.com/matheusrgarcia/palworld-save-latest",
+    "bytes": 10589649,
+    "files": [
+      {
+        "url": "resources/demo-saves/matheusrgarcia/Level.sav",
+        "path": "matheusrgarcia/Level.sav",
+        "bytes": 10562938
+      },
+      {
+        "url": "resources/demo-saves/matheusrgarcia/LevelMeta.sav",
+        "path": "matheusrgarcia/LevelMeta.sav",
+        "bytes": 1653
+      },
+      {
+        "url": "resources/demo-saves/matheusrgarcia/Players/9BC636AA000000000000000000000000.sav",
+        "path": "matheusrgarcia/Players/9BC636AA000000000000000000000000.sav",
+        "bytes": 12275
+      },
+      {
+        "url": "resources/demo-saves/matheusrgarcia/Players/A996A095000000000000000000000000.sav",
+        "path": "matheusrgarcia/Players/A996A095000000000000000000000000.sav",
+        "bytes": 12783
+      }
+    ],
+    "author": "matheusrgarcia",
+    "savedAt": "2025-02-18",
+    "summary": {
+      "percent": 24.9,
+      "level": 53,
+      "day": 953,
+      "players": 2
+    }
+  },
+  {
+    "id": "castinglok",
+    "name": "Castinglok",
+    "description": "",
+    "sourceUrl": "https://github.com/Castinglok/palworld-saves",
+    "bytes": 14039151,
+    "files": [
+      {
+        "url": "resources/demo-saves/castinglok/Level.sav",
+        "path": "castinglok/Level.sav",
+        "bytes": 13952785
+      },
+      {
+        "url": "resources/demo-saves/castinglok/LevelMeta.sav",
+        "path": "castinglok/LevelMeta.sav",
+        "bytes": 1655
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/16A08079000000000000000000000000.sav",
+        "path": "castinglok/Players/16A08079000000000000000000000000.sav",
+        "bytes": 3863
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/4280F6CE000000000000000000000000.sav",
+        "path": "castinglok/Players/4280F6CE000000000000000000000000.sav",
+        "bytes": 9716
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/4EF7F9FF000000000000000000000000.sav",
+        "path": "castinglok/Players/4EF7F9FF000000000000000000000000.sav",
+        "bytes": 8146
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/5959302D000000000000000000000000.sav",
+        "path": "castinglok/Players/5959302D000000000000000000000000.sav",
+        "bytes": 3275
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/5F85B1D7000000000000000000000000.sav",
+        "path": "castinglok/Players/5F85B1D7000000000000000000000000.sav",
+        "bytes": 7867
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/60EAA9DE000000000000000000000000.sav",
+        "path": "castinglok/Players/60EAA9DE000000000000000000000000.sav",
+        "bytes": 17156
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/652E0046000000000000000000000000.sav",
+        "path": "castinglok/Players/652E0046000000000000000000000000.sav",
+        "bytes": 2525
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/961BEE99000000000000000000000000.sav",
+        "path": "castinglok/Players/961BEE99000000000000000000000000.sav",
+        "bytes": 3274
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/ABA05DA2000000000000000000000000.sav",
+        "path": "castinglok/Players/ABA05DA2000000000000000000000000.sav",
+        "bytes": 5538
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/C4A48024000000000000000000000000.sav",
+        "path": "castinglok/Players/C4A48024000000000000000000000000.sav",
+        "bytes": 2684
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/D3F7F8A8000000000000000000000000.sav",
+        "path": "castinglok/Players/D3F7F8A8000000000000000000000000.sav",
+        "bytes": 11325
+      },
+      {
+        "url": "resources/demo-saves/castinglok/Players/FCE99672000000000000000000000000.sav",
+        "path": "castinglok/Players/FCE99672000000000000000000000000.sav",
+        "bytes": 9342
+      }
+    ],
+    "author": "Castinglok",
+    "savedAt": "2025-01-01",
+    "summary": {
+      "percent": 28.1,
+      "level": 60,
+      "day": 723,
+      "players": 12
+    }
+  },
+  {
+    "id": "doodesz",
+    "name": "Doodesz",
+    "description": "",
+    "sourceUrl": "https://github.com/Doodesz/SaveGames",
+    "bytes": 1185999,
+    "files": [
+      {
+        "url": "resources/demo-saves/doodesz/Level.sav",
+        "path": "doodesz/Level.sav",
+        "bytes": 1134554
+      },
+      {
+        "url": "resources/demo-saves/doodesz/LevelMeta.sav",
+        "path": "doodesz/LevelMeta.sav",
+        "bytes": 1929
+      },
+      {
+        "url": "resources/demo-saves/doodesz/LocalData.sav",
+        "path": "doodesz/LocalData.sav",
+        "bytes": 20166
+      },
+      {
+        "url": "resources/demo-saves/doodesz/Players/7D223AFC000000000000000000000000.sav",
+        "path": "doodesz/Players/7D223AFC000000000000000000000000.sav",
+        "bytes": 12694
+      },
+      {
+        "url": "resources/demo-saves/doodesz/Players/CABC4AB2000000000000000000000000.sav",
+        "path": "doodesz/Players/CABC4AB2000000000000000000000000.sav",
+        "bytes": 7467
+      },
+      {
+        "url": "resources/demo-saves/doodesz/Players/DB790EB7000000000000000000000000.sav",
+        "path": "doodesz/Players/DB790EB7000000000000000000000000.sav",
+        "bytes": 9189
+      }
+    ],
+    "author": "Doodesz",
+    "savedAt": "2026-08-03",
+    "summary": {
+      "percent": 23.3,
+      "level": 49,
+      "day": 107,
+      "players": 3
+    }
+  },
+  {
+    "id": "chikipi-mega-base",
+    "name": "Chikipi Mega Base",
+    "description": "",
+    "sourceUrl": "https://www.reddit.com/r/Palworld/comments/1tezq0t/update_to_the_chikipi_mega_base_its_100_complete/",
+    "bytes": 6180945,
+    "files": [
+      {
+        "url": "resources/demo-saves/chikipi-mega-base/Level.sav",
+        "path": "chikipi-mega-base/Level.sav",
+        "bytes": 5764796
+      },
+      {
+        "url": "resources/demo-saves/chikipi-mega-base/LevelMeta.sav",
+        "path": "chikipi-mega-base/LevelMeta.sav",
+        "bytes": 1990
+      },
+      {
+        "url": "resources/demo-saves/chikipi-mega-base/LocalData.sav",
+        "path": "chikipi-mega-base/LocalData.sav",
+        "bytes": 70131
+      },
+      {
+        "url": "resources/demo-saves/chikipi-mega-base/Players/00000000000000000000000000000001.sav",
+        "path": "chikipi-mega-base/Players/00000000000000000000000000000001.sav",
+        "bytes": 30925
+      },
+      {
+        "url": "resources/demo-saves/chikipi-mega-base/Players/00000000000000000000000000000001_dps.sav",
+        "path": "chikipi-mega-base/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 313103
+      }
+    ],
+    "savedAt": "2026-05-15",
+    "summary": {
+      "percent": 58,
+      "level": 65,
+      "day": 4571,
+      "players": 1
+    }
+  },
+  {
+    "id": "samoga-level-60",
+    "name": "Samoga level 60",
+    "description": "",
+    "sourceUrl": "https://www.playground.ru/palworld/cheat/palworld_sohranenie_60_uroven_4_bazy_vse_paly-1797372",
+    "bytes": 13239677,
+    "files": [
+      {
+        "url": "resources/demo-saves/samoga-level-60/Level.sav",
+        "path": "samoga-level-60/Level.sav",
+        "bytes": 13145583
+      },
+      {
+        "url": "resources/demo-saves/samoga-level-60/LevelMeta.sav",
+        "path": "samoga-level-60/LevelMeta.sav",
+        "bytes": 1703
+      },
+      {
+        "url": "resources/demo-saves/samoga-level-60/LocalData.sav",
+        "path": "samoga-level-60/LocalData.sav",
+        "bytes": 73974
+      },
+      {
+        "url": "resources/demo-saves/samoga-level-60/Players/00000000000000000000000000000001.sav",
+        "path": "samoga-level-60/Players/00000000000000000000000000000001.sav",
+        "bytes": 18417
+      }
+    ],
+    "savedAt": "2025-10-11",
+    "summary": {
+      "percent": 30.2,
+      "level": 60,
+      "day": 829,
+      "players": 1
+    }
+  },
+  {
+    "id": "vlvix-female",
+    "name": "Vlvix female",
+    "description": "Older save format.",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/153",
+    "bytes": 9619298,
+    "files": [
+      {
+        "url": "resources/demo-saves/vlvix-female/Level.sav",
+        "path": "vlvix-female/Level.sav",
+        "bytes": 9597328
+      },
+      {
+        "url": "resources/demo-saves/vlvix-female/LevelMeta.sav",
+        "path": "vlvix-female/LevelMeta.sav",
+        "bytes": 1593
+      },
+      {
+        "url": "resources/demo-saves/vlvix-female/LocalData.sav",
+        "path": "vlvix-female/LocalData.sav",
+        "bytes": 11726
+      },
+      {
+        "url": "resources/demo-saves/vlvix-female/Players/00000000000000000000000000000001.sav",
+        "path": "vlvix-female/Players/00000000000000000000000000000001.sav",
+        "bytes": 8651
+      }
+    ],
+    "savedAt": "2024-01-27",
+    "summary": {
+      "percent": 13.1,
+      "level": 50,
+      "day": 10,
+      "players": 1
+    }
+  },
+  {
+    "id": "poplar",
+    "name": "Poplar",
+    "description": "",
+    "sourceUrl": "https://github.com/poplar-backups/palworld-server",
+    "bytes": 3294833,
+    "files": [
+      {
+        "url": "resources/demo-saves/poplar/Level.sav",
+        "path": "poplar/Level.sav",
+        "bytes": 3097197
+      },
+      {
+        "url": "resources/demo-saves/poplar/LevelMeta.sav",
+        "path": "poplar/LevelMeta.sav",
+        "bytes": 1931
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/1637ACA7000000000000000000000000.sav",
+        "path": "poplar/Players/1637ACA7000000000000000000000000.sav",
+        "bytes": 17732
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/1637ACA7000000000000000000000000_dps.sav",
+        "path": "poplar/Players/1637ACA7000000000000000000000000_dps.sav",
+        "bytes": 35749
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/A6D7969B000000000000000000000000.sav",
+        "path": "poplar/Players/A6D7969B000000000000000000000000.sav",
+        "bytes": 22253
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/A6D7969B000000000000000000000000_dps.sav",
+        "path": "poplar/Players/A6D7969B000000000000000000000000_dps.sav",
+        "bytes": 35471
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/B2E0D7AC000000000000000000000000.sav",
+        "path": "poplar/Players/B2E0D7AC000000000000000000000000.sav",
+        "bytes": 13683
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/BDD662CA000000000000000000000000.sav",
+        "path": "poplar/Players/BDD662CA000000000000000000000000.sav",
+        "bytes": 9001
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/EA64FE45000000000000000000000000.sav",
+        "path": "poplar/Players/EA64FE45000000000000000000000000.sav",
+        "bytes": 26274
+      },
+      {
+        "url": "resources/demo-saves/poplar/Players/EA64FE45000000000000000000000000_dps.sav",
+        "path": "poplar/Players/EA64FE45000000000000000000000000_dps.sav",
+        "bytes": 35542
+      }
+    ],
+    "author": "poplar-backups",
+    "savedAt": "2026-08-13",
+    "summary": {
+      "percent": 61.4,
+      "level": 80,
+      "day": 1569,
+      "players": 5
+    }
+  },
+  {
+    "id": "abhidya",
+    "name": "abhidya",
+    "description": "",
+    "sourceUrl": "https://github.com/abhidya/Palworld-World-Backup",
+    "bytes": 2518221,
+    "files": [
+      {
+        "url": "resources/demo-saves/abhidya/Level.sav",
+        "path": "abhidya/Level.sav",
+        "bytes": 2392890
+      },
+      {
+        "url": "resources/demo-saves/abhidya/LevelMeta.sav",
+        "path": "abhidya/LevelMeta.sav",
+        "bytes": 1931
+      },
+      {
+        "url": "resources/demo-saves/abhidya/Players/00000000000000000000000000000001.sav",
+        "path": "abhidya/Players/00000000000000000000000000000001.sav",
+        "bytes": 3857
+      },
+      {
+        "url": "resources/demo-saves/abhidya/Players/54001E88000000000000000000000000.sav",
+        "path": "abhidya/Players/54001E88000000000000000000000000.sav",
+        "bytes": 13950
+      },
+      {
+        "url": "resources/demo-saves/abhidya/Players/54001E88000000000000000000000000_dps.sav",
+        "path": "abhidya/Players/54001E88000000000000000000000000_dps.sav",
+        "bytes": 42367
+      },
+      {
+        "url": "resources/demo-saves/abhidya/Players/9C8317FC000000000000000000000000.sav",
+        "path": "abhidya/Players/9C8317FC000000000000000000000000.sav",
+        "bytes": 14487
+      },
+      {
+        "url": "resources/demo-saves/abhidya/Players/D87864F3000000000000000000000000.sav",
+        "path": "abhidya/Players/D87864F3000000000000000000000000.sav",
+        "bytes": 15185
+      },
+      {
+        "url": "resources/demo-saves/abhidya/Players/D87864F3000000000000000000000000_dps.sav",
+        "path": "abhidya/Players/D87864F3000000000000000000000000_dps.sav",
+        "bytes": 33554
+      }
+    ],
+    "author": "abhidya",
+    "savedAt": "2026-09-09",
+    "summary": {
+      "percent": 32.8,
+      "level": 62,
+      "day": 1208,
+      "players": 4
+    }
+  },
+  {
+    "id": "nolngo",
+    "name": "Nolngo",
+    "description": "",
+    "sourceUrl": "https://github.com/nolngo/palworld-server",
+    "bytes": 3241564,
+    "files": [
+      {
+        "url": "resources/demo-saves/nolngo/Level.sav",
+        "path": "nolngo/Level.sav",
+        "bytes": 3082842
+      },
+      {
+        "url": "resources/demo-saves/nolngo/LevelMeta.sav",
+        "path": "nolngo/LevelMeta.sav",
+        "bytes": 1931
+      },
+      {
+        "url": "resources/demo-saves/nolngo/Players/27AA65B4000000000000000000000000.sav",
+        "path": "nolngo/Players/27AA65B4000000000000000000000000.sav",
+        "bytes": 14722
+      },
+      {
+        "url": "resources/demo-saves/nolngo/Players/56C5FF86000000000000000000000000.sav",
+        "path": "nolngo/Players/56C5FF86000000000000000000000000.sav",
+        "bytes": 24426
+      },
+      {
+        "url": "resources/demo-saves/nolngo/Players/B4104D3C000000000000000000000000.sav",
+        "path": "nolngo/Players/B4104D3C000000000000000000000000.sav",
+        "bytes": 25062
+      },
+      {
+        "url": "resources/demo-saves/nolngo/Players/B4104D3C000000000000000000000000_dps.sav",
+        "path": "nolngo/Players/B4104D3C000000000000000000000000_dps.sav",
+        "bytes": 59324
+      },
+      {
+        "url": "resources/demo-saves/nolngo/Players/CF874500000000000000000000000000.sav",
+        "path": "nolngo/Players/CF874500000000000000000000000000.sav",
+        "bytes": 9256
+      },
+      {
+        "url": "resources/demo-saves/nolngo/Players/DC952A2F000000000000000000000000.sav",
+        "path": "nolngo/Players/DC952A2F000000000000000000000000.sav",
+        "bytes": 24001
+      }
+    ],
+    "author": "nolngo",
+    "savedAt": "2026-08-22",
+    "summary": {
+      "percent": 59.1,
+      "level": 80,
+      "day": 1620,
+      "players": 5
+    }
+  },
+  {
+    "id": "sadopera",
+    "name": "SadOpera",
+    "description": "",
+    "sourceUrl": "https://github.com/SadOpera/Palworld",
+    "bytes": 3059325,
+    "files": [
+      {
+        "url": "resources/demo-saves/sadopera/Level.sav",
+        "path": "sadopera/Level.sav",
+        "bytes": 2998508
+      },
+      {
+        "url": "resources/demo-saves/sadopera/LevelMeta.sav",
+        "path": "sadopera/LevelMeta.sav",
+        "bytes": 1929
+      },
+      {
+        "url": "resources/demo-saves/sadopera/Players/9715F04D000000000000000000000000.sav",
+        "path": "sadopera/Players/9715F04D000000000000000000000000.sav",
+        "bytes": 20184
+      },
+      {
+        "url": "resources/demo-saves/sadopera/Players/B2D9DEAB000000000000000000000000.sav",
+        "path": "sadopera/Players/B2D9DEAB000000000000000000000000.sav",
+        "bytes": 18763
+      },
+      {
+        "url": "resources/demo-saves/sadopera/Players/E1218C45000000000000000000000000.sav",
+        "path": "sadopera/Players/E1218C45000000000000000000000000.sav",
+        "bytes": 19941
+      }
+    ],
+    "author": "SadOpera",
+    "savedAt": "2026-08-03",
+    "summary": {
+      "percent": 47.7,
+      "level": 80,
+      "day": 223,
+      "players": 3
+    }
+  },
+  {
+    "id": "seawolf1024",
+    "name": "seawolf1024",
+    "description": "",
+    "sourceUrl": "https://github.com/seawolf1024/palworld-sync",
+    "bytes": 2239873,
+    "files": [
+      {
+        "url": "resources/demo-saves/seawolf1024/Level.sav",
+        "path": "seawolf1024/Level.sav",
+        "bytes": 1968346
+      },
+      {
+        "url": "resources/demo-saves/seawolf1024/LevelMeta.sav",
+        "path": "seawolf1024/LevelMeta.sav",
+        "bytes": 2010
+      },
+      {
+        "url": "resources/demo-saves/seawolf1024/LocalData.sav",
+        "path": "seawolf1024/LocalData.sav",
+        "bytes": 118997
+      },
+      {
+        "url": "resources/demo-saves/seawolf1024/Players/00000000000000000000000000000001.sav",
+        "path": "seawolf1024/Players/00000000000000000000000000000001.sav",
+        "bytes": 20662
+      },
+      {
+        "url": "resources/demo-saves/seawolf1024/Players/00000000000000000000000000000001_dps.sav",
+        "path": "seawolf1024/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 116431
+      },
+      {
+        "url": "resources/demo-saves/seawolf1024/Players/2E0382F9000000000000000000000000.sav",
+        "path": "seawolf1024/Players/2E0382F9000000000000000000000000.sav",
+        "bytes": 13427
+      }
+    ],
+    "author": "seawolf1024",
+    "savedAt": "2026-08-01",
+    "summary": {
+      "percent": 33,
+      "level": 75,
+      "day": 160,
+      "players": 2
+    }
+  },
+  {
+    "id": "seiak",
+    "name": "Seiak",
+    "description": "",
+    "sourceUrl": "https://github.com/Seiak/palworld-saves/releases/tag/snapshot-20260907-160001",
+    "bytes": 4036993,
+    "files": [
+      {
+        "url": "resources/demo-saves/seiak/Level.sav",
+        "path": "seiak/Level.sav",
+        "bytes": 3773853
+      },
+      {
+        "url": "resources/demo-saves/seiak/LevelMeta.sav",
+        "path": "seiak/LevelMeta.sav",
+        "bytes": 1931
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/1F82EC4F000000000000000000000000.sav",
+        "path": "seiak/Players/1F82EC4F000000000000000000000000.sav",
+        "bytes": 14403
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/5AC1DD52000000000000000000000000.sav",
+        "path": "seiak/Players/5AC1DD52000000000000000000000000.sav",
+        "bytes": 25199
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/5AC1DD52000000000000000000000000_dps.sav",
+        "path": "seiak/Players/5AC1DD52000000000000000000000000_dps.sav",
+        "bytes": 87119
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/96CD8BC7000000000000000000000000.sav",
+        "path": "seiak/Players/96CD8BC7000000000000000000000000.sav",
+        "bytes": 22666
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/96CD8BC7000000000000000000000000_dps.sav",
+        "path": "seiak/Players/96CD8BC7000000000000000000000000_dps.sav",
+        "bytes": 33554
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/DDBBB346000000000000000000000000.sav",
+        "path": "seiak/Players/DDBBB346000000000000000000000000.sav",
+        "bytes": 19777
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/DDBBB346000000000000000000000000_dps.sav",
+        "path": "seiak/Players/DDBBB346000000000000000000000000_dps.sav",
+        "bytes": 33554
+      },
+      {
+        "url": "resources/demo-saves/seiak/Players/FF77602C000000000000000000000000.sav",
+        "path": "seiak/Players/FF77602C000000000000000000000000.sav",
+        "bytes": 24937
+      }
+    ],
+    "author": "Seiak",
+    "savedAt": "2026-08-25",
+    "summary": {
+      "percent": 57.6,
+      "level": 80,
+      "day": 1849,
+      "players": 5
+    }
+  },
+  {
+    "id": "ariefsaiber",
+    "name": "AriefSaiber",
+    "description": "",
+    "sourceUrl": "https://github.com/AriefSaiber/palworldbackup",
+    "bytes": 2295794,
+    "files": [
+      {
+        "url": "resources/demo-saves/ariefsaiber/Level.sav",
+        "path": "ariefsaiber/Level.sav",
+        "bytes": 2104557
+      },
+      {
+        "url": "resources/demo-saves/ariefsaiber/LevelMeta.sav",
+        "path": "ariefsaiber/LevelMeta.sav",
+        "bytes": 1931
+      },
+      {
+        "url": "resources/demo-saves/ariefsaiber/LocalData.sav",
+        "path": "ariefsaiber/LocalData.sav",
+        "bytes": 97272
+      },
+      {
+        "url": "resources/demo-saves/ariefsaiber/Players/3776CB03000000000000000000000000.sav",
+        "path": "ariefsaiber/Players/3776CB03000000000000000000000000.sav",
+        "bytes": 18931
+      },
+      {
+        "url": "resources/demo-saves/ariefsaiber/Players/3776CB03000000000000000000000000_dps.sav",
+        "path": "ariefsaiber/Players/3776CB03000000000000000000000000_dps.sav",
+        "bytes": 45595
+      },
+      {
+        "url": "resources/demo-saves/ariefsaiber/Players/4DBA9208000000000000000000000000.sav",
+        "path": "ariefsaiber/Players/4DBA9208000000000000000000000000.sav",
+        "bytes": 8383
+      },
+      {
+        "url": "resources/demo-saves/ariefsaiber/Players/D4484037000000000000000000000000.sav",
+        "path": "ariefsaiber/Players/D4484037000000000000000000000000.sav",
+        "bytes": 19125
+      }
+    ],
+    "author": "AriefSaiber",
+    "savedAt": "2026-09-09",
+    "summary": {
+      "percent": 36.1,
+      "level": 68,
+      "day": 1578,
+      "players": 3
+    }
+  },
+  {
+    "id": "hinatsumi98-lab-research",
+    "name": "Hinatsumi98 / lab research",
+    "description": "World-only save with extensive lab research; no player files.",
+    "sourceUrl": "https://github.com/oMaN-Rod/palworld-save-tools/issues/8#issuecomment-5249449390",
+    "bytes": 3088572,
+    "files": [
+      {
+        "url": "resources/demo-saves/hinatsumi98-lab-research/Level.sav",
+        "path": "hinatsumi98-lab-research/Level.sav",
+        "bytes": 3088572
+      }
+    ],
+    "author": "Hinatsumi98",
+    "summary": {
+      "percent": null,
+      "level": 80,
+      "day": null,
+      "players": 9
+    }
+  },
+  {
+    "id": "umangdabhi",
+    "name": "UmangDabhi",
+    "description": "",
+    "sourceUrl": "https://github.com/UmangDabhi/Palworld-TheWorld",
+    "bytes": 2633791,
+    "files": [
+      {
+        "url": "resources/demo-saves/umangdabhi/Level.sav",
+        "path": "umangdabhi/Level.sav",
+        "bytes": 2466320
+      },
+      {
+        "url": "resources/demo-saves/umangdabhi/LevelMeta.sav",
+        "path": "umangdabhi/LevelMeta.sav",
+        "bytes": 2007
+      },
+      {
+        "url": "resources/demo-saves/umangdabhi/LocalData.sav",
+        "path": "umangdabhi/LocalData.sav",
+        "bytes": 53367
+      },
+      {
+        "url": "resources/demo-saves/umangdabhi/Players/00000000000000000000000000000001.sav",
+        "path": "umangdabhi/Players/00000000000000000000000000000001.sav",
+        "bytes": 20095
+      },
+      {
+        "url": "resources/demo-saves/umangdabhi/Players/00000000000000000000000000000001_dps.sav",
+        "path": "umangdabhi/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 44555
+      },
+      {
+        "url": "resources/demo-saves/umangdabhi/Players/7A63391C000000000000000000000000.sav",
+        "path": "umangdabhi/Players/7A63391C000000000000000000000000.sav",
+        "bytes": 21999
+      },
+      {
+        "url": "resources/demo-saves/umangdabhi/Players/7A63391C000000000000000000000000_dps.sav",
+        "path": "umangdabhi/Players/7A63391C000000000000000000000000_dps.sav",
+        "bytes": 25448
+      }
+    ],
+    "author": "UmangDabhi",
+    "savedAt": "2026-08-16",
+    "summary": {
+      "percent": 49.9,
+      "level": 80,
+      "day": 215,
+      "players": 2
+    }
+  },
+  {
+    "id": "ouiho",
+    "name": "OuiHo",
+    "description": "",
+    "sourceUrl": "https://github.com/xyuqikzz/Palworld-Save-Editor/issues/8#issuecomment-5117964887",
+    "bytes": 2586055,
+    "files": [
+      {
+        "url": "resources/demo-saves/ouiho/Level.sav",
+        "path": "ouiho/Level.sav",
+        "bytes": 2401354
+      },
+      {
+        "url": "resources/demo-saves/ouiho/LevelMeta.sav",
+        "path": "ouiho/LevelMeta.sav",
+        "bytes": 2018
+      },
+      {
+        "url": "resources/demo-saves/ouiho/LocalData.sav",
+        "path": "ouiho/LocalData.sav",
+        "bytes": 123018
+      },
+      {
+        "url": "resources/demo-saves/ouiho/Players/00000000000000000000000000000001.sav",
+        "path": "ouiho/Players/00000000000000000000000000000001.sav",
+        "bytes": 16832
+      },
+      {
+        "url": "resources/demo-saves/ouiho/Players/00000000000000000000000000000001_dps.sav",
+        "path": "ouiho/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 42833
+      }
+    ],
+    "savedAt": "2026-07-29",
+    "summary": {
+      "percent": 43,
+      "level": 80,
+      "day": 82,
+      "players": 1
+    }
+  },
+  {
+    "id": "rain-sasak1",
+    "name": "Rain-Sasak1",
+    "description": "",
+    "sourceUrl": "https://github.com/xyuqikzz/Palworld-Save-Editor/issues/1",
+    "bytes": 2385615,
+    "files": [
+      {
+        "url": "resources/demo-saves/rain-sasak1/Level.sav",
+        "path": "rain-sasak1/Level.sav",
+        "bytes": 2251504
+      },
+      {
+        "url": "resources/demo-saves/rain-sasak1/LevelMeta.sav",
+        "path": "rain-sasak1/LevelMeta.sav",
+        "bytes": 2012
+      },
+      {
+        "url": "resources/demo-saves/rain-sasak1/LocalData.sav",
+        "path": "rain-sasak1/LocalData.sav",
+        "bytes": 104517
+      },
+      {
+        "url": "resources/demo-saves/rain-sasak1/Players/00000000000000000000000000000001.sav",
+        "path": "rain-sasak1/Players/00000000000000000000000000000001.sav",
+        "bytes": 18304
+      },
+      {
+        "url": "resources/demo-saves/rain-sasak1/Players/111A15AF000000000000000000000000.sav",
+        "path": "rain-sasak1/Players/111A15AF000000000000000000000000.sav",
+        "bytes": 9278
+      }
+    ],
+    "savedAt": "2026-07-19",
+    "summary": {
+      "percent": 40.9,
+      "level": 71,
+      "day": 224,
+      "players": 2
+    }
+  },
+  {
+    "id": "haitran0303",
+    "name": "HaiTran0303",
+    "description": "",
+    "sourceUrl": "https://github.com/HaiTran0303/palworld",
+    "bytes": 1854310,
+    "files": [
+      {
+        "url": "resources/demo-saves/haitran0303/Level.sav",
+        "path": "haitran0303/Level.sav",
+        "bytes": 1641113
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/LevelMeta.sav",
+        "path": "haitran0303/LevelMeta.sav",
+        "bytes": 2023
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/LocalData.sav",
+        "path": "haitran0303/LocalData.sav",
+        "bytes": 126695
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/00000000000000000000000000000001.sav",
+        "path": "haitran0303/Players/00000000000000000000000000000001.sav",
+        "bytes": 11907
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/055CB083000000000000000000000000.sav",
+        "path": "haitran0303/Players/055CB083000000000000000000000000.sav",
+        "bytes": 10076
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/2A6525EF000000000000000000000000.sav",
+        "path": "haitran0303/Players/2A6525EF000000000000000000000000.sav",
+        "bytes": 10502
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/3A513AFF000000000000000000000000.sav",
+        "path": "haitran0303/Players/3A513AFF000000000000000000000000.sav",
+        "bytes": 8865
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/3C6E284B000000000000000000000000.sav",
+        "path": "haitran0303/Players/3C6E284B000000000000000000000000.sav",
+        "bytes": 9733
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/4398A94C000000000000000000000000.sav",
+        "path": "haitran0303/Players/4398A94C000000000000000000000000.sav",
+        "bytes": 6413
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/9E724B6A000000000000000000000000.sav",
+        "path": "haitran0303/Players/9E724B6A000000000000000000000000.sav",
+        "bytes": 10795
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/A1A7FA86000000000000000000000000.sav",
+        "path": "haitran0303/Players/A1A7FA86000000000000000000000000.sav",
+        "bytes": 6035
+      },
+      {
+        "url": "resources/demo-saves/haitran0303/Players/FAD8804E000000000000000000000000.sav",
+        "path": "haitran0303/Players/FAD8804E000000000000000000000000.sav",
+        "bytes": 10153
+      }
+    ],
+    "author": "HaiTran0303",
+    "savedAt": "2026-07-30",
+    "summary": {
+      "percent": 24,
+      "level": 54,
+      "day": 62,
+      "players": 9
+    }
+  },
+  {
+    "id": "nexus-2936-ajmeri",
+    "name": "Nexus 2936 / Ajmeri",
+    "description": "",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/2936",
+    "bytes": 3093435,
+    "files": [
+      {
+        "url": "resources/demo-saves/nexus-2936-ajmeri/Level.sav",
+        "path": "nexus-2936-ajmeri/Level.sav",
+        "bytes": 3025499
+      },
+      {
+        "url": "resources/demo-saves/nexus-2936-ajmeri/LevelMeta.sav",
+        "path": "nexus-2936-ajmeri/LevelMeta.sav",
+        "bytes": 1982
+      },
+      {
+        "url": "resources/demo-saves/nexus-2936-ajmeri/LocalData.sav",
+        "path": "nexus-2936-ajmeri/LocalData.sav",
+        "bytes": 46842
+      },
+      {
+        "url": "resources/demo-saves/nexus-2936-ajmeri/Players/00000000000000000000000000000001.sav",
+        "path": "nexus-2936-ajmeri/Players/00000000000000000000000000000001.sav",
+        "bytes": 19112
+      }
+    ],
+    "savedAt": "2025-12-18",
+    "summary": {
+      "percent": 45.8,
+      "level": 65,
+      "day": 335,
+      "players": 1
+    }
+  },
+  {
+    "id": "nexus-3536-venom-july",
+    "name": "Nexus 3536 / Venom July",
+    "description": "",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/3536",
+    "bytes": 3890836,
+    "files": [
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-july/Level.sav",
+        "path": "nexus-3536-venom-july/Level.sav",
+        "bytes": 3561448
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-july/LevelMeta.sav",
+        "path": "nexus-3536-venom-july/LevelMeta.sav",
+        "bytes": 2009
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-july/LocalData.sav",
+        "path": "nexus-3536-venom-july/LocalData.sav",
+        "bytes": 79426
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-july/Players/00000000000000000000000000000001.sav",
+        "path": "nexus-3536-venom-july/Players/00000000000000000000000000000001.sav",
+        "bytes": 28648
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-july/Players/00000000000000000000000000000001_dps.sav",
+        "path": "nexus-3536-venom-july/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 213109
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-july/Players/5E29213F000000000000000000000000.sav",
+        "path": "nexus-3536-venom-july/Players/5E29213F000000000000000000000000.sav",
+        "bytes": 6196
+      }
+    ],
+    "savedAt": "2026-07-16",
+    "summary": {
+      "percent": 68.5,
+      "level": 80,
+      "day": 448,
+      "players": 2
+    }
+  },
+  {
+    "id": "nexus-3536-venom-june",
+    "name": "Nexus 3536 / Venom June",
+    "description": "",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/3536",
+    "bytes": 3552995,
+    "files": [
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-june/Level.sav",
+        "path": "nexus-3536-venom-june/Level.sav",
+        "bytes": 3274400
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-june/LevelMeta.sav",
+        "path": "nexus-3536-venom-june/LevelMeta.sav",
+        "bytes": 1970
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-june/LocalData.sav",
+        "path": "nexus-3536-venom-june/LocalData.sav",
+        "bytes": 51032
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-june/Players/00000000000000000000000000000001.sav",
+        "path": "nexus-3536-venom-june/Players/00000000000000000000000000000001.sav",
+        "bytes": 22580
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-june/Players/00000000000000000000000000000001_dps.sav",
+        "path": "nexus-3536-venom-june/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 198497
+      },
+      {
+        "url": "resources/demo-saves/nexus-3536-venom-june/Players/5E29213F000000000000000000000000.sav",
+        "path": "nexus-3536-venom-june/Players/5E29213F000000000000000000000000.sav",
+        "bytes": 4516
+      }
+    ],
+    "savedAt": "2026-06-25",
+    "summary": {
+      "percent": 47.2,
+      "level": 65,
+      "day": 372,
+      "players": 2
+    }
+  },
+  {
+    "id": "nexus-121-eonacat-local",
+    "name": "Nexus 121 / EonaCat local",
+    "description": "Older save format.",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/121",
+    "bytes": 10331985,
+    "files": [
+      {
+        "url": "resources/demo-saves/nexus-121-eonacat-local/Level.sav",
+        "path": "nexus-121-eonacat-local/Level.sav",
+        "bytes": 10290052
+      },
+      {
+        "url": "resources/demo-saves/nexus-121-eonacat-local/LevelMeta.sav",
+        "path": "nexus-121-eonacat-local/LevelMeta.sav",
+        "bytes": 1603
+      },
+      {
+        "url": "resources/demo-saves/nexus-121-eonacat-local/LocalData.sav",
+        "path": "nexus-121-eonacat-local/LocalData.sav",
+        "bytes": 22767
+      },
+      {
+        "url": "resources/demo-saves/nexus-121-eonacat-local/Players/00000000000000000000000000000001.sav",
+        "path": "nexus-121-eonacat-local/Players/00000000000000000000000000000001.sav",
+        "bytes": 17563
+      }
+    ],
+    "savedAt": "2024-02-10",
+    "summary": {
+      "percent": 16.8,
+      "level": 50,
+      "day": 767,
+      "players": 1
+    }
+  },
+  {
+    "id": "nexus-121-eonacat-dedicated",
+    "name": "Nexus 121 / EonaCat dedicated",
+    "description": "Older save format.",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/121",
+    "bytes": 10324944,
+    "files": [
+      {
+        "url": "resources/demo-saves/nexus-121-eonacat-dedicated/Level.sav",
+        "path": "nexus-121-eonacat-dedicated/Level.sav",
+        "bytes": 10305819
+      },
+      {
+        "url": "resources/demo-saves/nexus-121-eonacat-dedicated/LevelMeta.sav",
+        "path": "nexus-121-eonacat-dedicated/LevelMeta.sav",
+        "bytes": 1555
+      },
+      {
+        "url": "resources/demo-saves/nexus-121-eonacat-dedicated/Players/3255B6C9000000000000000000000000.sav",
+        "path": "nexus-121-eonacat-dedicated/Players/3255B6C9000000000000000000000000.sav",
+        "bytes": 17570
+      }
+    ],
+    "savedAt": "2024-02-10",
+    "summary": {
+      "percent": 16.8,
+      "level": 50,
+      "day": 766,
+      "players": 1
+    }
+  },
+  {
+    "id": "dcs-modded",
+    "name": "DCS (modded)",
+    "description": "Modded save.",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/4927",
+    "bytes": 2447857,
+    "files": [
+      {
+        "url": "resources/demo-saves/dcs-modded/Level.sav",
+        "path": "dcs-modded/Level.sav",
+        "bytes": 2349016
+      },
+      {
+        "url": "resources/demo-saves/dcs-modded/LevelMeta.sav",
+        "path": "dcs-modded/LevelMeta.sav",
+        "bytes": 2072
+      },
+      {
+        "url": "resources/demo-saves/dcs-modded/LocalData.sav",
+        "path": "dcs-modded/LocalData.sav",
+        "bytes": 72133
+      },
+      {
+        "url": "resources/demo-saves/dcs-modded/Players/00000000000000000000000000000001.sav",
+        "path": "dcs-modded/Players/00000000000000000000000000000001.sav",
+        "bytes": 18583
+      },
+      {
+        "url": "resources/demo-saves/dcs-modded/Players/A05BC486000000000000000000000000.sav",
+        "path": "dcs-modded/Players/A05BC486000000000000000000000000.sav",
+        "bytes": 6053
+      }
+    ],
+    "savedAt": "2026-08-08",
+    "summary": {
+      "percent": 37.4,
+      "level": 80,
+      "day": 35,
+      "players": 2
+    }
+  },
+  {
+    "id": "pal-backup-aug-25",
+    "name": "Pal Backup · Aug 25",
+    "description": "",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/5351",
+    "bytes": 4259795,
+    "files": [
+      {
+        "url": "resources/demo-saves/pal-backup-aug-25/Level.sav",
+        "path": "pal-backup-aug-25/Level.sav",
+        "bytes": 3758798
+      },
+      {
+        "url": "resources/demo-saves/pal-backup-aug-25/LevelMeta.sav",
+        "path": "pal-backup-aug-25/LevelMeta.sav",
+        "bytes": 2008
+      },
+      {
+        "url": "resources/demo-saves/pal-backup-aug-25/LocalData.sav",
+        "path": "pal-backup-aug-25/LocalData.sav",
+        "bytes": 92397
+      },
+      {
+        "url": "resources/demo-saves/pal-backup-aug-25/Players/00000000000000000000000000000001.sav",
+        "path": "pal-backup-aug-25/Players/00000000000000000000000000000001.sav",
+        "bytes": 37183
+      },
+      {
+        "url": "resources/demo-saves/pal-backup-aug-25/Players/00000000000000000000000000000001_dps.sav",
+        "path": "pal-backup-aug-25/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 363170
+      },
+      {
+        "url": "resources/demo-saves/pal-backup-aug-25/Players/5E29213F000000000000000000000000.sav",
+        "path": "pal-backup-aug-25/Players/5E29213F000000000000000000000000.sav",
+        "bytes": 6239
+      }
+    ],
+    "savedAt": "2026-08-22",
+    "summary": {
+      "percent": 81.4,
+      "level": 80,
+      "day": 499,
+      "players": 2
+    }
+  },
+  {
+    "id": "palworld-1-0-3",
+    "name": "Palworld 1.0.3",
+    "description": "",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/5505",
+    "bytes": 3013945,
+    "files": [
+      {
+        "url": "resources/demo-saves/palworld-1-0-3/Level.sav",
+        "path": "palworld-1-0-3/Level.sav",
+        "bytes": 2805550
+      },
+      {
+        "url": "resources/demo-saves/palworld-1-0-3/LevelMeta.sav",
+        "path": "palworld-1-0-3/LevelMeta.sav",
+        "bytes": 2014
+      },
+      {
+        "url": "resources/demo-saves/palworld-1-0-3/LocalData.sav",
+        "path": "palworld-1-0-3/LocalData.sav",
+        "bytes": 123370
+      },
+      {
+        "url": "resources/demo-saves/palworld-1-0-3/Players/00000000000000000000000000000001.sav",
+        "path": "palworld-1-0-3/Players/00000000000000000000000000000001.sav",
+        "bytes": 28857
+      },
+      {
+        "url": "resources/demo-saves/palworld-1-0-3/Players/00000000000000000000000000000001_dps.sav",
+        "path": "palworld-1-0-3/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 54154
+      }
+    ],
+    "savedAt": "2026-09-02",
+    "summary": {
+      "percent": 80.3,
+      "level": 80,
+      "day": 365,
+      "players": 1
+    }
+  },
+  {
+    "id": "swar",
+    "name": "SWAR",
+    "description": "",
+    "sourceUrl": "https://www.nexusmods.com/palworld/mods/5563",
+    "bytes": 3444174,
+    "files": [
+      {
+        "url": "resources/demo-saves/swar/Level.sav",
+        "path": "swar/Level.sav",
+        "bytes": 3230497
+      },
+      {
+        "url": "resources/demo-saves/swar/LevelMeta.sav",
+        "path": "swar/LevelMeta.sav",
+        "bytes": 2007
+      },
+      {
+        "url": "resources/demo-saves/swar/LocalData.sav",
+        "path": "swar/LocalData.sav",
+        "bytes": 145969
+      },
+      {
+        "url": "resources/demo-saves/swar/Players/00000000000000000000000000000001.sav",
+        "path": "swar/Players/00000000000000000000000000000001.sav",
+        "bytes": 20670
+      },
+      {
+        "url": "resources/demo-saves/swar/Players/00000000000000000000000000000001_dps.sav",
+        "path": "swar/Players/00000000000000000000000000000001_dps.sav",
+        "bytes": 45031
+      }
+    ],
+    "savedAt": "2026-09-07",
+    "summary": {
+      "percent": 50.8,
+      "level": 100,
+      "day": 890,
+      "players": 1
+    }
+  },
+  {
+    "id": "puneetgoto",
+    "name": "PuneetGOTO",
+    "description": "",
+    "sourceUrl": "https://github.com/PuneetGOTO/palworld-backup/tree/79a9110dfc845a6239049fc35fc2e9ada538dd87",
+    "bytes": 446089,
+    "files": [
+      {
+        "url": "resources/demo-saves/puneetgoto/Level.sav",
+        "path": "puneetgoto/Level.sav",
+        "bytes": 420752
+      },
+      {
+        "url": "resources/demo-saves/puneetgoto/LevelMeta.sav",
+        "path": "puneetgoto/LevelMeta.sav",
+        "bytes": 1891
+      },
+      {
+        "url": "resources/demo-saves/puneetgoto/Players/24EBAC7B000000000000000000000000.sav",
+        "path": "puneetgoto/Players/24EBAC7B000000000000000000000000.sav",
+        "bytes": 5825
+      },
+      {
+        "url": "resources/demo-saves/puneetgoto/Players/3415D589000000000000000000000000.sav",
+        "path": "puneetgoto/Players/3415D589000000000000000000000000.sav",
+        "bytes": 5930
+      },
+      {
+        "url": "resources/demo-saves/puneetgoto/Players/5D6CF437000000000000000000000000.sav",
+        "path": "puneetgoto/Players/5D6CF437000000000000000000000000.sav",
+        "bytes": 5434
+      },
+      {
+        "url": "resources/demo-saves/puneetgoto/Players/AF668A8B000000000000000000000000.sav",
+        "path": "puneetgoto/Players/AF668A8B000000000000000000000000.sav",
+        "bytes": 6257
+      }
+    ],
+    "author": "PuneetGOTO",
+    "savedAt": "2025-08-23",
+    "summary": {
+      "percent": 7.2,
+      "level": 17,
+      "day": 44,
+      "players": 4
+    }
+  }
+]
