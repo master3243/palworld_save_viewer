@@ -123,8 +123,8 @@
   color: rgba(200, 236, 255, 0.5);
 }
 
-.switch-demo { display: flex; align-items: center; gap: 7px; margin: -8px 28px 16px -8px; padding: 6px 10px; border: 1px solid #31596e; border-radius: 7px; background: #122d3d; color: #8edfff; font: inherit; font-size: .8rem; cursor: pointer; }
-.switch-demo svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.switch-demo { display: flex; align-items: center; gap: 5px; margin: -8px 28px 16px -8px; padding: 4px 8px; border: 1px solid #31596e; border-radius: 6px; background: #122d3d; color: #8edfff; font: inherit; font-size: .75rem; line-height: 16px; cursor: pointer; }
+.switch-demo svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .switch-demo:hover { background: #1b4053; border-color: #63ccec; color: #d9f5ff; }
 .switch-demo:focus-visible { outline: 2px solid #95f3ff; outline-offset: 2px; }
 .demo-preview-name { color: #b7d1e0; font-size: .8rem; margin: 0; }

@@ -14,16 +14,15 @@ export class DemoPickerComponent implements OnInit, AfterViewInit {
   @Input() downloadError = '';
   @Output() readonly cancel = new EventEmitter<void>();
   @Output() readonly choose = new EventEmitter<DemoSave>();
-  @ViewChild('searchInput') private searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('pickerTitle') private pickerTitle!: ElementRef<HTMLElement>;
   demos: DemoSave[] = [];
   selectedId = '';
-  search = '';
   loading = true;
   error = '';
   readonly formatSize = formatSize;
 
   ngOnInit(): void { this.selectedId = this.current.id; void this.load(); }
-  ngAfterViewInit(): void { this.searchInput.nativeElement.focus(); }
+  ngAfterViewInit(): void { this.pickerTitle.nativeElement.focus(); }
   async load(): Promise<void> {
     this.loading = true;
     this.error = '';
@@ -37,11 +36,8 @@ export class DemoPickerComponent implements OnInit, AfterViewInit {
     catch (error) { this.error = error instanceof Error ? error.message : 'Could not load demos.'; }
     finally { this.loading = false; }
   }
-  get visibleDemos(): DemoSave[] {
-    const search = this.search.trim().toLowerCase();
-    return this.demos.filter(demo => `${demo.name} ${demo.author ?? ''} ${demo.description}`.toLowerCase().includes(search));
-  }
   get selection(): DemoSave | undefined { return this.demos.find(demo => demo.id === this.selectedId); }
+  select(demo: DemoSave): void { if (!this.busy) this.selectedId = demo.id; }
   sourceName(url: string): string {
     const name = new URL(url).hostname.replace(/^www\./, '').replace(/\.[^.]+$/, '');
     const labels: Record<string, string> = { github: 'GitHub', nexusmods: 'Nexus Mods' };

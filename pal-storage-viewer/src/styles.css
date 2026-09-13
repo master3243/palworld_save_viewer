@@ -109,6 +109,10 @@ table {
   outline-offset: 2px;
 }
 
+.compact-actions { justify-content: center; gap: 10px; }
+.compact-actions button { flex: 0 0 auto; padding: 4px 12px; line-height: 16px; }
+.compact-actions .modal-ghost { font-weight: 400; }
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
