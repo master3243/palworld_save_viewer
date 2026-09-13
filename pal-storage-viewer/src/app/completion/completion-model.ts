@@ -364,16 +364,20 @@ function technologyCategory(record: PlayerCompletion, data: CompletionData): Cat
 }
 
 function craftingSourceLabel(name: string, source: string): string {
+  const normalizeName = (value: string) => value.replace(/-/g, ' ').toLowerCase();
+  const normalizedName = normalizeName(name);
   for (const [prefix, label] of [['Technology: ', 'Tech'], ['Ancient technology: ', 'Ancient tech']]) {
     if (source.startsWith(prefix)) {
       const technology = source.slice(prefix.length);
-      return technology === name ? label : `${label}: ${technology}`;
+      return normalizeName(technology) === normalizedName ? label : `${label}: ${technology}`;
     }
   }
+  const normalizedSource = normalizeName(source);
   const prefix = `${name} `;
-  if (source.startsWith(prefix)) {
+  if (normalizedSource.startsWith(normalizeName(prefix))) {
     const suffix = source.slice(prefix.length);
     if (/^Schematic(?: \d+)?$/.test(suffix)) return suffix;
+    if (suffix === 'Fragment') return 'Fragments';
   }
   return source;
 }

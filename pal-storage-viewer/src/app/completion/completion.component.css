@@ -659,10 +659,11 @@
 .item-table .detail-col span { display: block; white-space: pre-line; overflow-wrap: anywhere; }
 .item-table .fishing-col { text-align: right; font-variant-numeric: tabular-nums; }
 .fishing-col small { display: block; font-size: .6rem; font-weight: 400; }
-.crafting-list .name-col span { display: inline-block; white-space: normal; vertical-align: middle; }
+/* Keep name content within 200px, including the 28px icon and its 8px gap. */
+.crafting-list .name-col span { display: inline-block; max-width: 164px; white-space: normal; overflow-wrap: normal; vertical-align: middle; }
 .crafting-list .name-col img { width: 28px; height: 28px; object-fit: contain; }
 .crafting-list td { vertical-align: middle; }
-.crafting-list .craft-source span { display: block; white-space: pre-line; }
+.crafting-list .craft-source span { display: block; width: max-content; min-width: min-content; max-width: 75px; white-space: pre-line; overflow-wrap: normal; }
 .crafting-list .crafted-col { text-align: right; font-variant-numeric: tabular-nums; }
 .crafting-list .craft-number { text-align: right; font-variant-numeric: tabular-nums; }
 .craft-weight img, .craft-value img { width: 14px; height: 14px; margin-left: 4px; vertical-align: middle; object-fit: contain; }
