@@ -43,58 +43,48 @@ function mapHarness() {
   return { component, layouts, frames, zoomTo, flush };
 }
 
-test('zoom regrouping waits for a 1.25x step while marker positions and hit targets move smoothly', () => {
+test('grouping waits for a 1.25x zoom step while positions and hit targets move smoothly', () => {
   const { component, layouts, zoomTo } = mapHarness();
-  assert.equal(component.clusters.length, 1);
-  for (const zoom of [1.01, 1.1, 1.2, 1.24]) {
+  component.filtered = [0, 3.65].map((x, i) => ({ key: String(i), map: 'palpagos', x, y: 0, item: {} }));
+  component.draw();
+  const initialLayouts = layouts.length;
+  for (const zoom of [1.01, 1.1, 1.24]) {
     zoomTo(zoom);
     assert.equal(component.clusters.length, 1);
-    const point = component.screen({ x: 3, y: 0 });
+    assert.equal(layouts.length, initialLayouts);
+    const point = component.screen({x:1.825,y:0});
+    assert.equal(component.markerAt(point).items.length, 2);
     assert.ok(Math.abs(component.clusters[0].x - point.x) < 1e-8);
     assert.ok(Math.abs(component.clusters[0].y - point.y) < 1e-8);
-    assert.equal(component.markerAt(point).items.length, 4);
   }
-  assert.deepEqual(layouts, [400]);
   zoomTo(1.25);
-  assert.deepEqual(layouts, [400, 500]);
-  assert.equal(component.markerLayout.size, component.size);
-  zoomTo(1.6);
-  assert.equal(layouts.length, 3);
   assert.equal(component.clusters.length, 2);
-});
-
-test('small zoom reversals do not repeatedly regroup at a boundary', () => {
-  const { component, layouts, zoomTo } = mapHarness();
-  const hierarchy = component.markerLayout.hierarchy;
-  zoomTo(1.5);
-  assert.equal(component.clusters.length, 2);
-  for (const zoom of [1.45, 1.6, 1.4, 1.5]) zoomTo(zoom);
-  assert.equal(layouts.length, 2);
-  zoomTo(1.19);
-  assert.equal(layouts.length, 3);
+  assert.equal(layouts.length, initialLayouts + 1);
+  for (const zoom of [1.24, 1.1, 1.2]) {
+    zoomTo(zoom);
+    assert.equal(component.clusters.length, 2);
+    assert.equal(layouts.length, initialLayouts + 1);
+  }
+  zoomTo(1);
   assert.equal(component.clusters.length, 1);
-  assert.strictEqual(component.markerLayout.hierarchy, hierarchy);
+  assert.equal(layouts.length, initialLayouts + 2);
 });
 
-test('filters, trip stops, map changes and viewport resizing bypass the zoom threshold', () => {
+test('panning and redraws reuse grouping while zoom and data changes recalculate it', () => {
   const { component, layouts, zoomTo } = mapHarness();
-  let hierarchy = component.markerLayout.hierarchy;
-  zoomTo(1.05);
-  component.filtered = [component.filtered[0]]; component.draw();
+  component.center.x += .1; component.draw(); component.draw();
+  assert.equal(layouts.length, 1);
+  zoomTo(1.3);
   assert.equal(layouts.length, 2);
-  assert.equal(component.clusters[0].items.length, 1);
-  assert.notStrictEqual(component.markerLayout.hierarchy, hierarchy);
-  hierarchy = component.markerLayout.hierarchy;
-  component.route = [component.filtered[0]]; component.draw();
+  component.filtered = [component.filtered[0]]; component.draw();
   assert.equal(layouts.length, 3);
-  assert.notStrictEqual(component.markerLayout.hierarchy, hierarchy);
-  hierarchy = component.markerLayout.hierarchy;
-  component.width = 350; component.draw();
+  assert.equal(component.clusters[0].items.length, 1);
+  component.route = [component.filtered[0]]; component.draw();
   assert.equal(layouts.length, 4);
-  assert.strictEqual(component.markerLayout.hierarchy, hierarchy);
-  component.maps = [{...component.maps[0], minX:-200}]; component.draw();
+  component.width = 350; component.draw();
   assert.equal(layouts.length, 5);
-  assert.notStrictEqual(component.markerLayout.hierarchy, hierarchy);
+  component.maps = [{...component.maps[0], minX:-200}]; component.draw();
+  assert.equal(layouts.length, 6);
 });
 
 test('destroying the map cancels its pending animation frame', () => {
@@ -117,6 +107,23 @@ function popupHarness() {
   const click = x => component.canvasClick({ clientX: x, clientY: 200 });
   return { component, first, second, group, move, click };
 }
+
+test('the drawn bubble count and hover preview agree for coincident objectives', () => {
+  const { component } = mapHarness();
+  component.filtered = [-30, -20, -10, 0, 0, 0, 0, 0, 10, 20, 30].map((x, i) => ({
+    key: String(i), map: 'palpagos', x, y: 0, item: {},
+  }));
+  const labels = [];
+  component.canvas.nativeElement.getContext().fillText = (text, x, y) => labels.push({ text, x, y });
+  component.canvas.nativeElement.getBoundingClientRect = () => ({ left: 0, top: 0 });
+  component.draw();
+  component.pointerMove({ pointerId: 1, pointerType: 'mouse', clientX: 200, clientY: 200 });
+  const atLocation = labels.filter(label => label.x === 200 && label.y === 200);
+  assert.deepEqual(atLocation.map(label => label.text), ['5']);
+  assert.equal(component.hoverCluster.items.length, 5);
+  component.canvasClick({ clientX: 200, clientY: 200 });
+  assert.equal(component.clusterItems.length, 5);
+});
 
 test('a clicked objective stays pinned while other objectives and groups have independent previews', () => {
   const { component, first, second, group, move, click } = popupHarness();

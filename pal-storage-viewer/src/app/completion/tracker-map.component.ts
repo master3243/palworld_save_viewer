@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, Output, ViewChild } from '@angular/core';
 import type { Category } from './completion-model';
 import { CATEGORY_COLORS, CATEGORY_ICONS, STATE_LABELS, MapDefinition, MapObjective, MapPoint, MarkerCluster,
-  distanceSquared, layoutMapMarkers, MarkerHierarchy, MARKER_ZOOM_STEP, mapObjectives, nearestTravel, parseCoordinates, project, unproject, visibleMarkerClusters } from './tracker-map-model';
+  distanceSquared, layoutMapMarkers, mapObjectives, nearestTravel, parseCoordinates, project, unproject, visibleMarkerClusters } from './tracker-map-model';
+const MARKER_ZOOM_STEP = 1.25;
 @Component({
   selector: 'app-tracker-map', standalone: true, imports: [CommonModule],
   templateUrl: './tracker-map.component.html', styleUrl: './tracker-map.component.css',
@@ -59,7 +60,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   private zoom = 1;
   private center = { x: .5, y: .5 };
   private clusters: MarkerCluster[] = [];
-  private markerLayout?: { points: MapObjective[]; map: MapDefinition; size: number; zoom: number; viewportSize: number; stops: string; hierarchy: MarkerHierarchy; clusters: MarkerCluster[] };
+  private markerLayout?: { points: MapObjective[]; map: MapDefinition; size: number; zoom: number; viewportSize: number; stops: string; clusters: MarkerCluster[] };
   private frame = 0;
   private initialized = false;
   private destroyed = false;
@@ -475,18 +476,15 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     const stops = new Map(route.map((p,i) => [p.key,i+1]));
     const stopKeys = JSON.stringify([...stops.keys()]);
     const viewportSize = Math.min(this.width, this.height);
-    // Measure from the last regrouping to prevent zoom flicker.
+    // Regroup at 1.25x zoom steps, measured from the last regrouping.
     if (!this.markerLayout || this.markerLayout.points !== this.filtered || this.markerLayout.map !== map
       || this.markerLayout.stops !== stopKeys || this.markerLayout.viewportSize !== viewportSize
       || this.zoom >= this.markerLayout.zoom * MARKER_ZOOM_STEP
       || this.zoom <= this.markerLayout.zoom / MARKER_ZOOM_STEP) {
-      const hierarchy = this.markerLayout?.points === this.filtered && this.markerLayout.map === map
-        && this.markerLayout.stops === stopKeys ? this.markerLayout.hierarchy
-        : new MarkerHierarchy(this.filtered, map, new Set(stops.keys()));
-      this.markerLayout = { points: this.filtered, map, size: this.size, zoom: this.zoom, viewportSize, stops: stopKeys, hierarchy,
-        clusters: layoutMapMarkers(this.filtered, map, this.size, new Set(stops.keys()), hierarchy) };
+      this.markerLayout = { points: this.filtered, map, size: this.size, zoom: this.zoom, viewportSize, stops: stopKeys,
+        clusters: layoutMapMarkers(this.filtered, map, this.size, new Set(stops.keys())) };
     }
-    // Rescale cached positions to keep hit targets aligned.
+    // Positions and hit targets still move smoothly between regrouping steps.
     this.clusters = visibleMarkerClusters(this.markerLayout.clusters, { x: left, y: top }, this.width, this.height, this.size / this.markerLayout.size);
     for (const cluster of this.clusters) {
       if (cluster.items.length > 1) {

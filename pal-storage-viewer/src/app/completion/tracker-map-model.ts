@@ -58,88 +58,53 @@ export function nearestTravel(target: MapObjective, objectives: MapObjective[]):
     .sort((a,b) => distanceSquared(a,target)-distanceSquared(b,target))[0] ?? null;
 }
 
-/** Group nearby screen-space markers, including pairs. */
-export function clusterMarkers(points: MapObjective[], screen: (p: MapObjective) => MapPoint, cell = 28): MarkerCluster[] {
-  const buckets = new Map<string, MarkerCluster[]>();
+/** Any chain of icons within 8px belongs to the same bubble. */
+export function clusterMarkers(points: MapObjective[], screen: (p: MapObjective) => MapPoint, distance = 8): MarkerCluster[] {
+  const positions = points.map(screen);
+  const buckets = new Map<string, Set<number>>();
+  const bucketKey = (point: MapPoint) => `${Math.floor(point.x / distance)},${Math.floor(point.y / distance)}`;
+  positions.forEach((point, index) => {
+    const key = bucketKey(point), bucket = buckets.get(key) ?? new Set<number>();
+    bucket.add(index); buckets.set(key, bucket);
+  });
+  const visited = new Set<number>();
   const clusters: MarkerCluster[] = [];
-  for (const p of points) {
-    const pos = screen(p), bx = Math.floor(pos.x/cell), by = Math.floor(pos.y/cell), key = `${bx},${by}`;
-    const neighbors = [];
-    for (let x=bx-1;x<=bx+1;x++) for(let y=by-1;y<=by+1;y++) neighbors.push(...buckets.get(`${x},${y}`)??[]);
-    const cluster = neighbors.find(c => distanceSquared(c,pos) < cell**2);
-    // Keep the seed as the cluster anchor so screen hit targets and grid membership
-    // remain stable; no markers are lost when neighboring cells share a cluster.
-    if (cluster) cluster.items.push(p);
-    else {
-      const next = { ...pos, items: [p] }; clusters.push(next);
-      const bucket = buckets.get(key) ?? []; bucket.push(next); buckets.set(key,bucket);
+  for (let seed = 0; seed < points.length; seed++) {
+    if (visited.has(seed)) continue;
+    const members = [seed];
+    visited.add(seed); buckets.get(bucketKey(positions[seed]))!.delete(seed);
+    for (let cursor = 0; cursor < members.length; cursor++) {
+      const point = positions[members[cursor]];
+      const bx = Math.floor(point.x / distance), by = Math.floor(point.y / distance);
+      for (let x = bx - 1; x <= bx + 1; x++) for (let y = by - 1; y <= by + 1; y++) {
+        const bucket = buckets.get(`${x},${y}`);
+        if (!bucket) continue;
+        for (const index of bucket) {
+          if (distanceSquared(point, positions[index]) > distance ** 2) continue;
+          // Search around every member, so a connecting icon also joins neighboring bubbles.
+          bucket.delete(index); visited.add(index); members.push(index);
+        }
+      }
     }
+    members.sort((a, b) => a - b);
+    clusters.push({
+      x: members.reduce((sum, index) => sum + positions[index].x, 0) / members.length,
+      y: members.reduce((sum, index) => sum + positions[index].y, 0) / members.length,
+      items: members.map(index => points[index]),
+    });
   }
   return clusters;
 }
 
-export const MARKER_ZOOM_STEP = 1.25;
-
-interface MarkerNode extends MarkerCluster {
-  diameter: number;
-  children: MarkerNode[];
-}
-
-/** Spatial groups shared across zoom levels. */
-export class MarkerHierarchy {
-  private readonly root?: MarkerNode;
-  private readonly stops: MarkerCluster[];
-
-  constructor(points: MapObjective[], map: MapDefinition, stops: ReadonlySet<string>) {
-    const markers = points.map(point => ({ ...project(point, map), items: [point] }));
-    this.stops = markers.filter(marker => stops.has(marker.items[0].key));
-    const grouped = markers.filter(marker => !stops.has(marker.items[0].key));
-    if (grouped.length) this.root = this.build(grouped);
-  }
-
-  private build(markers: MarkerCluster[]): MarkerNode {
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, x = 0, y = 0;
-    for (const marker of markers) {
-      minX = Math.min(minX, marker.x); maxX = Math.max(maxX, marker.x);
-      minY = Math.min(minY, marker.y); maxY = Math.max(maxY, marker.y);
-      x += marker.x; y += marker.y;
-    }
-    const node: MarkerNode = { x: x / markers.length, y: y / markers.length,
-      items: markers.flatMap(marker => marker.items), diameter: Math.hypot(maxX - minX, maxY - minY), children: [] };
-    if (markers.length > 1) {
-      // Balanced splits keep dense groups together.
-      const axis = maxX - minX >= maxY - minY ? 'x' : 'y';
-      markers.sort((a, b) => a[axis] - b[axis] || a.items[0].key.localeCompare(b.items[0].key));
-      let middle = Math.floor(markers.length / 2), largestGap = 0;
-      for (let i = 1; i < markers.length; i++) {
-        const gap = markers[i][axis] - markers[i - 1][axis];
-        if (gap > largestGap) { largestGap = gap; }
-      }
-      // Separate outliers before splitting dense groups.
-      if (largestGap > (markers[markers.length - 1][axis] - markers[0][axis]) / 4) {
-        middle = markers.findIndex((marker, i) => i > 0 && marker[axis] - markers[i - 1][axis] === largestGap);
-      }
-      node.children = [this.build(markers.slice(0, middle)), this.build(markers.slice(middle))];
-    }
-    return node;
-  }
-
-  layout(size: number): MarkerCluster[] {
-    const clusters: MarkerCluster[] = [];
-    const visit = (node: MarkerNode) => {
-      // 28px icons must overlap heavily before becoming a bubble.
-      if (node.items.length === 1 || node.diameter * size <= 12) clusters.push(node);
-      else node.children.forEach(visit);
-    };
-    if (this.root) visit(this.root);
-    return [...clusters, ...this.stops].map(cluster => ({
-      x: cluster.x * size, y: cluster.y * size, items: cluster.items,
-    }));
-  }
-}
-
-export function layoutMapMarkers(points: MapObjective[], map: MapDefinition, size: number, stops: ReadonlySet<string>, hierarchy?: MarkerHierarchy): MarkerCluster[] {
-  return (hierarchy ?? new MarkerHierarchy(points, map, stops)).layout(size);
+export function layoutMapMarkers(points: MapObjective[], map: MapDefinition, size: number, stops: ReadonlySet<string>): MarkerCluster[] {
+  const screen = (point: MapObjective) => {
+    const position = project(point, map);
+    return { x: position.x * size, y: position.y * size };
+  };
+  return [
+    ...clusterMarkers(points.filter(point => !stops.has(point.key)), screen),
+    ...points.filter(point => stops.has(point.key)).map(point => ({ ...screen(point), items: [point] })),
+  ];
 }
 
 export function visibleMarkerClusters(layout: MarkerCluster[], offset: MapPoint, width: number, height: number, scale = 1): MarkerCluster[] {
