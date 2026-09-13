@@ -9,6 +9,7 @@ import html
 import json
 import re
 from build_crafting_data import build as build_crafting
+from build_messenger_rewards import build as build_messengers
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -427,7 +428,8 @@ def build(cache: Path) -> dict:
     return {
         "generated": "2026-09-05",
         "sources": {**{name: f"https://github.com/{repo}/tree/{sha}/{folder}" for name, (repo, sha, folder) in UPSTREAMS.items()},
-                    "PalSchema Hub": "https://github.com/Booyaka101/palschema-hub/tree/39ed90b5a1ec0a1789da6d546250c4d926b905df/values"},
+                    "PalSchema Hub": "https://github.com/Booyaka101/palschema-hub/tree/39ed90b5a1ec0a1789da6d546250c4d926b905df/values",
+                    "Messenger rewards (Steam build 25080279)": "https://docs.palworldgame.com/getting-started/deploy-dedicated-server/"},
         "relicTypes": relic_types,
         "relics": relics,
         "fastTravel": fast_travel,
@@ -446,6 +448,7 @@ def build(cache: Path) -> dict:
         "skins": skins,
         "maxLevel": max_level,
         "palCritics": paldb["palCritics"],
+        "messengers": build_messengers(cache),
     }
 
 

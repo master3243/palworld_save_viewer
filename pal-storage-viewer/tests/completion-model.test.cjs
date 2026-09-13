@@ -22,6 +22,34 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('Messenger checklist uses the 17 placed one-shot IDs and excludes duplicate or unrelated claims', () => {
+  const ids = data.messengers.map(reward => reward.id);
+  assert.equal(ids.length, 17);
+  assert.equal(new Set(ids).size, 17);
+  assert(!data.messengers.some(reward => reward.npcId === 'U_Emote_location_G_02'));
+  const extra = '12345678-1020-3040-5060-708011223344';
+  const partial = category('messengers', { emote_npc_rewards: [ids[0], ids[0].toUpperCase(), ids[1], extra] });
+  assert.equal(partial.done, 2);
+  assert.equal(partial.total, 17);
+  assert.equal(partial.percent, 11.8);
+  assert.equal(partial.startedPercent, 11.8);
+  assert.deepEqual(partial.unknown, [extra]);
+  assert.equal(partial.items.filter(item => item.state === 'done').length, 2);
+  assert(partial.items.every(item => item.coords && item.position));
+  assert.equal(partial.groups.reduce((n, g) => n + g.total, 0), 17);
+  assert.equal(category('messengers', { emote_npc_rewards: ids }).percent, 100);
+  assert.equal(category('messengers', {}).needsFile, 'Player .sav');
+  assert.equal(category('messengers', { emote_npc_rewards: null }).needsFile, 'Player .sav');
+  const empty = category('messengers', { emote_npc_rewards: [] });
+  assert.equal(empty.needsFile, undefined);
+  assert.equal(empty.done, 0);
+  const before = summarize(record({ emote_npc_rewards: [] }), data);
+  const after = summarize(record({ emote_npc_rewards: ids }), data);
+  assert.equal(after.done - before.done, 17);
+  assert.equal(after.total, before.total);
+  assert(after.percent > before.percent);
+});
+
 test('Drones shows repeat patrol drone defeats and distinguishes missing data from zero', () => {
   const drones = extra => summarize(record(extra), data).stats.find(entry => entry.label === 'Drones');
   const entry = drones({ specific_boss_counts: { SecurityDrone: 9, SECURITYDRONE: 4, OtherBoss: 77 } });

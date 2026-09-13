@@ -16,6 +16,24 @@ function countMap(name, entries) {
   return Buffer.concat([tag(name, 'MapProperty', body.length), str('NameProperty'), str('IntProperty'), Buffer.from([0]), body]);
 }
 
+test('Messenger rewards decode GUID arrays and preserve missing, empty, and malformed distinctions', () => {
+  const name = 'CompletedEmoteNPCIDArray';
+  const property = (words, declaredCount = words.length) => {
+    const payload = Buffer.concat(words.map(parts => Buffer.concat(parts.map(int))));
+    const body = Buffer.concat([int(declaredCount), tag(name, 'StructProperty', payload.length),
+      str('Guid'), Buffer.alloc(17), payload]);
+    return Buffer.concat([tag(name, 'ArrayProperty', body.length), str('StructProperty'), Buffer.from([0]), body]);
+  };
+  const read = bytes => extractPlayerCompletion(new SaveBuffer(Buffer.concat([record, bytes]))).emote_npc_rewards;
+  assert.equal(read(Buffer.alloc(0)), null);
+  assert.deepEqual(read(property([])), []);
+  assert.deepEqual(read(property([[0x12345678, 0x10203040, 0x50607080, 0x11223344]])),
+    ['12345678-1020-3040-5060-708011223344']);
+  assert.equal(read(property([[1, 2, 3, 4]], 2)), null);
+  assert.equal(read(property([[1, 2, 3, 4]]).subarray(0, -1)), null);
+  assert.equal(read(countMap(name, [])), null);
+});
+
 test('activity maps preserve per-item counts for unions and distinguish missing data from zero', () => {
   const missing = extractPlayerCompletion(new SaveBuffer(record));
   assert.equal(missing.crafted_item_counts, null);

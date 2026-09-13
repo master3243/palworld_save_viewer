@@ -46,6 +46,8 @@ export interface CompletionData {
   maxLevel: number;
   /** In-game map coordinates of the nine Pal Critics (which one is which area is unknown). */
   palCritics: [number, number][];
+  /** One-time Messenger reward GUIDs joined to actual map placements. */
+  messengers: { id: string; npcId: string; region: string; x: number; y: number; z: number }[];
 }
 
 export interface CraftingRecipe {
@@ -237,6 +239,22 @@ function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'started
     numberLabel,
     hasTags: category.items.some((item) => !!item.tag),
   };
+}
+
+function messengerCategory(record: PlayerCompletion, data: CompletionData): Category {
+  const rewards = record.emote_npc_rewards;
+  const claimed = new Set((rewards ?? []).map(id => id.toLowerCase()));
+  const catalog = data.messengers ?? [];
+  const items: TrackedItem[] = catalog.map((reward, index) => ({
+    id: reward.id, name: 'Messenger of Love', detail: reward.region, group: reward.region,
+    state: claimed.has(reward.id) ? 'done' : 'todo', order: index, no: index + 1,
+    ...place(reward.x, reward.y),
+  }));
+  const regions = new Map(catalog.map(reward => [reward.region, reward.region]));
+  return finish({ key: 'messengers', title: 'Messenger of Love', items, groups: groupsOf(items, regions),
+    unknown: unknownIds(claimed, new Set(catalog.map(reward => reward.id))),
+    needsFile: rewards == null ? 'Player .sav' : undefined,
+  });
 }
 
 function arenaCategory(record: PlayerCompletion, world?: WorldProgress): Category {
@@ -778,6 +796,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     researchCategory(world, data),
     arenaCategory(record, world),
     skinCategory(record, data),
+    messengerCategory(record, data),
     achievementCategory(record, data, world),
   ];
   const counted = categories.filter((category) => category.total > 0 && !category.needsFile && !category.unavailable);

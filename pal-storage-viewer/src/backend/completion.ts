@@ -5,7 +5,7 @@
  * The save only lists what was obtained (every flag is true); the totals come from the
  * static game data bundled with the site (resources/completion/completion-data.json).
  */
-import { PropertyValue, SaveBuffer, findPropertyStart, readFString, readInt, readPropertyValue, readTagHeader } from './gvas';
+import { PropertyValue, SaveBuffer, findPropertyStart, formatGuid, readFString, readInt, readPropertyValue, readTagHeader } from './gvas';
 
 export interface ActiveQuest {
   id: string;
@@ -55,6 +55,8 @@ export interface PlayerCompletion {
   area_barriers: string[];
   world_maps: string[];
   npc_achievements: string[];
+  /** Completed Messenger of Love encounters; null when absent or unreadable. */
+  emote_npc_rewards?: string[] | null;
   pal_display: string[];
   quests_completed: string[];
   quests_active: ActiveQuest[];
@@ -216,6 +218,30 @@ function readStructArrayWithMaps(buf: SaveBuffer, label: string): Record<string,
   }
 }
 
+/** FGuid array, preserving missing/malformed data separately from a recorded empty array. */
+function readGuidList(buf: SaveBuffer, label: string): string[] | null {
+  const offset = findPropertyStart(buf, label);
+  if (offset === -1) return null;
+  try {
+    const tag = readTagHeader(buf, offset);
+    if (tag.type !== 'ArrayProperty') return null;
+    const [innerType, afterInner] = readFString(buf, tag.offset);
+    if (innerType !== 'StructProperty') return null;
+    const start = afterInner + 1;
+    const end = start + tag.size;
+    if (end > buf.length || tag.size < 4) return null;
+    const count = buf.i32(start);
+    const [, afterName] = readFString(buf, start + 4, end);
+    const [elementType, afterType] = readFString(buf, afterName, end);
+    const [structType, afterStruct] = readFString(buf, afterType + 8, end);
+    const at = afterStruct + 17;
+    if (elementType !== 'StructProperty' || structType !== 'Guid' || count < 0 || at + count * 16 !== end) return null;
+    return Array.from({ length: count }, (_, i) => formatGuid(buf.bytes, at + i * 16));
+  } catch {
+    return null;
+  }
+}
+
 /** Strings of an ArrayProperty of NameProperty (no element cap). */
 function readNameList(buf: SaveBuffer, label: string): string[] {
   const offset = findPropertyStart(buf, label);
@@ -314,6 +340,7 @@ export function extractPlayerCompletion(buf: SaveBuffer): PlayerCompletion | nul
     area_barriers: trueKeys(readScalarMap(buf, 'AreaBarrierUnlockFlags')),
     world_maps: trueKeys(readScalarMap(buf, 'UnlockedWorldMapFlags')),
     npc_achievements: trueKeys(readScalarMap(buf, 'NPCAchivementRewardFlag')),
+    emote_npc_rewards: readGuidList(buf, 'CompletedEmoteNPCIDArray'),
     pal_display: trueKeys(readScalarMap(buf, 'PalDisplayNPCDataTableProgress')),
     quests_completed: readNameList(buf, 'CompletedQuestArray_FullRelease'),
     quests_active: active,

@@ -1,6 +1,6 @@
 {
 "generated":"2026-09-05",
-"sources":{"palworld-save-pal":"https://github.com/oMaN-Rod/palworld-save-pal/tree/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json","PalWorldSaveTools":"https://github.com/deafdudecomputers/PalWorldSaveTools/tree/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data","Palworld-Pal-Editor":"https://github.com/KrisCris/Palworld-Pal-Editor/tree/3efb2d4b5d1f5710ee672d449b5162fe63745229/src/palworld_pal_editor/assets/data","PalSchema Hub":"https://github.com/Booyaka101/palschema-hub/tree/39ed90b5a1ec0a1789da6d546250c4d926b905df/values"},
+"sources":{"palworld-save-pal":"https://github.com/oMaN-Rod/palworld-save-pal/tree/2d244ae9ea12f2f70a66523bf83764185e22fa83/data/json","PalWorldSaveTools":"https://github.com/deafdudecomputers/PalWorldSaveTools/tree/1abd4b11756c9ca7774e9c35400fb8df4d12d966/resources/game_data","Palworld-Pal-Editor":"https://github.com/KrisCris/Palworld-Pal-Editor/tree/3efb2d4b5d1f5710ee672d449b5162fe63745229/src/palworld_pal_editor/assets/data","PalSchema Hub":"https://github.com/Booyaka101/palschema-hub/tree/39ed90b5a1ec0a1789da6d546250c4d926b905df/values","Messenger rewards (Steam build 25080279)":"https://docs.palworldgame.com/getting-started/deploy-dedicated-server/"},
 "relicTypes":[
 {"key":"capture_power","enum":"CapturePower","name":"Capture Power","item":"Lifmunk Effigy","pal":"Carbunclo"},
 {"key":"hunger_reduction","enum":"HungerReduction","name":"Satiety Duration","item":"Lamball Effigy","pal":"SheepBall"},
@@ -3552,5 +3552,24 @@
 {"id":"SkillUnlock_GuardianDog","name":"Yakumo Saddle","rarity":2,"group":"Key items","weight":0,"baseValue":0,"stackLimit":999999,"technologyLevels":[41],"inheritedTechnologyLevels":[],"stats":[],"icon":"resources/completion/crafting-icons/skillunlock_saddle.pog","recipes":[{"id":"SkillUnlock_GuardianDog","quantity":1,"workAmount":40000,"sources":["Technology: Yakumo Saddle"],"ingredients":[["Leather","Leather",30],["Fiber","Fiber",50],["IronIngot","Refined Ingot",20],["Pal_crystal_S","Paldium Fragment",40]]}]},
 {"id":"HeadEquip049","name":"Zenara Hat","rarity":4,"group":"Armor","weight":7,"baseValue":10000,"stackLimit":1,"technologyLevels":[],"inheritedTechnologyLevels":[],"stats":[["Defense",20],["HP",60],["Durability",5000]],"icon":"resources/completion/crafting-icons/headequip049.pog","recipes":[{"id":"HeadEquip049","quantity":1,"workAmount":15000,"sources":[],"ingredients":[["Cloth","Cloth",1]]}]},
 {"id":"GYM_Head_Grass","name":"Zoe Hat","rarity":4,"group":"Armor","weight":7,"baseValue":10000,"stackLimit":1,"technologyLevels":[],"inheritedTechnologyLevels":[],"stats":[["Defense",20],["HP",60],["Durability",5000]],"icon":"resources/completion/crafting-icons/gym_head_grass.pog","recipes":[{"id":"GYM_Head_Grass","quantity":1,"workAmount":15000,"sources":[],"ingredients":[["Cloth","Cloth",1]]}]}
+],
+"messengers":[
+{"id":"61af080c-4c3b-63b9-d67b-179036f5bad7","npcId":"U_Emote_location_A_01","region":"Grasslands","x":-372909.38,"y":160962.19,"z":1180.2214},
+{"id":"b84f31e5-4bb4-0f69-f919-8a9beab35c61","npcId":"U_Emote_location_A_02","region":"Grasslands","x":-324919.72,"y":184888.78,"z":-1410.9703},
+{"id":"c4d84287-4774-8102-98df-d4962336854e","npcId":"U_Emote_location_B_01","region":"Grasslands","x":-122503.99,"y":-95720.3,"z":-1969.7063},
+{"id":"7d7e48ad-4230-e5e9-7b93-3ebb58da2a9f","npcId":"U_Emote_location_B_02","region":"Grasslands","x":-200929.97,"y":29515.947,"z":7344.705},
+{"id":"d55aa1f6-479a-67d9-2b5f-2f8e7e4bb584","npcId":"U_Emote_location_C_01","region":"Forest","x":-228298.52,"y":128233.85,"z":6250.16},
+{"id":"e6f9f1b5-4f60-dadf-06fe-afa7ab7879f5","npcId":"U_Emote_location_C_02","region":"Forest","x":-168691.22,"y":176950.44,"z":1121.1425},
+{"id":"4674d32a-4a3b-189b-ebf6-4a9efb0f1ddd","npcId":"U_Emote_location_D_01","region":"Forest","x":-238944.05,"y":245949.55,"z":-763.9129},
+{"id":"a8c33898-4bec-9351-d679-6ab13510468f","npcId":"U_Emote_location_D_02","region":"Forest","x":-102387.53,"y":176430.2,"z":1581.3514},
+{"id":"6f8dfa93-4730-a3d2-b0db-4b8fdd7975cd","npcId":"U_Emote_location_E_01","region":"Desert","x":-41412.387,"y":442348.12,"z":9956.843},
+{"id":"ac41aff5-4068-37f4-9991-61bf0ab96bbf","npcId":"U_Emote_location_E_02","region":"Desert","x":21619.781,"y":362008.75,"z":-392.47104},
+{"id":"a7cd2f24-4d06-d7fe-8a0a-8da8c3b90487","npcId":"U_Emote_location_F_01","region":"Mount Obsidian","x":-254381.0,"y":-127244.0,"z":9646.0},
+{"id":"ce857156-41ef-9c1a-17ab-239dbcf44703","npcId":"U_Emote_location_F_02","region":"Mount Obsidian","x":-415870.66,"y":-166346.72,"z":13565.0},
+{"id":"9f67f420-47f9-296c-156c-50ae80d076e3","npcId":"U_Emote_location_G_01","region":"Astral Mountains","x":-26109.559,"y":143466.56,"z":21902.523},
+{"id":"1c05192b-416c-fe43-9967-ba97821cd45f","npcId":"U_Emote_location_H_01","region":"Sakurajima","x":-22499.852,"y":-148555.19,"z":2809.2056},
+{"id":"5191a9c9-4edc-47d0-f5d2-ec9ccb32e9e2","npcId":"U_Emote_location_H_02","region":"Sakurajima","x":-2013.6637,"y":-103741.836,"z":1090.8793},
+{"id":"2ce443b7-4f7e-ef85-5280-e781d5a34d50","npcId":"U_Emote_location_I_01","region":"Feybreak","x":-640333.06,"y":-203100.89,"z":-356.94504},
+{"id":"1b98118c-4e02-57bc-723b-a4ae4a3cfda2","npcId":"U_Emote_location_I_02","region":"Feybreak","x":-650683.06,"y":-315756.5,"z":20122.7}
 ]
 }

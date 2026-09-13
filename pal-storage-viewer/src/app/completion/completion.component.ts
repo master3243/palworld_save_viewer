@@ -469,6 +469,7 @@ export class CompletionComponent implements OnChanges {
     if (item.state === 'active') return 'In progress';
     const done = item.state === 'done';
     switch (this.selectedCategory) {
+      case 'messengers': return done ? 'Claimed' : 'Not Claimed';
       case 'technologies':
       case 'fastTravel': return done ? 'Unlocked' : 'Locked';
       case 'research': return done ? 'Researched' : 'Not Researched';

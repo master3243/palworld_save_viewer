@@ -183,6 +183,14 @@
     },
     "crafting/icon-sources.json": {
       "sha256": "8c233a0cc7f748867d6a3c75ee247f12d8071f959dfa10b767868ab25ffb9d63"
+    },
+    "messengers.db": {
+      "url": "https://docs.palworldgame.com/getting-started/deploy-dedicated-server/",
+      "sha256": "334b0a55ffba71aae51c48e74583db4dbb9f7fa58a687bfed5d311121666f882",
+      "steamAppId": 2394010,
+      "steamDepotId": 2394012,
+      "steamManifestId": "1125678324530723107",
+      "steamBuildId": "25080279"
     }
   }
 }

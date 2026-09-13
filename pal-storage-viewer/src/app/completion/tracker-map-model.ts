@@ -13,14 +13,14 @@ export interface MarkerCluster extends MapPoint { items: MapObjective[] }
 export const CATEGORY_COLORS: Record<string, string> = {
   relics: '#85efb1', notes: '#ffd779', fastTravel: '#6ee3ff', towers: '#ff897e',
   towersHard: '#ee86c1', alphas: '#edab73', bounties: '#ff778e', mainQuests: '#d8b4ff',
-  sideQuests: '#a7a6ff', areas: '#a8d3e8', ruins: '#dfc599',
+  messengers: '#ec8eac', sideQuests: '#a7a6ff', areas: '#a8d3e8', ruins: '#dfc599',
 };
 export const CATEGORY_ICONS: Record<string, string> = {
   paldeck: 'Paldeck', captureBonus: 'Capture Bonus', raids: 'Raid Boss', statue: 'Statue of Power',
   technologies: 'Technology', research: 'Lab Research', skins: 'Skins',
   relics: 'Lifmunk Effigy', notes: 'Journals', fastTravel: 'Fast Travel', towers: 'Tower',
   towersHard: 'Tower', alphas: 'Alpha Pal', bounties: 'Bounty', mainQuests: 'Main Mission',
-  sideQuests: 'Sub Mission', areas: 'Region', ruins: 'Ancient Ruin',
+  messengers: 'Messenger of Love', sideQuests: 'Sub Mission', areas: 'Region', ruins: 'Ancient Ruin',
 };
 export const STATE_LABELS: Record<ItemState, string> = { done: 'Done', active: 'Missing', todo: 'Missing' };
 

@@ -97,6 +97,7 @@ def build():
             icons[label] = f"resources/completion/maps/icons/{filename}"
         # Simple map conventions for categories without an available game texture.
         symbols = {
+            "Messenger of Love": '<path fill="#ec8eac" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
             "Region": '<path fill="#cce8ec" stroke="#122c3b" stroke-width="1" d="m1 20 8-15 5 8 3-5 6 12Zm5-4h6l-3-5Zm10 0h4l-2-4Z"/>',
         }
         for label, shape in symbols.items():
