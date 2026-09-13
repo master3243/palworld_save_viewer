@@ -110,8 +110,11 @@ table {
 }
 
 .compact-actions { justify-content: center; gap: 10px; }
-.compact-actions button { flex: 0 0 auto; padding: 4px 12px; line-height: 16px; }
-.compact-actions .modal-ghost { font-weight: 400; }
+.compact-actions button { flex: 0 0 auto; height: 24px; min-height: 0; padding: 0 9px; font-family: "Open Sans", sans-serif; font-size: 11px; line-height: 24px; border-radius: 6px; }
+.compact-actions .modal-primary { font-weight: 700; background: rgba(116, 230, 255, 0.1); border-color: rgba(149, 243, 255, 0.32); }
+.compact-actions .modal-primary:hover { background: rgba(116, 230, 255, 0.18); border-color: rgba(149, 243, 255, 0.5); }
+.compact-actions .modal-ghost { min-width: 72px; border-radius: 8px; font-weight: 400; background: rgba(134, 220, 255, 0.025); border-color: rgba(134, 220, 255, 0.18); }
+.compact-actions .modal-ghost:hover { background: rgba(134, 220, 255, 0.06); border-color: rgba(134, 220, 255, 0.32); }
 
 @keyframes fade-in {
   from { opacity: 0; }
