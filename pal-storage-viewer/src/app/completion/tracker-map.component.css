@@ -97,7 +97,7 @@ form { margin-top:10px; }
   .map-count { font-size:10px; }
   .map-shell.expanded { inset:0; border-radius:0; overflow:auto; }
   .expanded .map-layout { flex:none; height:auto; }
-  .expanded .terrain { height:58dvh; min-height:320px; }
+  .expanded .terrain { height:80dvh; min-height:320px; }
   .expanded .map-toolbar { position:sticky; top:0; background:#071722; z-index:2; }
   .expanded .map-sidebar { max-height:none; overflow:visible; }
   .layer { min-height:28px; }
