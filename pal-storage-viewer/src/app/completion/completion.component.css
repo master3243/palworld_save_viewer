@@ -337,14 +337,26 @@
   display: block;
   height: 6px;
   overflow: hidden;
+  position: relative;
 }
 
-.bar-fill {
-  background: #68c9ee;
+.bar-fill,
+.bar-started {
   border-radius: 999px;
   display: block;
   height: 100%;
   transition: width 0.4s ease;
+}
+
+.bar-started {
+  background: #70653b;
+  inset: 0 auto 0 0;
+  position: absolute;
+}
+
+.bar-fill {
+  background: #68c9ee;
+  position: relative;
 }
 
 .category-card.complete .bar-fill {

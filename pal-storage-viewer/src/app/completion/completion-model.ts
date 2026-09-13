@@ -145,6 +145,8 @@ export interface Category {
   done: number;
   total: number;
   percent: number;
+  /** Completed or in-progress rows, using the same counted total as percent. */
+  startedPercent: number;
   items: TrackedItem[];
   groups: TrackedGroup[];
   /** Ids the save has that the master list does not know (old or renamed content). */
@@ -219,15 +221,17 @@ function percentOf(done: number, total: number): number {
 
 const STATE_RANK: Record<ItemState, number> = { active: 0, todo: 1, done: 2 };
 
-function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'hasCoords' | 'hasNumbers' | 'numberLabel' | 'hasTags'>, numberLabel = 'No.'): Category {
+function finish(category: Omit<Category, 'done' | 'total' | 'percent' | 'startedPercent' | 'hasCoords' | 'hasNumbers' | 'numberLabel' | 'hasTags'>, numberLabel = 'No.'): Category {
   const counted = category.items.filter((item) => item.counted !== false);
   const done = counted.filter((item) => item.state === 'done').length;
+  const active = counted.filter((item) => item.state === 'active').length;
   const total = counted.length;
   const stateRank = category.key === 'crafting' ? { active: 0, todo: 0, done: 0 }
     : ['captureBonus', 'relics', 'statue'].includes(category.key) ? { active: 0, todo: 0, done: 1 } : STATE_RANK;
   category.items.sort((a, b) => stateRank[a.state] - stateRank[b.state] || a.order - b.order || a.name.localeCompare(b.name));
   return {
     ...category, done, total, percent: percentOf(done, total),
+    startedPercent: percentOf(done + active, total),
     hasCoords: category.items.some((item) => item.coords !== ''),
     hasNumbers: category.items.some((item) => item.no !== null),
     numberLabel,
@@ -649,7 +653,7 @@ function researchCategory(world: WorldProgress | undefined, data: CompletionData
   const labs = world?.labs ?? [];
   if (!labs.length) {
     return {
-      key: 'research', title: 'Lab Research', done: 0, total: data.research.length, percent: 0, items: [], groups: [],
+      key: 'research', title: 'Lab Research', done: 0, total: data.research.length, percent: 0, startedPercent: 0, items: [], groups: [],
       unknown: [], hasCoords: false, hasNumbers: false, numberLabel: '', hasTags: false, needsFile: 'Level.sav',
     };
   }

@@ -108,6 +108,7 @@
             <span class="card-count" [attr.title]="category.unavailable || null">{{ category.needsFile ? '?' : category.unavailable && category.key !== 'arena' ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
           </span>
           <span class="bar" aria-hidden="true">
+            <span class="bar-started" *ngIf="!category.unavailable && !category.needsFile && category.startedPercent > category.percent" [style.width.%]="category.startedPercent"></span>
             <span class="bar-fill" [style.width.%]="category.unavailable ? 0 : category.percent"></span>
           </span>
           <span class="card-foot">

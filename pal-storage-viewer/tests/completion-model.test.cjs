@@ -38,6 +38,12 @@ test('obtained but unread journals count as not read until LocalData marks them 
   assert.equal(checked.done, 1);
   assert.equal(empty.done, 0);
   assert.equal(checked.total, missing.total);
+  // Reading a journal moves it from yellow to green without changing the combined bar.
+  assert.equal(missing.startedPercent, missing.percent);
+  assert.equal(checked.startedPercent, missing.percent);
+  assert.equal(empty.startedPercent, missing.percent);
+  assert(checked.startedPercent > checked.percent);
+  assert.equal(empty.percent, 0);
 });
 
 test('seen and butchered columns preserve completion and distinguish unknown from zero', () => {
