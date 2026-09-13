@@ -1,17 +1,17 @@
 .demo-picker { max-width: 640px; max-height: calc(100dvh - 40px); display: flex; flex-direction: column; box-sizing: border-box; text-align: left; }
 .demo-search { flex-shrink: 0; box-sizing: border-box; width: 100%; background: #081924; border: 1px solid #315164; border-radius: 7px; color: #e6f5ff; font: inherit; padding: 9px 12px; margin-bottom: 12px; }
-.demo-list { display: flex; flex-direction: column; gap: 7px; max-height: 52dvh; min-height: 0; overflow-y: auto; padding: 2px; }
-.demo-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px; border: 1px solid #294455; border-radius: 8px; background: #112331; }
+.demo-list { display: flex; flex-direction: column; gap: 4px; max-height: 52dvh; min-height: 0; overflow-y: auto; padding: 2px; }
+.demo-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid #294455; border-radius: 8px; background: #112331; }
 .demo-row:hover, .demo-row:focus-within, .demo-row.selected { border-color: #63ccec; background: #173849; }
 .demo-choice { display: flex; gap: 9px; cursor: pointer; min-width: 0; }
 .demo-choice input { flex-shrink: 0; margin: 3px 0 0; accent-color: #63ccec; align-self: flex-start; }
-.demo-copy { display: flex; flex-direction: column; gap: 3px; overflow-wrap: anywhere; }
+.demo-copy { display: flex; flex-direction: column; gap: 1px; overflow-wrap: anywhere; }
 .demo-copy strong { color: #ecf8ff; font-size: .85rem; }
 .demo-copy small { color: #91efbc; font-size: .68rem; margin-left: 5px; }
-.demo-meta, .demo-description { color: #a8c0ce; font-size: .74rem; line-height: 1.4; }
-.demo-side { display: flex; flex-direction: column; align-items: flex-end; align-self: start; gap: 3px; }
+.demo-meta, .demo-description { color: #a8c0ce; font-size: .74rem; line-height: 1.3; }
+.demo-side { display: flex; flex-direction: column; align-items: flex-end; align-self: start; gap: 1px; }
 .demo-size { color: #a8c0ce; font-size: .74rem; line-height: 1.4; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.demo-source { color: #7bddff; font-size: .75rem; white-space: nowrap; text-decoration: none; padding: 6px 0; }
+.demo-source { color: #7bddff; font-size: .75rem; white-space: nowrap; text-decoration: none; padding: 3px 0; }
 .demo-source:hover { text-decoration: underline; }
 .demo-message { color: #acc5d4; font-size: .8rem; margin: 10px 0; }
 .demo-error { color: #ff9b9b; font-size: .8rem; }
@@ -22,4 +22,4 @@ button:disabled { opacity: .5; cursor: default; }
   .demo-row { gap: 6px; }
 }
 
-.demo-stats { color: #c4e9f8; font-size: .74rem; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.demo-stats { color: #c4e9f8; font-size: .74rem; line-height: 1.3; font-variant-numeric: tabular-nums; }

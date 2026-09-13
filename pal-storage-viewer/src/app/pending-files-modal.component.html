@@ -14,12 +14,14 @@
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14m-4-4 4 4-4 4M17 14H3m4-4-4 4 4 4"/></svg>
         <span>Change demo</span>
       </button>
-      <h2 class="modal-title" id="confirmLoadTitle">
-        {{ append ? 'Add' : 'Load' }} {{ fileCount }} {{ fileCount === 1 ? 'file' : 'files' }} from {{ folders.length }} {{ folders.length === 1 ? 'folder' : 'folders' }}?
+      <div class="confirm-heading">
+        <h2 class="modal-title" id="confirmLoadTitle">
+          {{ append ? 'Add' : 'Load' }} {{ fileCount }} {{ fileCount === 1 ? 'file' : 'files' }} from {{ folders.length }} {{ folders.length === 1 ? 'folder' : 'folders' }}?
+        </h2>
+        <p class="demo-preview-name" *ngIf="demo && demo.id !== 'default'">{{ demo.name }} <a [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer">Source ↗</a></p>
         <small class="modal-subtitle" *ngIf="palTotal !== null">{{ palTotal | number }} pals</small>
-      </h2>
+      </div>
     </div>
-    <p class="demo-preview-name" *ngIf="demo && demo.id !== 'default'">{{ demo.name }} <a [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer">Source ↗</a></p>
     <div class="confirm-list">
       <div class="confirm-folder" *ngFor="let folder of folders; trackBy: trackFolder">
         <div class="confirm-folder-heading">

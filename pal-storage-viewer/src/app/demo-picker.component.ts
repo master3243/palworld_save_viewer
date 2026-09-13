@@ -42,6 +42,11 @@ export class DemoPickerComponent implements OnInit, AfterViewInit {
     return this.demos.filter(demo => `${demo.name} ${demo.author ?? ''} ${demo.description}`.toLowerCase().includes(search));
   }
   get selection(): DemoSave | undefined { return this.demos.find(demo => demo.id === this.selectedId); }
+  sourceName(url: string): string {
+    const name = new URL(url).hostname.replace(/^www\./, '').replace(/\.[^.]+$/, '');
+    const labels: Record<string, string> = { github: 'GitHub', nexusmods: 'Nexus Mods' };
+    return labels[name] ?? name.charAt(0).toUpperCase() + name.slice(1);
+  }
   confirm(): void { if (this.selection && !this.busy) this.choose.emit(this.selection); }
   trackDemo(_index: number, demo: DemoSave): string { return demo.id; }
 }

@@ -17,7 +17,7 @@
         </label>
         <span class="demo-side">
           <span class="demo-size">{{ formatSize(demo.bytes) }}</span>
-          <a class="demo-source" [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'Source for ' + demo.name">Source ↗</a>
+          <a class="demo-source" [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer" [attr.aria-label]="sourceName(demo.sourceUrl) + ' source for ' + demo.name">{{ sourceName(demo.sourceUrl) }} ↗</a>
         </span>
       </div>
     </div>
