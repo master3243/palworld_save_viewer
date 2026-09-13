@@ -33,7 +33,7 @@ function mapHarness() {
   component.canvas = { nativeElement: { width: 400, height: 400, getContext: () => ctx } };
   component.width = component.height = 400;
   component.maps = [{ key: 'palpagos', minX: -100, maxX: 100, minY: -100, maxY: 100 }];
-  component.filtered = [0, 9, 19, 20].map((x, i) => ({ key: String(i), map: 'palpagos', x, y: 0, item: {} }));
+  component.filtered = [0, 2.25, 4.75, 5].map((x, i) => ({ key: String(i), map: 'palpagos', x, y: 0, item: {} }));
   component.drawTerrainDetail = component.drawObjective = component.positionPopup = component.updateNearby = () => {};
   function flush() {
     const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn());
@@ -49,7 +49,7 @@ test('zoom regrouping waits for a 1.25x step while marker positions and hit targ
   for (const zoom of [1.01, 1.1, 1.2, 1.24]) {
     zoomTo(zoom);
     assert.equal(component.clusters.length, 1);
-    const point = component.screen({ x: 12, y: 0 });
+    const point = component.screen({ x: 3, y: 0 });
     assert.ok(Math.abs(component.clusters[0].x - point.x) < 1e-8);
     assert.ok(Math.abs(component.clusters[0].y - point.y) < 1e-8);
     assert.equal(component.markerAt(point).items.length, 4);
@@ -60,14 +60,14 @@ test('zoom regrouping waits for a 1.25x step while marker positions and hit targ
   assert.equal(component.markerLayout.size, component.size);
   zoomTo(1.6);
   assert.equal(layouts.length, 3);
-  assert.equal(component.clusters.length, 4);
+  assert.equal(component.clusters.length, 2);
 });
 
 test('small zoom reversals do not repeatedly regroup at a boundary', () => {
   const { component, layouts, zoomTo } = mapHarness();
   const hierarchy = component.markerLayout.hierarchy;
   zoomTo(1.5);
-  assert.equal(component.clusters.length, 4);
+  assert.equal(component.clusters.length, 2);
   for (const zoom of [1.45, 1.6, 1.4, 1.5]) zoomTo(zoom);
   assert.equal(layouts.length, 2);
   zoomTo(1.19);

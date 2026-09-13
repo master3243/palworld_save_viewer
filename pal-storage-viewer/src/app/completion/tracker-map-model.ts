@@ -58,7 +58,7 @@ export function nearestTravel(target: MapObjective, objectives: MapObjective[]):
     .sort((a,b) => distanceSquared(a,target)-distanceSquared(b,target))[0] ?? null;
 }
 
-/** Screen-space bubbles require at least four markers. */
+/** Group nearby screen-space markers, including pairs. */
 export function clusterMarkers(points: MapObjective[], screen: (p: MapObjective) => MapPoint, cell = 28): MarkerCluster[] {
   const buckets = new Map<string, MarkerCluster[]>();
   const clusters: MarkerCluster[] = [];
@@ -75,9 +75,7 @@ export function clusterMarkers(points: MapObjective[], screen: (p: MapObjective)
       const bucket = buckets.get(key) ?? []; bucket.push(next); buckets.set(key,bucket);
     }
   }
-  return clusters.flatMap(cluster => cluster.items.length >= 4
-    ? [cluster]
-    : cluster.items.map(point => ({ ...screen(point), items: [point] })));
+  return clusters;
 }
 
 export const MARKER_ZOOM_STEP = 1.25;
@@ -129,8 +127,8 @@ export class MarkerHierarchy {
   layout(size: number): MarkerCluster[] {
     const clusters: MarkerCluster[] = [];
     const visit = (node: MarkerNode) => {
-      // 56px spans two icons. Keep smaller groups in the tree.
-      if (node.items.length === 1 || (node.items.length >= 4 && node.diameter * size <= 56)) clusters.push(node);
+      // 28px icons must overlap heavily before becoming a bubble.
+      if (node.items.length === 1 || node.diameter * size <= 12) clusters.push(node);
       else node.children.forEach(visit);
     };
     if (this.root) visit(this.root);

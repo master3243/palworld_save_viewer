@@ -76,17 +76,17 @@ test('clustering groups adjacent grid cells, preserves coincident objectives and
   const clusters = clusterMarkers(points,p=>p);
   assert.equal(clusters.length,2);
   assert.deepEqual(clusters.flatMap(c=>c.items.map(p=>p.item.id)).sort(),['a','b','c','d','e']);
-  assert.equal(clusterMarkers(points,p=>({x:p.x*30,y:p.y*30})).length,5);
+  assert.equal(clusterMarkers(points,p=>({x:p.x*30,y:p.y*30})).length,4);
 });
 
-test('bubbles require at least four items and smaller groups retain every exact position', () => {
+test('nearby pairs and triples form bubbles just like larger groups', () => {
   for (let count = 1; count <= 5; count++) {
     const points = mapObjectives([category('notes', Array.from({length:count}, (_,i) => item(String(i),`${i*2}, ${i}`)))]);
     const clusters = clusterMarkers(points,p=>p);
-    assert.equal(clusters.length,count < 4 ? count : 1);
+    assert.equal(clusters.length,1);
     assert.equal(clusters.flatMap(c=>c.items).length,count);
-    assert.ok(clusters.every(c=>c.items.length === 1 || c.items.length >= 4));
-    if (count < 4) for (const c of clusters) {
+    assert.equal(new MarkerHierarchy(points, layoutMap, new Set()).layout(1000).length,1);
+    if (count === 1) for (const c of clusters) {
       assert.equal(c.x,c.items[0].x); assert.equal(c.y,c.items[0].y);
     }
   }
@@ -128,21 +128,36 @@ test('zooming in never absorbs singleton markers into a new bubble', () => {
   assert.deepEqual(members(hierarchy.layout(1000)), members(coarse));
 });
 
-test('dense overlapping icons remain compact bubbles instead of being stranded as singletons', () => {
-  const points = Array.from({ length: 256 }, (_, i) => ({ key: String(i), x: (i % 16) * 15, y: Math.floor(i / 16) * 15 }));
+test('heavily overlapping icons remain compact bubbles instead of being stranded as singletons', () => {
+  const points = Array.from({ length: 256 }, (_, i) => ({ key: String(i), x: (i % 16) * 3, y: Math.floor(i / 16) * 3 }));
   const hierarchy = new MarkerHierarchy(points, layoutMap, new Set());
   const layout = hierarchy.layout(1000);
-  assert.ok(layout.length <= 64, 'Four or more overlapping icons should be represented by each bubble');
-  assert.ok(layout.every(cluster => cluster.items.length >= 4));
+  assert.ok(layout.length <= 64, 'Dense overlapping icons should be represented compactly');
+  assert.ok(layout.every(cluster => cluster.items.length >= 2));
   for (const cluster of layout) {
     const xs = cluster.items.map(point => point.x), ys = cluster.items.map(point => point.y);
-    assert.ok(Math.hypot(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) <= 56);
+    assert.ok(Math.hypot(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) <= 12);
   }
   assertRefinement(layout, hierarchy.layout(1250));
 });
 
+test('partially overlapping icons remain separate while very close icons form a bubble', () => {
+  const points = [0, 1, 2, 3].map(i => ({ key: String(i), x: (i % 2) * 16, y: Math.floor(i / 2) * 16 }));
+  assert.equal(new MarkerHierarchy(points, layoutMap, new Set()).layout(1000).length, 4);
+  const close = points.map(point => ({ ...point, x: point.x / 4, y: point.y / 4 }));
+  assert.equal(new MarkerHierarchy(close, layoutMap, new Set()).layout(1000).length, 1);
+});
+
+test('pairs only bubble when heavily overlapping and trip stops remain individual', () => {
+  const points = [0, 8].map((x, i) => ({ key: String(i), x, y: 0 }));
+  const hierarchy = new MarkerHierarchy(points, layoutMap, new Set());
+  assert.deepEqual(members(hierarchy.layout(1000)), [['0', '1']]);
+  assert.deepEqual(members(hierarchy.layout(2000)), [['0'], ['1']]);
+  assert.deepEqual(members(new MarkerHierarchy(points, layoutMap, new Set(['1'])).layout(1000)), [['0'], ['1']]);
+});
+
 test('a distant outlier does not split four nearby icons into ungrouped pairs', () => {
-  const points = [0, 10, 20, 30, 500].map((x, i) => ({ key: String(i), x, y: 0 }));
+  const points = [0, 3, 6, 9, 500].map((x, i) => ({ key: String(i), x, y: 0 }));
   const layout = new MarkerHierarchy(points, layoutMap, new Set()).layout(1000);
   assert.deepEqual(members(layout), [['0', '1', '2', '3'], ['4']]);
 });
@@ -161,7 +176,7 @@ test('hierarchy stays nested through large zoom jumps, reversals and coincident 
     assert.equal(new Set(layout.flatMap(cluster => cluster.items.map(point => point.key))).size, points.length);
     assert.equal(layout.reduce((sum, cluster) => sum + cluster.items.length, 0), points.length);
     for (const cluster of layout) {
-      assert.ok(cluster.items.length === 1 || cluster.items.length >= 4);
+      assert.ok(cluster.items.length >= 1);
       if (cluster.items.some(point => stops.has(point.key))) assert.equal(cluster.items.length, 1);
       const positions = cluster.items.map(point => project(point, layoutMap));
       const anchor = { x: positions.reduce((sum, point) => sum + point.x, 0) / positions.length,
@@ -181,8 +196,8 @@ test('hierarchy stays nested through large zoom jumps, reversals and coincident 
 
 test('panning across grid boundaries moves bubbles without changing anchors or membership', () => {
   const points = mapObjectives([category('notes', [
-    item('a', '120, 900'), item('b', '125, 900'), item('c', '135, 900'),
-    item('d', '120, 890'), item('e', '150, 870'), item('f', '135, 885'),
+    item('a', '120, 900'), item('b', '121, 900'), item('c', '123, 900'),
+    item('d', '120, 898'), item('e', '126, 894'), item('f', '123, 897'),
   ])]);
   const layout = layoutMapMarkers(points, layoutMap, 1000, new Set());
   assert(layout.some(c => c.items.length > 1));
@@ -198,7 +213,7 @@ test('panning across grid boundaries moves bubbles without changing anchors or m
 });
 
 test('viewport clipping hides whole bubbles without regrouping their offscreen members', () => {
-  const points = mapObjectives([category('notes', [item('a', '30, 900'), item('b', '40, 900'), item('c', '45, 900'), item('d', '50, 900'), item('e', '120, 900')])]);
+  const points = mapObjectives([category('notes', [item('a', '30, 900'), item('b', '34, 900'), item('c', '37, 900'), item('d', '40, 900'), item('e', '120, 900')])]);
   const layout = layoutMapMarkers(points, layoutMap, 1000, new Set());
   assert.deepEqual(members(layout), [['notes:a', 'notes:b', 'notes:c', 'notes:d'], ['notes:e']]);
   assert.deepEqual(members(visibleMarkerClusters(layout, {x:-50,y:0}, 100, 200)), members(layout));
@@ -208,11 +223,11 @@ test('viewport clipping hides whole bubbles without regrouping their offscreen m
 });
 
 test('map layouts still respond to zoom, filters and individually numbered trip stops', () => {
-  const points = mapObjectives([category('notes', [item('a', '30, 900'), item('b', '40, 900'), item('c', '45, 900'), item('d', '50, 900'), item('e', '120, 900')])]);
+  const points = mapObjectives([category('notes', [item('a', '30, 900'), item('b', '34, 900'), item('c', '37, 900'), item('d', '40, 900'), item('e', '120, 900')])]);
   const layout = (points, size = 1000, stops = new Set()) => layoutMapMarkers(points, layoutMap, size, stops);
-  assert.deepEqual(members(layout(points, 4000)), [['notes:a'], ['notes:b'], ['notes:c'], ['notes:d'], ['notes:e']]);
-  assert.deepEqual(members(layout(points.slice(1))), [['notes:b'], ['notes:c'], ['notes:d'], ['notes:e']]);
-  assert.deepEqual(members(layout(points, 1000, new Set(['notes:b']))), [['notes:a'], ['notes:c'], ['notes:d'], ['notes:e'], ['notes:b']]);
+  assert.deepEqual(members(layout(points, 5000)), [['notes:a'], ['notes:b'], ['notes:c'], ['notes:d'], ['notes:e']]);
+  assert.deepEqual(members(layout(points.slice(1))), [['notes:b', 'notes:c', 'notes:d'], ['notes:e']]);
+  assert.deepEqual(members(layout(points, 1000, new Set(['notes:b']))), [['notes:a', 'notes:c', 'notes:d'], ['notes:e'], ['notes:b']]);
   assert.deepEqual(members(layout(points)), [['notes:a', 'notes:b', 'notes:c', 'notes:d'], ['notes:e']]);
   assert.deepEqual(layout([]), []);
 });
