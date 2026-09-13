@@ -4,7 +4,7 @@
  */
 import { CommonModule } from '@angular/common';
 import {
-  ApplicationRef, ChangeDetectorRef, Component, ComponentRef, Directive, ElementRef, EnvironmentInjector, Input, NgZone, OnDestroy, OnInit, createComponent,
+  ApplicationRef, ChangeDetectorRef, Component, ComponentRef, Directive, ElementRef, EnvironmentInjector, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, createComponent,
 } from '@angular/core';
 import { OfflineImageService } from './offline-image.service';
 
@@ -106,10 +106,14 @@ export interface TooltipData {
         <li *ngFor="let level of data.levels" [class.current]="level.current"><span class="tip-level">{{ level.label }}</span><span class="tip-level-text"><ng-container *ngFor="let seg of level.segments"><em *ngIf="seg.value; else plain">{{ seg.text }}</em><ng-template #plain>{{ seg.text }}</ng-template></ng-container></span></li>
       </ol>
       <p class="tip-note" *ngIf="data.note">{{ data.note }}</p>
+      <div class="tip-actions" *ngIf="actionLabel"><button type="button" class="tip-action" (click)="actionClicked.emit()">{{ actionLabel }}</button></div>
     </div>
   `,
   styles: [`
     .tip { background: rgba(14, 24, 32, .96); border: 1px solid rgba(190, 220, 235, .35); box-shadow: 0 10px 30px rgba(0, 0, 0, .55); color: #e6f1f5; font-size: .78rem; left: 0; max-width: 380px; min-width: 220px; opacity: 0; padding-bottom: 9px; pointer-events: none; position: fixed; top: 0; z-index: 1000; }
+    .tip-actions { border-top: 1px solid rgba(190, 220, 235, .18); margin: 9px 12px 0; padding-top: 9px; display: flex; justify-content: flex-start; }
+    .tip-action { background: #143447; border: 1px solid #477b94; border-radius: 5px; color: #d7f3ff; padding: 6px 12px; font: inherit; cursor: pointer; }
+    .tip-action:hover, .tip-action:focus-visible { background: #20516a; outline: 1px solid #7bd6ff; }
     .tip.ready { opacity: 1; }
     .tip.fitted { max-width: none; }
     .tip.interactive { pointer-events: auto; }
@@ -189,6 +193,8 @@ export interface TooltipData {
 })
 export class GameTooltipComponent implements OnInit, OnDestroy {
   @Input({ required: true }) data!: TooltipData;
+  @Output() readonly actionClicked = new EventEmitter<void>();
+  actionLabel = '';
   interactive = false;
   x = 0;
   y = 0;
@@ -215,12 +221,16 @@ export class GameTooltipComponent implements OnInit, OnDestroy {
 @Directive({ selector: '[appTooltip]', standalone: true })
 export class TooltipDirective implements OnInit, OnDestroy {
   @Input('appTooltip') data: TooltipData | null = null;
+  @Input() tooltipPinnable = false;
+  @Input() tooltipActionLabel = '';
+  @Output() readonly tooltipAction = new EventEmitter<void>();
+  private pinned = false;
   private ref: ComponentRef<GameTooltipComponent> | null = null;
   private static active: TooltipDirective | null = null;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
   private touchPortrait = false;
   private get interactive(): boolean {
-    return !!this.data?.wikiUrl && window.matchMedia('(max-width: 720px)').matches;
+    return this.tooltipPinnable || (!!this.data?.wikiUrl && window.matchMedia('(max-width: 720px)').matches);
   }
   private readonly keepOpen = () => { clearTimeout(this.closeTimer); };
   private readonly show = () => { this.keepOpen(); this.open(); };
@@ -228,7 +238,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
   private readonly leave = () => {
     this.keepOpen();
     // Touch browsers can synthesize a mouse leave immediately after a tap.
-    if (this.touchPortrait) return;
+    if (this.touchPortrait || this.pinned) return;
     if (this.interactive) this.closeTimer = setTimeout(this.hide, 200);
     else this.close();
   };
@@ -242,6 +252,14 @@ export class TooltipDirective implements OnInit, OnDestroy {
     this.touchPortrait = !!this.data?.portrait && event.pointerType !== 'mouse';
   };
   private readonly click = (event: MouseEvent) => {
+    if (this.tooltipPinnable) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (this.pinned) this.close();
+      else { this.show(); this.pinned = !!this.ref; }
+      this.host.nativeElement.setAttribute('aria-pressed', String(this.pinned));
+      return;
+    }
     if (this.data?.portrait) {
       this.show();
       return;
@@ -258,7 +276,7 @@ export class TooltipDirective implements OnInit, OnDestroy {
     if (event.key === 'Escape') this.close();
     if (event.key === 'Tab' && !event.shiftKey && document.activeElement === this.host.nativeElement && this.interactive) {
       event.preventDefault();
-      this.ref?.location.nativeElement.querySelector('.tip-wiki')?.focus();
+      this.ref?.location.nativeElement.querySelector('.tip-wiki, .tip-action')?.focus();
     }
   };
 
@@ -289,12 +307,17 @@ export class TooltipDirective implements OnInit, OnDestroy {
   }
 
   private open(): void {
-    if (!this.data || this.ref) return;
+    if (!this.data || this.ref || TooltipDirective.active?.pinned) return;
     TooltipDirective.active?.close();
     TooltipDirective.active = this;
     const ref = createComponent(GameTooltipComponent, { environmentInjector: this.injector });
     ref.instance.data = this.data;
     ref.instance.interactive = this.interactive;
+    ref.instance.actionLabel = this.tooltipActionLabel;
+    ref.instance.actionClicked.subscribe(() => {
+      this.close();
+      this.zone.run(() => this.tooltipAction.emit());
+    });
     const anchor = this.host.nativeElement.getBoundingClientRect();
     if (this.data.fit === 'host') ref.instance.width = Math.round(anchor.width);
     else if (this.data.width) ref.instance.width = this.data.width;
@@ -325,6 +348,8 @@ export class TooltipDirective implements OnInit, OnDestroy {
   private close(): void {
     this.keepOpen();
     this.touchPortrait = false;
+    this.pinned = false;
+    if (this.tooltipPinnable) this.host.nativeElement.setAttribute('aria-pressed', 'false');
     if (!this.ref) return;
     document.removeEventListener('pointerdown', this.outside, true);
     document.removeEventListener('keydown', this.keydown);

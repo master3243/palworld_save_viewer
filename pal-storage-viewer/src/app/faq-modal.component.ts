@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
 import { GithubIconComponent } from './github-icon.component';
 
@@ -10,6 +10,16 @@ import { GithubIconComponent } from './github-icon.component';
   templateUrl: './faq-modal.component.html',
   styleUrl: './faq-modal.component.css'
 })
-export class FaqModalComponent {
+export class FaqModalComponent implements AfterViewInit {
+  @Input() section: 'local-data-owner' | null = null;
+  @ViewChild('localDataOwner') private localDataOwner!: ElementRef<HTMLDetailsElement>;
   @Output() readonly closed = new EventEmitter<void>();
+
+  ngAfterViewInit(): void {
+    if (this.section !== 'local-data-owner') return;
+    const target = this.localDataOwner.nativeElement;
+    target.querySelector('summary')?.focus({ preventScroll: true });
+    const scroller = target.closest('.faq');
+    if (scroller) scroller.scrollTop += target.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+  }
 }

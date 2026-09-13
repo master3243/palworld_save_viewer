@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 
 import type { PlayerCompletion, SaveSetSummary } from '../save-parser.service';
 import { Category, CompletionData, CompletionSummary, TrackedGroup, TrackedItem, WorldProgress, summarize } from './completion-model';
@@ -44,6 +44,7 @@ const RING_RADIUS = 52;
   styleUrls: ['../pal-wiki-links.css', './completion.component.css']
 })
 export class CompletionComponent implements OnChanges {
+  @Output() readonly localDataHelp = new EventEmitter<void>();
   @Input() sets: SaveSetSummary[] = [];
   @Input() rows: Record<string, unknown>[] = [];
   @Input() localDataOwners = new Map<string, string>();

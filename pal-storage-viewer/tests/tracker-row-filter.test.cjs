@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const decorator = () => () => {};
 const context = { exports: {}, require: name => name === '@angular/core'
-  ? { Component: decorator, Input: decorator, ViewChild: decorator, ChangeDetectionStrategy: { OnPush: 0 } } : {} };
+  ? { Component: decorator, Input: decorator, Output: decorator, EventEmitter: class { emit() {} }, ViewChild: decorator, ChangeDetectionStrategy: { OnPush: 0 } } : {} };
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(require.resolve('../src/app/completion/completion.component.ts'), 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, experimentalDecorators: true },
 }).outputText, context);

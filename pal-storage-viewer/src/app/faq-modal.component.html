@@ -101,12 +101,12 @@
           <p>It also literally took less time to make the first version of this tool than it took to find that one Pal.</p>
         </div>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" [open]="section === 'local-data-owner'">
         <summary>What does the 100% Tracker track?</summary>
         <div class="faq-body">
           <p>It tracks the many things I managed to extract from the save file <code>Players\xxx.sav</code> with online recources to compare against for the overall progress.</p>
           <p>If you know something missing or wrong, please let me know.</p>
-          <details class="faq-item">
+          <details class="faq-item" #localDataOwner [open]="section === 'local-data-owner'" [class.faq-highlight]="section === 'local-data-owner'">
             <summary>What's the deal with LocalData.sav and assigning an owner</summary>
             <div class="faq-body">
               <p>Since Palworld supports co-op, a single world save file (<code>Level.sav</code>) can contain many players (each with a player <code>.sav</code> and a <code>LocalData.sav</code>). The player <code>.sav</code> holds most information related to the player while the <code>LocalData.sav</code> holds very little but is still important to the website.</p>

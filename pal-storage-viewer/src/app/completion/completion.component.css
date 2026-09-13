@@ -839,3 +839,5 @@
 .local-owner-unverified { display: inline-flex; color: #ffd37a; cursor: default; }
 .local-owner-info { display: inline-flex; color: #63ccec; cursor: default; }
 .local-owner-warning:focus-visible, .local-owner-info:focus-visible, .local-owner-unverified:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }
+
+.local-owner-warning, .local-owner-info, .local-owner-unverified { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }

@@ -195,7 +195,7 @@
 
   <p #saveLocationCopyNotice class="save-location-copy-status" [class.copied]="!!copiedSaveLocation" [style.left.px]="saveLocationCopyPosition.x" [style.top.px]="saveLocationCopyPosition.y" role="status" *ngIf="!hasData && !screenshotMode">{{ saveLocationCopyStatus }}</p>
 
-  <app-faq-modal *ngIf="isDropHelpOpen" (closed)="closeDropHelp()"></app-faq-modal>
+  <app-faq-modal *ngIf="isDropHelpOpen" [section]="faqSection" (closed)="closeDropHelp()"></app-faq-modal>
 
   <app-pending-files-modal
     *ngIf="pendingFiles"
@@ -387,7 +387,7 @@
       <p>These files hold no Pals.</p>
       <span>They do carry player progress, so the <button type="button" class="link-button" (click)="setView('tracker')">100% Tracker</button> works. For the Pal table, add Level.sav or a _dps.sav file.</span>
     </div>
-    <app-completion *ngIf="view === 'tracker'" [sets]="saveSets" [rows]="originalRows" [localDataOwners]="localDataOwners"></app-completion>
+    <app-completion *ngIf="view === 'tracker'" [sets]="saveSets" [rows]="originalRows" [localDataOwners]="localDataOwners" (localDataHelp)="openLocalDataHelp()"></app-completion>
   </section>
 
   <div class="github-meta">

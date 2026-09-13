@@ -62,15 +62,15 @@
                 <option value="">Select player</option>
                 <option *ngFor="let owner of set.players" [value]="owner.uid">{{ set.local_owner_id === owner.uid ? '✅ ' : '' }}{{ localDataOwnerReasons(set, owner.uid).length ? '❗ ' : '' }}{{ owner.name || owner.uid }}</option>
               </select>
-              <span class="local-owner-warning" *ngIf="localDataOwnerWarning(set) as warning" tabindex="0" role="img" [attr.aria-label]="warning.title + ' ' + warning.lines?.join(' ')" [appTooltip]="warning">
+              <button type="button" class="local-owner-warning" *ngIf="localDataOwnerWarning(set) as warning" aria-pressed="false" [attr.aria-label]="warning.title + ' ' + warning.lines?.join(' ')" [appTooltip]="warning" [tooltipPinnable]="true" tooltipActionLabel="More Info" (tooltipAction)="localDataHelp.emit()">
                 <svg class="achievement-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18.1A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></svg>
-              </span>
-              <span class="local-owner-info" *ngIf="localDataOwnerInfo(set) as info" tabindex="0" role="img" [attr.aria-label]="info.title + ' ' + info.lines?.join(' ')" [appTooltip]="info">
+              </button>
+              <button type="button" class="local-owner-info" *ngIf="localDataOwnerInfo(set) as info" aria-pressed="false" [attr.aria-label]="info.title + ' ' + info.lines?.join(' ')" [appTooltip]="info" [tooltipPinnable]="true" tooltipActionLabel="More Info" (tooltipAction)="localDataHelp.emit()">
                 <svg class="achievement-warning-icon achievement-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg>
-              </span>
-              <span class="local-owner-unverified" *ngIf="localDataOwnerUnverified(set) as unverified" tabindex="0" role="img" [attr.aria-label]="unverified.title + ' ' + unverified.lines?.join(' ')" [appTooltip]="unverified">
+              </button>
+              <button type="button" class="local-owner-unverified" *ngIf="localDataOwnerUnverified(set) as unverified" aria-pressed="false" [attr.aria-label]="unverified.title + ' ' + unverified.lines?.join(' ')" [appTooltip]="unverified" [tooltipPinnable]="true" tooltipActionLabel="More Info" (tooltipAction)="localDataHelp.emit()">
                 <svg class="achievement-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18.1A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></svg>
-              </span>
+              </button>
             </label>
           </ng-container>
         </div>

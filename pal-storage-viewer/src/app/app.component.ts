@@ -369,6 +369,7 @@ export class AppComponent implements OnDestroy {
     this.scheduleMeasure();
   }
   isDropHelpOpen = false;
+  faqSection: 'local-data-owner' | null = null;
   openRowIndex: number | null = null;
   sorts: SortCriterion[] = [];
   sortedColumns = new Set<string>();
@@ -888,6 +889,12 @@ export class AppComponent implements OnDestroy {
   toggleDropHelp(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    this.faqSection = null;
+    this.isDropHelpOpen = true;
+  }
+
+  openLocalDataHelp(): void {
+    this.faqSection = 'local-data-owner';
     this.isDropHelpOpen = true;
   }
 
