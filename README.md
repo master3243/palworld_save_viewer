@@ -1,4 +1,4 @@
-# Palworld Save Viewer
+# Palworld Save Analyzer
 
 A local viewer for your Palworld save files that lists every Pal you own with all their stats in one searchable table.
 

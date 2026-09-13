@@ -180,7 +180,6 @@
   margin-left: 6px;
   position: relative;
   top: 5px;
-  text-transform: lowercase;
   /* text-shadow: 0 0 9px rgba(129, 222, 255, 0.45); */
   white-space: nowrap;
 }
@@ -1121,10 +1120,10 @@
   border-radius: 999px;
   display: inline-flex;
   flex: 0 0 auto;
-  margin-left: 22px;
+  margin-left: 10px;
   padding: 3px;
   position: relative;
-  top: 2px;
+  top: 5px;
 }
 
 .view-switch button {
@@ -1157,8 +1156,8 @@
 }
 
 .page.compact .view-switch {
-  margin-left: 16px;
-  top: 1px;
+  margin-left: 8px;
+  top: 4px;
 }
 
 .page.compact .view-switch button {
@@ -1179,6 +1178,10 @@
 
 @media (max-width: 720px) {
   .page:not(.compact) .toolbar { flex-direction: column; }
+  .page:not(.compact) .title-link {
+    /* Remove the logo image's transparent bottom padding from the stacked gap. */
+    margin-bottom: calc(var(--image-height) * -102 / 360);
+  }
   .viewer-title { top: 3px; margin-left: 3px; }
   .view-switch { margin-left: 0; top: 0; }
 
