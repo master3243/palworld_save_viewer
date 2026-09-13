@@ -24,7 +24,7 @@ canvas { width:100%; height:100%; display:block; touch-action:none; cursor:grab;
 canvas:active { cursor:grabbing; }
 .map-tools { position:absolute; top:89px; left:14px; display:flex; flex-direction:column; gap:5px; }
 .map-tools button { width:35px; height:35px; font-size:22px; line-height:1; background:#071722ed; }
-.map-count { position:absolute; top:44px; left:99px; right:45px; width:fit-content; max-width:calc(100% - 144px); padding:6px 10px; border-radius:20px; background:#071722e8; font-size:12px; pointer-events:none; }
+.map-zoom { position:absolute; top:44px; left:99px; right:45px; width:fit-content; max-width:calc(100% - 144px); padding:6px 10px; border-radius:20px; background:#071722e8; font-size:12px; pointer-events:none; }
 .north { position:absolute; right:15px; top:13px; display:grid; text-align:center; pointer-events:none; color:#dbf0f7; text-shadow:0 1px 4px #000; }
 .north b { font-size:10px; }
 .terrain-error { position:absolute; top:82px; left:60px; right:15px; background:#071722ed; padding:8px; font-size:12px; }
@@ -94,7 +94,7 @@ form { margin-top:10px; }
   .map-layout { display:flex; flex-direction:column; height:auto; }
   .terrain { height:440px; flex:none; }
   .map-sidebar { border-left:0; border-top:1px solid #294657; max-height:540px; }
-  .map-count { font-size:10px; }
+  .map-zoom { font-size:10px; }
   .map-shell.expanded { inset:0; border-radius:0; overflow:auto; }
   .expanded .map-layout { flex:none; height:auto; }
   .expanded .terrain { height:80dvh; min-height:320px; }

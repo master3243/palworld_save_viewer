@@ -26,7 +26,7 @@
         <button type="button" aria-label="Zoom in" title="Zoom in" (click)="zoomBy(1.5)">+</button>
         <button type="button" aria-label="Zoom out" title="Zoom out" (click)="zoomBy(1 / 1.5)">−</button>
       </div>
-      <div class="map-count">{{ filtered.length | number }}</div>
+      <div class="map-zoom" title="Map zoom">{{ zoom | number:'1.0-2' }}×</div>
       <div class="north" aria-hidden="true">↑<b>N</b></div>
       <p class="terrain-error" *ngIf="imageError">{{ imageError }}</p>
       <div #popup class="map-popup" *ngIf="popupPinned">

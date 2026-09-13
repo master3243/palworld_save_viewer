@@ -57,7 +57,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   private tiles = new Map<string, HTMLImageElement>();
   private width = 1;
   private height = 1;
-  private zoom = 1;
+  protected zoom = 1;
   private center = { x: .5, y: .5 };
   private clusters: MarkerCluster[] = [];
   private markerLayout?: { points: MapObjective[]; map: MapDefinition; size: number; zoom: number; viewportSize: number; stops: string; clusters: MarkerCluster[] };
