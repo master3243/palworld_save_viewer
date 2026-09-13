@@ -161,11 +161,12 @@ export function extractLevel(buf: SaveBuffer, lookups: Lookups, progress?: Parse
     };
     const block = new SaveBuffer(raw);
     if (readBool(block, findPropertyStart(block, 'IsPlayer'))) {
+      const levelOffset = findPropertyStart(block, 'Level');
       players.push({
         player_uid: identity.instance_player_uid,
         instance_id: identity.instance_id,
         name: readStr(block, findPropertyStart(block, 'NickName')),
-        level: readByte(block, findPropertyStart(block, 'Level')),
+        level: readByte(block, levelOffset) ?? readInt(block, levelOffset),
         attributes: extractPlayerAttributes(block),
         arena_points: readInt(block, findPropertyStart(block, 'ArenaRankPoint')),
       });

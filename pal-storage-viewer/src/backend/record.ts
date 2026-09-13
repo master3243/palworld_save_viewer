@@ -194,7 +194,10 @@ export function buildRecord(
       debug_name: typeof instance['DebugName'] === 'string' ? instance['DebugName'] : '',
     };
   }
-  const slotId = asDict(readStructProperty(buf, prop('SlotId')));
+  // Older saves use SlotID and store Level as an IntProperty.
+  const slotId = asDict(readStructProperty(buf, prop('SlotId')) ?? readStructProperty(buf, prop('SlotID')));
+  const levelOffset = prop('Level');
+  const level = readByte(buf, levelOffset) ?? readInt(buf, levelOffset);
   const itemContainer = asDict(readStructProperty(buf, prop('ItemContainerId')));
   const workOption = asDict(readStructProperty(buf, prop('WorkSuitabilityOptionInfo')));
   const arenaRestore = asDict(readStructProperty(buf, prop('ArenaRestoreParameter')));
@@ -214,7 +217,7 @@ export function buildRecord(
   const workRanks = WORK_KEYS.map((_, index) => baseRanks[index] + workBonus[index]);
   const derived = deriveStats({
     species_id: characterId,
-    level: readByte(buf, prop('Level')),
+    level,
     exp: readInt64(buf, prop('Exp')),
     rank: readByte(buf, prop('Rank')),
     ivs: { hp: readByte(buf, prop('Talent_HP')), attack: readByte(buf, prop('Talent_Shot')), defense: readByte(buf, prop('Talent_Defense')) },
@@ -249,7 +252,7 @@ export function buildRecord(
     nickname: readStr(buf, prop('NickName')),
     filtered_nickname: readStr(buf, prop('FilteredNickName')),
     // The game omits Level until a Pal gains a level; it is 1 in game, so show 1 (user's choice).
-    level: readByte(buf, prop('Level')) ?? 1,
+    level: level ?? 1,
     exp: readInt64(buf, prop('Exp')),
     rank: readByte(buf, prop('Rank')),
     rank_up_exp: readUInt16(buf, prop('RankUpExp')),
