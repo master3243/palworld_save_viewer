@@ -16,10 +16,10 @@ export interface DemoSave {
 export const DEFAULT_DEMO: DemoSave = {
   "id": "default",
   "name": "Original demo",
-  "author": "me",
+  "author": "master3243",
   "savedAt": "2026-09-01",
   "description": "Two snapshots of the same world, including dimensional storage.",
-  "sourceUrl": "https://github.com/me/palworld_save_viewer/tree/main/resources/example_save",
+  "sourceUrl": "https://github.com/master3243/palworld_save_viewer/tree/main/resources/example_save",
   "bytes": 4127362,
   "files": [
     {
@@ -60,6 +60,7 @@ export const DEFAULT_DEMO: DemoSave = {
   ],
   "summary": {
     "percent": 62.6,
+    "pals": 3731,
     "level": 80,
     "day": 667,
     "players": 1

@@ -11,7 +11,7 @@
           <span class="demo-copy">
             <strong>{{ demo.name }} <small *ngIf="demo.id === current.id">Current</small></strong>
             <span class="demo-meta" *ngIf="demo.author || demo.savedAt">{{ demo.author }}<ng-container *ngIf="demo.author && demo.savedAt"> · </ng-container>{{ demo.savedAt }}</span>
-            <span class="demo-stats" *ngIf="demo.summary as stats" title="Highest player completion and level. Completion includes LocalData for each player not ruled out as its owner.">{{ stats.percent === null ? '?' : (stats.percent | number:'1.0-1') }}% Complete - LVL {{ stats.level ?? '?' }} - Day {{ stats.day ?? '?' }} - {{ stats.players }} {{ stats.players === 1 ? 'Player' : 'Players' }}</span>
+            <span class="demo-stats" *ngIf="demo.summary as stats" title="Highest player completion and level. Completion includes LocalData for each player not ruled out as its owner.">{{ stats.percent === null ? '?' : (stats.percent | number:'1.0-1') }}% Complete - {{ stats.pals | number }} Pals - LVL {{ stats.level ?? '?' }} - Day {{ stats.day ?? '?' }} - {{ stats.players }} {{ stats.players === 1 ? 'Player' : 'Players' }}</span>
             <span class="demo-description" *ngIf="demo.description">{{ demo.description }}</span>
           </span>
         </label>

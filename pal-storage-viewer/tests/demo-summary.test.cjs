@@ -17,7 +17,7 @@ function harness() {
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(require.resolve('../src/app/demo-summary.ts'), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText, context);
-  return { score: sets => JSON.parse(JSON.stringify(context.exports.demoSummary(sets, [], {}))), worlds };
+  return { score: (sets, rows = []) => JSON.parse(JSON.stringify(context.exports.demoSummary(sets, rows, {}))), worlds };
 }
 const player = (uid, level, percent) => ({ uid, level, completion: percent === null ? null : { percent } });
 const world = (players, extra = {}) => ({ players, in_game_day: 100, has_level: true, has_local_data: true,
@@ -26,7 +26,7 @@ const world = (players, extra = {}) => ({ players, in_game_day: 100, has_level: 
 test('completion and level are independent maxima; every owner not ruled out receives LocalData', () => {
   const { score, worlds } = harness();
   const result = score([world([player('a', 30, 70), player('b', 80, 40)])]);
-  assert.deepEqual(result, { percent: 72, level: 80, day: 100, players: 2 });
+  assert.deepEqual(result, { percent: 72, pals: 0, level: 80, day: 100, players: 2 });
   assert(worlds.every(w => w.checkedNotes.length === 2 && w.seenSpecies.length === 1 && w.maxFriendship === 500));
 });
 
@@ -46,12 +46,12 @@ test('repeated players count once across snapshots and latest day is shown', () 
   assert.deepEqual(score([
     world([player('AA-BB', 25, 30)], { in_game_day: 20 }),
     world([player('aabb', 50, 65)], { in_game_day: 130 }),
-  ]), { percent: 67, level: 50, day: 130, players: 1 });
+  ], [{}, {}, {}]), { percent: 67, pals: 3, level: 50, day: 130, players: 1 });
 });
 
 test('missing stats stay unknown; players without completion still count and contribute their level', () => {
   const { score } = harness();
-  assert.deepEqual(score([world([player('a', null, null)], { in_game_day: null })]), { percent: null, level: null, day: null, players: 1 });
+  assert.deepEqual(score([world([player('a', null, null)], { in_game_day: null })]), { percent: null, pals: 0, level: null, day: null, players: 1 });
   assert.deepEqual(score([world([player('a', 50, null), player('b', 10, 0)], { in_game_day: 0, has_local_data: false })]),
-    { percent: 0, level: 50, day: 0, players: 2 });
+    { percent: 0, pals: 0, level: 50, day: 0, players: 2 });
 });

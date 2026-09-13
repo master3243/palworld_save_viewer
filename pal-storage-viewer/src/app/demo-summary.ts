@@ -4,6 +4,7 @@ import { playerWorldProgress } from './completion/player-world-progress';
 
 export interface DemoSummary {
   percent: number | null;
+  pals: number;
   level: number | null;
   day: number | null;
   players: number;
@@ -11,7 +12,7 @@ export interface DemoSummary {
 
 /** Run offline for the picker, using the tracker's exact scoring and exclusion criteria. */
 export function demoSummary(sets: SaveSetSummary[], rows: Record<string, unknown>[], data: CompletionData): DemoSummary {
-  const result: DemoSummary = { percent: null, level: null, day: null, players: 0 };
+  const result: DemoSummary = { percent: null, pals: rows.length, level: null, day: null, players: 0 };
   const players = new Set<string>();
   const max = (a: number | null, b: number | null) => b == null ? a : a == null ? b : Math.max(a, b);
   for (const set of sets) {
