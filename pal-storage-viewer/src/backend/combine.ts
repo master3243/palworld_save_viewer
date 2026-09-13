@@ -1,4 +1,4 @@
-import { LocalOwnerEvidence, OwnerCandidate, identifiedLocalOwner, localOwnerFilters } from './local-data-owner';
+import { LocalOwnerEvidence, OwnerCandidate, identifiedLocalOwner, localOwnerAssessment } from './local-data-owner';
 import type { GuildAchievementProgress } from './achievement-progress';
 /**
  * Merge parsed save files into one pal table with a location per pal.
@@ -50,6 +50,7 @@ export interface SaveSetSummary {
   local_data_file?: string;
   local_owner_id?: string | null;
   local_owner_filters?: Record<string, string[]>;
+  local_owner_matches?: Record<string, string[]>;
   label: string;
   letter: string;
   folder: string;
@@ -357,13 +358,15 @@ export function combineSaves(entries: CombineEntry[], lookups?: Lookups): Combin
     }
     const playerIds = new Set<string>([...set.players, ...set.player_names.keys()]);
     const ownerCandidates = [...playerIds].map(uid => ({ ...(set.owner_candidates.get(uid) ?? { uid }), name: set.player_names.get(uid) }));
+    const ownerAssessment = localOwnerAssessment(set.owner_evidence, set.checked_notes, ownerCandidates, set.level_records);
     summaries.push({
       label: display,
       letter,
       folder: label,
       local_data_file: set.local_data_file,
       local_owner_id: identifiedLocalOwner(set.owner_evidence, ownerCandidates, set.level_records),
-      local_owner_filters: localOwnerFilters(set.owner_evidence, set.checked_notes, ownerCandidates, set.level_records),
+      local_owner_filters: ownerAssessment.filters,
+      local_owner_matches: ownerAssessment.matches,
       world_name: set.world_name,
       host_player_name: set.host_player_name,
       in_game_day: set.in_game_day,

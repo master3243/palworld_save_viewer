@@ -82,8 +82,8 @@ export function extractLocalOwnerEvidence(buf: SaveBuffer): LocalOwnerEvidence {
 }
 
 /** Union of matches within each ID rule; intersection across rules. Missing evidence is unconstrained. */
-export function localOwnerFilters(local: LocalOwnerEvidence | null, checkedNotes: string[] | null, players: OwnerCandidate[], records: PalRecord[]): Record<string, string[]> {
-  const result: Record<string, string[]> = {};
+export function localOwnerAssessment(local: LocalOwnerEvidence | null, checkedNotes: string[] | null, players: OwnerCandidate[], records: PalRecord[]): { filters: Record<string, string[]>; matches: Record<string, string[]> } {
+  const filters: Record<string, string[]> = {}, matches: Record<string, string[]> = {};
   const instances = new Set(local?.instanceIds);
   const currentOwners = new Set(records.filter(pal => instances.has(pal.identity.instance_id ?? ''))
     .map(pal => guidOrNull(pal.ownership.owner_player_uid)).filter((id): id is string => !!id));
@@ -91,15 +91,31 @@ export function localOwnerFilters(local: LocalOwnerEvidence | null, checkedNotes
   const ownerNames = [...currentOwners].map(playerName).join(', ');
   for (const player of players) {
     const name = playerName(player.uid);
-    const reasons: string[] = [];
-    if (local?.playerUids.length && !local.playerUids.includes(player.uid)) reasons.push(`Player IDs recorded with friendships or saved Pal teams in LocalData.sav do not include the ID for ${name}.`);
-    if (local?.containerIds.length && player.containers?.length && !player.containers.some(id => local.containerIds.includes(id))) reasons.push(`The storage IDs recorded with saved Pal teams in LocalData.sav do not match the party or Palbox belonging to ${name}.`);
-    if (currentOwners.size && !currentOwners.has(player.uid)) reasons.push(`Pals referenced by LocalData.sav are currently owned by ${ownerNames} in Level.sav.`);
-    if (checkedNotes?.length && player.notes != null && checkedNotes.some(id => !player.notes!.includes(id))) reasons.push(`${name} has not obtained some journals marked as read in LocalData.sav.`);
-    if (local?.trackedQuest && player.quests != null && !player.quests.includes(local.trackedQuest)) reasons.push(`${name} has not started or completed the tracked quest in LocalData.sav.`);
-    result[player.uid] = reasons;
+    const reasons: string[] = [], evidence: string[] = [];
+    const check = (matched: boolean, positive: string, negative: string) => (matched ? evidence : reasons).push(matched ? positive : negative);
+    if (local?.playerUids.length) check(local.playerUids.includes(player.uid),
+      `Player IDs recorded with friendships or saved Pal teams in LocalData.sav include the ID for ${name}.`,
+      `Player IDs recorded with friendships or saved Pal teams in LocalData.sav do not include the ID for ${name}.`);
+    if (local?.containerIds.length && player.containers?.length) check(player.containers.some(id => local.containerIds.includes(id)),
+      `The storage IDs recorded with saved Pal teams in LocalData.sav match the party or Palbox belonging to ${name}.`,
+      `The storage IDs recorded with saved Pal teams in LocalData.sav do not match the party or Palbox belonging to ${name}.`);
+    if (currentOwners.size) check(currentOwners.has(player.uid),
+      `Pals referenced by LocalData.sav include Pals currently owned by ${name} in Level.sav.`,
+      `Pals referenced by LocalData.sav are currently owned by ${ownerNames} in Level.sav.`);
+    if (checkedNotes?.length && player.notes != null) check(checkedNotes.every(id => player.notes!.includes(id)),
+      `${name} has obtained all journals marked as read in LocalData.sav.`,
+      `${name} has not obtained some journals marked as read in LocalData.sav.`);
+    if (local?.trackedQuest && player.quests != null) check(player.quests.includes(local.trackedQuest),
+      `${name} has started or completed the tracked quest in LocalData.sav.`,
+      `${name} has not started or completed the tracked quest in LocalData.sav.`);
+    filters[player.uid] = reasons;
+    matches[player.uid] = evidence;
   }
-  return result;
+  return { filters, matches };
+}
+
+export function localOwnerFilters(local: LocalOwnerEvidence | null, checkedNotes: string[] | null, players: OwnerCandidate[], records: PalRecord[]): Record<string, string[]> {
+  return localOwnerAssessment(local, checkedNotes, players, records).filters;
 }
 
 export function identifiedLocalOwner(local: LocalOwnerEvidence | null, players: OwnerCandidate[], records: PalRecord[]): string | null {

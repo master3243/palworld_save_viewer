@@ -10,7 +10,7 @@ import { OfflineImageService } from './offline-image.service';
 
 /** A run of tooltip text; `value` marks the part that changes with the skill level. */
 export interface TextSegment { text: string; value: boolean; }
-export interface TooltipText { text: string; tone?: 'warning' | 'success'; }
+export interface TooltipText { text: string; tone?: 'warning' | 'success' | 'danger'; }
 /** One partner-skill level in the tooltip's level list. */
 export interface LevelLine { label: string; segments: TextSegment[]; current: boolean; }
 
@@ -62,7 +62,7 @@ export interface TooltipData {
   template: `
     <div class="tip" [style.left.px]="x" [style.top.px]="y" [style.width.px]="width" [style.min-width.px]="data.width ?? null" [class.fitted]="width !== null" [class.ready]="ready" [class.interactive]="interactive">
       <div class="tip-title">
-        <span><ng-container *ngIf="data.titleSegments; else plainTitle"><ng-container *ngFor="let segment of data.titleSegments"><span [class.tip-warning]="segment.tone === 'warning'" [class.tip-success]="segment.tone === 'success'">{{ segment.text }}</span></ng-container></ng-container><ng-template #plainTitle>{{ data.title }}</ng-template></span><b *ngIf="data.titleRight">{{ data.titleRight }}</b>
+        <span><ng-container *ngIf="data.titleSegments; else plainTitle"><ng-container *ngFor="let segment of data.titleSegments"><span [class.tip-danger]="segment.tone === 'danger'" [class.tip-warning]="segment.tone === 'warning'" [class.tip-success]="segment.tone === 'success'">{{ segment.text }}</span></ng-container></ng-container><ng-template #plainTitle>{{ data.title }}</ng-template></span><b *ngIf="data.titleRight">{{ data.titleRight }}</b>
         <a *ngIf="interactive && data.wikiUrl" class="tip-wiki" [href]="data.wikiUrl" target="_blank" rel="noopener noreferrer" title="palworld.wiki.gg" [attr.aria-label]="'Open ' + data.title + ' on Palworld Wiki'">
           <span>GG</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg>
@@ -100,7 +100,7 @@ export interface TooltipData {
           <span class="tip-work-items" [style.--work-columns]="row.items.length"><span class="tip-work-item" *ngFor="let item of row.items" [class.up]="item.up" [class.none]="item.none" [title]="item.name"><img [src]="item.src" alt=""><b>{{ item.rank }}</b></span></span>
         </div>
       </div>
-      <ng-container *ngIf="data.lineSegments; else plainLines"><p class="tip-line" *ngFor="let line of data.lineSegments"><span *ngFor="let segment of line" [class.tip-warning]="segment.tone === 'warning'" [class.tip-success]="segment.tone === 'success'">{{ segment.text }}</span></p></ng-container>
+      <ng-container *ngIf="data.lineSegments; else plainLines"><p class="tip-line" *ngFor="let line of data.lineSegments"><span *ngFor="let segment of line" [class.tip-danger]="segment.tone === 'danger'" [class.tip-warning]="segment.tone === 'warning'" [class.tip-success]="segment.tone === 'success'">{{ segment.text }}</span></p></ng-container>
       <ng-template #plainLines><p class="tip-line" *ngFor="let line of data.lines">{{ line }}</p></ng-template>
       <ol class="tip-levels" *ngIf="data.levels?.length">
         <li *ngFor="let level of data.levels" [class.current]="level.current"><span class="tip-level">{{ level.label }}</span><span class="tip-level-text"><ng-container *ngFor="let seg of level.segments"><em *ngIf="seg.value; else plain">{{ seg.text }}</em><ng-template #plain>{{ seg.text }}</ng-template></ng-container></span></li>
@@ -120,6 +120,7 @@ export interface TooltipData {
     .tip-wiki:hover, .tip-wiki:focus-visible { background: rgba(61, 174, 217, .2); border-color: #afc7ff; box-shadow: 0 0 6px rgba(132, 165, 245, .28); color: #fff; outline: none; }
     .tip-title { align-items: center; background: linear-gradient(90deg, rgba(110, 125, 135, .55), rgba(60, 75, 85, .55)); color: #fff; display: flex; font-size: .9rem; font-weight: 700; gap: 16px; justify-content: space-between; padding: 6px 12px; }
     .tip-title b { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+    .tip-danger { color: #ff8e8e; font-weight: 700; }
     .tip-warning { color: #ffd16c; font-weight: 700; }
     .tip-success { color: #91efbc; font-weight: 700; }
     .tip-intro { line-height: 1.45; margin: 8px 12px 0; }

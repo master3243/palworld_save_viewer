@@ -5,7 +5,7 @@ const ts = require('typescript');
 require.extensions['.ts'] = (m, f) => m._compile(ts.transpileModule(fs.readFileSync(f, 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText, f);
-const { localOwnerFilters, identifiedLocalOwner, extractOwnerQuests, extractLocalOwnerEvidence } = require('../src/backend/local-data-owner.ts');
+const { localOwnerAssessment, localOwnerFilters, identifiedLocalOwner, extractOwnerQuests, extractLocalOwnerEvidence } = require('../src/backend/local-data-owner.ts');
 const { SaveBuffer } = require('../src/backend/gvas.ts');
 const local = extra => ({ playerUids: [], instanceIds: [], containerIds: [], trackedQuest: null, ...extra });
 const pal = (id, owner) => ({ identity: { instance_id: id }, ownership: { owner_player_uid: owner } });
@@ -57,4 +57,18 @@ test('identification requires ID evidence and rejects conflicting ID rules', () 
   assert.equal(identifiedLocalOwner(local({ playerUids: ['a'], containerIds: ['party-b'] }), players, []), null);
   assert.equal(identifiedLocalOwner(local({ instanceIds: ['pal'] }), players, [pal('pal', 'a')]), 'a');
   assert.equal(identifiedLocalOwner(local({ playerUids: ['absent'] }), players, []), 'absent');
+});
+
+
+test('ownership assessment retains matching evidence and does not treat missing evidence as a match', () => {
+  const players = [{ uid: 'a', name: 'Alice', containers: ['party-a'], notes: ['note'], quests: ['quest'] },
+    { uid: 'b', name: 'Bob', containers: ['party-b'], notes: [], quests: [] }];
+  const assessment = localOwnerAssessment(local({ playerUids: ['a'], instanceIds: ['pal'], containerIds: ['party-a'], trackedQuest: 'quest' }), ['note'], players, [pal('pal', 'a')]);
+  assert.equal(assessment.matches.a.length, 5);
+  assert.deepEqual(assessment.filters.a, []);
+  assert.equal(assessment.filters.b.length, 5);
+  assert.deepEqual(assessment.matches.b, []);
+  assert.ok(assessment.matches.a.every(reason => reason.includes('Alice')));
+  const missing = localOwnerAssessment(local({ containerIds: ['unknown'], trackedQuest: 'quest', instanceIds: ['unknown'] }), ['note'], [{uid:'a'}], []);
+  assert.deepEqual(missing, { filters: {a: []}, matches: {a: []} });
 });

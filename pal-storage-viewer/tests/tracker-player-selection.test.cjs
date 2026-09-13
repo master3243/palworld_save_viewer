@@ -93,8 +93,66 @@ test('owner warning highlights selected and ID-identified names with a leading o
   component.localDataOwners.set('world', '0');
   const warning = component.localDataOwnerWarning(world);
   assert.equal(warning.lines[0], '✓ Owner identified by ID: Player 1');
-  assert.ok(warning.titleSegments.some(s => s.text === 'Player 0' && s.tone === 'warning'));
+  assert.ok(warning.titleSegments.some(s => s.text === 'Player 0' && s.tone === 'danger'));
   assert.ok(warning.lineSegments[0].some(s => s.text === 'Player 1' && s.tone === 'success'));
-  assert.ok(warning.lineSegments[1].some(s => s.text === 'Player 0' && s.tone === 'warning'));
+  assert.ok(warning.lineSegments[1].some(s => s.text === 'Player 0' && s.tone === 'danger'));
   assert.ok(warning.lineSegments[1].some(s => s.text === 'Player 1' && s.tone === 'success'));
+});
+
+
+test('likely owner info uses matching evidence and the actual filename while warnings take precedence', () => {
+  const { component } = tracker();
+  const world = set(20, 80)[0];
+  world.local_owner_id = '1';
+  world.local_data_file = 'custom-local.sav';
+  world.local_owner_filters = { '0': ['Player ID does not match.'], '1': [] };
+  world.local_owner_matches = { '0': ['A journal matches.'], '1': ['Player IDs in LocalData.sav match Player 1.'] };
+  const info = component.localDataOwnerInfo(world);
+  assert.equal(info.title, 'Player "Player 1" is identified as the likely owner of custom-local.sav due to:');
+  assert.equal(info.lines[0], '• Player IDs in custom-local.sav match Player 1.');
+  assert.equal(component.localDataOwnerInfo(world), info);
+  assert.equal(component.localDataOwnerWarning(world), null);
+  component.localDataOwners.set('world', '0');
+  assert.equal(component.localDataOwnerInfo(world), null);
+  assert.ok(component.localDataOwnerWarning(world));
+  component.localDataOwners.set('world', '');
+  assert.equal(component.localDataOwnerInfo(world), null);
+});
+
+test('likely owner info distinguishes inferred matches and avoids unsupported ownership claims', () => {
+  const { component } = tracker();
+  const world = set(20, 80)[0];
+  world.local_owner_filters = { '0': ['Quest mismatch.'], '1': [] };
+  world.local_owner_matches = { '0': [], '1': ['Player 1 has started the tracked quest in LocalData.sav.'] };
+  const info = component.localDataOwnerInfo(world);
+  assert.ok(info.lines.some(line => line.includes('tracked quest')));
+  assert.ok(info.lines.some(line => line.includes('No owner was identified by ID')));
+  const unknown = set(20,80)[0];
+  component.localDataOwners.set('world', '0');
+  assert.equal(component.localDataOwnerInfo(unknown), null);
+  const sole = set(20)[0];
+  assert.ok(component.localDataOwnerInfo(sole).lines.some(line => line.includes('only loaded player')));
+  assert.ok(component.localDataOwnerInfo(sole).lines.some(line => line.includes('inferred')));
+});
+
+
+test('unverified selections have their own warning without overlapping likely or conflicting states', () => {
+  const { component } = tracker();
+  const world = set(20,80)[0];
+  world.local_data_file = 'mixed-local.sav';
+  component.localDataOwners.set('world', '0');
+  const unverified = component.localDataOwnerUnverified(world);
+  assert.equal(unverified.title, 'Player "Player 0" is an unverified owner of mixed-local.sav.');
+  assert.match(unverified.lines[0], /could not be determined/);
+  assert.equal(component.localDataOwnerUnverified(world), unverified);
+  assert.equal(component.localDataOwnerWarning(world), null);
+  assert.equal(component.localDataOwnerInfo(world), null);
+  const conflicting = {...world,local_owner_filters:{'0':['Wrong ID.'],'1':[]}};
+  assert.equal(component.localDataOwnerUnverified(conflicting), null);
+  assert.ok(component.localDataOwnerWarning(conflicting));
+  const likely = {...world,local_owner_matches:{'0':['Matching player ID.']}};
+  assert.equal(component.localDataOwnerUnverified(likely), null);
+  assert.ok(component.localDataOwnerInfo(likely));
+  component.localDataOwners.set('world', '');
+  assert.equal(component.localDataOwnerUnverified(world), null);
 });

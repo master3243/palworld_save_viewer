@@ -834,5 +834,8 @@
 .achievement-unconfirmed .achievement-warning-icon { color: #ff8e8e; }
 .achievement-warning-counts { display: flex; flex-direction: column; gap: 6px; color: #ffd37a; }
 
-.local-owner-warning { display: inline-flex; color: #ffd16c; cursor: default; }
-.local-owner-warning:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }
+.local-owner-warning { display: inline-flex; color: #ff8e8e; cursor: default; }
+.local-owner-warning .achievement-warning-icon { color: inherit; }
+.local-owner-unverified { display: inline-flex; color: #ffd37a; cursor: default; }
+.local-owner-info { display: inline-flex; color: #63ccec; cursor: default; }
+.local-owner-warning:focus-visible, .local-owner-info:focus-visible, .local-owner-unverified:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; border-radius: 3px; }

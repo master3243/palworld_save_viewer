@@ -48,6 +48,8 @@ export class CompletionComponent implements OnChanges {
   @Input() rows: Record<string, unknown>[] = [];
   @Input() localDataOwners = new Map<string, string>();
   private ownerWarnings = new WeakMap<SaveSetSummary, Map<string, TooltipData>>();
+  private ownerInfos = new WeakMap<SaveSetSummary, Map<string, TooltipData>>();
+  private ownerUnverified = new WeakMap<SaveSetSummary, Map<string, TooltipData>>();
   readonly condensationStars = [0, 1, 2, 3, 4];
 
   /** Master lists; loaded once from resources/completion/completion-data.json. */
@@ -311,7 +313,7 @@ export class CompletionComponent implements OnChanges {
             .filter(match => match.at >= 0).sort((a, b) => a.at - b.at)[0];
           if (!match) { segments.push({ text: text.slice(start) }); break; }
           if (match.at > start) segments.push({ text: text.slice(start, match.at) });
-          segments.push({ text: match.value, tone: match.value === name ? 'warning' : 'success' });
+          segments.push({ text: match.value, tone: match.value === name ? 'danger' : 'success' });
           start = match.at + match.value.length;
         }
         return segments;
@@ -323,7 +325,7 @@ export class CompletionComponent implements OnChanges {
         lines.unshift(`✓ Owner identified by ID: ${ownerName}`);
         lineSegments.unshift([{ text: '✓ Owner identified by ID: ' }, { text: ownerName, tone: 'success' }]);
       }
-      warning = { title, titleSegments: [{ text: 'Player "' }, { text: name, tone: 'warning' },
+      warning = { title, titleSegments: [{ text: 'Player "' }, { text: name, tone: 'danger' },
         { text: `" is the unlikely owner of ${set.local_data_file || 'LocalData.sav'} due to:` }],
         lines, lineSegments, width: 380 };
       warnings.set(uid, warning);
@@ -331,11 +333,61 @@ export class CompletionComponent implements OnChanges {
     return warning;
   }
 
+  localDataOwnerInfo(set: SaveSetSummary): TooltipData | null {
+    const uid = this.localDataOwner(set);
+    if (!uid || this.localDataOwnerReasons(set, uid).length) return null;
+    const player = set.players.find(player => player.uid === uid);
+    if (!player) return null;
+    let infos = this.ownerInfos.get(set);
+    if (!infos) { infos = new Map(); this.ownerInfos.set(set, infos); }
+    const cached = infos.get(uid);
+    if (cached) return cached;
+    const name = player.name?.trim() || `Player ${uid}`;
+    const reasons = (set.local_owner_matches?.[uid] ?? []).map(reason => reason.replaceAll('LocalData.sav', set.local_data_file || 'LocalData.sav'));
+    const possible = set.players.filter(player => !this.localDataOwnerReasons(set, player.uid).length);
+    if (set.local_owner_id === uid && !reasons.length) reasons.push(`Ownership was identified by matching ID evidence for ${name}.`);
+    if (!reasons.length) {
+      if (possible.length !== 1) return null;
+      reasons.push(set.players.length === 1 ? 'This is the only loaded player.' : 'Other loaded players were ruled out by the ownership checks.');
+    }
+    if (!set.local_owner_id) reasons.push('No owner was identified by ID; this match is inferred.');
+    if (possible.length > 1) reasons.push('Other loaded players also match the available checks.');
+    const description = `" is identified as the likely owner of ${set.local_data_file || 'LocalData.sav'} due to:`;
+    const info: TooltipData = {
+      title: `Player "${name}${description}`,
+      titleSegments: [{ text: 'Player "' }, { text: name, tone: 'success' }, { text: description }],
+      lines: reasons.map(reason => `• ${reason}`), width: 380,
+    };
+    infos.set(uid, info);
+    return info;
+  }
+
+  localDataOwnerUnverified(set: SaveSetSummary): TooltipData | null {
+    const uid = this.localDataOwner(set);
+    const player = set.players.find(player => player.uid === uid);
+    if (!player || this.localDataOwnerReasons(set, uid).length || this.localDataOwnerInfo(set)) return null;
+    let tooltips = this.ownerUnverified.get(set);
+    if (!tooltips) { tooltips = new Map(); this.ownerUnverified.set(set, tooltips); }
+    const cached = tooltips.get(uid);
+    if (cached) return cached;
+    const name = player.name?.trim() || `Player ${uid}`;
+    const description = `" is an unverified owner of ${set.local_data_file || 'LocalData.sav'}.`;
+    const tooltip: TooltipData = {
+      title: `Player "${name}${description}`,
+      titleSegments: [{ text: 'Player "' }, { text: name, tone: 'warning' }, { text: description }],
+      lines: ['Ownership could not be determined from the loaded files.',
+        'The available evidence neither supports nor rules out this selection.'], width: 380,
+    };
+    tooltips.set(uid, tooltip);
+    return tooltip;
+  }
+
   selectLocalDataOwner(uid: string): void {
     const set = this.localDataSave;
     if (!set) return;
     this.localDataOwners.set(set.folder, uid);
     this.ngOnChanges();
+    this.changeDetector.markForCheck();
   }
 
   get showFishing(): boolean {
