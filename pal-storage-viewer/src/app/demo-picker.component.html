@@ -10,12 +10,15 @@
           <input type="radio" name="demoSave" [value]="demo.id" [(ngModel)]="selectedId" [disabled]="busy">
           <span class="demo-copy">
             <strong>{{ demo.name }} <small *ngIf="demo.id === current.id">Current</small></strong>
-            <span class="demo-meta"><ng-container *ngIf="demo.author">{{ demo.author }} · </ng-container><ng-container *ngIf="demo.savedAt">{{ demo.savedAt }} · </ng-container>{{ formatSize(demo.bytes) }}</span>
+            <span class="demo-meta" *ngIf="demo.author || demo.savedAt">{{ demo.author }}<ng-container *ngIf="demo.author && demo.savedAt"> · </ng-container>{{ demo.savedAt }}</span>
             <span class="demo-stats" *ngIf="demo.summary as stats" title="Highest player completion and level. Completion includes LocalData for each player not ruled out as its owner.">{{ stats.percent === null ? '?' : (stats.percent | number:'1.0-1') }}% Complete - LVL {{ stats.level ?? '?' }} - Day {{ stats.day ?? '?' }} - {{ stats.players }} {{ stats.players === 1 ? 'Player' : 'Players' }}</span>
             <span class="demo-description" *ngIf="demo.description">{{ demo.description }}</span>
           </span>
         </label>
-        <a class="demo-source" [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'Source for ' + demo.name">Source ↗</a>
+        <span class="demo-side">
+          <span class="demo-size">{{ formatSize(demo.bytes) }}</span>
+          <a class="demo-source" [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'Source for ' + demo.name">Source ↗</a>
+        </span>
       </div>
     </div>
     <p class="demo-message" *ngIf="!loading && !error && !visibleDemos.length">No matching demos.</p>

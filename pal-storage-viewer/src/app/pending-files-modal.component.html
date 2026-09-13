@@ -9,11 +9,17 @@
     <button class="confirm-close" type="button" aria-label="Cancel loading and close dialog" title="Close" (click)="cancel.emit()">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg>
     </button>
-    <h2 class="modal-title" id="confirmLoadTitle">
-      {{ append ? 'Add' : 'Load' }} {{ fileCount }} {{ fileCount === 1 ? 'file' : 'files' }} from {{ folders.length }} {{ folders.length === 1 ? 'folder' : 'folders' }}?
-      <small class="modal-subtitle" *ngIf="palTotal !== null">{{ palTotal | number }} pals</small>
-    </h2>
-    <p class="demo-preview-name" *ngIf="demo">{{ demo.name }} <a [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer">Source ↗</a></p>
+    <div class="confirm-header">
+      <button *ngIf="demo" class="switch-demo" type="button" aria-label="Change demo" title="Change demo" (click)="switchDemo.emit()">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14m-4-4 4 4-4 4M17 14H3m4-4-4 4 4 4"/></svg>
+        <span>Change demo</span>
+      </button>
+      <h2 class="modal-title" id="confirmLoadTitle">
+        {{ append ? 'Add' : 'Load' }} {{ fileCount }} {{ fileCount === 1 ? 'file' : 'files' }} from {{ folders.length }} {{ folders.length === 1 ? 'folder' : 'folders' }}?
+        <small class="modal-subtitle" *ngIf="palTotal !== null">{{ palTotal | number }} pals</small>
+      </h2>
+    </div>
+    <p class="demo-preview-name" *ngIf="demo && demo.id !== 'default'">{{ demo.name }} <a [href]="demo.sourceUrl" target="_blank" rel="noopener noreferrer">Source ↗</a></p>
     <div class="confirm-list">
       <div class="confirm-folder" *ngFor="let folder of folders; trackBy: trackFolder">
         <div class="confirm-folder-heading">
@@ -49,7 +55,6 @@
     <p class="confirm-note" *ngIf="ignored">{{ ignored }} {{ ignored === 1 ? 'file' : 'files' }} ignored</p>
     <p class="confirm-note">Drop more files to add</p>
     <div class="modal-actions">
-      <button *ngIf="demo" class="modal-ghost switch-demo" type="button" (click)="switchDemo.emit()">Switch Demo?</button>
       <button class="modal-ghost" type="button" (click)="cancel.emit()">Cancel</button>
       <button class="modal-primary" type="button" (click)="confirm.emit()">{{ append ? 'Add' : 'Load' }}</button>
     </div>

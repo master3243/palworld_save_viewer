@@ -9,6 +9,8 @@
 .demo-copy strong { color: #ecf8ff; font-size: .85rem; }
 .demo-copy small { color: #91efbc; font-size: .68rem; margin-left: 5px; }
 .demo-meta, .demo-description { color: #a8c0ce; font-size: .74rem; line-height: 1.4; }
+.demo-side { display: flex; flex-direction: column; align-items: flex-end; align-self: start; gap: 3px; }
+.demo-size { color: #a8c0ce; font-size: .74rem; line-height: 1.4; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .demo-source { color: #7bddff; font-size: .75rem; white-space: nowrap; text-decoration: none; padding: 6px 0; }
 .demo-source:hover { text-decoration: underline; }
 .demo-message { color: #acc5d4; font-size: .8rem; margin: 10px 0; }

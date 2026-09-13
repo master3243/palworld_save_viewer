@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { DemoSave, loadDemoCatalog } from './demo-catalog';
+import { DEFAULT_DEMO, DemoSave, loadDemoCatalog } from './demo-catalog';
 import { formatSize } from './save-file-labels';
 
 @Component({
@@ -27,7 +27,13 @@ export class DemoPickerComponent implements OnInit, AfterViewInit {
   async load(): Promise<void> {
     this.loading = true;
     this.error = '';
-    try { this.demos = await loadDemoCatalog(); }
+    try {
+      this.demos = [...await loadDemoCatalog()].sort((a, b) => {
+        if (a.id === DEFAULT_DEMO.id) return -1;
+        if (b.id === DEFAULT_DEMO.id) return 1;
+        return (b.summary.percent ?? -1) - (a.summary.percent ?? -1);
+      });
+    }
     catch (error) { this.error = error instanceof Error ? error.message : 'Could not load demos.'; }
     finally { this.loading = false; }
   }
