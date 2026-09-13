@@ -154,7 +154,8 @@
   margin-left: calc(var(--image-height) * -45 / 360);
   overflow: visible;
   position: relative;
-  width: clamp(125px, 16.8vw, 175px);
+  /* End the box at the artwork's right edge (x=611 in the 640×360 image). */
+  width: calc(var(--image-height) * 611 / 360);
 }
 
 .title-logo {
@@ -176,9 +177,9 @@
   font-size: clamp(0.95rem, 1.8vw, 1.5rem);
   font-weight: 850;
   letter-spacing: 0;
-  margin-left: -14px;
+  margin-left: 6px;
   position: relative;
-  top: 3px;
+  top: 5px;
   text-transform: lowercase;
   /* text-shadow: 0 0 9px rgba(129, 222, 255, 0.45); */
   white-space: nowrap;
@@ -219,7 +220,7 @@
 .page.compact .viewer-title {
   font-size: 1.05rem;
   margin-left: 6px;
-  top: 2px;
+  top: 4px;
 }
 
 .dropzone {
@@ -908,9 +909,6 @@
     gap: 8px;
   }
 
-  .logo-crop {
-    width: min(138px, 34vw);
-  }
 }
 
 .drop-actions {
@@ -1181,10 +1179,11 @@
 
 @media (max-width: 720px) {
   .page:not(.compact) .toolbar { flex-direction: column; }
+  .viewer-title { top: 3px; margin-left: 3px; }
   .view-switch { margin-left: 0; top: 0; }
 
   .page.compact .title-link { --art-height: 26px; }
-  .page.compact .viewer-title { font-size: .9rem; }
+  .page.compact .viewer-title { font-size: .9rem; top: 2px; margin-left: 3px; }
   .page.compact .view-switch { margin-left: 0; top: 0; }
   .page.compact .view-switch button {
     align-items: center;
