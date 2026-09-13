@@ -106,6 +106,14 @@
         <div class="faq-body">
           <p>It tracks the many things I managed to extract from the save file <code>Players\xxx.sav</code> with online recources to compare against for the overall progress.</p>
           <p>If you know something missing or wrong, please let me know.</p>
+          <details class="faq-item">
+            <summary>What's the deal with LocalData.sav and assigning an owner</summary>
+            <div class="faq-body">
+              <p>Since Palworld supports co-op, a single world save file (<code>Level.sav</code>) can contain many players (each with a player <code>.sav</code> and a <code>LocalData.sav</code>). The player <code>.sav</code> holds most information related to the player while the <code>LocalData.sav</code> holds very little but is still important to the website.</p>
+              <p>The complication arises from the fact that <code>LocalData.sav</code> is ambiguous as to which player it points to. The website does it's best to infer who the owner is (either by using a player ID referenced in <code>LocalData.sav</code> or other inference criteria). The website let's you pick an owner if you know which player the file belongs to.</p>
+              <p>In multiplayer servers, the host has the <code>Level.sav</code>, their own single <code>LocalData.sav</code>, and all other players <code>.sav</code> (yes the host has all other player's main progress files); Each other player in the server only stores their own <code>LocalData.sav</code>. This should immediately tell you who owns the <code>LocalData.sav</code></p>
+            </div>
+          </details>
         </div>
       </details>
       <details class="faq-item">

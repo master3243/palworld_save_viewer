@@ -32,7 +32,11 @@
   line-height: 1.5;
 }
 
-.faq-item summary {
+.faq-item .faq-item {
+  background: rgba(123, 214, 255, 0.06);
+}
+
+.faq-item > summary {
   color: #e8f8ff;
   cursor: pointer;
   font-weight: 600;
@@ -41,22 +45,22 @@
   position: relative;
 }
 
-.faq-item summary::-webkit-details-marker {
+.faq-item > summary::-webkit-details-marker {
   display: none;
 }
 
-.faq-item summary::before {
+.faq-item > summary::before {
   color: #9de3ff;
   content: '▸';
   left: 12px;
   position: absolute;
 }
 
-.faq-item[open] summary::before {
+.faq-item[open] > summary::before {
   content: '▾';
 }
 
-.faq-item[open] summary {
+.faq-item[open] > summary {
   border-bottom: 1px solid rgba(123, 214, 255, 0.12);
 }
 
