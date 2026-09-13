@@ -125,6 +125,7 @@
 }
 
 .title-link {
+  --image-height: clamp(62px, 8.4vw, 91px);
   align-items: center;
   border-radius: 8px;
   color: inherit;
@@ -141,10 +142,16 @@
   outline-offset: 4px;
 }
 
+/* The logo artwork includes tall antlers; reduce the emblem by 22% for
+ * visual balance with the lettering. Their visible bounds are 156/360 and 325/512. */
+.title-emblem { display: block; flex-shrink: 0; width: calc(var(--image-height) * 156 / 360 * 512 / 325 * 0.78); height: calc(var(--image-height) * 156 / 360 * 0.88); object-fit: cover; }
+
 .logo-crop {
   display: block;
   flex: 0 0 auto;
-  height: clamp(62px, 8.4vw, 91px);
+  height: var(--image-height);
+  /* The 640×360 logo has some px of transparent padding before its artwork. */
+  margin-left: calc(var(--image-height) * -45 / 360);
   overflow: visible;
   position: relative;
   width: clamp(125px, 16.8vw, 175px);
@@ -191,10 +198,14 @@
   margin-bottom: 0;
 }
 
-.page.compact .logo-crop {
+.page.compact .title-link {
   --art-height: 34px;
   --image-height: calc(var(--art-height) / 0.4417);
+}
+
+.page.compact .logo-crop {
   height: var(--art-height);
+  margin-left: 0;
   overflow: hidden;
   width: calc(var(--image-height) * 1.7778 * 0.925);
 }
@@ -1172,7 +1183,7 @@
   .page:not(.compact) .toolbar { flex-direction: column; }
   .view-switch { margin-left: 0; top: 0; }
 
-  .page.compact .logo-crop { --art-height: 26px; }
+  .page.compact .title-link { --art-height: 26px; }
   .page.compact .viewer-title { font-size: .9rem; }
   .page.compact .view-switch { margin-left: 0; top: 0; }
   .page.compact .view-switch button {
@@ -1183,6 +1194,12 @@
   }
   .page.compact .view-label { display: none; }
   .page.compact .view-short { display: inline-flex; }
+}
+
+@media (max-width: 360px) {
+  .page.compact .title-link { --art-height: 22px; }
+  .page.compact .viewer-title { font-size: .8rem; }
+  .page.compact .view-switch button { padding: 6px 7px; }
 }
 
 .empty-view {

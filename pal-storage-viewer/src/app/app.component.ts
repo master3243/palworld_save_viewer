@@ -17,6 +17,7 @@ import { APP_VERSION } from './app-version';
 import { Game8LookupService } from './game8-lookup.service';
 import { GameDataService } from './game-data.service';
 import { OfflineImageService } from './offline-image.service';
+import { OfflineImageDirective } from './offline-image.directive';
 import { palImagePath } from './pal-image';
 import { PalStorageRow, ParseProgress, SaveInput, SaveParserService, SaveSetSummary, SaveSource, UnidentifiedSavesError } from './save-parser.service';
 import { elementIcons, workTable } from './trait-icons';
@@ -67,7 +68,7 @@ interface DirectoryEntryLike {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, PalDetailCardComponent, PalRowComponent, FilterBarComponent, GithubIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent, DemoPickerComponent],
+  imports: [CommonModule, OfflineImageDirective, PalDetailCardComponent, PalRowComponent, FilterBarComponent, GithubIconComponent, CompletionComponent, FaqModalComponent, PendingFilesModalComponent, SourcesBarComponent, DemoPickerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
