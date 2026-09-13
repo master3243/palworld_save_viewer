@@ -22,6 +22,18 @@ const category = (key, extra) => summarize(record(extra), data).categories.find(
 const mission = (id, extra) => category('sideQuests', extra).items.find(i => i.id === id);
 const flags = (prefix, count) => Array.from({ length: count }, (_, i) => `${prefix}_${i + 1}`);
 
+test('Drones shows repeat patrol drone defeats and distinguishes missing data from zero', () => {
+  const drones = extra => summarize(record(extra), data).stats.find(entry => entry.label === 'Drones');
+  const entry = drones({ specific_boss_counts: { SecurityDrone: 9, SECURITYDRONE: 4, OtherBoss: 77 } });
+  assert.equal(entry.value, '9');
+  assert.equal(entry.title, 'PIDF Patrol Drones defeated');
+  assert.equal(entry.missing, false);
+  assert.equal(drones({ specific_boss_counts: {} }).value, '0');
+  assert.equal(drones({ specific_boss_counts: { OtherBoss: 77 } }).value, '0');
+  assert.equal(drones({ specific_boss_counts: null }).value, '?');
+  assert.equal(drones({}).missing, true);
+});
+
 test('obtained but unread journals count as not read until LocalData marks them checked', () => {
   const save = record({ notes: ['Day0', 'GrassBoss3'] });
   const notes = checkedNotes => summarize(save, data, { labs: [], checkedNotes }).categories.find(c => c.key === 'notes');

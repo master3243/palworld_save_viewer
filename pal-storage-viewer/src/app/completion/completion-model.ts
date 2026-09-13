@@ -803,8 +803,9 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     stat('Raid Bosses', countTotal(record.raid_boss_counts), 'Total raid boss victories, including repeat clears'),
     stat('Dungeons', counters.normal_dungeon_clears, 'Random dungeons cleared'),
     stat('Fixed Dungeons', counters.fixed_dungeon_clears, 'Fixed (story) dungeons cleared'),
-    stat('Oil Rigs', counters.oilrig_clears, 'Oil rig raids cleared'),
     stat('Camps', counters.camps_conquered, 'Syndicate camps conquered'),
+    stat('Oil Rigs', counters.oilrig_clears, 'Oil rig raids cleared'),
+    stat('Drones', record.specific_boss_counts == null ? null : normalizedCounts(record.specific_boss_counts).get('securitydrone') ?? 0, 'PIDF Patrol Drones defeated'),
     stat('Predators', counters.predator_defeats, 'Predator pals defeated'),
     stat('Treasures', counters.treasures_found, 'Treasure map spots dug up'),
   ];
