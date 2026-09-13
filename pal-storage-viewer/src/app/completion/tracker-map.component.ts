@@ -503,9 +503,10 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
 
   private drawObjective(ctx: CanvasRenderingContext2D, point: MapObjective, stop?: number): void {
     const p=this.screen(point), icon=this.icons.get(this.iconName(point));
-    ctx.beginPath();ctx.arc(p.x,p.y,14,0,Math.PI*2);ctx.fillStyle='#0a1925ed';ctx.fill();
-    ctx.strokeStyle='#7a9cac';ctx.lineWidth=.75;ctx.stroke();
-    ctx.save();ctx.shadowColor='#001018';ctx.shadowBlur=2;
+    const done=point.item.state==='done';
+    ctx.beginPath();ctx.arc(p.x,p.y,14,0,Math.PI*2);ctx.fillStyle=done?'#245b3eed':'#0a1925ed';ctx.fill();
+    ctx.strokeStyle=done?'#64957980':'#7a9cac';ctx.lineWidth=.75;ctx.stroke();
+    ctx.save();ctx.shadowColor='#001018';ctx.shadowBlur=done?1:2;
     if(icon?.complete && icon.naturalWidth) {
       const scale=Math.min(18/Math.max(icon.naturalWidth,icon.naturalHeight),20/Math.hypot(icon.naturalWidth,icon.naturalHeight))*(point.category === 'fastTravel' ? 1.5 : point.category === 'relics' ? 1.1 : point.category === 'bounties' ? 1.44 : point.category === 'towers' || point.category === 'towersHard' ? 1.44 : point.category === 'areas' || point.category === 'notes' || point.category === 'alphas' || point.category === 'mainQuests' || point.category === 'sideQuests' ? 1.2 : 1), w=icon.naturalWidth*scale,h=icon.naturalHeight*scale;
       ctx.drawImage(icon,p.x-w/2,p.y-h/2,w,h);
@@ -516,11 +517,13 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       ctx.fillStyle='#ffe09a';ctx.beginPath();ctx.arc(p.x-11,p.y+11,7,0,Math.PI*2);ctx.fill();
       ctx.fillStyle='#162331';ctx.font='700 9px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(stop),p.x-11,p.y+11);
     }
-    if(point.item.state==='done') {
-      const x=p.x+10,y=p.y-10;
-      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='#092519';ctx.fill();
+    if(done) {
+      const x=p.x+6,y=p.y-6;
+      ctx.save();
       ctx.beginPath();ctx.moveTo(x-3,y);ctx.lineTo(x-1,y+2);ctx.lineTo(x+3,y-3);
-      ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#55f695';ctx.lineWidth=1.7;ctx.stroke();
+      ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#000';ctx.lineWidth=3.7;ctx.stroke();
+      ctx.strokeStyle='#55f695';ctx.lineWidth=1.7;ctx.stroke();
+      ctx.restore();
     }
   }
 
