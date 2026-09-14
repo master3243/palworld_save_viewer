@@ -10,13 +10,13 @@ Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, a
 
 ## Example
 
-Example of searching my save for Pals with perfect IVs and 4 diamond active skills:
+Example of searching my save for Pals with >= 250 IVs and exactly 2 diamond active skills:
 
-<img src="resources/perfectIVsearch.png" alt="Example of perfect IV search" width="500" />
+<img src="resources/example_250IVsearch.png" alt="Example of perfect IV search" width="500" />
 
-Example of searching my save for Male Bellanoir with perfect IVs and Serenity (for breeding):
+Example of searching my save for Male Bellanoir with perfect IVs and Serenity (in this image you can see the simple yet powerful query builder):
 
-<img src="resources/perfectMaleBellanoirSerenity.png" alt="Example of male Bellanoir and Serenity search" width="500" />
+<img src="resources/example_malbellanoirserenety.png" alt="Example of male Bellanoir and Serenity search" width="500" />
 
 ## How do I use it?
 
@@ -34,9 +34,9 @@ The save folder (for Steam users) is:
 
 Where `IDprofile` and `IDworld` are long random numbers.
 
-Inside it, drag and drop these three: `Players` + `Level.sav` + `LevelMeta.sav`
+Inside it, drag and drop these four items: `Players` + `Level.sav` + `LevelMeta.sav` + `LocalData.sav`
 
-<img src="resources/upload_steam.png" alt="Steam: drag the Players folder, Level.sav, and LevelMeta.sav into the upload area" width="500" />
+<img src="resources/upload_steam.png" alt="Steam: drag the Players folder, Level.sav, LevelMeta.sav, and LocalData.sav into the upload area" width="500" />
 
 ---
 
