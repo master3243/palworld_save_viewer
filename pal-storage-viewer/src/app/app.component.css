@@ -561,8 +561,8 @@
 }
 
 .steam-upload-guide .upload-drop-instruction {
-  flex-wrap: nowrap;
-  font-size: min(0.8rem, calc((100cqw - 97px) / 25));
+  flex-wrap: wrap;
+  font-size: 0.8rem;
   white-space: nowrap;
 }
 
