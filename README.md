@@ -12,11 +12,11 @@ Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, a
 
 ## Example
 
-Example of the 100% tracker:
+Example of the 100% tracker for my save file:
 
 <img src="resources/example_completion.png" alt="Example of 100% tracker" width="500" />
 
-Example of the map:
+Example of the map showing everything my save file is missing:
 
 <img src="resources/example_map.png" alt="Example of map" width="500" />
 
