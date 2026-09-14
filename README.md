@@ -1,6 +1,8 @@
 # Palworld Save Analyzer
 
-A local viewer for your Palworld save files that lists every Pal you own with all their stats in one searchable table.
+A local save analyzer for your Palworld save files that shows you a 100% tracker with everything you're missing with a map showing where the missing objects are. 
+
+Another view also lists every Pal you own with all their stats in one searchable table.
 
 Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, and dimensional storage.
 
@@ -9,6 +11,14 @@ Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, a
 ## [https://master3243.github.io/palworld_save_viewer/](https://master3243.github.io/palworld_save_viewer/)
 
 ## Example
+
+Example of the 100% tracker:
+
+<img src="resources/example_100tracker.png" alt="Example of 100% tracker" width="500" />
+
+Example of the map:
+
+<img src="resources/example_map.png" alt="Example of map" width="500" />
 
 Example of searching my save for Pals with >= 250 IVs and exactly 2 diamond active skills:
 
@@ -127,7 +137,8 @@ Dropping a whole world save folder onto the viewer provides the most complete vi
 | `Players/<uid>_dps.sav`            | yes            | Dimensional Pal Storage (up to 9,600 Pals)                                                                |
 | `Players/<uid>.sav`                | no             | Metadata mapping container to either the player's party or Pal Box (mostly can be inferred and not needed)|
 | `LevelMeta.sav`                    | no             | Metadata used to label the save                                                                           |
-| `LocalData.sav`, `WorldOption.sav` | no             | Skipped, contain no useful info for us                                                                    |
+| `LocalData.sav`                    | no             | Player-local progress, including encountered species, checked journals, and friendship history            |
+| `WorldOption.sav`                  | no             | Skipped; world settings are not used by the viewer                                                        |
 
 
 Files from different worlds can be loaded side by side and the table will show which save file each Pal belongs to.
