@@ -14,7 +14,7 @@ Drop a save file/folder to see all owned Pals: party Pals, Pal Box, base Pals, a
 
 Example of the 100% tracker:
 
-<img src="resources/example_100tracker.png" alt="Example of 100% tracker" width="500" />
+<img src="resources/example_completion.png" alt="Example of 100% tracker" width="500" />
 
 Example of the map:
 
