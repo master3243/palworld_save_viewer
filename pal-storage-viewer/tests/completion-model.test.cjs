@@ -29,6 +29,7 @@ test('Messenger checklist uses the 17 placed one-shot IDs and excludes duplicate
   assert(!data.messengers.some(reward => reward.npcId === 'U_Emote_location_G_02'));
   const extra = '12345678-1020-3040-5060-708011223344';
   const partial = category('messengers', { emote_npc_rewards: [ids[0], ids[0].toUpperCase(), ids[1], extra] });
+  assert.equal(partial.unconfirmed, false);
   assert.equal(partial.done, 2);
   assert.equal(partial.total, 17);
   assert.equal(partial.percent, 11.8);
@@ -38,10 +39,18 @@ test('Messenger checklist uses the 17 placed one-shot IDs and excludes duplicate
   assert(partial.items.every(item => item.coords && item.position));
   assert.equal(partial.groups.reduce((n, g) => n + g.total, 0), 17);
   assert.equal(category('messengers', { emote_npc_rewards: ids }).percent, 100);
-  assert.equal(category('messengers', {}).needsFile, 'Player .sav');
-  assert.equal(category('messengers', { emote_npc_rewards: null }).needsFile, 'Player .sav');
+  for (const missing of [{}, { emote_npc_rewards: null }]) {
+    const unconfirmed = category('messengers', missing);
+    assert.equal(unconfirmed.needsFile, undefined);
+    assert.equal(unconfirmed.unconfirmed, true);
+    assert.match(unconfirmed.unavailable, /not recorded/);
+    assert.equal(unconfirmed.done, 0);
+    assert.equal(unconfirmed.total, 17);
+  }
   const empty = category('messengers', { emote_npc_rewards: [] });
   assert.equal(empty.needsFile, undefined);
+  assert.equal(empty.unavailable, undefined);
+  assert.equal(empty.unconfirmed, false);
   assert.equal(empty.done, 0);
   const before = summarize(record({ emote_npc_rewards: [] }), data);
   const after = summarize(record({ emote_npc_rewards: ids }), data);

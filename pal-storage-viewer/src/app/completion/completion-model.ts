@@ -164,6 +164,8 @@ export interface Category {
   /** Set when the category cannot be computed because this save file was not loaded. */
   needsFile?: string;
   unavailable?: string;
+  /** The checklist exists, but its completion field was not recorded in this save. */
+  unconfirmed?: boolean;
   arenaPoints?: StatEntry;
   unknownCount?: number;
   /** Costs of all remaining technologies, independent of the visible list filters. */
@@ -253,7 +255,8 @@ function messengerCategory(record: PlayerCompletion, data: CompletionData): Cate
   const regions = new Map(catalog.map(reward => [reward.region, reward.region]));
   return finish({ key: 'messengers', title: 'Messenger of Love', items, groups: groupsOf(items, regions),
     unknown: unknownIds(claimed, new Set(catalog.map(reward => reward.id))),
-    needsFile: rewards == null ? 'Player .sav' : undefined,
+    unavailable: rewards == null ? 'Messenger of Love progress was not recorded in the loaded save.' : undefined,
+    unconfirmed: rewards == null,
   });
 }
 
@@ -266,6 +269,7 @@ function arenaCategory(record: PlayerCompletion, world?: WorldProgress): Categor
   return finish({
     key: 'arena', title: 'Arena', groups: [],
     unknown: Object.keys(clears ?? {}).filter(id => !known.has(id.toLowerCase())).sort(),
+    unconfirmed: clears == null,
     unavailable: clears == null ? 'Solo arena progress was not recorded in the loaded save. Did you visit the arena?' : undefined,
     arenaPoints: stat('Arena Points', world?.arenaPoints ?? (world?.hasLevel ? 0 : null),
       world?.arenaPoints == null ? 'Arena Points were not recorded in the loaded save. Assuming 0.' : 'Arena points recorded for this player',
