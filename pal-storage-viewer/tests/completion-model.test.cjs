@@ -254,14 +254,15 @@ test('crafting sorts by direct or inherited tech level regardless of crafted sta
   assert.equal(bait.order, 15);
 });
 
-test('missing crafting history stays unknown and does not lower overall completion', () => {
+test('missing crafting history assumes zero with an unconfirmed full checklist', () => {
   for (const crafted_item_counts of [null, undefined]) {
     const r = record({ crafted_item_counts });
     const c = category('crafting', r);
     assert.equal(c.total, 1273);
     assert.ok(c.unavailable);
-    assert.ok(c.items.every(item => item.crafting.count === null));
-    assert.equal(summarize(r, data).percent, summarize(r, { ...data, crafting: [] }).percent);
+    assert.ok(c.items.every(item => item.crafting.count === 0 && item.state === 'todo'));
+    assert.equal(c.unconfirmed, true);
+    assert.equal(c.done, 0);
   }
 });
 
@@ -602,7 +603,7 @@ test('arena counts seven tiers toward completion and keeps points independent', 
   assert.equal(arena.hasNumbers, false);
   assert.equal(summary.done, baseline.done + 2);
   assert.equal(summary.total, baseline.total);
-  const counted = summary.categories.filter(c => c.total > 0 && !c.needsFile && !c.unavailable);
+  const counted = summary.categories.filter(c => c.total > 0);
   assert.equal(summary.percent, Math.round(counted.reduce((sum, c) => sum + c.percent, 0) / counted.length * 10) / 10);
   const all = category('arena', { arena_solo_clears: Object.fromEntries(arena.items.map(i => [i.id, 1])) });
   assert.equal(all.done, 7);
@@ -614,4 +615,25 @@ test('arena counts seven tiers toward completion and keeps points independent', 
   assert.equal(unknown.arenaPoints.value, '?');
   assert.match(unknown.arenaPoints.title, /not recorded in the loaded save\./);
   assert.equal(category('arena', { arena_solo_clears: {} }).unavailable, undefined);
+});
+
+
+test('missing checklist progress remains visible and counts as zero in overall completion', () => {
+  const r = record({ skins: data.skins.map(([id]) => id) });
+  const summary = summarize(r, data);
+  for (const key of ['research', 'arena', 'messengers', 'crafting']) {
+    const c = summary.categories.find(c => c.key === key);
+    assert.equal(c.unconfirmed, true, key);
+    assert.equal(c.done, 0, key);
+    assert.equal(c.percent, 0, key);
+    assert.equal(c.items.length, c.total, key);
+    assert(c.items.length > 0, key);
+    assert(c.items.every(item => item.state === 'todo'), key);
+    assert(c.groups.every(group => group.done === 0), key);
+  }
+  const counted = summary.categories.filter(c => c.total > 0);
+  assert.equal(summary.percent, Math.round(counted.reduce((sum, c) => sum + c.percent, 0) / counted.length * 10) / 10);
+  const confirmed = summarize(r, data, { labs: [{}] }).categories.find(c => c.key === 'research');
+  assert.equal(confirmed.unconfirmed, false);
+  assert.equal(confirmed.done, 0);
 });

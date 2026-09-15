@@ -456,9 +456,9 @@ export class CompletionComponent implements OnChanges {
   }
 
   stateLabel(item: TrackedItem): string {
-    if (item.achievement) return item.achievement.unknown ? (item.achievement.current === null ? 'Unknown' : 'Unconfirmed')
+    if (item.achievement) return item.achievement.unknown ? (item.achievement.current === null ? 'Not Achieved' : 'Unconfirmed')
       : item.state === 'done' ? 'Achieved' : item.state === 'active' ? 'In progress' : 'Not Achieved';
-    if (this.selectedCategory === 'arena') return this.category?.unavailable ? '?' : item.state === 'done' ? 'Cleared' : 'Uncleared';
+    if (this.selectedCategory === 'arena') return item.state === 'done' ? 'Cleared' : 'Uncleared';
     if (this.selectedCategory === 'crafting') return item.crafting?.count == null ? 'Unknown' : item.state === 'done' ? 'Crafted' : 'Not crafted';
     if (this.selectedCategory === 'paldeck') return item.state === 'done' ? 'Captured' : 'Never Captured';
     if (this.selectedCategory === 'captureBonus') return item.state === 'done' ? 'Captured 5' : item.state === 'active' ? 'Progressing to 5' : 'Never Captured';

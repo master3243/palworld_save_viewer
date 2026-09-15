@@ -105,7 +105,7 @@
               <svg *ngIf="category.key === 'arena'" class="card-map-icon arena-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 19 6-6"/><path d="M14.5 17.5 3.586 6.586A2 2 0 013 5.172V3h2.172a2 2 0 011.414.586L17.5 14.5"/><path d="m14.828 6.172 2.586-2.586A2 2 0 0118.828 3H21v2.172a2 2 0 01-.586 1.414l-2.586 2.586"/><path d="M16 16l4 4M19 21l2-2M5 14l4 4M5 21l-2-2M7.5 16.5 4 20"/></svg>
               <span>{{ category.title }}</span>
             </span>
-            <span class="card-count" [attr.title]="category.unavailable || null">{{ category.needsFile ? '?' : category.unavailable && !category.unconfirmed ? '-' : (category.done | number) }}<span>/{{ category.total | number }}</span></span>
+            <span class="card-count" [attr.title]="category.unavailable || null">{{ category.done | number }}<span>/{{ category.total | number }}</span></span>
           </span>
           <span class="bar" aria-hidden="true">
             <span class="bar-started" *ngIf="!category.unavailable && !category.needsFile && category.startedPercent > category.percent" [style.width.%]="category.startedPercent"></span>
@@ -115,16 +115,16 @@
             <span class="achievement-unknown" *ngIf="category.unknownCount">{{ category.unknownCount }} unconfirmed</span>
             <span class="achievement-unknown" *ngIf="category.unconfirmed">unconfirmed</span>
             <span class="card-needs" *ngIf="category.needsFile">Not recorded in the loaded save.</span>
-            <span class="card-pct" *ngIf="!category.needsFile && !(category.unconfirmed)">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
+            <span class="card-pct" *ngIf="!category.needsFile && !category.unconfirmed">{{ category.unavailable ? 'Unknown' : category.percent + '%' }}</span>
           </span>
         </button>
 
       <ng-container *ngIf="category.key === selectedCategory">
       <section class="category-detail" #categoryDetail tabindex="-1" *ngIf="category as open" [id]="'category-detail-' + open.key" [attr.aria-label]="open.title">
         <div class="detail-head">
-          <h3>{{ open.title }} <span class="detail-count" [class.missing-data]="!!open.needsFile || (!!open.unconfirmed)">{{ open.needsFile || (open.unconfirmed) ? '?' : open.unavailable ? '-' : (open.done | number) }} of {{ open.total | number }}</span></h3>
+          <h3>{{ open.title }} <span class="detail-count" [class.missing-data]="!!open.needsFile || !!open.unconfirmed">{{ open.done | number }} of {{ open.total | number }}</span></h3>
           <div class="detail-controls">
-            <label class="status-priority" *ngIf="!open.needsFile && !(open.unconfirmed)">
+            <label class="status-priority">
               <input #statusPriority type="checkbox" [checked]="prioritizeNotDone" (change)="prioritizeNotDone = statusPriority.checked">
               Prioritize Not Done
             </label>
@@ -157,7 +157,7 @@
             <span class="group-chip-head">
             <img class="group-icon" *ngIf="groupIcon(open.key, group) as icon" [src]="icon" [style.transform]="open.key === 'relics' ? 'scale(1.1)' : open.key === 'research' || (open.key === 'fastTravel' && group.key === 'statue') ? 'scale(1.2)' : null" alt="" decoding="async">
             <span>{{ open.key === 'technologies' ? (group.key === 'ancient' ? 'Ancient tech' : 'Tech') : group.name }}</span>
-            <b>{{ open.unavailable ? '-' : group.done }}<span>/{{ group.total }}</span></b>
+            <b>{{ group.done }}<span>/{{ group.total }}</span></b>
             </span>
             <ng-container *ngFor="let balance of open.technologyPoints">
               <span class="point-values" *ngIf="balance.key === group.key">
@@ -168,7 +168,7 @@
             </ng-container>
           </button>
         </div>
-        <p class="tracker-note error" *ngIf="open.needsFile">{{ open.title }} data was not recorded in the loaded save.</p>
+        <p class="tracker-note error" *ngIf="open.needsFile">{{ open.title }} data was not recorded in the loaded save. Assuming zero completion.</p>
         <ng-template #achievementWarning>
           <svg class="achievement-warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18.1A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></svg>
         </ng-template>
@@ -178,12 +178,12 @@
             <span class="achievement-warning achievement-unconfirmed" *ngIf="open.unknownCount"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>{{ open.unknownCount }} unconfirmed</span>
           </div>
         </div>
-        <p class="tracker-note" [class.error]="!!open.unconfirmed" *ngIf="open.unavailable">{{ open.unavailable }}</p>
+        <p class="tracker-note" [class.error]="!!open.unconfirmed" *ngIf="open.unavailable">{{ open.unavailable }} Assuming zero completion.</p>
         <p class="tracker-note" *ngIf="open.unknown.length">
           {{ open.unknown.length }} {{ open.unknown.length === 1 ? 'entry' : 'entries' }} in this save {{ open.unknown.length === 1 ? 'is' : 'are' }} not in the master list and {{ open.unknown.length === 1 ? 'is' : 'are' }} not counted: {{ open.unknown.join(', ') }}
         </p>
         <ng-container *ngIf="{ fishing: showFishing, count: tableColumnCount, details: showDetails } as columns">
-        <table class="item-table" [contentSizedTable]="tableSizingColumns" [attr.aria-rowcount]="visibleItems.length + 1" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'" *ngIf="!open.needsFile && !(open.unconfirmed)">
+        <table class="item-table" [contentSizedTable]="tableSizingColumns" [attr.aria-rowcount]="visibleItems.length + 1" [stickyTableHeader]="trackerScroll" (stickyHeaderChange)="headerPinned = $event" [class.pal-list]="isPalList" [class.crafting-list]="open.key === 'crafting'">
           <caption class="table-start" aria-hidden="true"></caption>
           <thead>
             <tr>
@@ -223,9 +223,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of visibleItems; let rowIndex = index; trackBy: trackItem" [attr.aria-rowindex]="rowIndex + 2" [attr.data-item-id]="item.id" [attr.data-state]="item.achievement?.unknown || (item.crafting && item.crafting.count === null) ? 'unknown' : item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
+            <tr *ngFor="let item of visibleItems; let rowIndex = index; trackBy: trackItem" [attr.aria-rowindex]="rowIndex + 2" [attr.data-item-id]="item.id" [attr.data-state]="item.state" [class.uncounted]="item.counted === false" [attr.tabindex]="isPalList ? 0 : -1">
               <ng-container *tableRowViewport="trackerScroll; columns: columns.count; height: isPalList ? 36 : open.key === 'crafting' ? 38 : 30">
-              <td class="state-col" [class.missing-data]="!!item.achievement?.unknown || (!!open.unconfirmed)" [attr.title]="item.achievement?.unknown ? item.detail : open.unconfirmed ? open.unavailable : null">
+              <td class="state-col" [class.missing-data]="!!item.achievement?.unknown || !!open.unconfirmed" [attr.title]="item.achievement?.unknown ? item.detail : open.unconfirmed ? open.unavailable : null">
                 <span class="item-status"><span class="state-dot" aria-hidden="true"></span>{{ stateLabel(item) }}</span>
               </td>
               <td class="no-col" *ngIf="open.hasNumbers" [attr.title]="isPalList ? stateLabel(item) : null">
@@ -247,7 +247,7 @@
                     <span class="achievement-warning achievement-unconfirmed" *ngIf="achievement.unknown" [attr.title]="item.detail"><ng-container *ngTemplateOutlet="achievementWarning"></ng-container>Unconfirmed</span>
                   </small>
                 </td>
-                <td class="achievement-progress" [class.missing-data]="achievement.unknown"><span class="card-count">{{ achievement.current === null ? '?' : (achievement.current | number) }}<span>/{{ achievement.target | number }}</span></span></td>
+                <td class="achievement-progress" [class.missing-data]="achievement.unknown"><span class="card-count">{{ (achievement.current ?? 0) | number }}<span>/{{ achievement.target | number }}</span></span></td>
               </ng-container>
               <td class="checked-col" *ngIf="open.key === 'notes'" [class.missing-data]="item.checked == null" [class.checked]="item.checked === true" [class.not-checked]="item.checked === false" [attr.title]="item.checked == null ? player?.world?.checkedUnavailable : item.checked ? 'Checked' : 'Not checked'" [attr.aria-label]="item.checked == null ? 'Checked status unknown' : item.checked ? 'Checked' : 'Not checked'">{{ item.checked == null ? '?' : item.checked ? '✔' : '✘' }}</td>
               <td class="seen-col" *ngIf="open.key === 'paldeck'" [class.missing-data]="item.seen == null" [class.seen]="item.seen === true" [class.not-seen]="item.seen === false" [attr.title]="item.seen == null ? player?.world?.seenUnavailable : item.seen ? 'Seen' : 'Not seen'" [attr.aria-label]="item.seen == null ? 'Seen status unknown' : item.seen ? 'Seen' : 'Not seen'">{{ item.seen == null ? '?' : item.seen ? '✔' : '✘' }}</td>

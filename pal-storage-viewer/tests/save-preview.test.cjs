@@ -43,10 +43,10 @@ test('names resolve regardless of arrival order and refresh when Level is added 
 });
 
 test('progress uses tracker category weighting and the matching world research', () => {
-  // Paldeck 50%, capture bonus 0%, research 100%, achievements 0% => 37.5% overall.
-  assert.deepEqual(pendingFileDetails([player, level('Church')], catalog)[0], { text: 'Church', stat: '37.5%', statTitle: 'Tracker progress' });
-  // Without research data that category is excluded, giving (50 + 0 + 0) / 3.
-  assert.equal(pendingFileDetails([player], catalog)[0].stat, '16.7%');
+  // Paldeck 50%, capture bonus 0%, research 100%, arena 0%, achievements 0% => 30% overall.
+  assert.deepEqual(pendingFileDetails([player, level('Church')], catalog)[0], { text: 'Church', stat: '30%', statTitle: 'Tracker progress' });
+  // Missing research and arena progress stay in the denominator as zero: 50 / 5.
+  assert.equal(pendingFileDetails([player], catalog)[0].stat, '10%');
   assert.equal(pendingFileDetails([player], null, undefined, true)[0].stat, '...');
   const noRecord = { ...player, completion: null };
   assert.equal(pendingFileDetails([noRecord], catalog)[0].text, '');
@@ -56,7 +56,7 @@ test('progress uses tracker category weighting and the matching world research',
 
 test('append previews can resolve players and progress from the already loaded world', () => {
   const loaded = { players: [{ uid, name: 'Existing player' }], labs: [{ research: 100 }] };
-  assert.equal(pendingFileDetails([player], catalog, loaded)[0].stat, '37.5%');
+  assert.equal(pendingFileDetails([player], catalog, loaded)[0].stat, '30%');
 });
 
 test('empty worlds and failed reads remain distinct from missing progress', () => {

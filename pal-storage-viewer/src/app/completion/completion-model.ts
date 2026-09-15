@@ -419,7 +419,7 @@ function craftingCategory(record: PlayerCompletion, data: CompletionData): Categ
   const catalog = data.crafting ?? [];
   const known = new Set(catalog.map(item => item.id.toLowerCase()));
   const items: TrackedItem[] = catalog.map(item => {
-    const count = record.crafted_item_counts == null ? null : counts.get(item.id.toLowerCase()) ?? 0;
+    const count = counts.get(item.id.toLowerCase()) ?? 0;
     const sources = [...new Set(item.recipes.flatMap(recipe => recipe.sources))];
     const levels = item.technologyLevels.length ? item.technologyLevels : item.inheritedTechnologyLevels;
     return {
@@ -433,6 +433,7 @@ function craftingCategory(record: PlayerCompletion, data: CompletionData): Categ
   const groups = new Map([...new Set(catalog.map(item => item.group))].sort().map(name => [name, name]));
   return finish({ key: 'crafting', title: 'Crafting', items, groups: groupsOf(items, groups),
     unknown: [...counts].filter(([id, count]) => count > 0 && !known.has(id)).map(([id]) => id).sort(),
+    unconfirmed: record.crafted_item_counts == null,
     unavailable: record.crafted_item_counts == null ? 'Crafting history was not recorded in the loaded save.' : undefined,
   });
 }
@@ -673,12 +674,6 @@ function ruinCategory(record: PlayerCompletion, data: CompletionData): Category 
  */
 function researchCategory(world: WorldProgress | undefined, data: CompletionData): Category {
   const labs = world?.labs ?? [];
-  if (!labs.length) {
-    return {
-      key: 'research', title: 'Lab Research', done: 0, total: data.research.length, percent: 0, startedPercent: 0, items: [], groups: [],
-      unknown: [], hasCoords: false, hasNumbers: false, numberLabel: '', hasTags: false, needsFile: 'Level.sav',
-    };
-  }
   const names = new Map<string, string>([
     ['Handcraft', 'Handiwork'],
     ['EmitFlame', 'Kindling'],
@@ -701,9 +696,12 @@ function researchCategory(world: WorldProgress | undefined, data: CompletionData
       const detail = [names.get(category) ?? category, state === 'active' ? `${Math.round((done / work) * 100)}% researched` : ''].filter(Boolean).join(' · ');
       return { id, name, detail, state, group: category, coords: '', map: '', order: 0, no: null };
     });
-    return finish({ key: 'research', title: 'Lab Research', items, groups: groupsOf(items, names), unknown: [] });
+    return finish({ key: 'research', title: 'Lab Research', items, groups: groupsOf(items, names), unknown: [],
+      unconfirmed: !labs.length,
+      unavailable: !labs.length ? 'Lab Research progress was not recorded in the loaded save.' : undefined,
+    });
   };
-  return labs.map(build).sort((a, b) => b.done - a.done)[0];
+  return (labs.length ? labs : [{}]).map(build).sort((a, b) => b.done - a.done)[0];
 }
 
 /** Pal skins. Paid DLC skins are listed but not counted. */
@@ -803,7 +801,7 @@ export function summarize(record: PlayerCompletion, data: CompletionData, world?
     messengerCategory(record, data),
     achievementCategory(record, data, world),
   ];
-  const counted = categories.filter((category) => category.total > 0 && !category.needsFile && !category.unavailable);
+  const counted = categories.filter((category) => category.total > 0);
   const percent = counted.length ? Math.round((counted.reduce((sum, category) => sum + category.percent, 0) / counted.length) * 10) / 10 : 0;
   const done = categories.reduce((sum, category) => sum + category.done, 0);
   const total = categories.reduce((sum, category) => sum + category.total, 0);
