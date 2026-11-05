@@ -1,8 +1,8 @@
 /**
  * Browser half of live mode (see local/README.md). Only active when the page URL has
  * `?live`, which local/live-server.mjs adds. It polls the helper for the save folder,
- * loads the saves once, then keeps every player's map position current from their small
- * Players/<uid>.sav, and offers a reload when the world files change.
+ * loads the saves, keeps every player's map position current from their small
+ * Players/<uid>.sav, and quietly reloads everything after each game save.
  */
 import { decodeSave, type OodleDecoder } from '../src/backend/decode';
 import { SaveBuffer, findPropertyStart, readStructPayload, readVector } from '../src/backend/gvas';
@@ -44,46 +44,57 @@ function publish(next: LivePlayer[]): void {
 const versionOf = (file: LiveFile) => `${file.size}:${file.mtime}`;
 const isPlayerSave = (path: string) => /^Players\/[0-9A-Za-z]+\.sav$/i.test(path) && !/_dps\.sav$/i.test(path);
 
+export interface LiveLinkHooks {
+  /** Replace the loaded saves. Quiet loads are the automatic refreshes; false means not applied. */
+  load: (inputs: SaveInput[], quiet: boolean) => Promise<boolean>;
+  /** Whether an automatic refresh may run now (otherwise the pill offers Reload saves). */
+  canRefresh: () => boolean;
+}
+
 /**
- * Start polling. `load` replaces the loaded saves; it is called once at start and again
- * whenever the user clicks Reload after the world files changed.
+ * Start polling. The saves load once at start and then refresh by themselves after every
+ * game save, so the tracker and map icons follow along with the player marker.
  */
-export function startLiveLink(load: (inputs: SaveInput[]) => Promise<void>): void {
+export function startLiveLink(hooks: LiveLinkHooks): void {
   const widget = new LiveWidget();
   let previous = new Map<string, string>();
   let loadedFolder = '';
   let loadedVersions = new Map<string, string>();
   const positionVersions = new Map<string, string>();
   let busy = false;
+  let failed = '';
   let lastStatus: LiveStatus | null = null;
 
   const settledFiles = (status: LiveStatus) =>
     // A file counts once two polls in a row see the same size and time, so half-written saves are skipped.
     status.files.filter(file => previous.get(file.path) === versionOf(file));
+  const signature = (files: LiveFile[]) => files.map(f => `${f.path}=${versionOf(f)}`).sort().join('|');
 
-  const reload = async () => {
-    if (busy || !lastStatus) return;
+  const reload = async (status: LiveStatus, files: LiveFile[], quiet: boolean) => {
+    if (busy) return;
     busy = true;
-    widget.update({ text: 'Loading saves...', stale: false });
+    if (!quiet) widget.update({ text: 'Loading saves...', stale: false });
     try {
-      const status = lastStatus;
-      const files = settledFiles(status);
       const inputs = await Promise.all(files.map(async (file): Promise<SaveInput> => {
         const bytes = await fetchFile(file.path);
         const name = file.path.split('/').pop()!;
         return { file: new File([bytes], name, { lastModified: file.mtime }), path: file.path };
       }));
-      await load(inputs);
-      loadedFolder = status.folder;
-      loadedVersions = new Map(files.filter(f => !isPlayerSave(f.path)).map(f => [f.path, versionOf(f)]));
-      widget.update({ text: '', stale: false, error: '' });
+      if (await hooks.load(inputs, quiet)) {
+        loadedFolder = status.folder;
+        loadedVersions = new Map(files.map(f => [f.path, versionOf(f)]));
+        failed = '';
+      }
+      widget.update({ text: '', error: '' });
     } catch (error) {
-      widget.update({ error: error instanceof Error ? error.message : String(error) });
+      if (!quiet) widget.update({ text: '', error: error instanceof Error ? error.message : String(error) });
+      // Usually a save caught mid-write; the next game save is tried again.
+      else { failed = signature(files); console.warn('[live] refresh skipped:', error); }
     } finally {
       busy = false;
     }
   };
-  widget.onReload = () => void reload();
+  widget.onReload = () => { if (lastStatus) void reload(lastStatus, lastStatus.files, false); };
 
   const tick = async () => {
     let status: LiveStatus;
@@ -97,11 +108,15 @@ export function startLiveLink(load: (inputs: SaveInput[]) => Promise<void>): voi
     }
     if (status.error) { widget.update({ error: status.error }); previous = new Map(); return; }
     const settled = settledFiles(status);
+    const allSettled = settled.length === status.files.length;
     previous = new Map(status.files.map(file => [file.path, versionOf(file)]));
     lastStatus = status;
     if (!settled.some(f => f.path === 'Level.sav')) return;
 
-    if (!loadedFolder && !busy) await reload();
+    if (!loadedFolder) {
+      if (allSettled) await reload(status, status.files, false);
+      if (!loadedFolder) return;
+    }
 
     for (const file of settled.filter(f => isPlayerSave(f.path))) {
       if (positionVersions.get(file.path) === versionOf(file)) continue;
@@ -112,10 +127,13 @@ export function startLiveLink(load: (inputs: SaveInput[]) => Promise<void>): voi
       } catch { /* mid-write or unreadable; retried on the next change */ }
     }
 
-    const worldChanged = status.folder !== loadedFolder || settled.some(f =>
-      !isPlayerSave(f.path) && loadedVersions.get(f.path) !== versionOf(f));
+    const changed = status.folder !== loadedFolder || status.files.length !== loadedVersions.size
+      || status.files.some(f => loadedVersions.get(f.path) !== versionOf(f));
+    if (changed && allSettled && !busy && hooks.canRefresh() && signature(status.files) !== failed) {
+      void reload(status, status.files, true);
+    }
     const newest = Math.max(0, ...players.map(p => p.savedAt));
-    if (!busy) widget.update({ newest, stale: !!loadedFolder && worldChanged, error: '' });
+    if (!busy) widget.update({ newest, stale: changed && !hooks.canRefresh(), error: '' });
   };
 
   const loop = async () => {
@@ -195,6 +213,6 @@ class LiveWidget {
     this.label.textContent = error ? `● Live: ${error}` : text || `● Live · position saved ${ageText}`;
     this.label.style.color = error ? '#ffb4a8' : '#9ff5c4';
     this.button.style.display = stale && !error ? '' : 'none';
-    this.button.title = 'The game saved new world data. Reload to refresh the tracker and Pal list.';
+    this.button.title = 'The game saved. The tracker refreshes by itself; on the Pal table this would reset your scroll, so it waits for a click.';
   }
 }

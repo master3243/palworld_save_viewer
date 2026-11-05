@@ -678,7 +678,15 @@ export class AppComponent implements OnDestroy {
     }
     this.parser.warmUp();
     // Opened through local/live-server.mjs: keep reading the save folder from the helper.
-    if (liveModeEnabled()) startLiveLink((inputs) => this.isParsing ? Promise.resolve() : this.parseInputs(inputs, false));
+    // Refreshes are quiet, and wait while the Pal table is open since they would reset its scroll.
+    if (liveModeEnabled()) startLiveLink({
+      canRefresh: () => !this.isParsing && this.view === 'tracker',
+      load: async (inputs, quiet) => {
+        if (this.isParsing) return false;
+        await this.parseInputs(inputs, false, false, quiet);
+        return true;
+      },
+    });
   }
 
   async onFileInput(event: Event): Promise<void> {
@@ -1033,8 +1041,12 @@ export class AppComponent implements OnDestroy {
     this.isExportMenuOpen = false;
   }
 
-  /** Merge `inputs` (optionally on top of what is already loaded) and rebuild the table. */
-  private async parseInputs(inputs: SaveInput[], append: boolean, removing = false): Promise<void> {
+  /**
+   * Merge `inputs` (optionally on top of what is already loaded) and rebuild the table.
+   * `quiet` (live mode refreshes) shows no progress, gives way to any other load and throws
+   * instead of showing errors.
+   */
+  private async parseInputs(inputs: SaveInput[], append: boolean, removing = false, quiet = false): Promise<void> {
     const candidates = inputs.filter((input) => this.parser.isCandidate(input));
     if (!candidates.length) {
       if (removing) this.clearLoadedData();
@@ -1052,28 +1064,31 @@ export class AppComponent implements OnDestroy {
     this.error = '';
     const load = { cancelled: false, cancellable: append && this.hasData && !removing };
     this.activeLoad = load;
-    this.isParsing = true;
-    this.progress = { fraction: null, label: 'Initializing...', detail: '' };
+    const stale = () => load.cancelled || (quiet && this.activeLoad !== load);
+    if (!quiet) {
+      this.isParsing = true;
+      this.progress = { fraction: null, label: 'Initializing...', detail: '' };
+    }
     this.assignSaveLetters(merged);
     try {
       // The worker owns 0..95% of the bar; the table build takes the rest.
       const result = await this.parser.parseMany(merged, (update) => {
-        if (load.cancelled) return;
+        if (load.cancelled || quiet) return;
         this.progress = {
           ...update,
           fraction: update.fraction === null ? null : update.fraction * PARSE_SHARE
         };
         this.changeDetector.markForCheck();
       }, this.saveLetters);
-      if (load.cancelled) return;
+      if (stale()) return;
       const rows: PalStorageRow[] = [];
       for (const [index, row] of result.rows.entries()) {
-        if (load.cancelled) return;
+        if (stale()) return;
         const paldeckNumber = await this.game8Lookup.numberFor(this.cellValue(row, 'pal_name'));
-        if (load.cancelled) return;
+        if (stale()) return;
         rows.push({ ...row, paldeck_no: paldeckNumber });
         if (index % 500 === 0) {
-          this.progress = {
+          if (!quiet) this.progress = {
             fraction: PARSE_SHARE + ((index + 1) / result.rows.length) * (1 - PARSE_SHARE),
             label: 'Building table',
             detail: `${(index + 1).toLocaleString()} of ${result.rows.length.toLocaleString()} pals`
@@ -1081,16 +1096,16 @@ export class AppComponent implements OnDestroy {
           await new Promise<void>((resolve) => setTimeout(resolve, 0));
         }
       }
-      if (load.cancelled) return;
+      if (stale()) return;
       const locationCounts = this.countLocations(rows);
       const originalRows = this.defaultOrder(rows);
       const columns = this.buildColumns(rows);
       this.resetData();
-      this.progress = { fraction: 1, label: 'Done', detail: '' };
+      if (!quiet) this.progress = { fraction: 1, label: 'Done', detail: '' };
       this.loadedInputs = merged;
       this.sources = result.sources;
       this.saveSets = result.sets;
-      if (!append && !removing) this.localDataOwners.clear();
+      if (!append && !removing && !quiet) this.localDataOwners.clear();
       for (const [folder, uid] of this.localDataOwners) {
         if (!result.sets.some(set => set.folder === folder && set.has_local_data && set.players.some(player => player.uid === uid))) {
           this.localDataOwners.delete(folder);
@@ -1104,7 +1119,8 @@ export class AppComponent implements OnDestroy {
       this.tabDiscovery.visit(this.view, this.hasData);
       this.scheduleMeasure();
     } catch (error) {
-      if (load.cancelled) return;
+      if (stale()) return;
+      if (quiet) throw error;
       if (removing && error instanceof UnidentifiedSavesError) this.clearLoadedData();
       this.error = error instanceof Error ? error.message : 'Could not load these save files.';
     } finally {

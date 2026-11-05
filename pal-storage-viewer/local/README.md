@@ -1,8 +1,8 @@
 # Live mode
 
-Keeps the app open in a browser tab while you play. Your saves load automatically, and the
-tracker map shows where you are (an arrow pointing the way you face) and follows you as the
-game saves.
+Keeps the app open in a browser tab while you play. Your saves load automatically, the
+tracker map shows where you are (an arrow pointing the way you face) and follows you, and
+everything you collect is ticked off as the game saves.
 
 A web page cannot keep reading a folder on its own, so a small helper runs on the PC that
 has the game. It serves the app and a read-only view of the save folder from one
@@ -32,11 +32,15 @@ print the link, `http://127.0.0.1:8765/`). The options below also work on the `.
 
 ## What updates when
 
-- **Your position** comes from `Players/<uid>.sav`, so it moves each time the game saves
-  (Palworld autosaves on a timer; the pill in the corner says how old the position is).
-- **Everything else** (Pals, tracker progress) loads once. When the game saves new world data,
-  the pill shows **Reload saves**; click it to refresh. Reloading resets the Pal table's sort and
-  scroll, which is why it is not automatic.
+Everything follows the game's saves (Palworld autosaves on a timer; the pill in the corner
+says how old your position is):
+
+- **Your position** comes from `Players/<uid>.sav` and moves a couple of seconds after each save.
+- **The tracker and map icons** (and the Pal list) reload quietly in the background a few
+  seconds after each save, with no loading screen. The map keeps its zoom, follow and trip.
+- While the **Pal table** is open the reload waits, because it would reset the table's scroll.
+  The pill shows **Reload saves** instead; click it, or switch back to the tracker and it
+  catches up by itself.
 - The **◎** map button turns following on or off. Dragging the map turns it off.
 
 The helper only listens on 127.0.0.1, only serves `Level.sav`, `LevelMeta.sav`,
