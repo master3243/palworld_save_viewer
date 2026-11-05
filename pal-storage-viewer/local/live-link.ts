@@ -84,12 +84,17 @@ export function startLiveLink(hooks: LiveLinkHooks): void {
         loadedFolder = status.folder;
         loadedVersions = new Map(files.map(f => [f.path, versionOf(f)]));
         failed = '';
+        widget.update({ refreshedAt: Date.now(), refreshError: '' });
       }
       widget.update({ text: '', error: '' });
     } catch (error) {
       if (!quiet) widget.update({ text: '', error: error instanceof Error ? error.message : String(error) });
       // Usually a save caught mid-write; the next game save is tried again.
-      else { failed = signature(files); console.warn('[live] refresh skipped:', error); }
+      else {
+        failed = signature(files);
+        widget.update({ refreshError: error instanceof Error ? error.message : String(error) });
+        console.warn('[live] refresh skipped:', error);
+      }
     } finally {
       busy = false;
     }
@@ -179,7 +184,7 @@ class LiveWidget {
   private readonly root = document.createElement('div');
   private readonly label = document.createElement('span');
   private readonly button = document.createElement('button');
-  private state = { text: 'Connecting to live helper...', error: '', stale: false, newest: 0 };
+  private state = { text: 'Connecting to live helper...', error: '', stale: false, newest: 0, refreshedAt: 0, refreshError: '' };
 
   constructor() {
     this.root.setAttribute('role', 'status');
@@ -207,10 +212,16 @@ class LiveWidget {
   }
 
   private render(): void {
-    const { text, error, stale, newest } = this.state;
-    const age = newest ? Math.max(0, Math.round((Date.now() - newest) / 1000)) : null;
-    const ageText = age === null ? 'waiting for a player save' : age < 90 ? `${age}s ago` : `${Math.round(age / 60)} min ago`;
-    this.label.textContent = error ? `● Live: ${error}` : text || `● Live · position saved ${ageText}`;
+    const { text, error, stale, newest, refreshedAt, refreshError } = this.state;
+    const ago = (time: number) => {
+      const age = Math.max(0, Math.round((Date.now() - time) / 1000));
+      return age < 90 ? `${age}s ago` : `${Math.round(age / 60)} min ago`;
+    };
+    // Both ages, so it is visible whether the icons are keeping up with the marker.
+    const status = `● Live · you ${newest ? ago(newest) : '(waiting for a save)'} · map ${refreshedAt ? ago(refreshedAt) : 'not loaded'}`
+      + (refreshError ? ' · last map refresh failed, retrying at the next save' : '');
+    this.label.textContent = error ? `● Live: ${error}` : text || status;
+    this.label.title = refreshError ? `Map refresh failed: ${refreshError}` : 'Position and map both update a few seconds after each game save.';
     this.label.style.color = error ? '#ffb4a8' : '#9ff5c4';
     this.button.style.display = stale && !error ? '' : 'none';
     this.button.title = 'The game saved. The tracker refreshes by itself; on the Pal table this would reset your scroll, so it waits for a click.';
