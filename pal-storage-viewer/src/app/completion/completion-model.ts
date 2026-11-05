@@ -198,8 +198,7 @@ export function worldToMap(x: number, y: number): { x: number; y: number } {
 }
 
 export function worldToMapExact(x: number, y: number): { x: number; y: number } {
-  // The World Tree has its own map readout (PalDB's separate tree map config).
-  if (mapOf(x, y)) return { x: (y + 818197) / 1335.144531 - 127.7, y: (x - 347351.5) / 1335.144531 + 648.7 };
+  // The game shows the same readout on the World Tree (checked in game); only its terrain image differs (maps.json).
   return { x: (y - 157935) / 459, y: (x + 123930) / 459 };
 }
 

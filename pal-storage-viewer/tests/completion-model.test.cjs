@@ -462,7 +462,7 @@ test('side missions have distinct start locations without changing completion', 
   assert.equal(points.filter(p => p.map === 'tree').length, 1);
   const guardian = c.items.find(i => i.id === 'Sub_HowSurviveWorldTree');
   assert.equal(guardian.map, 'World Tree');
-  assert.equal(guardian.coords, '102, 773');
+  assert.equal(guardian.coords, '-1458, 1388');
 });
 
 test('technology FName aliases count once and only genuinely unknown IDs are reported', () => {

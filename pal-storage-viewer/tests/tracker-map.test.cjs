@@ -40,7 +40,9 @@ test('main and tree terrain projections use their own readouts and point north u
   const main = maps[0], tree = maps[1];
   assert.deepEqual(worldToMap(-349737,-4254),{x:-353,y:-492});
   assert.equal(mapOf(628792,-610720),'World Tree');
-  assert.deepEqual(worldToMap(628792,-610720),{x:28,y:859});
+  assert.deepEqual(worldToMap(628792,-610720),{x:-1675,y:1640});
+  // In game, standing by the Cattiva Effigy on the World Tree shows -1937, 1638.
+  assert.deepEqual(worldToMap(627912,-731148),{x:-1937,y:1638});
   for (const m of maps) {
     assert.deepEqual(project({x:m.minX,y:m.maxY},m),{x:0,y:0});
     assert.deepEqual(project({x:m.maxX,y:m.minY},m),{x:1,y:1});
@@ -52,7 +54,7 @@ test('main and tree terrain projections use their own readouts and point north u
   const pos=project(worldToMap(628792,-610720),tree);
   assert(Math.abs(pos.x-(-610720+818197)/341797)<.003);
   assert(Math.abs(pos.y-(1-(628792-347351.5)/341797))<.003);
-  assert(main.minX < -1900 && tree.minX > -130);
+  assert(main.minX < -1900 && tree.minX < -2100 && tree.maxY > 1700);
 });
 
 test('nearest travel excludes locked statues, watchtowers, other maps, and the objective itself', () => {

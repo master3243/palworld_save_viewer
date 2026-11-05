@@ -14,9 +14,9 @@
     "name": "World Tree",
     "image": "resources/completion/maps/tree.pog",
     "detail": "resources/completion/maps/tree",
-    "minX": -127.7,
-    "maxX": 128.30000004793493,
-    "minY": 648.7,
-    "maxY": 904.700000047935
+    "minX": -2126.649237472767,
+    "maxX": -1381.9934640522877,
+    "minY": 1026.7570806100218,
+    "maxY": 1771.4128540305012
   }
 ]
