@@ -70,6 +70,8 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   private initialized = false;
   private destroyed = false;
   private lastPlayer = '';
+  /** The focus request already shown, so later data refreshes (live mode) do not apply it again. */
+  private focusedKey = '';
   private pointers = new Map<number, MapPoint>();
   private gesture: { center: MapPoint; distance: number } | null = null;
   private down: MapPoint | null = null;
@@ -88,7 +90,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.visible) { this.clearHover(); this.full = false; }
     if (!changes['categories'] && !changes['playerKey']) {
-      if (changes['focusKey'] && this.focusKey) this.focusObjective(this.focusKey);
+      if (changes['focusKey']) this.applyFocus();
       if (this.visible) this.queueDraw();
       return;
     }
@@ -96,7 +98,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     this.unmapped = this.categories.filter(c => !c.needsFile && c.items.some(i => i.state !== 'done' && i.counted !== false && !i.coords));
     if (this.lastPlayer !== this.playerKey) {
       this.lastPlayer = this.playerKey;
-      this.selected = null; this.travel = null; this.clusterItems = []; this.message = '';
+      this.selected = null; this.travel = null; this.clusterItems = []; this.message = ''; this.focusedKey = '';
       this.restoreRoute();
     } else this.route = this.route.flatMap(p => this.objectives.find(o => o.key === p.key) ?? []);
     if (this.selected) {
@@ -105,7 +107,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     }
     if (!this.initialized) { this.enabled = new Set(this.categories.filter(c => c.hasCoords).map(c => c.key)); this.initialized = true; }
     this.refresh();
-    if (this.focusKey) this.focusObjective(this.focusKey);
+    this.applyFocus();
   }
 
   ngAfterViewInit(): void {
@@ -141,8 +143,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       }
       this.loadImage();
       this.refresh();
-      if (this.focusKey) this.focusObjective(this.focusKey);
-      else if (this.following) this.centerOnPlayer();
+      if (!this.applyFocus() && this.following) this.centerOnPlayer();
       this.cd.markForCheck();
     } catch (error) { this.loadError = error instanceof Error ? error.message : 'Could not load the maps.'; this.cd.markForCheck(); }
   }
@@ -211,6 +212,14 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     this.enabled.add(point.category);
     if (point.item.state === 'done') this.status = 'all';
     this.search = ''; this.group = ''; this.refresh(); this.select(point, true);
+    if (this.map) this.focusedKey = key;
+  }
+
+  /** Shows the requested item once it can be shown; true if it did. */
+  private applyFocus(): boolean {
+    if (!this.focusKey || this.focusKey === this.focusedKey) return false;
+    this.focusObjective(this.focusKey);
+    return true;
   }
 
   select(point: MapObjective, focus = false): void {
@@ -359,7 +368,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       return;
     }
     const point = this.local(event); this.pointers.set(event.pointerId, point);
-    if (this.down && distanceSquared(point,this.down)>25) { this.dragged = true; this.following = false; }
+    if (this.down && distanceSquared(point,this.down)>25) this.dragged = true;
     const next = this.gestureState(), prev = this.gesture;
     if (next && prev) {
       const before = this.normalized(prev.center);

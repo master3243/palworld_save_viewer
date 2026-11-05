@@ -41,7 +41,8 @@ says how old your position is):
 - While the **Pal table** is open the reload waits, because it would reset the table's scroll.
   The pill shows **Reload saves** instead; click it, or switch back to the tracker and it
   catches up by itself.
-- The **◎** map button turns following on or off. Dragging the map turns it off.
+- The crosshair map button turns following on or off. While it is on you can still drag the
+  map to look around; it jumps back to you at the next save.
 
 The helper only listens on 127.0.0.1, only serves `Level.sav`, `LevelMeta.sav`,
 `LocalData.sav` and `Players/*.sav`, and never writes anything. Game Pass saves (`wgs`) are

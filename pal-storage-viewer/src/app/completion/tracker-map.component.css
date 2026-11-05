@@ -23,7 +23,9 @@ input[type=checkbox] { accent-color:#63d3ec; width:16px; height:16px; flex-shrin
 canvas { width:100%; height:100%; display:block; touch-action:none; cursor:grab; outline-offset:-3px; }
 canvas:active { cursor:grabbing; }
 .map-tools { position:absolute; top:89px; left:14px; display:flex; flex-direction:column; gap:5px; }
-.map-tools button { width:35px; height:35px; font-size:22px; line-height:1; background:#071722ed; }
+.map-tools button { width:35px; height:35px; padding:0; display:grid; place-items:center; font-size:22px; line-height:1; background:#071722ed; }
+.map-tools button svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; }
+.map-tools button svg .dot { fill:currentColor; stroke:none; }
 .map-zoom { position:absolute; top:44px; left:99px; right:45px; width:fit-content; max-width:calc(100% - 144px); padding:6px 10px; border-radius:20px; background:#071722e8; font-size:12px; pointer-events:none; }
 .north { position:absolute; right:15px; top:13px; display:grid; text-align:center; pointer-events:none; color:#dbf0f7; text-shadow:0 1px 4px #000; }
 .north b { font-size:10px; }
