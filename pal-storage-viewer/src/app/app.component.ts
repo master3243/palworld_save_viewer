@@ -27,6 +27,7 @@ import { PalRowComponent } from './pal-row.component';
 import { CellView, RowView, TableColumn } from './table-model';
 import { formatOwnedTime } from './owned-time';
 import { TabDiscovery, type ViewMode } from './tab-discovery';
+import { liveModeEnabled, startLiveLink } from '../../local/live-link';
 
 /** Sort weight of a location: party first, then the bases in order, the Pal Box, then dimensional storage. */
 export function locationRank(location: string): number {
@@ -676,6 +677,8 @@ export class AppComponent implements OnDestroy {
       });
     }
     this.parser.warmUp();
+    // Opened through local/live-server.mjs: keep reading the save folder from the helper.
+    if (liveModeEnabled()) startLiveLink((inputs) => this.isParsing ? Promise.resolve() : this.parseInputs(inputs, false));
   }
 
   async onFileInput(event: Event): Promise<void> {

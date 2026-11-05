@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, Output, ViewChild } from '@angular/core';
-import type { Category } from './completion-model';
+import { mapOf, worldToMapExact, type Category } from './completion-model';
+import { onLivePlayers, type LivePlayer } from '../../../local/live-link';
 import { CATEGORY_COLORS, CATEGORY_ICONS, STATE_LABELS, MapDefinition, MapObjective, MapPoint, MarkerCluster,
   distanceSquared, layoutMapMarkers, mapObjectives, nearestTravel, parseCoordinates, project, unproject, visibleMarkerClusters } from './tracker-map-model';
 const MARKER_ZOOM_STEP = 1.25;
@@ -50,6 +51,10 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
   centerCoords = '';
   cursorCoords = '';
   unmapped: Category[] = [];
+  /** Live mode only (local/live-link.ts): where each player last saved. */
+  live: { point: MapPoint; map: string; heading: number }[] = [];
+  following = false;
+  private stopLive?: () => void;
 
   private observer?: ResizeObserver;
   private image?: HTMLImageElement;
@@ -116,9 +121,10 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     });
     this.observer.observe(this.canvas.nativeElement);
     void this.load();
+    this.stopLive = onLivePlayers(players => this.zone.run(() => this.setLive(players)));
   }
 
-  ngOnDestroy(): void { this.destroyed = true; this.observer?.disconnect(); cancelAnimationFrame(this.frame); }
+  ngOnDestroy(): void { this.destroyed = true; this.observer?.disconnect(); this.stopLive?.(); cancelAnimationFrame(this.frame); }
 
   private async load(): Promise<void> {
     try {
@@ -136,6 +142,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       this.loadImage();
       this.refresh();
       if (this.focusKey) this.focusObjective(this.focusKey);
+      else if (this.following) this.centerOnPlayer();
       this.cd.markForCheck();
     } catch (error) { this.loadError = error instanceof Error ? error.message : 'Could not load the maps.'; this.cd.markForCheck(); }
   }
@@ -352,7 +359,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
       return;
     }
     const point = this.local(event); this.pointers.set(event.pointerId, point);
-    if (this.down && distanceSquared(point,this.down)>25) this.dragged = true;
+    if (this.down && distanceSquared(point,this.down)>25) { this.dragged = true; this.following = false; }
     const next = this.gestureState(), prev = this.gesture;
     if (next && prev) {
       const before = this.normalized(prev.center);
@@ -465,7 +472,7 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     ctx.fillStyle = 'rgba(2,10,16,.12)'; ctx.fillRect(0,0,this.width,this.height);
     this.drawTerrainDetail(ctx,left,top);
     this.clusters = [];
-    if (!this.filtered.length) return;
+    if (!this.filtered.length) { this.drawLive(ctx); return; }
     const visibleKeys = new Set(this.filtered.map(p => p.key));
     const route = this.routeHere;
     ctx.beginPath();
@@ -496,7 +503,42 @@ export class TrackerMapComponent implements OnChanges, AfterViewInit, OnDestroy 
     if (this.selected) {
       const p=this.screen(this.selected);ctx.beginPath();ctx.arc(p.x,p.y,16,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
     }
+    this.drawLive(ctx);
     this.positionPopup();
+  }
+
+  private setLive(players: LivePlayer[]): void {
+    const first = !this.live.length && players.length > 0;
+    this.live = players.map(p => ({ point: worldToMapExact(p.x, p.y), map: mapOf(p.x, p.y) ? 'tree' : 'palpagos', heading: p.heading }));
+    if (first) { this.following = true; this.zoom = Math.max(this.zoom, 4); }
+    if (this.following) this.centerOnPlayer();
+    this.cd.markForCheck(); this.queueDraw();
+  }
+
+  toggleFollow(): void {
+    this.following = !this.following;
+    if (this.following) this.centerOnPlayer();
+  }
+
+  private centerOnPlayer(): void {
+    const player = this.live[0];
+    if (!player) return;
+    if (player.map !== this.mapKey) { this.changeMap(player.map); this.zoom = 4; }
+    if (!this.map) return;
+    this.center = project(player.point, this.map); this.clamp(); this.updateNearby(); this.queueDraw();
+  }
+
+  /** Arrow pointing the way the player faced when the game last saved. */
+  private drawLive(ctx: CanvasRenderingContext2D): void {
+    for (const player of this.live) {
+      if (player.map !== this.mapKey) continue;
+      const p = this.screen(player.point);
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(player.heading);
+      ctx.beginPath(); ctx.moveTo(0,-14); ctx.lineTo(9,8); ctx.lineTo(0,3); ctx.lineTo(-9,8); ctx.closePath();
+      ctx.shadowColor='#000c'; ctx.shadowBlur=4; ctx.lineJoin='round'; ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.shadowBlur=0; ctx.fillStyle='#ff4f6d'; ctx.fill();
+      ctx.restore();
+    }
   }
 
   private drawObjective(ctx: CanvasRenderingContext2D, point: MapObjective, stop?: number): void {
